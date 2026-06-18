@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+.vercel
+.codex-tmp
+.env
+.env.local
+.DS_Store
+assets/practice-videos/hyper3d-ai-pipeline-collaboration.mp4

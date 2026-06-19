@@ -803,19 +803,27 @@ dd {
   margin-top: 38px;
 }
 
-.filter-tabs a {
+.filter-tabs button {
   padding: 10px 12px;
   color: var(--muted);
+  background: transparent;
   border: 1px solid var(--line);
+  font: inherit;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
-.filter-tabs a:hover {
+.filter-tabs button:hover,
+.filter-tabs button.is-active {
   color: var(--accent);
   border-color: var(--accent);
+}
+
+.filter-tabs button.is-active {
+  background: rgba(216, 254, 105, 0.08);
 }
 
 .project-card-grid {
@@ -1388,6 +1396,44 @@ dd {
   line-height: 1.55;
 }
 
+.practice-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.practice-evidence-grid a {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.practice-evidence-grid a:hover {
+  border-color: var(--accent);
+}
+
+.practice-evidence-grid video,
+.practice-evidence-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: #050505;
+  border: 1px solid var(--line);
+}
+
+.practice-evidence-grid span {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
 .practice-entry {
   width: min(var(--max), calc(100% - 40px));
   margin: 0 auto;
@@ -1876,21 +1922,49 @@ dd {
   text-transform: uppercase;
 }
 
-.criteria-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
+.criteria-strip,
+.criteria-card-grid {
   margin-top: 18px;
   padding-top: 18px;
   border-top: 1px solid var(--line);
 }
 
+.criteria-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.criteria-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.criteria-card-grid article,
 .criteria-strip strong {
-  padding: 10px 12px;
+  padding: 16px;
   color: var(--text);
   font-size: 13px;
+  background: var(--panel);
   border: 1px solid var(--line);
+}
+
+.criteria-card-grid span {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.criteria-card-grid strong {
+  display: block;
+  font-size: clamp(18px, 1.8vw, 22px);
+  line-height: 1.18;
 }
 
 .decision-grid {
@@ -1899,7 +1973,7 @@ dd {
 
 .testing-table {
   display: grid;
-  border: 1px solid var(--line);
+  gap: 12px;
 }
 
 .testing-table > div {
@@ -1908,7 +1982,7 @@ dd {
 }
 
 .testing-table > div + div {
-  border-top: 1px solid var(--line);
+  border-top: 0;
 }
 
 .testing-table strong,
@@ -1916,12 +1990,13 @@ dd {
   min-width: 0;
   padding: 18px;
   line-height: 1.55;
-  border-right: 1px solid var(--line);
+  background: var(--panel);
+  border: 1px solid var(--line);
 }
 
 .testing-table strong:last-child,
 .testing-table span:last-child {
-  border-right: 0;
+  border-right: 1px solid var(--line);
 }
 
 .testing-table strong {
@@ -1933,6 +2008,20 @@ dd {
 
 .testing-table span {
   color: var(--muted);
+}
+
+.testing-matrix .testing-row {
+  gap: 12px;
+}
+
+.testing-matrix .testing-header strong {
+  background: var(--bg);
+  border-color: rgba(216, 254, 105, 0.45);
+}
+
+.testing-matrix .testing-row:not(.testing-header) span:nth-child(3) {
+  color: var(--text);
+  border-color: rgba(216, 254, 105, 0.35);
 }
 
 .comparison-grid {
@@ -2087,6 +2176,7 @@ dd {
   .practice-layout,
   .reel-grid,
   .practice-entry-copy,
+  .practice-evidence-grid,
   .placeholder-grid,
   .gallery-intro,
   .image-stack figure,

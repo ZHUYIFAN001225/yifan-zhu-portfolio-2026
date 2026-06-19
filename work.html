@@ -28,12 +28,12 @@
         </p>
 
         <div class="filter-tabs" aria-label="Project filters">
-          <a href="#all">All</a>
-          <a href="#service">Service & Transformation</a>
-          <a href="#creative-technology">Creative Technology</a>
-          <a href="#cultural-education">Cultural / Education</a>
-          <a href="#social-public">Social / Public Innovation</a>
-          <a href="#speculative-critical">Speculative / Critical Interaction</a>
+          <button type="button" class="is-active" data-filter="all">All</button>
+          <button type="button" data-filter="service">Service & Transformation</button>
+          <button type="button" data-filter="creative-technology">Creative Technology</button>
+          <button type="button" data-filter="cultural-education">Cultural / Education</button>
+          <button type="button" data-filter="social-public">Social / Public Innovation</button>
+          <button type="button" data-filter="speculative-critical">Speculative / Critical Interaction</button>
         </div>
       </section>
 
@@ -41,7 +41,7 @@
         <div class="section-kicker">All Projects</div>
         <h2 id="all-work-title">Open a case study from the evidence you need.</h2>
         <div class="project-card-grid">
-          <a class="project-card" id="service" href="project-biodiversity-clock.html">
+          <a class="project-card" id="service" data-categories="service social-public" href="project-biodiversity-clock.html">
             <img src="assets/biodiversity-clock/hero-quote.jpg" alt="Multi-Species Biodiversity Clock cover" />
             <div>
               <span>Service & Transformation / Cultural Ecology</span>
@@ -52,7 +52,7 @@
             </div>
           </a>
 
-          <a class="project-card" id="cultural-education" href="project-scone-through-time.html">
+          <a class="project-card" id="cultural-education" data-categories="service cultural-education" href="project-scone-through-time.html">
             <img src="assets/scone-through-time/hero.jpg" alt="Scone Through Time cover" />
             <div>
               <span>Cultural / Education / Service Innovation</span>
@@ -63,7 +63,7 @@
             </div>
           </a>
 
-          <a class="project-card" href="resource-platform.html">
+          <a class="project-card" data-categories="creative-technology" href="resource-platform.html">
             <video muted playsinline preload="metadata" src="assets/practice-videos/manual-3d-modeling-01.mp4"></video>
             <div>
               <span>Creative Technology / Public Learning</span>
@@ -74,7 +74,7 @@
             </div>
           </a>
 
-          <a class="project-card" id="speculative-critical" href="project-ear-shield.html">
+          <a class="project-card" id="speculative-critical" data-categories="speculative-critical social-public" href="project-ear-shield.html">
             <img src="assets/ear-shield-hero.jpg" alt="Ear Shield cover" />
             <div>
               <span>Environmental Technology / Speculative System</span>
@@ -85,7 +85,7 @@
             </div>
           </a>
 
-          <a class="project-card" id="creative-technology" href="project-machine-mapping.html">
+          <a class="project-card" id="creative-technology" data-categories="creative-technology speculative-critical" href="project-machine-mapping.html">
             <img src="assets/machine-mapping-hero.jpg" alt="Machine Mapping cover" />
             <div>
               <span>Creative Technology / Critical AI</span>
@@ -96,7 +96,7 @@
             </div>
           </a>
 
-          <a class="project-card" href="project-seedwalkers.html">
+          <a class="project-card" data-categories="service social-public speculative-critical" href="project-seedwalkers.html">
             <img src="assets/seedwalkers-hero.jpg" alt="SeedWalkers cover" />
             <div>
               <span>Service & Transformation / Urban Biodiversity</span>
@@ -107,7 +107,7 @@
             </div>
           </a>
 
-          <a class="project-card" id="social-public" href="project-cross-culture.html">
+          <a class="project-card" id="social-public" data-categories="social-public cultural-education service" href="project-cross-culture.html">
             <img src="assets/cross-culture-hero.jpg" alt="Cross-Culture Icebreaker cover" />
             <div>
               <span>Social / Public Innovation / Cultural Experience</span>
@@ -128,5 +128,22 @@
       <a href="https://b23.tv/DQqusXX" target="_blank" rel="noopener noreferrer">Bilibili</a>
       <a href="https://boywithdoughnut.usells.com/" target="_blank" rel="noopener noreferrer">Resource Website</a>
     </footer>
+    <script>
+      const filterTabs = document.querySelectorAll(".filter-tabs button");
+      const projectCards = document.querySelectorAll(".project-card-grid .project-card");
+
+      filterTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const filter = tab.dataset.filter;
+
+          filterTabs.forEach((item) => item.classList.toggle("is-active", item === tab));
+          projectCards.forEach((card) => {
+            const categories = (card.dataset.categories || "").split(" ");
+            const visible = filter === "all" || categories.includes(filter);
+            card.hidden = !visible;
+          });
+        });
+      });
+    </script>
   </body>
 </html>

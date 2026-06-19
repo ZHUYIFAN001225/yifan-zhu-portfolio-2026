@@ -5,6 +5,8 @@ const root = process.cwd();
 const dist = path.join(root, "dist");
 const entries = [
   "index.html",
+  "work.html",
+  "about.html",
   "case-studies.html",
   "practice.html",
   "resource-platform.html",

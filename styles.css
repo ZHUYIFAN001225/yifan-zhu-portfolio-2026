@@ -2166,6 +2166,51 @@ dd {
   border-color: rgba(216, 254, 105, 0.42);
 }
 
+.scone-testing-rows {
+  display: grid;
+  gap: 16px;
+}
+
+.scone-testing-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+.scone-testing-cell {
+  min-width: 0;
+  padding: 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.scone-testing-cell h3 {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.scone-testing-cell p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.scone-testing-change {
+  border-color: rgba(216, 254, 105, 0.42);
+}
+
+.scone-testing-change p {
+  color: var(--text);
+}
+
 .comparison-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 1fr));
@@ -2538,5 +2583,9 @@ dd {
     font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+  }
+
+  .scone-testing-row {
+    grid-template-columns: 1fr;
   }
 }

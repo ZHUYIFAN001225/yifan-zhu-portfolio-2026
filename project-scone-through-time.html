@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Yifan Zhu | Scone Through Time</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=scone-structure-final" />
   </head>
   <body>
     <header class="site-header">
@@ -213,20 +213,20 @@
             <article><span>Why it mattered</span><p>The outcome needed to work in a classroom-like learning context with short attention spans and mixed learning needs.</p></article>
             <article><span>Design decision</span><p>Select stop-motion and object-based interaction because they balanced accessibility, storytelling, feasibility and engagement.</p></article>
           </div>
-          <div class="scone-criteria-grid" aria-label="Evaluation criteria">
-            <article>
+          <div class="scone-criteria-grid">
+            <article class="scone-criterion-card">
               <span>Criterion 01</span>
               <h3>Historical accuracy</h3>
             </article>
-            <article>
+            <article class="scone-criterion-card">
               <span>Criterion 02</span>
               <h3>Middle-school accessibility</h3>
             </article>
-            <article>
+            <article class="scone-criterion-card">
               <span>Criterion 03</span>
               <h3>Teaching-tool potential</h3>
             </article>
-            <article>
+            <article class="scone-criterion-card">
               <span>Criterion 04</span>
               <h3>Feasibility & engagement</h3>
             </article>
@@ -252,37 +252,64 @@
             <p class="eyebrow">Prototype Testing & Major Pivot</p>
             <h2>From beautiful storytelling to structured learning.</h2>
           </div>
-          <table class="scone-testing-table" aria-label="Prototype testing feedback, issue and design change">
-            <thead>
-              <tr>
-                <th scope="col">Feedback</th>
-                <th scope="col">Issue</th>
-                <th scope="col">Design Change</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label="Feedback">The prototype was tested through peer feedback and classroom-style review.</td>
-                <td data-label="Issue">A long linear story was less effective than short learning modules with interaction after each segment.</td>
-                <td data-label="Design Change">Add a separate interactive prompt after each animation segment.</td>
-              </tr>
-              <tr>
-                <td data-label="Feedback">The tea bag appeared only at the end.</td>
-                <td data-label="Issue">The key object felt abrupt and carried too little meaning.</td>
-                <td data-label="Design Change">Transform tea bags into a dedicated learning module.</td>
-              </tr>
-              <tr>
-                <td data-label="Feedback">Important information was implicit in the visuals.</td>
-                <td data-label="Issue">Students could remember surface details but miss the deeper service message.</td>
-                <td data-label="Design Change">Divide the story into three standalone micro-course modules.</td>
-              </tr>
-              <tr>
-                <td data-label="Feedback">Some scenes were visually attractive.</td>
-                <td data-label="Issue">They did not clearly support the learning objective.</td>
-                <td data-label="Design Change">Remove visually beautiful but pedagogically weak scenes.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="scone-testing-rows">
+            <article class="scone-testing-row">
+              <div class="scone-testing-cell">
+                <h3>Feedback</h3>
+                <p>The prototype was tested through peer feedback and classroom-style review.</p>
+              </div>
+              <div class="scone-testing-cell">
+                <h3>Issue</h3>
+                <p>A long linear story was less effective than short learning modules with interaction after each segment.</p>
+              </div>
+              <div class="scone-testing-cell scone-testing-change">
+                <h3>Design Change</h3>
+                <p>Add a separate interactive prompt after each animation segment.</p>
+              </div>
+            </article>
+            <article class="scone-testing-row">
+              <div class="scone-testing-cell">
+                <h3>Feedback</h3>
+                <p>The tea bag appeared only at the end.</p>
+              </div>
+              <div class="scone-testing-cell">
+                <h3>Issue</h3>
+                <p>The key object felt abrupt and carried too little meaning.</p>
+              </div>
+              <div class="scone-testing-cell scone-testing-change">
+                <h3>Design Change</h3>
+                <p>Transform tea bags into a dedicated learning module.</p>
+              </div>
+            </article>
+            <article class="scone-testing-row">
+              <div class="scone-testing-cell">
+                <h3>Feedback</h3>
+                <p>Important information was implicit in the visuals.</p>
+              </div>
+              <div class="scone-testing-cell">
+                <h3>Issue</h3>
+                <p>Students could remember surface details but miss the deeper service message.</p>
+              </div>
+              <div class="scone-testing-cell scone-testing-change">
+                <h3>Design Change</h3>
+                <p>Divide the story into three standalone micro-course modules.</p>
+              </div>
+            </article>
+            <article class="scone-testing-row">
+              <div class="scone-testing-cell">
+                <h3>Feedback</h3>
+                <p>Some scenes were visually attractive.</p>
+              </div>
+              <div class="scone-testing-cell">
+                <h3>Issue</h3>
+                <p>They did not clearly support the learning objective.</p>
+              </div>
+              <div class="scone-testing-cell scone-testing-change">
+                <h3>Design Change</h3>
+                <p>Remove visually beautiful but pedagogically weak scenes.</p>
+              </div>
+            </article>
+          </div>
           <figure class="wide-visual">
             <img src="assets/scone-through-time/prototype-testing-source.jpg" alt="Prototype testing source slide showing peer feedback and improvements" />
             <figcaption>The major pivot was from long linear storytelling to micro-course modules with interaction after each segment, based on peer feedback and classroom-style review.</figcaption>

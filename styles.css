@@ -1944,11 +1944,18 @@ dd {
 
 .criteria-card-grid article,
 .criteria-strip strong {
+  min-height: 104px;
   padding: 16px;
   color: var(--text);
   font-size: 13px;
   background: var(--panel);
   border: 1px solid var(--line);
+}
+
+.criteria-card-grid article {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .criteria-card-grid span {
@@ -2022,6 +2029,51 @@ dd {
 .testing-matrix .testing-row:not(.testing-header) span:nth-child(3) {
   color: var(--text);
   border-color: rgba(216, 254, 105, 0.35);
+}
+
+.testing-card-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.testing-card-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+.testing-card-row > div {
+  min-width: 0;
+  padding: 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.testing-card-row span {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.testing-card-row p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.testing-card-row > div:nth-child(3) {
+  border-color: rgba(216, 254, 105, 0.4);
+}
+
+.testing-card-row > div:nth-child(3) p {
+  color: var(--text);
 }
 
 .comparison-grid {
@@ -2206,6 +2258,7 @@ dd {
   .method-card-grid,
   .scope-flow,
   .testing-table > div,
+  .testing-card-row,
   .comparison-grid,
   .decision-grid,
   .shift-timeline {

@@ -8,7 +8,7 @@
 - Style: black background, small uppercase text, sticky top.
 
 ### Hero
-- Center mark: `YZ` for now. Replace later with logo or custom wordmark.
+- Homepage hero starts directly with the portfolio focus and name, without a separate monogram.
 - Eyebrow: `Service & Transformation Designer`
 - Main title: `Yifan Zhu`
 - Short intro:

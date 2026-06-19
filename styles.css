@@ -86,19 +86,6 @@ nav a:hover,
   padding: 72px 0 104px;
 }
 
-.identity-mark {
-  width: 160px;
-  height: 54px;
-  display: grid;
-  place-items: center;
-  border-top: 1px solid var(--text);
-  border-bottom: 1px solid var(--text);
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  transform: scaleX(1.35);
-}
-
 .hero-copy {
   max-width: 740px;
 }
@@ -318,6 +305,11 @@ h1 {
   color: var(--muted);
   font-size: 13px;
   border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.site-footer a {
+  overflow-wrap: anywhere;
 }
 
 .case-hero,
@@ -1928,6 +1920,10 @@ dd {
     flex-direction: column;
     justify-content: center;
     gap: 12px;
+  }
+
+  .site-footer {
+    justify-content: flex-start;
   }
 
   nav {

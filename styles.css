@@ -1021,6 +1021,18 @@ dd {
   min-width: 0;
 }
 
+.case-layout-main h1,
+.case-layout-main h2,
+.case-layout-main h3,
+.case-layout-main h4,
+.bio-hero h1,
+.bio-hero .hero-question,
+.case-head h2 {
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+}
+
 .full-case {
   width: min(var(--max), calc(100% - 40px));
   margin: 0 auto;
@@ -1636,9 +1648,10 @@ dd {
 .reflection-grid h3,
 .outcome-grid h3 {
   margin: 14px 0 12px;
-  font-size: 24px;
-  line-height: 1.08;
-  text-transform: uppercase;
+  font-size: clamp(19px, 1.9vw, 24px);
+  line-height: 1.16;
+  text-transform: none;
+  max-width: 28ch;
 }
 
 .logic-grid p,
@@ -1680,7 +1693,7 @@ dd {
 }
 
 .research-card-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .source-strip {
@@ -1719,7 +1732,7 @@ dd {
 
 .insight-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
   gap: 16px;
 }
 
@@ -1741,21 +1754,24 @@ dd {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .hmw-block p {
-  margin-top: 34px;
+  margin-top: 22px;
+  max-width: 68ch;
   color: var(--text);
-  font-size: clamp(28px, 3.2vw, 52px);
-  line-height: 1;
+  font-size: clamp(24px, 2.4vw, 38px);
+  line-height: 1.16;
   font-weight: 800;
-  text-transform: uppercase;
-  overflow-wrap: anywhere;
+  text-transform: none;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
 }
 
 .iteration-timeline {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .outcome-grid {
@@ -1779,7 +1795,7 @@ dd {
 }
 
 .journey-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .journey-grid span {
@@ -1792,7 +1808,7 @@ dd {
 }
 
 .impact-timeline {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .impact-timeline article {
@@ -1805,7 +1821,7 @@ dd {
 
 .method-card-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
 }
 
@@ -1878,7 +1894,7 @@ dd {
 }
 
 .decision-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .testing-table {
@@ -1921,7 +1937,7 @@ dd {
 
 .comparison-grid {
   display: grid;
-  grid-template-columns: 0.8fr 1fr;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
   gap: 16px;
 }
 
@@ -1930,7 +1946,93 @@ dd {
 }
 
 .shift-timeline {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (min-width: 861px) {
+  .case-layout {
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: clamp(22px, 2.8vw, 34px);
+  }
+
+  .case-layout-main .case-body,
+  .case-layout-main .meta-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .case-layout-main .logic-grid,
+  .case-layout-main .role-grid,
+  .case-layout-main .reflection-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .case-layout-main .support-grid,
+  .case-layout-main .method-card-grid,
+  .case-layout-main .research-card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .case-layout-main .journey-grid,
+  .case-layout-main .iteration-timeline,
+  .case-layout-main .impact-timeline {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .case-layout-main .decision-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .case-layout-main .impact-timeline article {
+    min-height: 0;
+  }
+
+  .case-layout-main .hmw-block {
+    min-height: 0;
+    padding: clamp(26px, 3.2vw, 42px);
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1380px) {
+  .case-layout {
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .case-head,
+  .bio-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.92fr);
+    gap: 34px;
+  }
+
+  .case-head h2,
+  .bio-hero h1 {
+    font-size: clamp(36px, 4.2vw, 58px);
+  }
+
+  .case-layout-main .research-card-grid,
+  .case-layout-main .support-grid,
+  .case-layout-main .method-card-grid,
+  .case-layout-main .journey-grid,
+  .case-layout-main .iteration-timeline,
+  .case-layout-main .impact-timeline,
+  .case-layout-main .logic-grid,
+  .case-layout-main .role-grid,
+  .case-layout-main .reflection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .case-layout-main .decision-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .insight-layout,
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hmw-block p {
+    font-size: clamp(24px, 2.8vw, 34px);
+  }
 }
 
 @media (max-width: 860px) {

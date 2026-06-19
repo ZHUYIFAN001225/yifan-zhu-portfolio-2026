@@ -2017,155 +2017,6 @@ dd {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.testing-table {
-  display: grid;
-  gap: 12px;
-}
-
-.testing-table > div {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-}
-
-.testing-table > div + div {
-  border-top: 0;
-}
-
-.testing-table strong,
-.testing-table span {
-  min-width: 0;
-  padding: 18px;
-  line-height: 1.55;
-  background: var(--panel);
-  border: 1px solid var(--line);
-}
-
-.testing-table strong:last-child,
-.testing-table span:last-child {
-  border-right: 1px solid var(--line);
-}
-
-.testing-table strong {
-  color: var(--accent);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.testing-table span {
-  color: var(--muted);
-}
-
-.testing-matrix .testing-row {
-  gap: 12px;
-}
-
-.testing-matrix .testing-header strong {
-  background: var(--bg);
-  border-color: rgba(216, 254, 105, 0.45);
-}
-
-.testing-matrix .testing-row:not(.testing-header) span:nth-child(3) {
-  color: var(--text);
-  border-color: rgba(216, 254, 105, 0.35);
-}
-
-.testing-card-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.testing-card-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  padding: 12px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-}
-
-.testing-card-row > div {
-  min-width: 0;
-  padding: 18px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-}
-
-.testing-card-row span {
-  display: block;
-  margin-bottom: 12px;
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.testing-card-row p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.testing-card-row > div:nth-child(3) {
-  border-color: rgba(216, 254, 105, 0.4);
-}
-
-.testing-card-row > div:nth-child(3) p {
-  color: var(--text);
-}
-
-.scone-testing-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 14px;
-}
-
-.scone-testing-table th,
-.scone-testing-table td {
-  width: 33.333%;
-  padding: 18px;
-  text-align: left;
-  vertical-align: top;
-  background: var(--panel);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.scone-testing-table th:first-child,
-.scone-testing-table td:first-child {
-  border-left: 1px solid var(--line);
-}
-
-.scone-testing-table th:last-child,
-.scone-testing-table td:last-child {
-  border-right: 1px solid var(--line);
-}
-
-.scone-testing-table th {
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
-.scone-testing-table td {
-  color: var(--muted);
-  line-height: 1.62;
-}
-
-.scone-testing-table td + td,
-.scone-testing-table th + th {
-  border-left: 1px solid var(--line);
-}
-
-.scone-testing-table td:nth-child(3) {
-  color: var(--text);
-  border-color: rgba(216, 254, 105, 0.42);
-}
-
 .scone-testing-rows {
   display: grid;
   gap: 16px;
@@ -2396,8 +2247,6 @@ dd {
   .reflection-grid,
   .method-card-grid,
   .scope-flow,
-  .testing-table > div,
-  .testing-card-row,
   .comparison-grid,
   .decision-grid,
   .shift-timeline {
@@ -2526,63 +2375,8 @@ dd {
     transform: rotate(90deg);
   }
 
-  .testing-table strong,
-  .testing-table span {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .testing-table span:last-child,
-  .testing-table strong:last-child {
-    border-bottom: 0;
-  }
-
   .scone-criteria-grid {
     grid-template-columns: 1fr;
-  }
-
-  .scone-testing-table,
-  .scone-testing-table thead,
-  .scone-testing-table tbody,
-  .scone-testing-table tr,
-  .scone-testing-table th,
-  .scone-testing-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .scone-testing-table {
-    border-spacing: 0;
-  }
-
-  .scone-testing-table thead {
-    display: none;
-  }
-
-  .scone-testing-table tr {
-    margin-bottom: 14px;
-    padding: 12px;
-    background: var(--bg);
-    border: 1px solid var(--line);
-  }
-
-  .scone-testing-table td {
-    border: 1px solid var(--line);
-  }
-
-  .scone-testing-table td + td {
-    margin-top: 10px;
-  }
-
-  .scone-testing-table td::before {
-    content: attr(data-label);
-    display: block;
-    margin-bottom: 10px;
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
   }
 
   .scone-testing-row {

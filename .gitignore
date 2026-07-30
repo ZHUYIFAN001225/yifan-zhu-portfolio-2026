@@ -7,3 +7,6 @@ build
 .env.local
 .DS_Store
 assets/practice-videos/hyper3d-ai-pipeline-collaboration.mp4
+
+# Local Netlify folder
+.netlify

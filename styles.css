@@ -62,9 +62,37 @@ a {
 
 nav {
   display: flex;
+  align-items: center;
   gap: 24px;
   color: var(--muted);
   font-size: 13px;
+}
+
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+
+.language-switcher button {
+  min-width: 42px;
+  border: 0;
+  border-radius: 0;
+  padding: 7px 9px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.language-switcher button:hover,
+.language-switcher button.is-active {
+  background: var(--accent);
+  color: var(--bg);
 }
 
 nav a:hover,
@@ -2190,6 +2218,10 @@ dd {
   nav {
     flex-wrap: wrap;
     gap: 14px;
+  }
+
+  .language-switcher {
+    width: auto;
   }
 
   .home-hero,

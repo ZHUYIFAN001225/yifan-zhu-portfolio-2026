@@ -16,6 +16,7 @@ const entries = [
   "project-machine-mapping.html",
   "project-scone-through-time.html",
   "project-seedwalkers.html",
+  "scripts/language.js",
   "styles.css",
   "assets"
 ];
@@ -24,7 +25,9 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 
 for (const entry of entries) {
-  await cp(path.join(root, entry), path.join(dist, entry), { recursive: true });
+  const destination = path.join(dist, entry);
+  await mkdir(path.dirname(destination), { recursive: true });
+  await cp(path.join(root, entry), destination, { recursive: true });
 }
 
 async function collectFiles(dir) {

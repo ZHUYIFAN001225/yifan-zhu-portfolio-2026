@@ -10,6 +10,7 @@ const entries = [
   "case-studies.html",
   "practice.html",
   "resource-platform.html",
+  "project-cyber-projection-toolkit.html",
   "project-biodiversity-clock.html",
   "project-cross-culture.html",
   "project-ear-shield.html",

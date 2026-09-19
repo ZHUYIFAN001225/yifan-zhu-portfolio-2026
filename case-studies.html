@@ -3,7 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="refresh" content="0; url=work.html" />
+    <script>
+      const destination = new URL("work.html", location.href);
+      const language = new URLSearchParams(location.search).get("lang");
+      if (language === "zh" || language === "en") destination.searchParams.set("lang", language);
+      location.replace(destination.href);
+    </script>
     <title>Yifan Zhu | Work</title>
     <link rel="stylesheet" href="styles.css" />
   </head>

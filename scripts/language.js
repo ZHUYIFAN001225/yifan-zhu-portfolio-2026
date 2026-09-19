@@ -185,7 +185,7 @@
     "Project Brief": "项目简报",
     "Launched Commercial Product / Blender Add-on": "已上线商业产品 / Blender 插件",
     "Launched commercial product / Blender add-on": "已上线商业产品 / Blender 插件",
-    "A launched commercial Blender add-on shaped by real creator workflow evidence.": "一款由真实创作者工作流证据驱动、现已上线的商业 Blender 插件。",
+    "A launched commercial Blender add-on shaped by real creator workflow evidence.": "从真实创作需求出发，独立开发并上线的商业 Blender 插件。",
     "Status": "状态",
     "Live commercial digital product; independently developed, published and continuously iterated": "已上线商业数字产品；独立完成开发、发布并持续迭代",
     "3D visual designers, motion-image creators and Blender learning users": "3D 视觉设计师、动态影像创作者与 Blender 学习用户",
@@ -195,7 +195,7 @@
     "Product definition, UX, parameter logic, add-on development, testing, documentation, launch and support": "产品定义、用户体验、参数逻辑、插件开发、测试、文档、发布与支持",
     "Creator ecosystem": "创作者生态",
     "590K+ related-content views, 74.6K+ likes / saves, 1.1K+ resource deliveries and 460+ platform users": "相关内容累计 59 万+播放、7.46 万+点赞 / 收藏、1,100+次资源交付及 460+平台用户",
-    "An independently developed and commercially released creator tool built from recurring Blender workflow problems and real audience evidence.": "从反复出现的 Blender 工作流问题与真实受众证据出发，独立开发并商业发布的创作者工具。",
+    "An independently developed and commercially released creator tool built from recurring Blender workflow problems and real audience evidence.": "针对 Blender 创作中反复遇到的问题，结合真实用户反馈，独立开发并商业化发布的创作工具。",
     "Product proof: end-to-end development, user-informed iteration, public product listing, owned distribution and support.": "产品证据：全流程开发、用户反馈驱动迭代、公开商品页、自营交付与支持。",
     "View Live Product Case": "查看已上线产品案例",
     "An independently developed and commercially released creator tool shaped by workflow evidence, testing and real platform users.": "一款由工作流证据、测试和真实平台用户共同驱动，独立开发并商业发布的创作者工具。",
@@ -539,6 +539,516 @@
     "Public Creative Technology Practice": "公开创意技术实践"
   };
 
+  // Keep complete project copy alongside the shared navigation vocabulary.
+  Object.assign(zh, {
+    "Home / Work / Multi-Species Biodiversity Clock": "首页 / 项目 / 多物种生物多样性时钟",
+    "What if the museum ran on ecological time, not human time?": "如果博物馆跟随生态节律运行，会发生什么？",
+    "The Burrell Collection": "巴勒尔珍藏馆（The Burrell Collection）",
+    "Pollok Country Park": "波洛克乡村公园（Pollok Country Park）",
+    "A museum experience reframed through ecological time.": "以生态时间重新组织博物馆体验。",
+    "01 Museum + Park Context": "01 博物馆与公园背景",
+    "02 Research Evidence": "02 调研依据",
+    "03 Key Insights": "03 核心洞察",
+    "04 Final Biodiversity Clock": "04 生物多样性时钟方案",
+    "05 Potential Impact Timeline": "05 预期影响时间线",
+    "Overview": "项目概览",
+    "Context": "项目背景",
+    "Research": "调研",
+    "Development": "设计推演",
+    "Impact": "项目价值",
+    "Reflection": "复盘与思考",
+    "A museum inside a living park system.": "一座身处鲜活生态系统中的博物馆。",
+    "Real-site grounding": "真实场地背景",
+    "Pollok Park + Burrell Collection": "波洛克公园与巴勒尔珍藏馆",
+    "This project began from a real place: Pollok Country Park and The Burrell Collection. Through field observation and stakeholder-informed research, the team explored how the museum and park could help visitors notice ecological rhythms that are usually invisible in a human-centred visitor experience.": "项目以波洛克乡村公园与巴勒尔珍藏馆为真实场地。团队通过实地观察及相关方调研，探索如何将博物馆与公园连接起来，让访客感知以人为中心的游览体验中容易被忽视的生态节律。",
+    "Human institution logic": "机构的运行逻辑",
+    "Museum time": "博物馆时间",
+    "Opening hours, exhibitions, visitor comfort and cultural display shape how people encounter the site.": "开放时间、展览安排、游览舒适度与文化展示，共同塑造人们使用场地的方式。",
+    "Ecological logic": "生态的运行逻辑",
+    "Species time": "物种时间",
+    "Seasonal rhythms, feeding patterns, migration, habitats and disturbance sensitivity shape how non-human species live in the same place.": "季节变化、觅食规律、迁徙、栖息地与对干扰的敏感程度，决定其他物种如何在同一场地中生活。",
+    "The design problem was not only lack of information.": "设计问题不仅在于信息不足。",
+    "Visitors could pass through Pollok Country Park without sensing the timing, needs and vulnerabilities of the species around them. The challenge was to move beyond biodiversity as static content and design an experience that makes ecological relationships feel immediate, situated and actionable.": "访客可能穿行于公园，却不了解周围物种的活动时间、需求及脆弱性。设计挑战是让生物多样性从静态知识变成与当下场景相关、可感知且能引导行动的体验。",
+    "The project therefore asked how The Burrell Collection could act less like a separate cultural container and more like a public interface for the living park around it.": "因此，项目探索巴勒尔珍藏馆如何超越独立文化展馆的角色，成为公众理解周边公园生态的入口。",
+    "My Role": "我的职责",
+    "Research, sense-making, prototype development and visual communication.": "调研、洞察提炼、原型开发与视觉沟通。",
+    "Research synthesis": "调研整合",
+    "I helped collect case studies, organise field and desk research, analyse stakeholders and translate ecological evidence into design opportunities.": "参与案例收集、实地与案头调研整理、利益相关者分析，并将生态信息转化为设计机会。",
+    "Concept logic": "概念构建",
+    "I contributed to the shift from a broad app idea toward a time-based museum-and-park experience centred on non-human rhythms.": "参与推动方案从宽泛的应用程序构想，转向以非人类物种节律为核心、连接博物馆与公园的时间体验。",
+    "Visual prototyping": "视觉原型",
+    "I supported the final communication by developing visual material and a tangible presentation model to make the concept easier to discuss.": "制作视觉材料与实体展示模型，支持最终方案沟通，让概念更易于理解和讨论。",
+    "Research Evidence": "调研依据",
+    "The research moved from broad biodiversity concern to situated multi-species interaction.": "从宏观生物多样性议题，聚焦到具体场地中的多物种互动。",
+    "01 / Animal-Aided Design": "01 / 动物辅助设计",
+    "Start from species needs.": "从物种需求出发。",
+    "AAD reframed the site from a human leisure space into a shared habitat where animal life cycles, food, shelter and movement patterns become design inputs.": "动物辅助设计（AAD）将场地视为共享栖息地，把动物生命周期、食物、庇护与活动路径纳入设计依据。",
+    "02 / Field research": "02 / 实地调研",
+    "Species are unevenly distributed.": "物种分布并不均匀。",
+    "Observation suggested that ecological life was concentrated in specific zones such as North Wood, rather than evenly spread across the park.": "实地观察发现，生态活动集中于北部林地等特定区域，并非均匀分布在整个公园。",
+    "03 / Management insight": "03 / 管理视角",
+    "Intervention needs better ecological knowledge.": "场地干预需要更充分的生态认知。",
+    "Park management choices can affect species, but the public often cannot see why certain habitats, paths or seasonal protections matter.": "公园管理决策会影响物种，但公众往往不了解特定栖息地、路径安排或季节性保护措施的重要性。",
+    "04 / Stakeholder input": "04 / 相关方交流",
+    "Emotional narratives beat abstract data.": "有情感连接的叙事更容易引发共鸣。",
+    "Stakeholder conversations with people connected to the park's biodiversity and visitor experience highlighted that emotional narratives, species presence and visitor motivation were more effective than abstract biodiversity facts alone.": "与公园生物多样性及访客体验相关人员的交流表明，情感叙事、具体物种与访客动机，比单独呈现抽象的生物多样性知识更能促进参与。",
+    "AAD and precedent research source material": "动物辅助设计与参考案例研究材料",
+    "Field research findings translated into design evidence": "从实地调研发现提炼设计依据",
+    "Stakeholder quotes and engagement insights": "相关方访谈摘录与参与洞察",
+    "Key Insights": "核心洞察",
+    "The project became about changing how visitors sense the park.": "改变访客感知公园的方式。",
+    "Insight 01": "洞察 01",
+    "Interaction matters more than species count. People need to understand relationships, not just identify animals.": "互动比物种数量更重要。人们需要理解生态关系，而不只是辨认动物。",
+    "Insight 02": "洞察 02",
+    "Participation is fragmented. Park users and museum visitors often belong to overlapping but disconnected publics.": "参与体验较为分散。公园使用者与博物馆访客有所重叠，但两者的活动往往缺少连接。",
+    "Insight 03": "洞察 03",
+    "Ecological processes work on longer timescales than visitor attention, so the experience needed to make seasonal and historical rhythms legible.": "生态变化的时间尺度远长于访客停留时间，因此需要让季节与历史节律变得可读、可理解。",
+    "How might we": "设计命题",
+    "encourage visitors to experience the park from a non-human perspective, shifting passive observation into active ecological participation?": "如何鼓励访客从其他物种的视角体验公园，将被动观看转化为主动的生态参与？",
+    "Design Development": "设计推演",
+    "From information display to a phygital biodiversity clock.": "从信息展示走向实体与数字结合的生物多样性时钟。",
+    "Prototype 01": "原型 01",
+    "Exhibition": "展览展示",
+    "An early public display approach that made biodiversity visible but still felt like information delivery.": "早期通过公共展示呈现生物多样性，但体验仍偏向单向信息传递。",
+    "Concept": "概念方案",
+    "Ecological signboard": "生态导览牌",
+    "A site-based direction that began connecting species presence with visitor movement and park context.": "结合具体场地，将物种分布、访客移动与公园环境联系起来。",
+    "Prototype 02": "原型 02",
+    "Clock + map + app": "时钟 + 地图 + 应用",
+    "A digital system explored time, mapping and visitor action, but still needed a stronger tangible experience.": "数字系统探索了时间、地图与访客行动的连接，但仍需要更鲜明的实体体验。",
+    "Final": "最终方案",
+    "Clock + receipt": "时钟 + 互动票据",
+    "The final direction combined a public clock, rotating structure, ecological time display and collectible receipt.": "最终方案整合公共时钟、旋转结构、生态时间展示与可收藏的互动票据。",
+    "Design iteration from exhibition and signboard ideas toward a phygital clock and receipt system.": "从展览与导览牌，逐步迭代为实体与数字结合的时钟及票据系统。",
+    "Final Outcome": "最终成果",
+    "A clock that translates museum visiting into ecological timing.": "用一座时钟，将博物馆游览连接到生态节律。",
+    "01 / Biodiversity Clock": "01 / 生物多样性时钟",
+    "Current time, animal rhythms and park activity": "当前时间、动物节律与公园活动",
+    "The public interface shows current ecological activity, five key animal rhythms, status cues and suggested time windows across the park day.": "公共界面展示当前生态活动、五种重点动物的节律、状态提示及一天中适宜观察的时间段。",
+    "02 / Seasonal + historical time": "02 / 季节与历史时间",
+    "Different scales of ecological memory": "不同时间尺度的生态记忆",
+    "The system connects daily activity with plant families, habitats, animal relationships and the longer history of Pollok Country Park.": "系统将日常活动与植物科属、栖息地、动物关系及波洛克公园的长期历史相连接。",
+    "03 / Interactive Receipt": "03 / 互动票据",
+    "A tangible takeaway from the park-museum encounter": "一份可以带走的公园与博物馆体验",
+    "Each receipt links a species in the park with a museum collection object and a reflective question, extending the experience beyond the screen.": "每张票据将公园中的一种物种、博物馆中的一件藏品与一个启发思考的问题关联起来，让体验延伸至屏幕之外。",
+    "User Journey": "用户旅程",
+    "Visitors move from noticing to collecting, reflecting and changing behaviour.": "从注意、收集与思考，走向行为改变。",
+    "Encounter": "发现",
+    "A visitor enters the museum-park threshold and sees ecological time instead of only human opening hours.": "访客来到博物馆与公园的交汇处，看到的不仅是开放时间，还有生态活动时间。",
+    "Interpret": "理解",
+    "The clock translates species activity into cues about who is active, where they may be, and what human behaviours matter.": "时钟提示哪些物种正在活动、可能出现在哪里，以及人的哪些行为会影响它们。",
+    "Collect": "收集",
+    "The interactive receipt gives the visitor a physical prompt that connects park species with cultural collection objects.": "互动票据作为实体提示，将公园物种与文化藏品连接起来。",
+    "Act": "行动",
+    "The visitor is invited to leave with a different sense of timing, movement and responsibility inside the shared ecological site.": "鼓励访客以新的时间意识、移动方式与责任感，参与共享生态场地中的活动。",
+    "Storyboard source visual for the visitor journey.": "访客旅程故事板原始视觉材料。",
+    "Watch project storyboard video": "观看项目故事板视频",
+    "Potential Impact Timeline": "预期影响时间线",
+    "The proposal imagines the museum gradually becoming an ecological learning and sensing hub.": "方案展望博物馆逐步成为生态学习与感知的公共节点。",
+    "See": "看见",
+    "Visitors begin noticing disturbance, species presence and the weak connection between museum and park experience.": "访客开始注意到环境干扰、物种存在，以及博物馆与公园体验之间尚未充分建立的连接。",
+    "Understand": "理解",
+    "Eco-routing, sensor input and habitat buffer zones support clearer links between behaviour and biodiversity.": "生态路线、传感信息与栖息地缓冲区，帮助公众理解行为与生物多样性之间的联系。",
+    "Ecological cues and guidance could reduce avoidable disturbance and help visitors build more careful habits around shared habitats.": "生态提示与引导有望减少可避免的干扰，帮助访客在共享栖息地中形成更谨慎的行动习惯。",
+    "Low-impact visiting habits become more normal as human behaviour aligns more closely with species rhythms.": "随着人的行为更贴近物种节律，低干扰游览有望逐渐成为常态。",
+    "Co-exist": "共存",
+    "The site could move toward more balanced coexistence, where visitor behaviour is shaped by seasonal ecological rhythms and lighter-touch intervention.": "通过季节性生态节律与适度干预引导访客行为，场地有望走向更平衡的共存。",
+    "Designing for species does not mean designing humans out.": "为其他物种设计，也要考虑人的合理参与。",
+    "Physical over default screen logic": "以实体体验补充屏幕交互",
+    "The project moved away from a purely app-based system because ecological participation needed a more tangible, situated and collectible form.": "方案不再局限于应用程序，因为生态参与需要更有触感、与场地关联且可留存的体验形式。",
+    "Protection versus coexistence": "保护与共存的平衡",
+    "The project keeps a productive tension open: biodiversity may benefit from reduced human presence, but design can make necessary human presence more aware and less harmful.": "减少人类活动可能有利于生物多样性；与此同时，设计也能让必要的公共活动更加自觉、减少伤害。",
+    "From data to behaviour": "从数据走向行为",
+    "The strongest opportunity was not simply displaying species data, but helping people feel how their timing, route and attention affect a shared ecological system.": "关键机会在于让人们感知自己的活动时间、路线与注意力如何影响共享生态系统，而不只是展示物种数据。",
+    "Competencies for service and transformation design roles": "服务与转型设计能力",
+    "Systems thinking": "系统思维",
+    "Reframing a museum and park as one socio-ecological service system with human and non-human stakeholders.": "将博物馆与公园视为同一社会生态服务系统，同时考虑人类与非人类相关方。",
+    "Research translation": "调研转化",
+    "Turning desk research, field observation and stakeholder insight into experience principles and design decisions.": "将案头研究、实地观察及相关方洞察转化为体验原则与设计决策。",
+    "Future prototyping": "未来体验原型",
+    "Using speculative but grounded objects, receipts, journeys and timelines to communicate a possible public service.": "通过有现实依据的概念物件、票据、旅程与时间线，呈现未来公共服务的可能性。",
+    "Critical technology framing": "审慎的技术定位",
+    "Keeping AI and sensing as careful support tools rather than presenting technology as a simple solution to ecological complexity.": "将 AI 与感知技术作为辅助工具，审慎回应生态系统的复杂性。",
+    "Back to Work": "返回项目列表",
+    "Next: Ear Shield": "下一项目：鲸声护盾",
+    "Previous: Ear Shield": "上一项目：鲸声护盾",
+    "Next: SeedWalkers": "下一项目：种子行者",
+    "Previous: SeedWalkers": "上一项目：种子行者",
+    "Next: Machine Mapping": "下一项目：机器映射",
+    "Previous: Machine Mapping": "上一项目：机器映射",
+    "Next: Cross-Culture": "下一项目：跨文化破冰包",
+    "Previous: Biodiversity Clock": "上一项目：生物多样性时钟",
+    "Type": "项目类型",
+    "Duration": "项目周期",
+    "In this project": "在本项目中",
+    "System": "系统架构",
+    "Prototype": "原型",
+    "Page-by-page evidence": "设计过程与成果详解",
+    "Your browser does not support embedded video. Use the product link below to view the published project.": "你的浏览器暂不支持内嵌视频，请通过下方产品链接查看已发布的项目。",
+    "Language switcher": "切换语言"
+  });
+
+  Object.assign(zh, {
+    "Home / Work / Ear Shield": "首页 / 项目 / 鲸声护盾",
+    "01 / Environmental technology": "01 / 环境技术",
+    "A speculative acoustic monitoring device and public installation exploring how human underwater noise disrupts toothed whale perception.": "通过概念性声学监测设备与公共互动装置，探索人类水下噪声如何干扰齿鲸的感知。",
+    "Making underwater acoustic disruption visible.": "让水下声学干扰变得可见。",
+    "Toothed whales rely on echolocation for orientation, hunting and communication. Human-made underwater noise can interfere with this sensory system and increase stranding risk.": "齿鲸依赖回声定位进行定向、捕猎与交流。人类产生的水下噪声可能干扰这一感知系统，并增加搁浅风险。",
+    "The issue is invisible to most audiences. The project needed to translate underwater acoustic disruption into a tangible device concept and public-facing experience.": "多数观众无法直接感知这一问题。项目将水下声学干扰转化为可理解的设备概念与面向公众的互动体验。",
+    "I moved from whale and sound-wave research into bionic suction ideation, Python acoustic analysis, device system design, and an Arduino / TouchDesigner installation.": "从鲸类与声波研究出发，开展仿生吸附构想、Python 声学分析、设备系统设计，以及 Arduino 与 TouchDesigner 互动装置开发。",
+    "The outcome is a speculative whale monitoring system and exhibition prototype that helps audiences understand how human noise affects whale perception.": "成果包括概念性鲸类监测系统与展览互动原型，帮助公众理解人类噪声对鲸类感知的影响。",
+    "Complete Ear Shield project archive": "鲸声护盾：完整项目档案",
+    "Each image is shown because it proves a specific design decision, research step or prototype development moment.": "每张作品板均对应具体的设计决策、调研步骤或原型开发阶段；下方中文说明提炼关键问题与设计回应。",
+    "Page 01 - Project overview": "第 01 页 · 项目概览",
+    "Problem: The topic needed a clear entry point.": "问题：议题需要清晰的切入点。",
+    "My response: I framed it as a smart whale monitoring and echo-enhancement system connecting conservation, acoustic sensing and public communication.": "设计回应：提出连接生态保护、声学感知与公共沟通的智能鲸类监测及回声增强系统概念。",
+    "Page 02 - Background research": "第 02 页 · 背景研究",
+    "Problem: Whale strandings are hard to connect to invisible underwater noise.": "问题：公众难以将鲸类搁浅与不可见的水下噪声联系起来。",
+    "My response: I mapped human noise, sonar interference and sperm whale echolocation to establish noise as sensory disruption.": "设计回应：梳理人类噪声、声呐干扰与抹香鲸回声定位之间的关系，将噪声界定为感知干扰。",
+    "Page 03 - Species and sound research": "第 03 页 · 物种与声音研究",
+    "Problem: A generic whale story would be too broad.": "问题：泛泛讨论鲸类会使研究范围过大。",
+    "My response: I narrowed the project to toothed whales and sperm whales, then studied echo characteristics and sound-wave feedback.": "设计回应：聚焦齿鲸及抹香鲸，研究回声特征与声波反馈。",
+    "Page 04 - Concept ideation and acoustic analysis": "第 04 页 · 概念推演与声学分析",
+    "Problem: The device needed a plausible attachment and monitoring logic.": "问题：设备需要合理的附着方式与监测逻辑。",
+    "My response: I explored octopus-inspired suction and tested Python audio analysis using MFCC, Chroma and Mel spectrogram comparisons.": "设计回应：探索章鱼启发的吸附结构，并通过 Python 比较 MFCC、Chroma 与 Mel 频谱，开展音频分析测试。",
+    "Page 05 - Device system design": "第 05 页 · 设备系统设计",
+    "Problem: The concept needed to become a system, not a single object sketch.": "问题：概念需要发展为完整系统。",
+    "My response: I defined device components, health monitoring, depth adaptation, noise reduction and whale database logic.": "设计回应：定义设备组件、健康监测、深度适应、降噪与鲸类数据库的系统逻辑。",
+    "Page 06 - Interactive prototype": "第 06 页 · 互动原型",
+    "Problem: Audiences cannot directly feel underwater acoustic interference.": "问题：观众无法直接感受水下声学干扰。",
+    "My response: I used Arduino, ultrasonic sensing, gesture input, TouchDesigner and Blender particle visuals to simulate disrupted whale perception.": "设计回应：结合 Arduino、超声波感应、手势输入、TouchDesigner 与 Blender 粒子视觉，模拟鲸类感知受到干扰的体验。",
+    "Page 07 - Exhibition and stakeholder plan": "第 07 页 · 展览与相关方规划",
+    "Problem: The work needed evidence of public communication and future collaboration potential.": "问题：项目需要展示公共沟通效果与后续合作可能性。",
+    "My response: I documented exhibition interaction and mapped stakeholders including research institutes, government, education bodies and environmental organizations.": "设计回应：记录展览现场互动，并梳理研究机构、政府、教育机构与环保组织等潜在相关方。",
+    "What Ear Shield demonstrates": "鲸声护盾展示的能力",
+    "Ecological framing": "生态议题定义",
+    "Turning underwater noise and whale perception into a clear environmental design problem.": "将水下噪声与鲸类感知转化为明确的环境设计问题。",
+    "Speculative system logic": "概念系统构建",
+    "Connecting monitoring device behaviour, acoustic analysis and stakeholder planning into one concept.": "将监测设备行为、声学分析与相关方规划整合为统一概念。",
+    "Physical computing": "实体交互开发",
+    "Using Arduino, TouchDesigner and Blender to create an interaction that communicates invisible acoustic disruption.": "使用 Arduino、TouchDesigner 与 Blender 构建互动，将不可见的声学干扰转化为可感知体验。",
+    "Making a complex conservation issue easier for exhibition audiences to understand and discuss.": "帮助展览观众理解并讨论复杂的生态保护议题。",
+    "Home / Work / SeedWalkers": "首页 / 项目 / 种子行者",
+    "02 / Service design + AR": "02 / 服务设计与增强现实",
+    "An AR service system using seed cards, public participation and ecological data to reconnect fragmented urban biodiversity.": "结合种子卡、公众参与与生态数据，通过增强现实服务系统探索城市生物多样性的重新连接。",
+    "A city-scale biodiversity service concept.": "面向城市生物多样性的服务概念。",
+    "Urban greenery can look sufficient while still being ecologically weak because of monoculture and fragmentation.": "城市绿化看似充足，却可能因物种单一与空间碎片化而缺乏生态韧性。",
+    "The project needed to connect city-scale carbon and biodiversity issues with everyday public participation.": "项目需要将城市尺度的碳排放与生物多样性议题，连接到公众日常参与。",
+    "I used carbon research, biodiversity logic, ENVI/ArcGIS analysis, service blueprinting and AR prototyping to shape the service.": "结合碳排放研究、生物多样性分析、ENVI / ArcGIS 空间分析、服务蓝图与 AR 原型，构建服务方案。",
+    "The outcome is a seed-card and AR planting service that turns ecological restoration into a participatory journey.": "提出种子卡与 AR 种植服务，将生态修复转化为公众可以参与的体验旅程。",
+    "Complete SeedWalkers project archive": "种子行者：完整项目档案",
+    "These pages show the research, service logic, stakeholder system and technical prototype behind the project.": "以下作品板展示研究、服务逻辑、相关方系统与技术原型；每页配有中文问题与设计回应。",
+    "Page 08 - Project overview": "第 08 页 · 项目概览",
+    "Problem: Climate pressure, biodiversity loss and public participation needed one clear proposition.": "问题：气候压力、生物多样性流失与公众参与需要统一的设计命题。",
+    "My response: I framed SeedWalkers as an AR service using seed cards and participatory planting to reconnect fragmented ecosystems.": "设计回应：以种子卡与参与式种植构建 AR 服务，探索重新连接碎片化生态系统。",
+    "Page 09 - Carbon and city background": "第 09 页 · 城市碳排放背景",
+    "Problem: Green coverage alone does not prove ecological resilience.": "问题：绿化覆盖率不能单独证明生态韧性。",
+    "My response: I used Changsha carbon and vegetation data to show the gap between emissions and absorption.": "设计回应：利用长沙碳排放与植被数据，呈现排放与吸收之间的差距。",
+    "Page 10 - Biodiversity logic": "第 10 页 · 生物多样性逻辑",
+    "Problem: Planting more greenery alone does not guarantee ecosystem health.": "问题：单纯增加绿植不一定能改善生态系统健康。",
+    "My response: I mapped how tree diversity supports habitats, birds, seed dispersal and urban carbon cycling.": "设计回应：梳理树种多样性对栖息地、鸟类、种子传播与城市碳循环的支持关系。",
+    "Page 11 - Urban vegetation analysis": "第 11 页 · 城市植被分析",
+    "Problem: The city problem was fragmentation and monoculture, not just a lack of green space.": "问题：城市生态挑战还包括植被碎片化与物种单一。",
+    "My response: I analyzed plant diversity and target ratios of trees, shrubs and ground cover.": "设计回应：分析植物多样性，以及乔木、灌木与地被的目标配比。",
+    "Page 12 - Service framework and app structure": "第 12 页 · 服务框架与应用架构",
+    "Problem: Ecological strategy needed to become a user-facing service.": "问题：生态策略需要转化为面向用户的服务。",
+    "My response: I designed seed collection, AR planting, city progress, ranking, maps, feedback and low-fidelity app screens.": "设计回应：设计种子领取、AR 种植、城市进度、排行、地图与反馈模块，并制作应用低保真界面。",
+    "Page 13 - User journey": "第 13 页 · 用户旅程",
+    "Problem: Users needed a simple reason to participate and understand contribution.": "问题：用户需要明确的参与动机，并能理解自己的贡献。",
+    "My response: I created a journey from QR login and seed cards to AR planting, badges and sharing.": "设计回应：构建从扫码登录、领取种子卡，到 AR 种植、获得徽章与分享的完整旅程。",
+    "Page 14 - Stakeholder map and service blueprint": "第 14 页 · 相关方地图与服务蓝图",
+    "Problem: City-scale ecological services cannot rely only on individual users.": "问题：城市级生态服务需要多方协作。",
+    "My response: I mapped users, technical staff, manufacturers, garden designers, government and maintenance teams.": "设计回应：梳理用户、技术人员、制造商、园林设计师、政府与维护团队的协作关系。",
+    "Page 15 - Technical implementation": "第 15 页 · 技术实现",
+    "Problem: The service needed credible spatial and technical grounding.": "问题：服务方案需要可靠的空间分析与技术支撑。",
+    "My response: I used ENVI, ArcGIS/NDVI, Blender and Unity to support vegetation analysis and AR prototyping.": "设计回应：使用 ENVI、ArcGIS / NDVI、Blender 与 Unity，支持植被分析和 AR 原型制作。",
+    "What SeedWalkers demonstrates": "种子行者展示的能力",
+    "Service design": "服务设计",
+    "Connecting ecological research, public participation and backstage support into a coherent service concept.": "将生态研究、公众参与与后台支持整合为连贯的服务概念。",
+    "Environmental research": "环境研究",
+    "Using carbon, biodiversity and vegetation analysis to define why the service matters.": "通过碳排放、生物多样性与植被分析，明确服务的必要性。",
+    "Spatial analysis": "空间分析",
+    "Using ENVI and ArcGIS/NDVI evidence to ground the service in urban vegetation conditions.": "利用 ENVI 与 ArcGIS / NDVI 分析，使服务设计建立在城市植被条件之上。",
+    "AR prototyping": "增强现实原型",
+    "Turning seed-card participation into a digital planting flow that people could imagine using in the city.": "将种子卡参与机制转化为可理解的数字种植流程，呈现其在城市中的使用方式。",
+    "Home / Work / Machine Mapping": "首页 / 项目 / 机器映射",
+    "03 / AI + critical interaction": "03 / AI 与批判性交互",
+    "A reflective experiment using speech recognition, image search and 3D visualization to question how color stereotypes are formed and repeated.": "结合语音识别、图像检索与三维可视化的反思性实验，探讨色彩刻板印象如何形成并被重复。",
+    "A critical interaction experiment about social input and machine memory.": "关于社会输入与机器记忆的批判性交互实验。",
+    "Color meanings are shaped by culture, markets, social agreement and personal experience.": "色彩含义受到文化、市场、社会共识与个人经验的共同塑造。",
+    "The project needed to make machine learning and social cognition visible without forcing a single conclusion.": "项目希望让机器学习与社会认知的关系变得可见，同时保留开放的讨论空间。",
+    "Participants discussed colors, the system extracted keywords, searched images, processed color blocks and visualized machine memory in Blender.": "参与者讨论色彩，系统提取关键词、检索图像并处理色块，最终在 Blender 中可视化呈现机器记忆。",
+    "The outcome is a reflective prototype that reveals how social input can shape machine memory.": "形成可运行的反思性交互原型，呈现社会输入如何塑造机器记忆。",
+    "Complete Machine Mapping project archive": "机器映射：完整项目档案",
+    "These pages show the cultural research, interaction logic and technical system.": "以下作品板呈现文化研究、交互逻辑与技术系统，并配有逐页中文解读。",
+    "Page 16 - Project overview": "第 16 页 · 项目概览",
+    "Problem: Machine learning bias and social cognition are abstract.": "问题：机器学习偏差与社会认知较为抽象。",
+    "My response: I framed the project as a reflective experiment where participants influence machine memory through discussion.": "设计回应：将项目构建为参与者通过讨论影响机器记忆的反思性实验。",
+    "Page 17 - Color stereotype research": "第 17 页 · 色彩刻板印象研究",
+    "Problem: Color meanings feel natural although they are socially constructed.": "问题：色彩含义看似天然，实际受到社会建构影响。",
+    "My response: I researched cultural, historical, market and social construction of color symbolism.": "设计回应：研究色彩象征的文化、历史、市场与社会建构背景。",
+    "Page 18 - Machine-learning metaphor": "第 18 页 · 机器学习隐喻",
+    "Problem: A normal interface would hide the learning process.": "问题：常规界面难以呈现学习过程。",
+    "My response: I designed a loop where discussion becomes keywords, keywords become images and images become visual memory.": "设计回应：建立讨论转化为关键词、关键词转化为图像、图像转化为视觉记忆的循环。",
+    "Page 19 - Design development": "第 19 页 · 设计开发",
+    "Problem: Conversation needed to become visible machine feedback.": "问题：对话需要转化为可见的机器反馈。",
+    "My response: I built a pipeline with audio input, Arduino, Python keyword extraction, image search, color processing and Blender visualization.": "设计回应：搭建包含音频输入、Arduino、Python 关键词提取、图像检索、色彩处理与 Blender 可视化的流程。",
+    "Page 20 - Participant interaction flow": "第 20 页 · 参与者交互流程",
+    "Problem: Participants needed structure without being told what to think.": "问题：参与者需要讨论结构，同时保有自主思考空间。",
+    "My response: I used staged discussions around blue, green and pink, then let the machine generate feedback.": "设计回应：围绕蓝色、绿色与粉色开展分阶段讨论，再由机器生成反馈。",
+    "Page 21 - Technical implementation": "第 21 页 · 技术实现",
+    "Problem: The critical concept needed a working technical system.": "问题：批判性概念需要可运行的技术系统支撑。",
+    "My response: I used Arduino sensing, Python, Vosk, image matching and Blender shader/space visualization.": "设计回应：结合 Arduino 感应、Python、Vosk 语音识别、图像匹配与 Blender 着色器及空间可视化。",
+    "What Machine Mapping demonstrates": "机器映射展示的能力",
+    "Critical AI thinking": "AI 批判性思考",
+    "Questioning how human language, cultural assumptions and machine processes shape each other.": "探讨人类语言、文化预设与机器处理过程如何相互塑造。",
+    "Participatory interaction": "参与式交互",
+    "Designing staged discussion so participants influence the system without being pushed toward one answer.": "通过分阶段讨论，让参与者影响系统，同时避免预设单一答案。",
+    "Technical experimentation": "技术实验",
+    "Connecting speech recognition, keyword extraction, image search and Blender visualization into one prototype logic.": "将语音识别、关键词提取、图像检索与 Blender 可视化整合为完整原型。",
+    "Data visualisation": "数据可视化",
+    "Making invisible social input visible as a changing machine memory environment.": "将不可见的社会输入呈现为不断变化的机器记忆空间。"
+  });
+
+  Object.assign(zh, {
+    "Home / Work / Cross-Culture Icebreaker": "首页 / 项目 / 跨文化破冰包",
+    "04 / Social design": "04 / 社会设计",
+    "A social pack and board-game experience helping Chinese international students exchange cultural backgrounds and build early connections.": "通过社交包与桌游体验，帮助中国留学生交流文化背景、建立初步联系。",
+    "Service design / social design / game experience": "服务设计 / 社会设计 / 游戏体验",
+    "Group project contribution across research, system framing and prototype communication": "在团队项目中参与调研、系统构建与原型沟通",
+    "Survey, personas, 5W1H, service system map, prototype": "问卷调研、用户画像、5W1H 分析、服务系统图与原型",
+    "Social package and board-game kit": "社交包与桌游套件",
+    "A social design proposal for low-pressure cultural exchange.": "面向低压力文化交流的社会设计方案。",
+    "Chinese international students may face social anxiety, language barriers and limited low-pressure opportunities to connect.": "中国留学生可能面临社交焦虑、语言障碍，以及缺少低压力交流机会等问题。",
+    "The project needed to break the ice naturally without forcing uncomfortable direct interaction.": "项目需要创造自然的破冰机会，避免让参与者被迫进入不自在的直接交流。",
+    "The team used survey data, personas, service mapping, social-pack flows and game mechanics.": "团队结合问卷数据、用户画像、服务地图、社交包流转与游戏机制开展设计。",
+    "The outcome is a two-part social system: a rotating social pack and a collaborative board-game kit.": "成果由两部分组成：轮流传递的社交包与协作式桌游套件。",
+    "Complete Cross-Culture Icebreaker project archive": "跨文化破冰包：完整项目档案",
+    "These pages show the user research, system logic, prototype and final demonstration.": "以下作品板展示用户研究、系统逻辑、原型与最终演示，并配有逐页中文解读。",
+    "Page 22 - Project overview": "第 22 页 · 项目概览",
+    "Problem: Students may want connection but struggle to start interaction naturally.": "问题：学生希望建立联系，却难以自然开启交流。",
+    "My response: The group proposed a social kit and game-based experience for structured cross-cultural exchange.": "设计回应：团队提出社交套件与游戏体验，为跨文化交流提供结构化支持。",
+    "Page 23 - Social background research": "第 23 页 · 社会背景研究",
+    "Problem: The challenge needed evidence beyond assumptions about shyness.": "问题：不能仅凭害羞等假设定义社交障碍。",
+    "My response: We mapped student scale, social anxiety, cultural conflict, loneliness, language barriers and adaptation issues.": "设计回应：梳理留学生群体规模、社交焦虑、文化冲突、孤独感、语言障碍与适应问题。",
+    "Page 24 - User research and framing": "第 24 页 · 用户研究与问题定义",
+    "Problem: Students' social barriers vary.": "问题：不同学生的社交障碍并不相同。",
+    "My response: We used interviews, a 117-person questionnaire, personas, HMW and 5W1H framing.": "设计回应：结合访谈、117 人问卷、用户画像、HMW 设计提问与 5W1H 分析定义问题。",
+    "Page 25 - Concept and service system": "第 25 页 · 概念与服务系统",
+    "Problem: Direct face-to-face interaction can be high pressure.": "问题：直接面对面交流可能带来较大压力。",
+    "My response: We explored indirect exchange through shared objects, Polaroids, journals, games and stakeholder support.": "设计回应：通过共享物件、拍立得照片、日记、游戏及相关方支持，探索间接交流方式。",
+    "Page 26 - Social pack and game user flows": "第 26 页 · 社交包与游戏流程",
+    "Problem: The service needed concrete interaction mechanics.": "问题：服务方案需要具体可执行的互动机制。",
+    "My response: We designed a rotating social pack journey and nine-person board game with puzzle zones and cultural prompts.": "设计回应：设计社交包轮转旅程，以及结合拼图区与文化提示的九人桌游。",
+    "Page 27 - Final prototype and significance": "第 27 页 · 最终原型与项目价值",
+    "Problem: The proposal needed to show feasibility.": "问题：方案需要呈现可行性依据。",
+    "My response: We produced physical prototypes, demo process, business canvas and participant feedback quotes.": "设计回应：制作实体原型、演示流程与商业模式画布，并整理参与者反馈。",
+    "What Cross-Culture Icebreaker demonstrates": "跨文化破冰包展示的能力",
+    "User research": "用户研究",
+    "Using interviews, questionnaire data and personas to define barriers to early social connection.": "通过访谈、问卷数据与用户画像，识别初期社交联系中的障碍。",
+    "Social design": "社会设计",
+    "Creating low-pressure interaction formats that help students exchange culture without forced self-presentation.": "创造低压力互动形式，让学生无需强制自我介绍也能交流文化。",
+    "Service mapping": "服务系统梳理",
+    "Connecting students, organisers, schools, communities and sponsors around a repeatable social experience.": "围绕可重复开展的社交体验，连接学生、组织者、学校、社区与赞助方。",
+    "Game mechanics": "游戏机制设计",
+    "Using physical prompts, routes, puzzle zones and cultural questions to structure meaningful interaction.": "通过实体提示、路线、拼图区与文化问题，组织有意义的交流。",
+    "Scottish afternoon tea and familiar food objects offered a clear entry point into wider questions of heritage, hospitality and service. The project explored how cultural material could become a learning experience rather than a static display.": "以苏格兰下午茶与熟悉的食物为切入点，探讨文化遗产、待客之道与服务。项目探索如何将文化材料转化为可参与的学习体验。",
+    "The aim was to help students connect past social rituals with present-day service thinking, business innovation and inclusive customer experience.": "目标是帮助学习者将历史中的社交仪式，与当代服务思维、商业创新及包容性顾客体验联系起来。",
+    "Early research was rich but scattered, mixing tourism stories, hotel narratives, lifestyle media, commercial references and historical sources. This made it hard to separate teachable cultural material from promotional storytelling.": "早期资料丰富但分散，混合了旅游故事、酒店叙事、生活方式媒体、商业参考与历史文献，难以区分适合教学的文化内容与宣传性叙事。",
+    "The project needed to turn fragmented research into a visual, low-barrier and transferable learning experience for young learners.": "项目需要将碎片化研究转化为面向年轻学习者、视觉化、易理解且可迁移的学习体验。",
+    "Rather than inventing a fictional history activity, the team used real learner needs, educational constraints and peer testing feedback to shape the project into a structured micro-learning experience.": "团队结合真实学习需求、教学条件与同伴测试反馈，将项目组织为结构化的微学习体验。",
+    "Stakeholders": "利益相关者",
+    "The stakeholder source was translated into three learning-needs cards for the web case study.": "将相关方研究提炼为三张学习需求卡片，便于在线阅读。",
+    "Research Challenge": "研究挑战",
+    "Narrowing The Scope": "聚焦研究范围",
+    "This filtering step shifted the project from a broad cultural topic into a more teachable journey built around familiar objects such as scones, tea caddies and tea bags.": "经过筛选，项目从宽泛文化议题聚焦为围绕司康、茶叶罐与茶包等熟悉物件展开的学习旅程。",
+    "Core Narrative": "核心叙事",
+    "The dense timeline was used as source material, then rebuilt as three cultural shifts.": "以详细时间线为研究依据，重新组织为三个关键文化转变。",
+    "Ideation": "创意探索",
+    "Refinement": "方案优化",
+    "More feasible, visual and suitable for young learners.": "更易实施、视觉化，适合年轻学习者。",
+    "Lower cost and easier to deliver in a short learning session.": "成本更低，便于在短时学习活动中开展。",
+    "The tea bag became a physical learning object, not only a prop.": "茶包成为承载知识的实体学习媒介。",
+    "Students process information immediately instead of waiting until the end.": "让学习者在每一阶段即时消化信息。",
+    "This made the learning experience more active and less like passive viewing.": "让学习体验更具主动参与性。",
+    "Prototype Testing & Major Pivot": "原型测试与关键调整",
+    "The major pivot was from long linear storytelling to micro-course modules with interaction after each segment, based on peer feedback and classroom-style review.": "根据同伴反馈与课堂式评审，方案从长篇线性叙事调整为分段微课，在每个模块后加入互动。",
+    "Interactive Learning Module": "互动学习模块",
+    "The tea bag module links cultural heritage with economies of scale and inclusive service innovation.": "茶包模块将文化遗产与规模经济、包容性服务创新连接起来。",
+    "Potential Educational Value": "潜在教育价值",
+    "Multi-Species / Biodiversity Clock, Scone Through Time, Ear Shield, SeedWalkers": "生物多样性时钟、司康时光、鲸声护盾、种子行者",
+    "Creative Technology & Visual Practice, Independent 3D & AI Resource Platform, Machine Mapping, Codex / AI-assisted web prototype": "创意技术与视觉实践、独立 3D 与 AI 资源平台、机器映射、Codex / AI 辅助网页原型",
+    "Scone Through Time, Cross-Culture Icebreaker, Biodiversity Clock": "司康时光、跨文化破冰包、生物多样性时钟",
+    "Transformation design / Multi-species service": "转型设计 / 多物种服务",
+    "Proof: systems framing, ecological research, phygital service prototype": "能力依据：系统构建、生态研究、实体与数字结合的服务原型",
+    "Cultural service learning prototype": "文化服务学习原型",
+    "Proof: research filtering, learning modules, testing-led pivot": "能力依据：研究筛选、学习模块设计、测试驱动的方案调整",
+    "Independent 3D & AI resource platform": "独立 3D 与 AI 资源平台",
+    "Proof: 381K+ views and 54K+ likes on one original Douyin Blender reel, 141K+ Bilibili views and 1.1K+ resource downloads / claims": "实践数据：单条抖音原创 Blender 视频获 38.1 万+播放、5.4 万+点赞；B 站累计 14.1 万+播放；资源下载 / 领取 1,100+ 次",
+    "Environmental technology / Exhibition prototype": "环境技术 / 展览原型",
+    "Proof: acoustic research, speculative system logic, physical computing": "能力依据：声学研究、概念系统构建、实体交互开发",
+    "381K+ views": "38.1 万+ 播放",
+    "A museum-and-park future experience that translates ecological rhythms into visitor noticing, reflection and action.": "连接博物馆与公园的未来体验，将生态节律转化为访客的观察、思考与行动。",
+    "Capability proof: systems thinking, research translation, future prototyping, phygital service design.": "能力体现：系统思维、调研转化、未来体验原型、实体与数字结合的服务设计。",
+    "Capability proof: research filtering, learning experience design, testing-led pivot, service innovation framing.": "能力体现：研究筛选、学习体验设计、测试驱动的方案调整、服务创新。",
+    "Capability proof: tutorial production, public engagement, resource packaging, creator-platform operation.": "能力体现：教程制作、公众参与、资源打包、创作者平台运营。",
+    "Capability proof: ecological research, bionic concept development, physical computing, public communication.": "能力体现：生态研究、仿生概念开发、实体交互、公共沟通。",
+    "Capability proof: critical AI framing, interaction logic, data pipeline thinking, visual prototyping.": "能力体现：AI 批判性思考、交互逻辑、数据处理流程、视觉原型。",
+    "Capability proof: service blueprinting, environmental research, spatial analysis, AR service flow.": "能力体现：服务蓝图、环境研究、空间分析、AR 服务流程。",
+    "Capability proof: user research, persona synthesis, social design, game-based service prototyping.": "能力体现：用户研究、用户画像、社会设计、游戏化服务原型。",
+    "01 / 3D Visualisation / Blender Craft": "01 / 三维可视化与 Blender 创作",
+    "These videos show hands-on 3D craft rather than AI generation: modeling, lighting, material control, atmosphere and composition. They support the portfolio's creative technology direction by showing that I can make visual systems, not only describe them.": "这些视频展示手工三维创作：建模、灯光、材质控制、氛围与构图，体现从视觉构想到实际制作的能力。此部分作品并非 AI 生成。",
+    "Manual 3D modeling": "手工三维建模",
+    "Material atmosphere": "材质与氛围",
+    "Cinematic atmosphere, material exploration and 3D composition.": "电影感氛围、材质探索与三维构图。",
+    "02 / AI-assisted Web & Creative Pipeline": "02 / AI 辅助网页与创作流程",
+    "This section separates AI-assisted workflow evidence from manual Blender craft. It includes an AI-assisted web prototype showcase and a Hyper3D collaboration video where the character and animation were generated through an AI-supported pipeline.": "此部分单独展示 AI 辅助工作流，包括网页原型，以及与 Hyper3D 合作的视频；其中角色与动画通过 AI 辅助流程生成。",
+    "Hyper3D collaboration": "Hyper3D 合作项目",
+    "AI-generated character": "AI 生成角色",
+    "Creative workflow direction": "创作流程规划",
+    "03 / Public Learning & Resource Platform": "03 / 公开教学与资源平台",
+    "The resource platform turns Blender, 3D and AI-assisted design workflows into tutorials, visual work and downloadable resources across Douyin, Bilibili, Xiaohongshu and a personal resource website. It is shown as evidence of public-facing creative communication, not as a commercial product claim.": "资源平台将 Blender、三维与 AI 辅助设计流程转化为教程、视觉作品及可下载资源，发布于抖音、B 站、小红书与个人资源网站。这些数据体现公开创作与传播成果，不代表商业插件销量。",
+    "381K+ views and 54K+ likes on one original Douyin Blender visual reel": "单条抖音原创 Blender 视觉视频：38.1 万+播放、5.4 万+点赞",
+    "141K+ Bilibili views": "B 站累计 14.1 万+播放",
+    "11.6K RED likes & collects": "小红书 1.16 万赞藏",
+    "1.1K+ free resource downloads / claims": "免费资源下载 / 领取 1,100+ 次",
+    "460+ resource users": "460+ 位资源用户",
+    "54K+ likes on one original Douyin Blender visual reel": "单条抖音原创 Blender 视觉视频获 5.4 万+点赞",
+    "I built a public-facing 3D and AI-assisted creative practice across Douyin, Xiaohongshu, Bilibili and a personal resource website. The practice translates Blender, GIS, AI-assisted workflows and visual prototyping processes into public tutorials, visual work, design-process content and reusable project resources.": "独立搭建覆盖抖音、小红书、B 站与个人资源网站的三维及 AI 辅助创作实践，将 Blender、GIS、AI 工作流与视觉原型制作转化为公开教程、视觉作品、设计过程内容及可复用项目资源。",
+    "A self-initiated showcase of visual work created in Blender over two years.": "自主整理与发布两年间使用 Blender 创作的视觉作品。",
+    "87 tutorial / design-process videos. Top educational video reached 23K+ views.": "发布 87 条教程 / 设计过程视频，播放最高的教学视频达 2.3 万+次。",
+    "460+ resource users. Free Blender project files, 3D scene assets and workflow resources.": "覆盖 460+ 位资源用户，提供免费 Blender 工程文件、三维场景素材与工作流资源。",
+    "Many learners struggle to understand 3D, Blender, GIS and AI-assisted workflows because tutorials often show final results without reusable files or workflow context. The challenge was to make complex technical workflows easier to learn, reproduce and adapt through public tutorials and downloadable project resources.": "许多教程只呈现最终效果，缺少可复用文件与完整流程，增加了三维、Blender、GIS 及 AI 辅助工作流的学习难度。因此，我通过公开教程与可下载工程资源，让复杂流程更易学习、复现和调整。",
+    "Topic selection based on learner interest and workflow value": "结合学习者兴趣与工作流价值选择主题",
+    "Blender / GIS / AI workflow testing and repeatable process design": "测试 Blender / GIS / AI 工作流，设计可复现流程",
+    "Tutorial recording and design-process communication": "录制教程并讲解设计过程",
+    "Project file packaging for reuse": "打包工程文件，支持重复使用",
+    "Publishing visual work and design-process content across Douyin, Bilibili and Xiaohongshu / RED": "在抖音、B 站与小红书发布视觉作品及设计过程内容",
+    "Free resource distribution through a personal resource website": "通过个人资源网站分发免费资源",
+    "User questions, feedback and collaboration enquiries informing future content": "根据用户提问、反馈与合作咨询规划后续内容",
+    "Explaining technical workflows in a format that can be watched, saved, repeated and shared by learners.": "以可观看、收藏、复现与分享的形式讲解技术工作流。",
+    "Packaging project files so learners can study the workflow beyond the tutorial video.": "打包工程文件，让学习者在视频之外进一步研究完整工作流。",
+    "Testing Blender, GIS and AI-assisted workflows as practical tools for visual and service design communication.": "测试 Blender、GIS 与 AI 辅助工作流在视觉及服务设计沟通中的实际用途。",
+    "Building measurable public-facing practice outside a traditional internship or company project.": "通过独立实践积累可量化的公开创作与用户反馈。",
+    "This independent practice has generated measurable public engagement, including 381K+ views and 54K+ likes on one original Douyin Blender visual reel, 141K+ Bilibili views, 11.6K Xiaohongshu likes and saves, and 1.1K+ free digital resource downloads / claims from 460+ users. It demonstrates my ability to create original 3D visual work, communicate complex Blender and AI-assisted workflows, design reusable digital resources and manage public-facing creative communication.": "这项独立实践积累了可量化的公开反馈：单条抖音原创 Blender 视觉视频获 38.1 万+播放与 5.4 万+点赞，B 站累计 14.1 万+播放，小红书 1.16 万赞藏，460+ 位用户累计下载 / 领取免费数字资源 1,100+ 次。体现了原创三维创作、复杂工作流讲解、可复用资源设计与公开内容运营能力。"
+  });
+
+  Object.assign(zh, {
+    "Project case studies have moved.": "项目案例已迁移。",
+    "The portfolio now uses a role-based Work page. If you are not redirected automatically, open the project hub below.": "作品集现已采用按能力方向组织的项目页面。如果未自动跳转，请通过下方链接打开项目列表。",
+    "Open Work": "打开项目列表",
+    "Primary navigation": "主导航",
+    "Portfolio focus areas": "作品集方向",
+    "Project filters": "项目筛选",
+    "Project navigation": "项目导航",
+    "Project section navigation": "项目章节导航",
+    "Cyber Projection Toolkit running inside Blender": "Cyber Projection Toolkit 在 Blender 中的运行画面",
+    "Cyber Projection Toolkit interface in Blender": "Cyber Projection Toolkit 的 Blender 操作界面",
+    "Multi-Species Biodiversity Clock project board": "多物种生物多样性时钟项目展示板",
+    "Multi-Species Biodiversity Clock cover": "多物种生物多样性时钟封面",
+    "Scone Through Time project cover": "司康时光项目封面",
+    "Scone Through Time cover": "司康时光封面",
+    "Ear Shield project board": "鲸声护盾项目展示板",
+    "Ear Shield cover": "鲸声护盾封面",
+    "Machine Mapping cover": "机器映射封面",
+    "SeedWalkers cover": "种子行者封面",
+    "Cross-Culture Icebreaker cover": "跨文化破冰包封面",
+    "Creative technology visual evidence": "创意技术视觉作品",
+    "Portfolio visual evidence for public learning and resource platform work": "公开教学与资源平台的视觉实践成果",
+    "Cyber Projection Toolkit controlling a holographic effect in Blender": "Cyber Projection Toolkit 在 Blender 中控制全息效果",
+    "Cyber Projection Toolkit Blender feature demonstration": "Cyber Projection Toolkit 插件功能演示",
+    "Create hologram from image or video control in Blender": "在 Blender 中通过图片或视频创建全息投影",
+    "Automatically generated projection plane and material": "自动生成的投影平面与材质",
+    "Cyber projection preset controls": "赛博投影预设控制",
+    "Glitch animation controls inside the Blender add-on": "Blender 插件中的故障动画控制",
+    "Colour and projection art direction controls": "色彩与投影视觉效果控制",
+    "Replace current projection image or video": "替换当前投影的图片或视频",
+    "Cyan hologram preset controlled through Cyber Projection Toolkit": "通过 Cyber Projection Toolkit 控制的青色全息预设",
+    "Amber hologram preset controlled through Cyber Projection Toolkit": "通过 Cyber Projection Toolkit 控制的琥珀色全息预设",
+    "Source video frame used to test the projection workflow": "用于测试投影流程的原始视频帧",
+    "Making a duplicated hologram material independent": "将复制的全息材质设为独立材质",
+    "Auto-Disconnect creating an independent hologram material": "使用自动断开功能创建独立全息材质",
+    "Several independent cyber projection effects in one Blender scene": "同一 Blender 场景中的多个独立赛博投影效果",
+    "Project slide asking what if the museum ran on ecological time, not human time": "项目命题：如果博物馆跟随生态时间运行",
+    "Exterior of The Burrell Collection in Pollok Country Park": "波洛克乡村公园内的巴勒尔珍藏馆外景",
+    "Pollok Country Park in Glasgow": "格拉斯哥波洛克乡村公园",
+    "Biodiversity Clock case study sections": "生物多样性时钟项目章节",
+    "AAD and desk research evidence slide": "动物辅助设计与案头调研展示板",
+    "Field research findings slide": "实地调研发现展示板",
+    "Stakeholder interview insight slide": "相关方访谈洞察展示板",
+    "Design iteration slide showing prototypes and final biodiversity clock direction": "展示原型迭代及最终生物多样性时钟方向的设计板",
+    "Final biodiversity clock interface and physical form": "最终生物多样性时钟界面与实体形态",
+    "Seasonal and historical time interface designs": "季节与历史时间界面设计",
+    "Interactive receipt specimen cards connecting animals and museum objects": "连接动物与博物馆藏品的互动票据样卡",
+    "Storyboard showing visitor journey through the biodiversity clock experience": "生物多样性时钟访客体验旅程故事板",
+    "Cross-Culture Icebreaker overview": "跨文化破冰包概览",
+    "Cross-Culture case study sections": "跨文化破冰包项目章节",
+    "Cross-Culture overview": "跨文化破冰包概览",
+    "Cross-Culture research": "跨文化交流背景调研",
+    "Cross-Culture user research": "跨文化交流用户研究",
+    "Cross-Culture service system": "跨文化交流服务系统",
+    "Cross-Culture user flows": "跨文化交流用户流程",
+    "Cross-Culture final prototype": "跨文化破冰包最终原型",
+    "Ear Shield project overview": "鲸声护盾项目概览",
+    "Ear Shield case study sections": "鲸声护盾项目章节",
+    "Ear Shield overview": "鲸声护盾概览",
+    "Ear Shield background research": "鲸声护盾背景研究",
+    "Ear Shield sound research": "鲸声护盾声音研究",
+    "Ear Shield concept ideation": "鲸声护盾概念推演",
+    "Ear Shield device system": "鲸声护盾设备系统",
+    "Ear Shield interactive prototype": "鲸声护盾互动原型",
+    "Ear Shield exhibition": "鲸声护盾展览现场",
+    "Machine Mapping overview": "机器映射概览",
+    "Machine Mapping project sections": "机器映射项目章节",
+    "Machine Mapping research": "机器映射背景研究",
+    "Machine Mapping learning loop": "机器映射学习循环",
+    "Machine Mapping development": "机器映射设计开发",
+    "Machine Mapping participant process": "机器映射参与者流程",
+    "Machine Mapping implementation": "机器映射技术实现",
+    "Scone Through Time case study sections": "司康时光项目章节",
+    "Stakeholder source slide for Scone Through Time": "司康时光相关方研究展示板",
+    "Core narrative timeline source slide": "核心叙事时间线研究材料",
+    "Prototype testing source slide showing peer feedback and improvements": "包含同伴反馈与改进措施的原型测试展示板",
+    "Animation module 1 source slide": "动画学习模块 1 展示板",
+    "Animation module 2 source slide": "动画学习模块 2 展示板",
+    "Animation module 3 source slide": "动画学习模块 3 展示板",
+    "Interactive learning module source slide": "互动学习模块展示板",
+    "SeedWalkers overview": "种子行者概览",
+    "SeedWalkers case study sections": "种子行者项目章节",
+    "SeedWalkers carbon background": "种子行者碳排放背景",
+    "SeedWalkers biodiversity logic": "种子行者生物多样性逻辑",
+    "SeedWalkers vegetation analysis": "种子行者植被分析",
+    "SeedWalkers service framework": "种子行者服务框架",
+    "SeedWalkers user journey": "种子行者用户旅程",
+    "SeedWalkers service blueprint": "种子行者服务蓝图",
+    "SeedWalkers implementation": "种子行者技术实现"
+  });
+
+  // Localise ordinary terminology even in earlier mixed-language translations.
+  for (const key of Object.keys(zh)) {
+    zh[key] = zh[key]
+      .replace(/包容性 hospitality/gi, "包容性接待服务")
+      .replace(/hospitality 学生/gi, "酒店与接待服务专业学生")
+      .replace(/hospitality 学习者/gi, "酒店与接待服务专业学习者")
+      .replace(/hospitality/gi, "酒店与接待服务")
+      .replace(/ASN 学习者/g, "有额外学习支持需求的学习者")
+      .replace(/中学 \/ ASN \/ /g, "中学生 / 需要额外学习支持者 / ")
+      .replace(/Human-in-the-loop/g, "人在回路中参与反馈的")
+      .replace(/Mel Spectrogram/g, "梅尔频谱")
+      .replace(/Three Horizons/g, "三重视野（Three Horizons）")
+      .replace(/Crazy 8s/g, "八格快速构思法（Crazy 8s）");
+  }
+  Object.assign(zh, {
+    "A place-based experience innovation collaboration with Glasgow City Council and Glasgow Life.": "与格拉斯哥市议会及 Glasgow Life 开展的场地体验创新合作。",
+    "Glasgow City Council × Glasgow Life": "格拉斯哥市议会 × Glasgow Life",
+    "Pollok Country Park and The Burrell Collection, South Glasgow": "格拉斯哥南部的波洛克乡村公园与巴勒尔珍藏馆",
+    "Developed in collaboration with The Burrell Collection and Pollok Country Park stakeholders, this place-based transformation design project translates ecological rhythms into a museum-and-park experience that invites visitors to notice, understand and participate in multi-species coexistence.": "与巴勒尔珍藏馆及波洛克乡村公园相关团队合作，将生态节律转化为连接博物馆与公园的体验，引导访客观察、理解并参与多物种共生。",
+    "The Burrell Collection is a Glasgow Life museum located inside Pollok Country Park. The collaboration connected institutional priorities, visitor experience and the park's living ecology through meetings, field inquiry and service design.": "巴勒尔珍藏馆由 Glasgow Life 运营，坐落于波洛克乡村公园内。本次合作通过机构会议、实地调研与服务设计，将机构目标、访客体验和公园生态联系起来。",
+    "A Glasgow Life museum embedded within Pollok Country Park. Photo: Anthony O'Neil / Geograph, CC BY-SA 2.0.": "位于波洛克乡村公园内、由 Glasgow Life 运营的博物馆。摄影：Anthony O'Neil / Geograph，CC BY-SA 2.0。",
+    "Stakeholder meetings with The Burrell Collection and Pollok Country Park; field research; visitor and ecological inquiry.": "与巴勒尔珍藏馆、波洛克乡村公园相关方开展会议，并进行实地、访客与生态调研。",
+    "A future museum-and-park experience translating ecological rhythms in Pollok Country Park into visitor action.": "连接博物馆与公园的未来体验，将波洛克乡村公园的生态节律转化为访客的观察、思考与行动。"
+  });
+
   const zhTitles = {
     "index.html": "朱一帆 | 服务与转型设计作品集",
     "work.html": "朱一帆 | 项目",
@@ -550,14 +1060,15 @@
     "project-biodiversity-clock.html": "朱一帆 | 多物种 / 生物多样性时钟",
     "project-ear-shield.html": "朱一帆 | Ear Shield 鲸声护盾",
     "project-seedwalkers.html": "朱一帆 | SeedWalkers 种子行者",
-    "project-machine-mapping.html": "朱一帆 | Machine Mapping 机器映射"
+    "project-machine-mapping.html": "朱一帆 | Machine Mapping 机器映射",
+    "project-cross-culture.html": "朱一帆 | 跨文化破冰包"
   };
 
   const normalize = (value) => value.replace(/\s+/g, " ").trim();
 
   const getCurrentPage = () => {
     const page = window.location.pathname.split("/").pop();
-    return page || "index.html";
+    return page ? (page.includes(".") ? page : `${page}.html`) : "index.html";
   };
 
   const getInitialLanguage = () => {
@@ -565,7 +1076,8 @@
     const queryLanguage = params.get("lang");
     if (queryLanguage === "zh" || queryLanguage === "en") return queryLanguage;
 
-    const saved = window.localStorage.getItem(LANGUAGE_KEY);
+    let saved;
+    try { saved = window.localStorage.getItem(LANGUAGE_KEY); } catch { /* Storage may be disabled. */ }
     if (saved === "zh" || saved === "en") return saved;
 
     const host = window.location.hostname.toLowerCase();
@@ -583,7 +1095,7 @@
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         const parent = node.parentElement;
-        if (!parent || SKIP_TAGS.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
+        if (!parent || SKIP_TAGS.has(parent.tagName) || parent.closest("[translate='no'], .language-switcher")) return NodeFilter.FILTER_REJECT;
         if (!normalize(node.nodeValue)) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
@@ -601,6 +1113,30 @@
     });
   };
 
+  const originalAttributes = new WeakMap();
+  const applyLanguageToAttributes = (language) => {
+    document.querySelectorAll("[aria-label], [alt], [title], [placeholder]").forEach((element) => {
+      if (!originalAttributes.has(element)) {
+        originalAttributes.set(element, Object.fromEntries(["aria-label", "alt", "title", "placeholder"]
+          .filter((name) => element.hasAttribute(name)).map((name) => [name, element.getAttribute(name)])));
+      }
+      for (const [name, english] of Object.entries(originalAttributes.get(element))) {
+        element.setAttribute(name, language === "zh" ? (zh[normalize(english)] || english) : english);
+      }
+    });
+  };
+
+  const updateLanguageLinks = (language) => {
+    document.querySelectorAll("a[href]").forEach((link) => {
+      const raw = link.getAttribute("href");
+      if (!raw || raw.startsWith("#")) return;
+      const url = new URL(raw, window.location.href);
+      if (url.origin !== window.location.origin || !(/\.html$/.test(url.pathname) || !url.pathname.split("/").pop().includes("."))) return;
+      url.searchParams.set("lang", language);
+      link.setAttribute("href", `${url.pathname}${url.search}${url.hash}`);
+    });
+  };
+
   const updateSwitcherState = (language) => {
     document.querySelectorAll("[data-language-option]").forEach((button) => {
       const isActive = button.dataset.languageOption === language;
@@ -612,6 +1148,8 @@
   const applyLanguage = (language) => {
     document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
     applyLanguageToTextNodes(language);
+    applyLanguageToAttributes(language);
+    updateLanguageLinks(language);
     document.title = language === "zh" && zhTitles[getCurrentPage()] ? zhTitles[getCurrentPage()] : originalTitle;
     updateSwitcherState(language);
   };
@@ -634,7 +1172,10 @@
       button.dataset.languageOption = language;
       button.setAttribute("aria-pressed", "false");
       button.addEventListener("click", () => {
-        window.localStorage.setItem(LANGUAGE_KEY, language);
+        try { window.localStorage.setItem(LANGUAGE_KEY, language); } catch { /* URL still preserves the choice. */ }
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", language);
+        window.history.replaceState(null, "", url);
         applyLanguage(language);
       });
       switcher.appendChild(button);

@@ -106,7 +106,7 @@ root.querySelectorAll('.v3-media').forEach(media=>{
 document.addEventListener('visibilitychange',()=>{if(document.hidden)root.querySelectorAll('video').forEach(v=>{v.pause();v.classList.remove('is-playing');});});
 
 const dialog=document.createElement('dialog');dialog.className='v3-video-dialog';dialog.setAttribute('aria-labelledby','v3-video-title');
-dialog.innerHTML='<div class="v3-dialog-header"><h2 id="v3-video-title"></h2><button type="button" data-close></button></div><video controls playsinline preload="metadata"></video><p class="v3-video-error" hidden></p><div class="v3-dialog-footer"><a data-dialog-case></a><a data-original target="_blank" rel="noopener noreferrer"></a></div>';
+dialog.innerHTML='<div class="v3-dialog-header"><h2 id="v3-video-title"></h2><button type="button" data-close></button></div><video controls playsinline preload="metadata"></video><p class="v3-video-error" hidden></p><div class="v3-dialog-footer"><a data-dialog-case></a><a data-original target="_blank" rel="noopener noreferrer"></a><a data-release target="_blank" rel="noopener noreferrer" hidden></a></div>';
 document.body.append(dialog);
 const player=dialog.querySelector('video');
 function close(){player.pause();dialog.close();}
@@ -120,8 +120,9 @@ export function openVideo(id,trigger) {
   opener=trigger;document.querySelectorAll('video').forEach(v=>v.pause());
   dialog.querySelector('h2').textContent=project.title[language()];
   dialog.querySelector('[data-close]').textContent=local('Close video','关闭视频');
-  const link=dialog.querySelector('[data-dialog-case]');link.textContent=local('Read the full story','阅读完整案例')+' ↗';const target=new URL(project.href,location.href);target.searchParams.set('from',active);target.searchParams.set('lang',language());link.href=target;
+  const link=dialog.querySelector('[data-dialog-case]');link.textContent=(project.href.startsWith('practice.html')?local('View film & details','查看影像与制作信息'):local('Read the full story','阅读完整案例'))+' ↗';const target=new URL(project.href,location.href);target.searchParams.set('from',active);target.searchParams.set('lang',language());link.href=target;
   const source=dialog.querySelector('[data-original]');source.textContent=local('Open original video','打开原视频')+' ↗';source.href=project.video;
+  const release=dialog.querySelector('[data-release]');release.hidden=!project.external;if(project.external){release.href=project.external;release.textContent=project.externalLabel[language()]+' ↗';}else release.removeAttribute('href');
   const error=dialog.querySelector('.v3-video-error');error.textContent=local('Video could not play. Open the original file.','视频暂时无法播放，请打开原视频文件。');error.hidden=true;
   player.poster=project.cover;player.src=project.webVideo||project.video;dialog.showModal();document.documentElement.classList.add('v3-dialog-open');player.play().catch(()=>{ /* Native controls remain available if autoplay is restricted. */ });
 }

@@ -3,6 +3,7 @@ import { pathToFileURL } from 'node:url';
 import { categories, projects, forthcoming, caseHighlights, orderedProjects } from './portfolio-catalog.mjs';
 import {renderProductDemos} from './product-demos.mjs';
 import {productCases} from './product-case-data.mjs';
+import {renderVisualWork,resourceCopy} from './render-visual-work.mjs';
 
 const dictionary = {};
 const esc = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -10,7 +11,7 @@ const t = (en, zh) => { dictionary[en.replace(/\s+/g,' ').trim()] = zh; return e
 const pair = value => t(value.en,value.zh);
 export const header = () => `<a class="v3-skip" href="#main">${t('Skip to content','跳转至内容')}</a>
   <header class="site-header v3-header"><a class="brand" href="index.html">Yifan Zhu<span class="v3-brand-dot" aria-hidden="true"></span></a>
-    <nav aria-label="Primary navigation"><a href="work.html">${t('All Work','全部作品')}</a><a href="practice.html">Practice</a><a href="about.html">About</a><a class="v3-contact-link" href="mailto:zhuyifan001225@gmail.com" aria-label="${t('Email Yifan Zhu','发邮件给朱一帆')}"><span class="v3-contact-label">${t('Let’s talk','聊聊合作')}</span><svg class="v3-mail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5"/></svg></a><button class="v3-theme-toggle" type="button" data-theme-toggle aria-label="${t('Switch to dark mode','切换到深色模式')}"><span class="v3-theme-label">${t('Dark','深色')}</span></button></nav></header>`;
+    <nav aria-label="Primary navigation"><a href="work.html">${t('All Work','全部作品')}</a><a href="practice.html">${t('Films & Tools','影像与工具')}</a><a href="about.html">About</a><a class="v3-contact-link" href="mailto:zhuyifan001225@gmail.com" aria-label="${t('Email Yifan Zhu','发邮件给朱一帆')}"><span class="v3-contact-label">${t('Let’s talk','聊聊合作')}</span><svg class="v3-mail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5"/></svg></a><button class="v3-theme-toggle" type="button" data-theme-toggle aria-label="${t('Switch to dark mode','切换到深色模式')}"><span class="v3-theme-label">${t('Dark','深色')}</span></button></nav></header>`;
 const footer = () => `<footer class="site-footer v3-footer"><div><a href="index.html">Yifan Zhu</a><p>${t('Research-led Multidisciplinary Designer','研究驱动的跨领域设计师')}</p></div><a href="mailto:zhuyifan001225@gmail.com">zhuyifan001225@gmail.com</a><div class="v3-footer-social"><a href="https://www.douyin.com/video/7652021976073058661" target="_blank" rel="noopener noreferrer">Douyin</a><a href="https://xhslink.com/m/AZhAMj7fpc7" target="_blank" rel="noopener noreferrer">${t('Xiaohongshu / RED','小红书 / RED')}</a><a href="https://b23.tv/DQqusXX" target="_blank" rel="noopener noreferrer">Bilibili</a><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener noreferrer">${t('Resource Website','资源网站')}</a></div></footer>`;
 function card(project,index) {
   const tones={'beauty-marketplace':['#ddd3e2','#3e3047'],'salon-booking':['#cedbd2','#263e32'],'ear-shield':['#cbdde7','#243d50'],'anxiety-market':['#dce3ed','#35445a'],'biodiversity-clock':['#dfe5be','#414b2f'],seedwalkers:['#d2dfc7','#354a30'],'machine-mapping':['#d8cce9','#433157'],scone:['#ead9bd','#57412c'],'cross-culture':['#ead3c2','#54382b'],'resource-platform':['#d0d9e1','#324654']};
@@ -24,7 +25,9 @@ function card(project,index) {
       ${project.video?`<button class="v3-play" type="button" data-play="${project.id}" aria-label="${t('Play video: '+project.title.en,'播放视频：'+project.title.zh)}">${t('Play','播放')} <span translate="no">${project.duration}</span></button>`:''}</div>
     <div class="v3-card-info"><div class="v3-card-status ${project.status.en==='Released product'?'v3-card-status--live':''}">${pair(project.status)}</div>
       <h3><a data-case-link href="${project.href}">${pair(project.title)}</a></h3><p>${pair(project.subtitle)}</p>
-      ${project.demo?`<a class="v3-demo-card-link" data-case-link href="${project.href}#interactive-demo">${t('Try prototype','体验原型')} ↗</a>`:''}<div class="v3-card-tags">${project.tags.map(pair).map(s=>`<span>${s}</span>`).join('')}</div></div>
+      ${project.demo?`<a class="v3-demo-card-link" data-case-link href="${project.href}#interactive-demo">${t('Try prototype','体验原型')} ↗</a>`:''}<div class="v3-card-tags">${project.tags.map(pair).map(s=>`<span>${s}</span>`).join('')}</div>
+      ${project.external?`<a class="v3-demo-card-link v3-release-link" href="${project.external}" target="_blank" rel="noopener noreferrer">${pair(project.externalLabel)} ↗</a>`:''}
+    </div>
   </div></article>`;
 }
 function gallery() {
@@ -58,6 +61,7 @@ export async function renderPortfolio() {
   const home = `<section class="v3-hero"><div><p class="v3-eyebrow">${t('Research-led Multidisciplinary Designer','研究驱动的跨领域设计师')}</p><h1>${t('Research-led.','以研究为起点。')}<br><span>${t('Made tangible.','让想法可体验。')}</span></h1></div><div class="v3-hero-note"><p>${t('I turn complex questions into experiences you can see, use and test.','我将复杂的问题转化为可看见、可使用、可测试的体验。')}</p><span>${t('Products. Moving images. Systems.','产品、动态影像与系统。')}</span></div></section>`;
   const work = `<section class="v3-hero v3-hero--work"><div><p class="v3-eyebrow">${t('The work of Yifan Zhu','朱一帆的设计实践')}</p><h1>${t('Different disciplines.','跨越不同领域。')}<br><span>${t('One curious mind.','始于同一份好奇。')}</span></h1></div><div class="v3-hero-note"><p>${t('Find the perspective that fits your team.','找到适合你的团队的设计视角。')}</p><span>${t('Explore a collection. Open the full story.','按方向浏览，深入完整案例。')}</span></div></section>`;
   await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',home+gallery()+approach(),'v3-index'));
+  await fs.writeFile('practice.html',renderVisualWork(t,document,projects));
   await fs.writeFile('work.html',document('Yifan Zhu | All Work',work+gallery(),'v3-index'));
   await fs.writeFile('project-anxiety-market.html',anxiety());
   for(const [file,html] of renderProductDemos(t,document))await fs.writeFile(file,html);
@@ -106,9 +110,17 @@ export async function renderPortfolio() {
       if(html.includes('class="section v3-role-links"'))html=html.replace(/<section class="section v3-role-links"[\s\S]*?<\/section>/,roleLinks);
       else html=html.replace('<section class="section cv-section"',roleLinks+'\n<section class="section cv-section"');
     }
+    for(const [from,en,zh] of resourceCopy){
+      const translated=t(en,zh);
+      if(file==='resource-platform.html'){
+        const pattern=from.replace(/[.*+?^\x24{}()|[\]\\]/g,'\\    await fs.writeFile(file,html);').replace(/\s+/g,'\\s+');
+        html=html.replace(new RegExp(pattern,'g'),translated);
+      }
+    }
     await fs.writeFile(file,html);
   }
   let language=await fs.readFile('scripts/language.js','utf8');
+  language=language.replace(/"practice.html": "[^"]*"/, '"practice.html": "朱一帆 | 影像与创意工具"');
   for(const [en,zh] of Object.entries(dictionary)) dictionary[en+' ↗']=zh+' ↗';
   const addition=`  // V3 translations start\n  Object.assign(zh, ${JSON.stringify(dictionary,null,2)});\n  // V3 translations end\n\n`;
   if(language.includes('// V3 translations start'))language=language.replace(/  \/\/ V3 translations start[\s\S]*?  \/\/ V3 translations end\n\n/,addition);

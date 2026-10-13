@@ -7,23 +7,19 @@
       const destination = new URL("work.html", location.href);
       const language = new URLSearchParams(location.search).get("lang");
       if (language === "zh" || language === "en") destination.searchParams.set("lang", language);
+      const filter = new URLSearchParams(location.search).get("filter");
+      if (filter) destination.searchParams.set("filter", filter);
       location.replace(destination.href);
     </script>
     <title>Yifan Zhu | Work</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+    <meta name="theme-color" content="#f6f5f1" /><script src="scripts/theme.js"></script><link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="v3.css" /><link rel="stylesheet" href="themes.css" /></head>
   <body>
-    <header class="site-header">
-      <a class="brand" href="index.html">Yifan Zhu</a>
-      <nav aria-label="Primary navigation">
-        <a href="work.html">Work</a>
-        <a href="practice.html">Practice</a>
-        <a href="about.html">About</a>
-        <a href="mailto:zhuyifan001225@gmail.com">Contact</a>
-      </nav>
-    </header>
+    <a class="v3-skip" href="#main">Skip to content</a>
+  <header class="site-header v3-header"><a class="brand" href="index.html">Yifan Zhu<span class="v3-brand-dot" aria-hidden="true"></span></a>
+    <nav aria-label="Primary navigation"><a href="work.html">All Work</a><a href="practice.html">Practice</a><a href="about.html">About</a><a class="v3-contact-link" href="mailto:zhuyifan001225@gmail.com" aria-label="Email Yifan Zhu"><span class="v3-contact-label">Let’s talk</span><svg class="v3-mail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5"/></svg></a><button class="v3-theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode"><span class="v3-theme-label">Dark</span></button></nav></header>
 
-    <main>
+    <main id="main">
       <section class="case-landing">
         <p class="eyebrow">Work</p>
         <h1>Project case studies have moved.</h1>
@@ -35,5 +31,5 @@
       </section>
     </main>
     <script src="scripts/language.js" defer></script>
-  </body>
+  <script src="scripts/v3-site.js" defer></script></body>
 </html>

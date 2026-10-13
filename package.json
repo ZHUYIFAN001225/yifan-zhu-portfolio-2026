@@ -4,7 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "demos": "node scripts/preview-products.mjs",
+    "demos:prepare": "node scripts/prepare-product-preview.mjs",
+    "content": "node scripts/render-portfolio.mjs",
+    "export:cases": "node scripts/export-product-cases.mjs",
     "build": "node scripts/build-static.mjs",
-    "test": "node scripts/check-translations.mjs --attributes"
+    "test": "node scripts/check-translations.mjs --attributes && node scripts/check-portfolio.mjs"
   }
 }

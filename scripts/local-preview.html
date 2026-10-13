@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>作品集 · 手机 / 桌面预览</title>
+  <style>
+    *{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif;background:#e9e7e2;color:#282828;display:flex;flex-direction:column}
+    .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;padding:14px 24px;background:#f8f7f3;border-bottom:1px solid #d7d5cf}
+    .brand{font-size:14px;font-weight:650;white-space:nowrap}.brand span{display:block;font-size:11px;font-weight:400;color:#686761;margin-top:5px}
+    .devices{display:flex;padding:4px;border:1px solid #d7d5cf;border-radius:100px;gap:4px;background:#eeece7}
+    button,select,a{font:inherit}button{cursor:pointer}.devices button{border:0;border-radius:100px;min-height:40px;padding:9px 20px;background:transparent;color:#555650;font-weight:600;font-size:13px}.devices button[aria-pressed="true"]{background:#34363b;color:white}
+    label{display:flex;align-items:center;gap:8px;font-size:12px;color:#65645f}select{min-height:44px;padding:8px 30px 8px 12px;border:1px solid #d7d5cf;border-radius:9px;background:#fffefa;color:#282828;max-width:100%}
+    .open{margin-left:auto;min-height:44px;display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:#34363b;text-underline-offset:4px}
+    :focus-visible{outline:2px solid #636b9c;outline-offset:3px}.hint{padding:9px 24px;font-size:11px;line-height:1.5;color:#686761;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.hint p{margin:0}
+    #stage{flex:1;min-height:240px;position:relative;overflow:hidden;margin:0 12px 12px}
+    #shell{position:absolute;left:50%;top:50%;background:#303234;border:1px solid #c0beb7;padding:7px;border-radius:28px;box-shadow:0 14px 45px #25282318;transform-origin:center}
+    #shell[data-view="desktop"]{border-radius:12px;padding:3px;background:#d6d4ce}
+    iframe{display:block;border:0;background:#f6f4ef;border-radius:21px}#shell[data-view="desktop"] iframe{border-radius:8px}
+    @media(max-width:650px){.toolbar{padding:12px;gap:10px}.brand{width:100%}.brand span{display:inline;margin-left:8px}.devices button{padding:9px 18px}.open{margin-left:0}.hint{padding:8px 14px}.toolbar label{gap:5px}.toolbar select{font-size:12px}#stage{margin-inline:4px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand">Yifan Zhu · 本地预览<span>手机与桌面布局对照</span></div>
+    <div class="devices" role="group" aria-label="选择预览设备">
+      <button type="button" data-view="mobile" aria-pressed="true">手机</button>
+      <button type="button" data-view="desktop" aria-pressed="false">桌面</button>
+    </div>
+    <label>尺寸 <select id="size" aria-label="预览尺寸"></select></label>
+    <label>页面 <select id="page" aria-label="选择预览页面">
+      <option value="/index.html?lang=zh">首页</option>
+      <option value="/work.html?filter=all&lang=zh">All Work</option>
+      <option value="/about.html?lang=zh">关于</option>
+      <option value="/project-beauty-marketplace.html?from=digital-products-ux&lang=zh">LOOK 产品</option>
+      <option value="/project-glasgow-booking.html?from=digital-products-ux&lang=zh">预约系统</option>
+      <option value="/project-cyber-projection-toolkit.html?lang=zh">Cyber Toolkit</option>
+    </select></label>
+    <a id="open" class="open" target="_blank" rel="noopener" href="/index.html?lang=zh">独立打开当前页面 ↗</a>
+  </header>
+  <div class="hint"><p>可以在预览里点击、滚动和播放视频；切换设备会保留当前页面。</p><p id="dimensions" role="status"></p></div>
+  <main id="stage" aria-label="交互式作品集预览">
+    <div id="shell" data-view="mobile"><iframe id="site" title="作品集手机预览" allow="fullscreen" allowfullscreen></iframe></div>
+  </main>
+  <script>
+    const frame=document.querySelector('#site'),shell=document.querySelector('#shell'),stage=document.querySelector('#stage');
+    const size=document.querySelector('#size'),page=document.querySelector('#page'),open=document.querySelector('#open');
+    const params=new URL(location.href).searchParams;
+    const sizes={mobile:[[375,812],[430,932]],desktop:[[1440,900],[1280,800],[1920,1080]]};
+    let view=params.get('view')==='desktop'?'desktop':'mobile';
+    const selected={mobile:'375x812',desktop:'1440x900'};
+    if(sizes[view].some(pair=>pair.join('x')===params.get('size')))selected[view]=params.get('size');
+    let current='/index.html?lang=zh';
+    function permitted(value){try{const url=new URL(value,location.origin);return url.origin===location.origin&&/^\/[a-z][a-z0-9-]*\.html$/.test(url.pathname)?url.pathname+url.search+url.hash:null;}catch{return null;}}
+    current=permitted(params.get('page')||'')||current;
+    function sync(readFrame=true){
+      if(readFrame)try{current=permitted(frame.contentWindow.location.href)||current;}catch{}
+      open.href=current;
+      const match=Array.from(page.options).find(option=>new URL(option.value,location.origin).pathname===new URL(current,location.origin).pathname);
+      if(match)page.value=match.value;else page.selectedIndex=-1;
+      const url=new URL(location.href);url.searchParams.set('view',view);url.searchParams.set('size',selected[view]);url.searchParams.set('page',current);history.replaceState(null,'',url);
+    }
+    function fit(){
+      const [width,height]=selected[view].split('x').map(Number),padding=view==='mobile'?16:8;
+      frame.style.width=width+'px';frame.style.height=height+'px';
+      const scale=Math.min(1,Math.max(1,stage.clientWidth-24)/(width+padding),Math.max(1,stage.clientHeight-16)/(height+padding));
+      shell.style.transform=`translate(-50%,-50%) scale(${scale})`;
+      document.querySelector('#dimensions').textContent=`${view==='mobile'?'手机':'桌面'} ${width} × ${height} · 浏览器尺寸模拟`;
+    }
+    function switchView(next){
+      view=next;shell.dataset.view=view;
+      document.querySelectorAll('[data-view]').forEach(button=>{if(button.tagName==='BUTTON')button.setAttribute('aria-pressed',String(button.dataset.view===view));});
+      size.replaceChildren(...sizes[view].map(([width,height])=>{const option=document.createElement('option');option.value=width+'x'+height;option.textContent=width+' × '+height;return option;}));
+      size.value=selected[view];frame.title=view==='mobile'?'作品集手机预览':'作品集桌面预览';fit();sync();
+    }
+    document.querySelectorAll('button[data-view]').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.view)));
+    size.addEventListener('change',()=>{selected[view]=size.value;fit();sync();});
+    page.addEventListener('change',()=>{current=page.value;frame.src=current;sync(false);});
+    open.addEventListener('click',sync);
+    frame.addEventListener('load',()=>{
+      sync();
+      try{frame.contentDocument.addEventListener('portfolio:language',sync);frame.contentWindow.addEventListener('popstate',sync);frame.contentWindow.addEventListener('hashchange',sync);frame.contentDocument.addEventListener('click',()=>setTimeout(sync,0));}catch{}
+    });
+    new ResizeObserver(fit).observe(stage);
+    frame.src=current;switchView(view);
+  </script>
+</body>
+</html>

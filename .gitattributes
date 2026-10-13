@@ -1,0 +1,13 @@
+# Preserve original media byte-for-byte on Windows and Linux.
+*.pdf binary
+*.mp4 binary
+*.mov binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

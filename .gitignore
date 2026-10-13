@@ -3,6 +3,8 @@ dist
 build
 .vercel
 .codex-tmp
+tmp/pdfs/
+output/pdf/
 .env
 .env.local
 .DS_Store

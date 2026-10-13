@@ -1,0 +1,259 @@
+/* Theme extension: load after v3.css. Real artwork and product screenshots stay unchanged. */
+:root {
+  --v3-focus: #636b9c;
+  --v3-control: #34363b;
+  --v3-control-ink: #f6f4ef;
+}
+
+.v3-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.v3-theme-label { display: inline; }
+.v3-theme-toggle:focus-visible {
+  outline: 2px solid var(--v3-focus);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .v3-theme-toggle:hover { background: var(--panel); }
+}
+
+/* Dark changes apply on screen only. Exported product-case PDFs have their own paper palette. */
+@media screen {
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #141518;
+    --panel: #1e2025;
+    --panel-2: #292c33;
+    --text: #f3f1ec;
+    --muted: #b1b0aa;
+    --line: #3d4048;
+    --accent: #c5cde2;
+    --v3-secondary: #cfcdc7;
+    --v3-focus: #b8c3e6;
+    --v3-control: #e0e4ed;
+    --v3-control-ink: #1a1c21;
+  }
+
+  /* Existing case components predominantly inherit these shared tokens. */
+  html[data-theme="dark"] body { background: var(--bg); color: var(--text); }
+  html[data-theme="dark"] :is(a, button, input):focus-visible { outline-color: var(--v3-focus); }
+  html[data-theme="dark"] .v3-header nav { color: var(--muted); }
+  html[data-theme="dark"] .v3-header .language-switcher { border-color: var(--line); }
+  html[data-theme="dark"] .v3-header .language-switcher button { color: var(--muted); }
+  html[data-theme="dark"] .v3-header .language-switcher button.is-active {
+    color: var(--v3-control-ink);
+    background: var(--v3-control);
+  }
+  html[data-theme="dark"] .v3-hero h1 > span { color: var(--accent); }
+  html[data-theme="dark"] :is(
+    .v3-hero-note p, .v3-sidebar-note p, .v3-sidebar-note a,
+    .v3-approach > div > p:not(.v3-nav-label), .case-head p,
+    .v3-product-intro, .v3-product-section p, .v3-feature-list li,
+    .ux-decisions dd
+  ) { color: var(--v3-secondary); }
+  html[data-theme="dark"] :is(
+    .v3-filter, .v3-filter-index, .v3-filter-count, .v3-sidebar-note span,
+    .v3-result-count, .v3-result-note, .v3-card-status,
+    .v3-card-info p, .v3-card-tags, .v3-next li span,
+    .v3-approach h2 span, .v3-approach li span, .v3-public-metrics small,
+    .ux-evidence-slots small
+  ) { color: var(--muted); }
+  html[data-theme="dark"] .v3-filter.is-active,
+  html[data-theme="dark"] .v3-filter.is-active .v3-filter-count { color: var(--accent); }
+  html[data-theme="dark"] .v3-filter.is-active .v3-filter-index { color: transparent; }
+  html[data-theme="dark"] .v3-filter:hover { color: var(--text); }
+  html[data-theme="dark"] .v3-card-status--live { color: var(--accent); }
+  html[data-theme="dark"] .v3-product-section p.v3-demo-caption { color: var(--muted); }
+  html[data-theme="dark"] .v3-share:after { color: var(--text); }
+
+  /* Artwork-specific coloured covers and white evidence boards retain their own presentation. */
+  html[data-theme="dark"] .v3-card:not([data-project="web-prototype"]):not([data-project="scone"]):not(.v3-card--product) .v3-media {
+    background: var(--panel);
+  }
+  html[data-theme="dark"] .v3-case-categories a[aria-current],
+  html[data-theme="dark"] .v3-research-status { border-color: #778198; }
+  html[data-theme="dark"] .v3-case-tools .v3-tool-primary {
+    color: var(--bg);
+    background: var(--accent);
+  }
+  html[data-theme="dark"] :is(.v3-video-dialog, .v3-image-dialog) {
+    color: var(--text);
+    background: var(--bg);
+    border-color: var(--line);
+  }
+  html[data-theme="dark"] .v3-dialog-header button { background: var(--panel-2); color: var(--text); }
+  html[data-theme="dark"] .v3-video-error { color: #e7c58d; }
+  html[data-theme="dark"] .v3-motion-setting input { accent-color: var(--accent); }
+  html[data-theme="dark"] .v3-signature {
+    background: var(--panel-2);
+    color: var(--text);
+    box-shadow: 0 12px 50px #0005;
+  }
+  html[data-theme="dark"] .v3-signature:after { background: #8993ab; }
+
+  /* Product case actions and the existing CV/email action stay distinguishable. */
+  html[data-theme="dark"] :is(.v3-solid-button, .v3-outline-button) { border-color: var(--v3-control); }
+  html[data-theme="dark"] .v3-solid-button { background: var(--v3-control); color: var(--v3-control-ink); }
+  html[data-theme="dark"] .v3-outline-button { color: var(--text); background: transparent; }
+  html[data-theme="dark"] .cv-section .primary-cta {
+    color: var(--bg);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  html[data-theme="dark"] .product-response,
+  html[data-theme="dark"] .product-response :is(span, p) { color: var(--text); }
+  html[data-theme="dark"] :is(.scone-testing-change, .comparison-grid article:last-child) { border-color: #778198; }
+
+  /* Research plans remain visibly distinct from completed evidence. */
+  html[data-theme="dark"] .ux-evidence-note { background: #22262e; border-color: #8994ae; }
+  html[data-theme="dark"] .ux-architecture li { border-color: var(--line); }
+  html[data-theme="dark"] .ux-architecture li:before { background: #9ba9ca; }
+  html[data-theme="dark"] .ux-journey li { border-color: #778198; }
+  html[data-theme="dark"] .ux-journey li:not(:last-child):after { color: #aebbd7; }
+  html[data-theme="dark"] :is(.ux-journey span, .ux-research-plan > div > span, .ux-decision-number) { color: #b4c1de; }
+  html[data-theme="dark"] .ux-research-status {
+    color: #ecd7a7 !important;
+    background: #3a3326;
+  }
+  html[data-theme="dark"] .ux-evidence-slots > div { border-color: #62636a; }
+  html[data-theme="dark"] .ux-roadmap li { border-color: var(--line); }
+  html[data-theme="dark"] .ux-roadmap li.is-current { border-color: var(--accent); }
+
+  /* Bottom navigation deliberately retains a contrasting surface in both themes. */
+  html[data-theme="dark"] .v3-mobile-sheet { background: var(--bg); color: var(--text); box-shadow: 0 -12px 50px #0007; }
+  html[data-theme="dark"] .v3-mobile-sheet::backdrop { background: #0009; }
+  html[data-theme="dark"] .v3-mobile-choices a[aria-current] { background: var(--panel-2); border-color: #59647c; }
+  html[data-theme="dark"] .v3-mobile-check { color: var(--accent); }
+  html[data-theme="dark"] .v3-mobile-dock { background: #292c32f5; border-color: #515662; color: var(--text); }
+  html[data-theme="dark"] .v3-mobile-browse small { color: #cbced7; }
+
+  @media (hover: hover) and (pointer: fine) {
+    html[data-theme="dark"] main :is(p, li, dd, figcaption) a:hover,
+    html[data-theme="dark"] :is(.back-link, .v3-demo-card-link):hover,
+    html[data-theme="dark"] .v3-dialog-footer a:hover,
+    html[data-theme="dark"] .site-footer a[href]:hover { color: #d3dcf6; }
+    html[data-theme="dark"] .v3-solid-button:hover { background: #f1f3f8; }
+    html[data-theme="dark"] .v3-outline-button:hover { background: var(--panel); }
+    html[data-theme="dark"] .cv-section .primary-cta:hover { color: var(--accent); background: transparent; }
+  }
+  @media (max-width: 760px) {
+    html[data-theme="dark"] .v3-filter.is-active {
+      color: var(--bg);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    html[data-theme="dark"] .v3-filter.is-active .v3-filter-count { color: var(--bg); }
+    html[data-theme="dark"] .v3-case-categories a[aria-current] { color: var(--text); background: var(--panel-2); }
+  }
+}
+
+/* Existing language.js and theme runtime both append their controls to header nav.
+   Keep their semantic DOM unchanged: utilities share the brand row, links get the next row. */
+@media screen and (max-width: 760px) {
+  .site-header.v3-header {
+    flex-wrap: wrap;
+    min-height: 0;
+    gap: 0;
+    padding: 8px 0;
+  }
+  .v3-header .brand {
+    flex: 0 0 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding-right: 164px;
+    font-size: 16px;
+  }
+  .v3-header nav {
+    flex: 1 0 100%;
+    width: 100%;
+    min-height: 44px;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+  .v3-header nav > a { min-height: 44px; min-width: 44px; font-size: 12px; }
+  .v3-header .v3-theme-toggle {
+    position: absolute;
+    top: 8px;
+    right: 100px;
+    min-width: 56px;
+    min-height: 44px;
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+  .v3-header .v3-theme-label { display: inline; }
+  .v3-header .language-switcher {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    padding: 0 2px;
+    min-height: 44px;
+    width: 94px;
+    justify-content: center;
+  }
+  .v3-header .language-switcher button { min-height: 44px; min-width: 44px; padding: 5px 7px; }
+}
+
+/* Print always uses the editorial paper palette, regardless of saved screen appearance. */
+@media print {
+  :root, html[data-theme] {
+    color-scheme: light;
+    --bg: #fff;
+    --panel: #f1f0ec;
+    --panel-2: #e8e6df;
+    --text: #222;
+    --muted: #55544f;
+    --line: #ccc9c1;
+    --accent: #494f5d;
+  }
+  .v3-theme-toggle { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-theme-toggle { transition: none !important; animation: none !important; }
+}
+html[data-motion="reduce"] .v3-theme-toggle { transition: none !important; animation: none !important; }
+
+/* Recruitment scan: contributions stay beside the outcome, before the long case. */
+.ux-facts.ux-facts--lead{grid-template-columns:1fr;gap:12px;margin:24px 0 0;padding:20px 0 0;max-width:62ch}
+.ux-facts--lead>div{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:baseline}
+.ux-facts--lead dt{font-size:11px;line-height:1.5}
+.ux-facts--lead dd{margin:0;font-size:13px;line-height:1.65}
+.ux-case .v3-product-head{align-items:center;gap:clamp(24px,4vw,64px)}
+.ux-case .v3-product-hero{align-self:center;padding:24px;gap:16px}
+.ux-case .v3-product-hero .ux-screen{min-width:0}
+.ux-case .v3-product-hero img{height:auto;max-height:510px;width:100%;object-fit:contain}
+.ux-case .v3-product-hero figcaption{font-size:11px;line-height:1.5}
+.about-hero h1{font-size:clamp(38px,5.5vw,80px);max-width:18ch}
+.v3-about-contact{display:flex;align-items:center;flex-wrap:wrap;gap:12px 28px;margin-top:28px}
+.v3-about-contact a{font-size:14px;font-weight:600;line-height:1.6;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1px;min-height:44px;display:inline-flex;align-items:center;overflow-wrap:anywhere}
+@media(max-width:760px){
+  .ux-facts.ux-facts--lead{margin-top:22px;padding-top:18px;gap:14px}
+  .ux-facts--lead>div{grid-template-columns:78px 1fr;gap:10px}
+  .ux-case .v3-product-hero{padding:18px;gap:12px}
+  .ux-case .v3-product-hero img{max-height:300px}
+  .v3-about-contact{gap:8px 20px;margin-top:20px}
+}
+@media print{.ux-facts.ux-facts--lead{break-inside:avoid}.v3-about-contact{display:none}}
+
+@media screen and (max-width:760px){
+  .v3-header nav > .v3-contact-link{width:44px;min-width:44px!important}
+  .v3-gallery[data-collection="all"] [data-project="cyber-toolkit"]{grid-column:1/-1}
+}
+
+.about-hero > p:not(.eyebrow){max-width:72ch;font-size:16px;line-height:1.8}
+.ux-facts.ux-facts--lead{margin:20px 0 24px}

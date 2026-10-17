@@ -151,3 +151,40 @@ window.addEventListener('pagereveal',event=>{
  if(document.documentElement.dataset.motion==='reduce'||matchMedia('(prefers-reduced-motion: reduce)').matches){event.viewTransition.skipTransition();document.documentElement.dataset.pageTransition='reduced';return;}
  event.viewTransition.finished.then(()=>{document.documentElement.dataset.pageTransition='complete';}).catch(()=>{document.documentElement.dataset.pageTransition='skipped';});
 });
+
+// Case diagrams play once as they scroll into view, so the logic unfolds in order.
+// Without JavaScript, or with reduced motion, everything is simply shown in its final state.
+(() => {
+  const html=document.documentElement;
+  // One motion language across the site: product diagrams, case-study grids, method chains and public metrics.
+  const groups=document.querySelectorAll(['.ux-case :is(.ux-pains,.ux-persona,.ux-needs,.ux-lanes,.ux-bridge,.ux-flywheel,.ux-blueprint,.ux-scenario,.ux-phases,.ux-principles,.ux-chips--off,.ux-process,.ux-iterations,.ux-taps,.ux-journey,.ux-architecture,.ux-screens,.ux-research-plan,.ux-evidence-slots,.ux-roadmap,.ux-audience)',
+    'main :is(.v3-approach ol,.v3-public-metrics,.skills-grid,.about-grid,.archive-grid,.practice-evidence-grid,.metrics-grid,.platform-grid,.link-card-grid,.support-grid,.process-flow,.role-grid,.research-card-grid,.reflection-grid,.outcome-grid,.logic-grid,.journey-grid,.method-card-grid,.scope-flow,.scone-criteria-grid,.product-problem-grid,.product-feature-grid,.iteration-evidence-grid,.impact-timeline,.ai-video-process,.practice-video-grid)'].join(','));
+  if(!groups.length)return;
+  const reduced=()=>html.dataset.motion==='reduce'||matchMedia('(prefers-reduced-motion: reduce)').matches;
+  groups.forEach(g=>{
+    g.dataset.anim='';
+    if(g.classList.contains('ux-blueprint'))g.querySelectorAll('.ux-bp-row').forEach(row=>[...row.children].forEach((cell,i)=>cell.style.setProperty('--i',i)));
+    else if(g.classList.contains('ux-lanes'))[...g.children].forEach((lane,l)=>lane.querySelectorAll('li').forEach((li,i)=>li.style.setProperty('--i',l*2+i)));
+    else if(g.classList.contains('ux-persona'))g.querySelectorAll('li').forEach((li,i)=>li.style.setProperty('--i',i+1));
+    else if(!g.classList.contains('ux-flywheel'))[...g.children].forEach((el,i)=>el.style.setProperty('--i',i));
+  });
+  // Count a figure up from zero, keeping its decimals and suffix (e.g. 381K+, 11.6K, 1.1K+).
+  const countUp=(el,delay)=>{
+    const node=[...el.childNodes].find(n=>n.nodeType===3&&/\d/.test(n.nodeValue));if(!node)return;
+    const m=/^(\D*)(\d+(?:\.\d+)?)(.*)$/s.exec(node.nodeValue);if(!m)return;
+    const [,pre,num,post]=m,end=parseFloat(num),dp=(num.split('.')[1]||'').length,start=performance.now()+delay,dur=1100;
+    const tick=now=>{const k=Math.min(1,Math.max(0,(now-start)/dur)),e=1-Math.pow(1-k,3);node.nodeValue=pre+(end*e).toFixed(dp)+post;if(k<1)requestAnimationFrame(tick);};
+    node.nodeValue=pre+(0).toFixed(dp)+post;requestAnimationFrame(tick);
+  };
+  const play=g=>{if(g.classList.contains('is-on'))return;g.classList.add('is-on');if(reduced())return;
+    if(g.matches('.ux-taps'))g.querySelectorAll('b').forEach((el,i)=>countUp(el,i*160));
+    else if(g.matches('.v3-public-metrics,.metrics-grid,.platform-metrics .platform-grid'))g.querySelectorAll(':scope>* strong').forEach((el,i)=>countUp(el,i*160));};
+  if(reduced()||!('IntersectionObserver' in window)){groups.forEach(g=>g.classList.add('is-on'));return;}
+  html.classList.add('ux-motion');
+  const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){play(e.target);io.unobserve(e.target);}}),{threshold:0,rootMargin:'0px 0px -10% 0px'});
+  groups.forEach(g=>io.observe(g));
+  // Content at the very end of a page can never travel up past the trigger line; play it on arrival.
+  const atEnd=()=>{if(innerHeight+scrollY>=document.documentElement.scrollHeight-8)groups.forEach(g=>{if(g.getBoundingClientRect().top<innerHeight){play(g);io.unobserve(g);}});};
+  addEventListener('scroll',atEnd,{passive:true});atEnd();
+  document.addEventListener('portfolio:motion',()=>{if(reduced()){html.classList.remove('ux-motion');groups.forEach(g=>g.classList.add('is-on'));}});
+})();

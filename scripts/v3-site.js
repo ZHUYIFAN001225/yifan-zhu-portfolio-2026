@@ -47,11 +47,14 @@
         const key=stage.dataset.demoStage,url=(local&&demos[key])||stage.dataset.publicDemo;
         const unavailable=stage.parentElement.querySelector('[data-demo-unavailable]');
         if(!url){if(unavailable)unavailable.hidden=false;return;}
-        const frame=stage.querySelector('[data-demo-frame]');frame.src=url;
+        // Public prototypes follow the portfolio language (they default to English).
+        const withLang=(u,embed)=>{if(local&&demos[key])return u;try{const x=new URL(u,location.href);x.searchParams.set('lang',(document.documentElement.lang||'en').startsWith('zh')?'zh':'en');if(embed)x.searchParams.set('embed','1');return x.href;}catch{return u;}};
+        const frame=stage.querySelector('[data-demo-frame]');frame.src=withLang(url,true);
         // Some prototypes refresh when their window gains focus, which swallowed the first tap.
         // Give the frame focus as the pointer arrives, so the first real click goes through.
         frame.addEventListener('pointerenter',()=>{try{if(document.activeElement!==frame)frame.contentWindow.focus();}catch{}});stage.hidden=false;if(unavailable)unavailable.hidden=true;
-        stage.querySelectorAll('[data-demo-launch]').forEach(a=>{const route=(local&&demos[a.dataset.demoLaunch])||(a.dataset.demoLaunch===key?stage.dataset.publicDemo:'');if(route){a.href=route;a.hidden=false;}});
+        const links=()=>stage.querySelectorAll('[data-demo-launch]').forEach(a=>{const name=a.dataset.demoLaunch,route=(local&&demos[name])||(name===key?stage.dataset.publicDemo:name===key+'Admin'?stage.dataset.publicAdmin:'');if(route){a.href=local&&demos[name]?route:withLang(route);a.hidden=false;}});links();
+        document.addEventListener('portfolio:language',()=>{const next=withLang(url,true);if(frame.src!==next)frame.src=next;links();});
         const note=stage.querySelector('[data-demo-local-note]');if(note)note.hidden=!(local&&demos[key]);
         const cta=document.querySelector('[data-demo-cta]');
         if(cta){const label=()=>{cta.textContent=text('Try the prototype ↓','试用交互原型 ↓');};label();document.addEventListener('portfolio:language',label);}

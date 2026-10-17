@@ -186,7 +186,7 @@ export const productCases=[{
   subtitle:p('One shared diary. Two clear experiences.','一本共享预约本，两端清晰体验。'),
   intro:p('A customer and shop booking system for a small Glasgow salon run by an older owner, who currently manages every appointment through WeChat, a paper diary and memory.','为格拉斯哥一家小理发店设计的顾客与店铺双端预约系统。店主年纪较大，目前所有预约都靠微信、纸质本和记忆管理。'),
   core:p('The aim is not to put booking online. It is to let the routine run itself, so the owner only steps in for the exceptions — without learning a complicated tool.','目标不是「把预约搬到线上」，而是让日常预约自己运转，店主只在出现异常时介入，而且不需要学习复杂的工具。'),
-  status:p('Local shared prototype · field research planned','本地双端原型 · 现场调研待开展'),
+  status:p('Interactive two-sided prototype · field research planned','可交互双端原型 · 现场调研待开展'),
   role:p('Problem framing, service blueprint, booking rules, UI for both sides and AI-assisted prototyping','问题定义、服务蓝图、预约规则、双端界面与 AI 辅助原型'),
   scope:p('Customer booking + shop diary and availability','顾客预约 + 店铺排期与开放安排'),
   hero:['booking-customer','booking-admin'],
@@ -337,16 +337,17 @@ export const productCases=[{
     {file:'booking-exception',ext:'png',title:p('06 / Preserve affected bookings','06 / 保留受影响预约'),body:p('Before closing a day, the owner is told how many customers are affected. Their bookings are kept and move to rescheduling instead of disappearing.','关闭某天之前，系统先告诉店主会影响多少位顾客；这些预约会保留并进入改期，而不是直接消失。')}
   ],
   decisions:[],
-  demo:p('Choose a service → an available day → a start time → review. Confirm only a simulated appointment, then open the shop view to inspect the same date. Try My bookings for rescheduling and cancellation. All data are local fixtures.','选择服务 → 可约日期 → 开始时间 → 核对。确认模拟预约后，打开店铺端查看同一天。可在我的预约中体验改期与取消。数据均为本地演示配置。'),
-  // Public deployment of the standalone prototype (separate repository). Empty until it is live.
-  publicDemo:'',
-  boundary:p('The portfolio runs an isolated build of the existing customer and full shop source. Both use a local shared service; restarting it resets in-memory appointments. CloudBase persistence, real WeChat identity, reliable notifications and production deployment are unfinished. No real customer is charged or notified.','作品集运行现有顾客端与完整店铺源码的隔离构建，连接本地共享服务；重启会重置内存预约。CloudBase 持久化、真实微信身份、可靠通知与正式部署尚未完成，不会向真实顾客收费或发送通知。'),
+  demo:p('Choose a service → an available day → a start time → review, and book. Then open the shop view: the same booking is in the owner’s diary. Try My bookings to reschedule or cancel. The booking rules run in your browser on sample data; Reset demo starts again.','选择服务 → 可约日期 → 开始时间 → 核对并预约。再打开店铺端，同一笔预约已出现在店主的预约本里。可在「我的预约」中改期或取消。预约规则在浏览器内运行，使用示例数据；「重置演示」可重新开始。'),
+  // Public deployment of the standalone prototype (separate repository: glasgow-salon-booking-prototype).
+  publicDemo:'https://zhuyifan001225.github.io/glasgow-salon-booking-prototype/',
+  publicAdmin:'https://zhuyifan001225.github.io/glasgow-salon-booking-prototype/admin.html',
+  boundary:p('The public prototype runs the project’s real booking rules in the browser, with sample data stored only on the visitor’s device. The UI was written in Chinese for WeChat customers; an English layer is on by default. CloudBase persistence, real WeChat identity, reliable notifications and production deployment are unfinished. No real customer is charged or notified.','公开原型在浏览器中运行项目真实的预约规则，示例数据只保存在访问者本机。界面原本为微信顾客以中文设计，默认叠加英文层。CloudBase 持久化、真实微信身份、可靠通知与正式部署尚未完成，不会向真实顾客收费或发送通知。'),
   research:[
     {title:p('Observe a real booking','观察真实预约'),body:p('With permission, map how a request moves from a conversation to the diary, including changes and interruptions. Record steps without retaining private customer details.','获得同意后，记录需求如何从对话进入预约本，以及中途变动与打断；不保留顾客隐私信息。')},
     {title:p('Validate the operating rules','验证实际经营规则'),body:p('Confirm service lengths, opening windows, same-day policy, buffers and preferred language with the owner. Demo fixtures are not final business rules.','与经营者核实服务时长、开放窗口、当天预约政策、缓冲与语言偏好；演示配置不作为最终经营规则。')},
     {title:p('Test both sides of a change','测试变动后的双端体验'),body:p('Ask a customer to book and reschedule, then ask the owner to adjust a period and identify affected appointments. Record completion, errors, time and assistance.','请顾客预约并改期，再请经营者调整时段并找到受影响预约；记录完成情况、错误、耗时与所需帮助。')}
   ],
-  roadmap:[p('Now · customer and full shop interfaces connected locally','现在 · 顾客端与完整店铺端本地联调'),p('Next · owner interview, observation and two-sided task testing','下一步 · 店主访谈、现场观察与双端任务测试'),p('Then · refine service rules and run an agreed limited pilot','之后 · 修订服务规则并开展经同意的小范围试点'),p('Before release · persistent data, identity, notification delivery and recovery checks','发布前 · 持久化、身份、通知送达与恢复验证')],
+  roadmap:[p('Now · customer and shop prototype, public and runnable in the browser','现在 · 顾客端与店铺端原型，可在浏览器中公开试用'),p('Next · owner interview, observation and two-sided task testing','下一步 · 店主访谈、现场观察与双端任务测试'),p('Then · refine service rules and run an agreed limited pilot','之后 · 修订服务规则并开展经同意的小范围试点'),p('Before release · persistent data, identity, notification delivery and recovery checks','发布前 · 持久化、身份、通知送达与恢复验证')],
   evidenceItems:[],
   sourceDocs:['01_Background_and_Pain_Points.txt','Barbershop_Design_Logic_Framework.txt','preview/NAVIGATION_REVIEW.md','SELF_TEST_REPORT.md']
 }];

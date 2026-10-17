@@ -37,13 +37,24 @@
   document.addEventListener('portfolio:language',()=>document.querySelectorAll('.v3-image-link').forEach(a=>a.setAttribute('aria-label',text('Open image at full size','查看完整图片'))));
   const updateCasePdfs=()=>document.querySelectorAll('[data-case-pdf]').forEach(a=>{a.href=`assets/v3/case-pdfs/${a.dataset.casePdf}-${zh()?'ZH':'EN'}.pdf`;});
   updateCasePdfs();document.addEventListener('portfolio:language',updateCasePdfs);
-  // Only the local review server advertises working local demos. Public builds
-  // keep the screenshots without publishing localhost links.
-  if(document.querySelector('[data-demo-launch]')&&['127.0.0.1','localhost','::1'].includes(location.hostname)){
-    fetch('/__local-demos.json').then(r=>r.ok?r.json():{}).then(demos=>{
-      document.querySelectorAll('[data-demo-launch]').forEach(a=>{const route=demos[a.dataset.demoLaunch];if(route){a.href=route;a.hidden=false;}});
-      document.querySelectorAll('[data-demo-unavailable]').forEach(p=>{const key=p.closest('section')?.querySelector('[data-demo-launch]')?.dataset.demoLaunch;p.hidden=Boolean(demos[key]);});
-    }).catch(()=>{});
+  // Embedded prototypes: a public deployment (set per case) or, during local review,
+  // the running local demo service. Public builds never publish localhost links.
+  const stages=document.querySelectorAll('[data-demo-stage]');
+  if(stages.length){
+    const local=['127.0.0.1','localhost','::1'].includes(location.hostname);
+    const ready=demos=>{
+      stages.forEach(stage=>{
+        const key=stage.dataset.demoStage,url=(local&&demos[key])||stage.dataset.publicDemo;
+        const unavailable=stage.parentElement.querySelector('[data-demo-unavailable]');
+        if(!url){if(unavailable)unavailable.hidden=false;return;}
+        stage.querySelector('[data-demo-frame]').src=url;stage.hidden=false;if(unavailable)unavailable.hidden=true;
+        stage.querySelectorAll('[data-demo-launch]').forEach(a=>{const route=(local&&demos[a.dataset.demoLaunch])||(a.dataset.demoLaunch===key?stage.dataset.publicDemo:'');if(route){a.href=route;a.hidden=false;}});
+        const note=stage.querySelector('[data-demo-local-note]');if(note)note.hidden=!(local&&demos[key]);
+        const cta=document.querySelector('[data-demo-cta]');
+        if(cta){const label=()=>{cta.textContent=text('Try the prototype ↓','试用交互原型 ↓');};label();document.addEventListener('portfolio:language',label);}
+      });
+    };
+    if(local)fetch('/__local-demos.json').then(r=>r.ok?r.json():{}).then(ready).catch(()=>ready({}));else ready({});
   }
 })();
 

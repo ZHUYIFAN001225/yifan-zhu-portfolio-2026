@@ -46,6 +46,8 @@ export const productCases=[{
     {title:p('Keep both sides consistent','保持双端一致'),why:p('Availability and price can change between browsing and booking.','浏览与预约之间，空档和价格可能发生变化。'),how:p('The demo rechecks booking conditions and keeps pending requests visible. Chat, payment and identity remain simulated.','Demo 复核预约条件并保留待处理请求；聊天、支付与身份仍为模拟。'),test:p('Test stale information, unavailable slots and declined requests before a real pilot.','真实试点前测试信息过期、空档失效与请求被拒绝等场景。')}
   ],
   demo:p('Choose the Consumer role and a preset demo name. Open a look → Make It Real → nearby Creators → service and availability. Switch to the matching Creator from Profile to inspect the same request. No real phone number or payment is needed.','选择消费者身份与预设演示称呼。打开造型 → Make It Real → 附近 Creator → 服务与空档。在个人页切换到对应 Creator，可查看同一请求。无需真实手机号或支付。'),
+  // Public deployment of the standalone prototype (separate repository). Empty until it is live.
+  publicDemo:'',
   boundary:p('Creator identities, reviews, distances, payments and messages are simulated. Matching uses tags and rules; style preview is a collage. Browser storage does not provide production authentication or cross-device sync. A separate, narrower V1 includes persistent APIs and an iOS source project, but is not a launched product.','Creator 身份、评价、距离、支付与消息均为模拟。匹配基于标签与规则；造型预览为拼贴。浏览器存储不等于生产身份认证或跨设备同步。另有范围更小的 V1，包含持久化 API 与 iOS 源码，但尚未上线。'),
   research:[
     {title:p('Explore the real journey','了解真实服务旅程'),body:p('Ask consumers how they collect references, explain a look and decide whom to trust. Capture consented journey notes and anonymised examples.','了解消费者如何收集参考、表达造型并判断可信服务者；记录经同意的旅程笔记与匿名例子。')},
@@ -100,6 +102,8 @@ export const productCases=[{
     {title:p('Recover rather than erase','让变动可以恢复'),why:p('Deleting an affected booking would hide an unresolved customer commitment.','直接删除受影响预约，会掩盖尚未解决的顾客承诺。'),how:p('Keep the record visible in an affected / reschedule state; preserve context during recovery.','保留记录并进入受影响 / 待改期状态，恢复流程保留上下文。'),test:p('Ask the owner to close a period and explain which customers still need action.','请经营者关闭一个时段，并判断哪些顾客仍需处理。')}
   ],
   demo:p('Choose a service → an available day → a start time → review. Confirm only a simulated appointment, then open the shop view to inspect the same date. Try My bookings for rescheduling and cancellation. All data are local fixtures.','选择服务 → 可约日期 → 开始时间 → 核对。确认模拟预约后，打开店铺端查看同一天。可在我的预约中体验改期与取消。数据均为本地演示配置。'),
+  // Public deployment of the standalone prototype (separate repository). Empty until it is live.
+  publicDemo:'',
   boundary:p('The portfolio runs an isolated build of the existing customer and full shop source. Both use a local shared service; restarting it resets in-memory appointments. CloudBase persistence, real WeChat identity, reliable notifications and production deployment are unfinished. No real customer is charged or notified.','作品集运行现有顾客端与完整店铺源码的隔离构建，连接本地共享服务；重启会重置内存预约。CloudBase 持久化、真实微信身份、可靠通知与正式部署尚未完成，不会向真实顾客收费或发送通知。'),
   research:[
     {title:p('Observe a real booking','观察真实预约'),body:p('With permission, map how a request moves from a conversation to the diary, including changes and interruptions. Record steps without retaining private customer details.','获得同意后，记录需求如何从对话进入预约本，以及中途变动与打断；不保留顾客隐私信息。')},

@@ -525,3 +525,30 @@ body:not(.v3-index) main .eyebrow{font-size:12px;line-height:1.4;font-weight:600
 .site-header.v3-header{position:sticky;top:0;z-index:30;background:var(--bg);box-shadow:0 0 0 100vmax var(--bg);clip-path:inset(0 -100vmax);transition:transform .45s var(--v3-ease-out,ease)}
 html.v3-header-hidden .site-header.v3-header{transform:translateY(-100%)}
 @media(prefers-reduced-motion:reduce){.site-header.v3-header{transition:none}}
+
+/* Films & Tools: AI video production — final film, before/after and process */
+.ai-video-feature{display:grid;grid-template-columns:minmax(0,1fr);max-width:1080px}
+.ai-video-film{min-width:0;margin:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--v3-radius);overflow:hidden}
+.ai-video-film video{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#050505}
+.ai-video-film>div{padding:18px}
+.ai-video-film span{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.ai-video-film p{margin:10px 0 0;color:var(--muted);line-height:1.55}
+.ai-video-process{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:28px 0 0;padding:0;list-style:none;counter-reset:none}
+.ai-video-process li{min-width:0;padding:20px 0 0;border-top:1px solid var(--line)}
+.ai-video-process span{color:var(--muted);font-size:12px}
+.ai-video-process h3{margin:10px 0 8px;font-size:18px;line-height:1.3;font-weight:500;letter-spacing:-.3px;text-transform:none}
+.ai-video-process p{margin:0;color:var(--muted);font-size:14px;line-height:1.65}
+@media(max-width:1000px){.ai-video-process{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.ai-video-process{grid-template-columns:1fr;gap:4px}.ai-video-process li{padding-top:16px}}
+
+/* Product cases: embedded, directly usable prototype */
+.ux-demo-stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:40px;align-items:start;margin:28px 0 8px}
+.ux-demo-stage[hidden]{display:none}
+.ux-demo-device{width:min(390px,100%);padding:10px;background:#111214;border-radius:44px;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.ux-demo-device iframe{display:block;width:100%;height:min(780px,82vh);border:0;border-radius:34px;background:#000}
+.ux-demo-panel{max-width:420px;padding-top:8px}
+.ux-demo-panel>p{color:var(--muted);line-height:1.65}
+.ux-demo-live{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:var(--text)!important;font-weight:600}
+.ux-demo-live span{width:8px;height:8px;border-radius:50%;background:#3fae6a;box-shadow:0 0 0 4px rgba(63,174,106,.18)}
+@media(max-width:760px){.ux-demo-stage{grid-template-columns:1fr;gap:22px}.ux-demo-device{margin:0 auto;width:min(360px,100%);border-radius:38px;padding:8px}.ux-demo-device iframe{height:min(700px,78vh);border-radius:30px}.ux-demo-panel{max-width:none}}
+.ai-video-film p.ai-video-credit{margin-top:6px;font-size:13px}.ai-video-credit a{color:var(--text);border-bottom:1px solid currentColor}

@@ -5,7 +5,7 @@ import http from 'node:http';
 import {createRequire} from 'node:module';
 const config=JSON.parse(fs.readFileSync('.codex-tmp/v3/local-projects.json','utf8'));
 const require=createRequire(import.meta.url);
-const publicFiles=new Set(['index.html','app.js','data.js','whole-data.js','logic.js','member.js','avatar.js','whole.js','styles.css','pinterest.css','member.css','whole.css','avatar.css']);
+const publicFiles=new Set(['index.html','app.js','data.js','whole-data.js','logic.js','member.js','avatar.js','whole.js','styles.css','pinterest.css','member.css','whole.css','avatar.css','creator.css']);
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml'};
 const beauty=http.createServer(async(req,res)=>{
   try{

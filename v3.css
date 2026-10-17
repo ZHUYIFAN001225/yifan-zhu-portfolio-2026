@@ -552,3 +552,9 @@ html.v3-header-hidden .site-header.v3-header{transform:translateY(-100%)}
 .ux-demo-live span{width:8px;height:8px;border-radius:50%;background:#3fae6a;box-shadow:0 0 0 4px rgba(63,174,106,.18)}
 @media(max-width:760px){.ux-demo-stage{grid-template-columns:1fr;gap:22px}.ux-demo-device{margin:0 auto;width:min(360px,100%);border-radius:38px;padding:8px}.ux-demo-device iframe{height:min(700px,78vh);border-radius:30px}.ux-demo-panel{max-width:none}}
 .ai-video-film p.ai-video-credit{margin-top:6px;font-size:13px}.ai-video-credit a{color:var(--text);border-bottom:1px solid currentColor}
+/* The booking prototype draws its own device and customer/shop switch, so it is shown without a second bezel. */
+.ux-demo-stage--framed .ux-demo-device{width:min(430px,100%);padding:0;background:none;border-radius:28px;box-shadow:none;overflow:hidden;border:1px solid var(--line)}
+.ux-demo-stage--framed .ux-demo-device iframe{height:min(860px,86vh);border-radius:0;background:transparent}
+.ux-demo-stage{grid-template-columns:minmax(0,390px) minmax(0,1fr)}.ux-demo-device{width:100%}
+.ux-demo-stage--framed{grid-template-columns:minmax(0,430px) minmax(0,1fr)}
+@media(max-width:760px){.ux-demo-stage,.ux-demo-stage--framed{grid-template-columns:minmax(0,1fr)}.ux-demo-device{width:min(390px,100%)}.ux-demo-stage--framed .ux-demo-device{width:min(430px,100%)}}

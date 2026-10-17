@@ -8,17 +8,33 @@ const root=process.cwd(),port=Number(process.env.PORT||4176);
 const types={'.pdf':'application/pdf','.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.mp4':'video/mp4','.json':'application/json; charset=utf-8','.ico':'image/x-icon','.woff2':'font/woff2'};
 http.createServer(async(req,res)=>{
   try{
-    if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);return res.end();}
+    if(!['GET','HEAD'].includes(req.method)&&!req.url.startsWith('/__demo/booking/api/')){res.writeHead(405);return res.end();}
     const url=new URL(req.url,'http://localhost');
-    const localDemos={beauty:'http://127.0.0.1:4181/',booking:'http://127.0.0.1:4173/',bookingAdmin:'http://127.0.0.1:4173/admin.html'};
+    // Local demos are served through this origin (/__demo/...), so the case pages can
+    // embed them even in browsers that block other localhost ports inside frames.
+    const upstream={beauty:'http://127.0.0.1:4181',booking:'http://127.0.0.1:4173'};
+    const localDemos={beauty:'/__demo/beauty/',booking:'/__demo/booking/',bookingAdmin:'/__demo/booking/admin.html'};
     if(url.pathname==='/__local-demos.json'){
       const available={};
-      await Promise.all(Object.entries(localDemos).map(async([key,href])=>{try{const check=await fetch(href,{signal:AbortSignal.timeout(700)});if(check.ok)available[key]='/__demo/'+key;}catch{}}));
+      await Promise.all(Object.entries({beauty:'beauty',booking:'booking',bookingAdmin:'booking'}).map(async([key,app])=>{try{const check=await fetch(upstream[app]+'/',{signal:AbortSignal.timeout(700)});if(check.ok)available[key]=localDemos[key];}catch{}}));
       res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end(JSON.stringify(available));
     }
-    if(url.pathname.startsWith('/__demo/')){
-      const href=localDemos[url.pathname.slice(8)];if(!href){res.writeHead(404);return res.end();}
-      res.writeHead(302,{Location:href,'Cache-Control':'no-store'});return res.end();
+    const demo=/^\/__demo\/(beauty|booking)(\/.*)?$/.exec(url.pathname);
+    if(demo){
+      if(!demo[2]){res.writeHead(302,{Location:`/__demo/${demo[1]}/`});return res.end();}
+      const prefix=`/__demo/${demo[1]}`,target=upstream[demo[1]];
+      const headers={...req.headers,host:new URL(target).host};delete headers.origin;delete headers.referer;delete headers['accept-encoding'];
+      const body=['GET','HEAD'].includes(req.method)?undefined:await new Promise(r=>{const c=[];req.on('data',d=>c.push(d));req.on('end',()=>r(Buffer.concat(c)));});
+      try{
+        const up=await fetch(target+demo[2]+url.search,{method:req.method,headers,body,redirect:'manual'});
+        const type=up.headers.get('content-type')||'';let out=Buffer.from(await up.arrayBuffer());
+        // The booking prototype uses root-relative URLs; keep them inside the demo prefix.
+        if(demo[1]==='booking'&&/text\/html|javascript/.test(type))out=Buffer.from(out.toString('utf8').replace(/(["'`])\/(api\/|style\.css|client\.js|admin\.html|admin-client\.js|admin-legacy\.html)/g,`$1${prefix}/$2`));
+        // Inside a frame, the booking prototype's refresh-on-focus re-renders during the first tap.
+        // Ignore a focus that comes straight from a tap; the fix belongs in the prototype itself.
+        if(demo[1]==='booking'&&/text\/html/.test(type))out=Buffer.from(out.toString('utf8').replace('<head>','<head><script>(()=>{let tap=0;document.addEventListener("pointerdown",()=>{tap=Date.now()},true);const add=window.addEventListener;window.addEventListener=function(type,fn,opts){if(this===window&&type==="focus"){return add.call(this,type,function(e){if(Date.now()-tap<1000)return;return fn.call(this,e)},opts)}return add.call(this,type,fn,opts)}})();</script>'));
+        res.writeHead(up.status,{'Content-Type':type||'application/octet-stream','Cache-Control':'no-store'});return res.end(req.method==='HEAD'?undefined:out);
+      }catch{res.writeHead(502,{'Content-Type':'text/plain; charset=utf-8'});return res.end('Demo service is not running. Start it with npm run demos.');}
     }
     const name=decodeURIComponent(url.pathname).replace(/^\/+/, '')||'index.html';
     // Preview only public pages/assets, never Git data, backups or local research.

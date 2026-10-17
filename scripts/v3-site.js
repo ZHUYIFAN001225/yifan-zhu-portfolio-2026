@@ -47,7 +47,10 @@
         const key=stage.dataset.demoStage,url=(local&&demos[key])||stage.dataset.publicDemo;
         const unavailable=stage.parentElement.querySelector('[data-demo-unavailable]');
         if(!url){if(unavailable)unavailable.hidden=false;return;}
-        stage.querySelector('[data-demo-frame]').src=url;stage.hidden=false;if(unavailable)unavailable.hidden=true;
+        const frame=stage.querySelector('[data-demo-frame]');frame.src=url;
+        // Some prototypes refresh when their window gains focus, which swallowed the first tap.
+        // Give the frame focus as the pointer arrives, so the first real click goes through.
+        frame.addEventListener('pointerenter',()=>{try{if(document.activeElement!==frame)frame.contentWindow.focus();}catch{}});stage.hidden=false;if(unavailable)unavailable.hidden=true;
         stage.querySelectorAll('[data-demo-launch]').forEach(a=>{const route=(local&&demos[a.dataset.demoLaunch])||(a.dataset.demoLaunch===key?stage.dataset.publicDemo:'');if(route){a.href=route;a.hidden=false;}});
         const note=stage.querySelector('[data-demo-local-note]');if(note)note.hidden=!(local&&demos[key]);
         const cta=document.querySelector('[data-demo-cta]');

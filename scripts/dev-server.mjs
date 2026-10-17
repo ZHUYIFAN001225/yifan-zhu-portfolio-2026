@@ -5,7 +5,7 @@ import { renderPortfolio } from './render-portfolio.mjs';
 
 await renderPortfolio();
 const root=process.cwd(),port=Number(process.env.PORT||4176);
-const types={'.pdf':'application/pdf','.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.mp4':'video/mp4','.json':'application/json; charset=utf-8','.ico':'image/x-icon'};
+const types={'.pdf':'application/pdf','.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.mp4':'video/mp4','.json':'application/json; charset=utf-8','.ico':'image/x-icon','.woff2':'font/woff2'};
 http.createServer(async(req,res)=>{
   try{
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);return res.end();}

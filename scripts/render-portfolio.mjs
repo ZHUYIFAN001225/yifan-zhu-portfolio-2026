@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
-import { categories, projects, forthcoming, caseHighlights, orderedProjects } from './portfolio-catalog.mjs';
+import { categories, projects, forthcoming, caseHighlights, orderedProjects, featured } from './portfolio-catalog.mjs';
 import {renderProductDemos} from './product-demos.mjs';
 import {productCases} from './product-case-data.mjs';
 import {renderVisualWork,resourceCopy} from './render-visual-work.mjs';
@@ -25,7 +25,7 @@ function card(project,index) {
       ${project.video?`<button class="v3-play" type="button" data-play="${project.id}" aria-label="${t('Play video: '+project.title.en,'播放视频：'+project.title.zh)}">${t('Play','播放')} <span translate="no">${project.duration}</span></button>`:''}</div>
     <div class="v3-card-info"><div class="v3-card-status ${project.status.en==='Released product'?'v3-card-status--live':''}">${pair(project.status)}</div>
       <h3><a data-case-link href="${project.href}">${pair(project.title)}</a></h3><p>${pair(project.subtitle)}</p>
-      ${project.demo?`<a class="v3-demo-card-link" data-case-link href="${project.href}#interactive-demo">${t('Try prototype','体验原型')} ↗</a>`:''}<div class="v3-card-tags">${project.tags.map(pair).map(s=>`<span>${s}</span>`).join('')}</div>
+      ${project.demo?`<a class="v3-demo-card-link" data-case-link href="${project.href}#interactive-demo">${t('See prototype flow','查看原型流程')} ↗</a>`:''}<div class="v3-card-tags">${project.tags.map(pair).map(s=>`<span>${s}</span>`).join('')}</div>
       ${project.external?`<a class="v3-demo-card-link v3-release-link" href="${project.external}" target="_blank" rel="noopener noreferrer">${pair(project.externalLabel)} ↗</a>`:''}
     </div>
   </div></article>`;
@@ -40,6 +40,15 @@ function gallery() {
       <div class="v3-gallery">${orderedProjects('all').map(card).join('\n')}</div>
       <div class="v3-next"><div><span class="v3-nav-label">${t('Next in the studio','后续作品')}</span><h2>${t('More questions. New possibilities.','新的问题，更多可能。')}</h2><p>${t('Case studies forthcoming. These are not presented as launched products.','案例整理中，以下项目未作为已发布产品展示。')}</p></div><ul>${forthcoming.map(p=>`<li>${pair(p.title)}<span>${pair(p.status)}</span></li>`).join('')}</ul></div>
     </div></section>`;
+}
+function selected() {
+  const picks=featured.map(id=>projects.find(p=>p.id===id));
+  const disciplines=categories.filter(c=>c.id!=='all');
+  return `<section class="v3-workspace v3-featured" id="work" aria-labelledby="v3-selected-title">
+    <div class="v3-featured-head"><div><p class="v3-nav-label">${t('Selected work','精选作品')}</p><h2 id="v3-selected-title">${t('Six projects across four disciplines.','六个项目，四个方向。')}</h2></div><a class="v3-all-link" href="work.html?filter=all">${t('View all','查看全部')} <span translate="no">${projects.length}</span> ${t('works','件作品')}<span aria-hidden="true">→</span></a></div>
+    <div class="v3-gallery" data-collection="all">${picks.map(card).join('\n')}</div>
+    <nav class="v3-discipline-strip" aria-label="${t('Explore by discipline','按职业方向浏览')}">${disciplines.map(c=>`<a href="work.html?filter=${c.id}"><span class="v3-discipline-count" translate="no">${String(projects.filter(p=>p.categories.includes(c.id)).length).padStart(2,'0')}</span><strong>${pair(c.label)}</strong><small>${pair(c.description)}</small><span class="v3-discipline-arrow" aria-hidden="true">→</span></a>`).join('')}</nav>
+  </section>`;
 }
 function approach() {
   return `<section class="v3-approach"><div><p class="v3-nav-label">${t('The thread through my work','贯穿作品的方法')}</p><h2>${t('Start with people.','从人出发。')}<br><span>${t('Make the idea tangible.','让想法变得可体验。')}</span></h2><a href="about.html">${t('About my practice','关于我的实践')} ↗</a></div><div><p>${t('I connect research, systems thinking and experience design, using AI-assisted rapid prototyping to make ideas tangible, testable and open to iteration.','我连接调研、系统思维与体验设计，通过 AI 辅助快速原型，让想法变得可体验、可测试，并在反馈中迭代。')}</p><ol>${[['User Research','用户研究'],['Problem Framing','问题定义'],['Systems Thinking','系统思维'],['Experience Design','体验设计'],['AI-assisted Rapid Prototyping','AI 辅助快速原型'],['Testing & Iteration','测试与迭代']].map(([en,zh],i)=>`<li><span>0${i+1}</span>${t(en,zh)}</li>`).join('')}</ol></div></section>
@@ -60,7 +69,7 @@ export async function renderPortfolio() {
   for(const key of Object.keys(dictionary))delete dictionary[key];
   const home = `<section class="v3-hero"><div><p class="v3-eyebrow">${t('Research-led Multidisciplinary Designer','研究驱动的跨领域设计师')}</p><h1>${t('Research-led.','以研究为起点。')}<br><span>${t('Made tangible.','让想法可体验。')}</span></h1></div><div class="v3-hero-note"><p>${t('I turn complex questions into experiences you can see, use and test.','我将复杂的问题转化为可看见、可使用、可测试的体验。')}</p><span>${t('Products. Moving images. Systems.','产品、动态影像与系统。')}</span></div></section>`;
   const work = `<section class="v3-hero v3-hero--work"><div><p class="v3-eyebrow">${t('The work of Yifan Zhu','朱一帆的设计实践')}</p><h1>${t('Different disciplines.','跨越不同领域。')}<br><span>${t('One curious mind.','始于同一份好奇。')}</span></h1></div><div class="v3-hero-note"><p>${t('Find the perspective that fits your team.','找到适合你的团队的设计视角。')}</p><span>${t('Explore a collection. Open the full story.','按方向浏览，深入完整案例。')}</span></div></section>`;
-  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',home+gallery()+approach(),'v3-index'));
+  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',home+selected()+approach(),'v3-index'));
   await fs.writeFile('practice.html',renderVisualWork(t,document,projects));
   await fs.writeFile('work.html',document('Yifan Zhu | All Work',work+gallery(),'v3-index'));
   await fs.writeFile('project-anxiety-market.html',anxiety());

@@ -16,7 +16,10 @@ const title=document.createElement('h2');title.id='v3-mobile-collections-title';
 const close=document.createElement('button');close.type='button';close.textContent='×';header.append(title,close);
 const list=document.createElement('nav');list.className='v3-mobile-choices';
 categories.forEach(c=>{const a=document.createElement('a');a.dataset.mobileCollection=c.id;const label=document.createElement('span'),check=document.createElement('span');check.className='v3-mobile-check';check.setAttribute('aria-hidden','true');check.textContent='✓';a.append(label,check);list.append(a);});
-sheet.append(header,list);document.body.append(dock,sheet);
+// Pages outside the collections stay reachable on phones, where the header hides them.
+const more=document.createElement('nav');more.className='v3-mobile-choices v3-mobile-more';
+const films=document.createElement('a');films.dataset.mobilePage='practice.html';const filmsLabel=document.createElement('span'),filmsCheck=document.createElement('span');filmsCheck.className='v3-mobile-check';filmsCheck.setAttribute('aria-hidden','true');filmsCheck.textContent='✓';films.append(filmsLabel,filmsCheck);more.append(films);
+sheet.append(header,list,more);document.body.append(dock,sheet);
 
 function labels(){
   const lang=language(),active=collection(),category=categories.find(c=>c.id===active);
@@ -25,17 +28,18 @@ function labels(){
   trigger.querySelector('small').textContent=category.label[lang];
   trigger.setAttribute('aria-label',text('Browse work. Current collection: ','作品分类，当前：')+category.label[lang]);
   top.setAttribute('aria-label',text('Back to top','回到顶部'));title.textContent=text('Explore by discipline','按职业方向浏览');
-  close.setAttribute('aria-label',text('Close work categories','关闭作品分类'));list.setAttribute('aria-label',text('Work categories','作品分类'));
-  list.querySelectorAll('a').forEach(a=>{const c=categories.find(c=>c.id===a.dataset.mobileCollection);a.firstElementChild.textContent=c.label[lang];a.href=`work.html?filter=${c.id}&lang=${lang}#work`;if(c.id===active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  close.setAttribute('aria-label',text('Close work categories','关闭作品分类'));more.setAttribute('aria-label',text('More pages','更多页面'));filmsLabel.textContent=text('Films & Tools','影像与工具');films.href=`practice.html?lang=${lang}`;if(location.pathname.endsWith('/practice.html'))films.setAttribute('aria-current','page');else films.removeAttribute('aria-current');list.setAttribute('aria-label',text('Work categories','作品分类'));
+  list.querySelectorAll('a').forEach(a=>{const c=categories.find(c=>c.id===a.dataset.mobileCollection);a.firstElementChild.textContent=c.label[lang];a.href=`work.html?filter=${c.id}&lang=${lang}#work`;if(c.id===active&&!location.pathname.endsWith('/practice.html'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
 }
 function dismiss(){sheet.close();}
 trigger.addEventListener('click',()=>{if(!phone.matches)return;labels();sheet.showModal();trigger.setAttribute('aria-expanded','true');document.documentElement.classList.add('v3-mobile-nav-open');});
 close.addEventListener('click',dismiss);
 sheet.addEventListener('close',()=>{trigger.setAttribute('aria-expanded','false');document.documentElement.classList.remove('v3-mobile-nav-open');if(phone.matches)trigger.focus({preventScroll:true});});
 sheet.addEventListener('click',e=>{if(e.target!==sheet)return;const r=sheet.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dismiss();});
+more.addEventListener('click',()=>dismiss());
 list.addEventListener('click',e=>{
   const a=e.target.closest('[data-mobile-collection]');if(!a||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
-  if(document.querySelector('.v3-workspace')){
+  if(document.querySelector('.v3-workspace:not(.v3-featured)')){
     e.preventDefault();dismiss();document.dispatchEvent(new CustomEvent('portfolio:select-collection',{detail:{collection:a.dataset.mobileCollection}}));
   }else dismiss();
 });

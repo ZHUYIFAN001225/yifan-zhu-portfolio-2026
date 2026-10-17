@@ -7,6 +7,8 @@ const filters = [...root.querySelectorAll('[data-filter]')];
 const language = () => document.documentElement.lang.startsWith('zh') ? 'zh' : 'en';
 const local = (en,zh) => language()==='zh' ? zh : en;
 let active = 'all';
+// The homepage shortlist reuses cards, previews and the video dialog, without collection controls.
+const featuredOnly = root.classList.contains('v3-featured');
 let frame = 0;
 let opener;
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -36,6 +38,7 @@ function contextLinks() {
   });
 }
 function labels() {
+  if(featuredOnly){contextLinks();return;}
   const category=categories.find(c=>c.id===active);
   root.querySelector('[data-gallery-title]').textContent=category.label[language()];
   root.querySelector('[data-gallery-description]').textContent=category.description[language()];
@@ -46,7 +49,10 @@ function labels() {
   contextLinks();
 }
 function applyFilter(value,{push=false}={}) {
+  if(featuredOnly){labels();layout();return;}
   const next=normalizeCategory(value),changed=next!==active;
+  // Cards that stay visible glide to their new place instead of jumping.
+  const before=push&&changed&&!reduceMotion()?new Map(cards.filter(c=>!c.hidden).map(c=>[c,c.getBoundingClientRect()])):null;
   active=next;
   gallery.dataset.collection=active;
   const ordered=orderedProjects(active);
@@ -57,11 +63,17 @@ function applyFilter(value,{push=false}={}) {
   let visibleIndex=0;
   cards.forEach(card=>{
     const visible=active==='all'||card.dataset.categories.split(' ').includes(active);
-    card.hidden=!visible;card.classList.toggle('is-filter-enter',visible&&push&&changed&&!reduceMotion());
+    card.hidden=!visible;card.classList.toggle('is-filter-enter',visible&&Boolean(before)&&!before.has(card));
     if(visible)card.style.setProperty('--reveal-delay',`${Math.min(visibleIndex++,3)*35}ms`);
     if(!visible)card.querySelector('video')?.pause();
   });
   labels();layout();
+  if(before)requestAnimationFrame(()=>requestAnimationFrame(()=>cards.forEach(card=>{
+    const from=before.get(card);if(card.hidden||!from)return;
+    const to=card.getBoundingClientRect(),dx=from.left-to.left,dy=from.top-to.top;
+    if(Math.abs(dx)<1&&Math.abs(dy)<1)return;
+    card.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:760,easing:'cubic-bezier(.16,1,.3,1)'});
+  })));
   document.dispatchEvent(new CustomEvent('portfolio:collection',{detail:{collection:active}}));
 }
 filters.forEach(link=>link.addEventListener('click',event=>{
@@ -79,7 +91,7 @@ applyFilter(new URL(location.href).searchParams.get('filter'));
 const initialURL=new URL(location.href);
 if(initialURL.searchParams.has('filter')&&initialURL.searchParams.get('filter')!==active){initialURL.searchParams.set('filter',active);history.replaceState(null,'',initialURL);}
 
-root.querySelector('[data-share]').addEventListener('click',async event=>{
+root.querySelector('[data-share]')?.addEventListener('click',async event=>{
   const button=event.currentTarget;
   const url=new URL('work.html',location.href);url.searchParams.set('filter',active);url.searchParams.set('lang',language());
   try{await navigator.clipboard.writeText(url.href);button.textContent=local('Link copied','链接已复制')+' ↗';button.setAttribute('aria-label',local('Link copied','链接已复制'));}

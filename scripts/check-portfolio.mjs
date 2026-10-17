@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {categories,projects,normalizeCategory,collectionOrder,orderedProjects,forthcoming,caseHighlights} from './portfolio-catalog.mjs';
+import {categories,projects,normalizeCategory,collectionOrder,orderedProjects,forthcoming,caseHighlights,featured} from './portfolio-catalog.mjs';
+assert.ok(featured.every(id=>projects.some(p=>p.id===id)),'Unknown featured project');
 
 assert.equal(categories.length,5);
 assert.equal(new Set(projects.map(p=>p.id)).size,projects.length);
@@ -32,7 +33,7 @@ for(const project of projects){
 }
 for(const page of ['index.html','work.html']){
   const html=fs.readFileSync(page,'utf8');
-  assert.equal([...html.matchAll(/data-project="/g)].length,projects.length);
+  assert.equal([...html.matchAll(/data-project="/g)].length,page==='index.html'?featured.length:projects.length);
   for(const c of categories)assert.ok(html.includes(`href="work.html?filter=${c.id}"`));
   assert.ok(html.includes('type="module" src="scripts/gallery.mjs"'));
 }

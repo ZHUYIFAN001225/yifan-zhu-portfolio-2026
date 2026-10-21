@@ -69,7 +69,9 @@ export async function renderPortfolio() {
   for(const key of Object.keys(dictionary))delete dictionary[key];
   const home = `<section class="v3-hero"><div><p class="v3-eyebrow">${t('Research-led Multidisciplinary Designer','研究驱动的跨领域设计师')}</p><h1>${t('Research-led.','以研究为起点。')}<br><span>${t('Made tangible.','让想法可体验。')}</span></h1></div><div class="v3-hero-note"><p>${t('I turn complex questions into experiences you can see, use and test.','我将复杂的问题转化为可看见、可使用、可测试的体验。')}</p><span>${t('Products. Moving images. Systems.','产品、动态影像与系统。')}</span></div></section>`;
   const work = `<section class="v3-hero v3-hero--work"><div><p class="v3-eyebrow">${t('The work of Yifan Zhu','朱一帆的设计实践')}</p><h1>${t('Different disciplines.','跨越不同领域。')}<br><span>${t('One curious mind.','始于同一份好奇。')}</span></h1></div><div class="v3-hero-note"><p>${t('Find the perspective that fits your team.','找到适合你的团队的设计视角。')}</p><span>${t('Explore a collection. Open the full story.','按方向浏览，深入完整案例。')}</span></div></section>`;
-  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',home+selected()+approach(),'v3-index'));
+  // The homepage opens straight on the collection, so a reviewer can pick a discipline in one click.
+  const homeHero = work.replace(`${t('The work of Yifan Zhu','朱一帆的设计实践')}`,t('Yifan Zhu · Research-led Multidisciplinary Designer','朱一帆 · 研究驱动的跨领域设计师'));
+  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',homeHero+gallery(),'v3-index'));
   await fs.writeFile('practice.html',renderVisualWork(t,document,projects));
   await fs.writeFile('work.html',document('Yifan Zhu | All Work',work+gallery(),'v3-index'));
   await fs.writeFile('project-anxiety-market.html',anxiety());

@@ -33,7 +33,7 @@ for(const project of projects){
 }
 for(const page of ['index.html','work.html']){
   const html=fs.readFileSync(page,'utf8');
-  assert.equal([...html.matchAll(/data-project="/g)].length,page==='index.html'?featured.length:projects.length);
+  assert.equal([...html.matchAll(/data-project="/g)].length,projects.length);
   for(const c of categories)assert.ok(html.includes(`href="work.html?filter=${c.id}"`));
   assert.ok(html.includes('type="module" src="scripts/gallery.mjs"'));
 }

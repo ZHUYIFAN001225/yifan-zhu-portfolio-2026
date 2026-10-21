@@ -188,3 +188,34 @@ window.addEventListener('pagereveal',event=>{
   addEventListener('scroll',atEnd,{passive:true});atEnd();
   document.addEventListener('portfolio:motion',()=>{if(reduced()){html.classList.remove('ux-motion');groups.forEach(g=>g.classList.add('is-on'));}});
 })();
+
+// Screen map: side switch and a full-size viewer for every captured screen.
+(() => {
+  const zh=()=>document.documentElement.lang.startsWith('zh');
+  document.querySelectorAll('[data-smap]').forEach(map=>{
+    const tabs=[...map.querySelectorAll('[data-smap-tab]')],sides=[...map.querySelectorAll('[data-smap-side]')];
+    const show=id=>{tabs.forEach(b=>b.setAttribute('aria-selected',String(b.dataset.smapTab===id)));sides.forEach(s=>{s.hidden=s.dataset.smapSide!==id;});};
+    tabs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.smapTab)));
+    tabs.forEach((b,i)=>b.addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.focus();show(n.dataset.smapTab);}));
+    if(tabs[0])show(tabs[0].dataset.smapTab);
+  });
+  const shots=[...document.querySelectorAll('[data-shot]')];
+  if(!shots.length||typeof HTMLDialogElement==='undefined')return;
+  const dialog=document.createElement('dialog');dialog.className='ux-viewer';
+  dialog.innerHTML='<div class="ux-viewer-inner"><button type="button" data-prev>←</button><figure><img alt=""><figcaption></figcaption></figure><button type="button" data-next>→</button></div><button type="button" data-close>×</button>';
+  document.body.append(dialog);
+  const img=dialog.querySelector('img'),cap=dialog.querySelector('figcaption');
+  let group=[],index=0,opener=null;
+  const label=()=>{dialog.querySelector('[data-prev]').setAttribute('aria-label',zh()?'上一张':'Previous');dialog.querySelector('[data-next]').setAttribute('aria-label',zh()?'下一张':'Next');dialog.querySelector('[data-close]').setAttribute('aria-label',zh()?'关闭':'Close');};
+  const render=()=>{const b=group[index],name=b.querySelector('strong')?.textContent||b.dataset.caption||'';img.src=b.dataset.shot;img.alt=name;cap.innerHTML='';cap.append(name);const s=document.createElement('small');s.textContent=`${index+1} / ${group.length}`;cap.append(s);};
+  const step=d=>{index=(index+d+group.length)%group.length;render();};
+  shots.forEach(b=>b.addEventListener('click',()=>{const box=b.closest('.ux-smap-side,.ux-details')||document;group=[...box.querySelectorAll('[data-shot]')];index=group.indexOf(b);opener=b;label();render();dialog.showModal();}));
+  dialog.querySelector('[data-prev]').addEventListener('click',()=>step(-1));
+  dialog.querySelector('[data-next]').addEventListener('click',()=>step(1));
+  dialog.querySelector('[data-close]').addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('click',e=>{if(e.target===dialog||e.target.classList.contains('ux-viewer-inner'))dialog.close();});
+  dialog.addEventListener('keydown',e=>{if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1);});
+  dialog.addEventListener('close',()=>opener?.focus());
+  let x0=null;dialog.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
+  dialog.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)step(dx<0?1:-1);x0=null;});
+})();

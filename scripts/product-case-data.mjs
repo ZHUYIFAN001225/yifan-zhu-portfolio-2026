@@ -55,6 +55,63 @@ export const productCases=[{
       {title:p('Sponsored, later','后期推广'),body:p('Labelled promotion at scale.','规模化后的标注推广。')}
     ],note:p('A proposal to test, not validated revenue.','这是待验证的方案，不是已实现的收入。')}
   },
+  // Screen map: every screen is a real capture from the running prototype, grouped by navigation level.
+  screenMap:{
+    dir:'look',
+    lead:p('Every screen below is captured from the running prototype. Level 1 is the tab bar; each row follows one path deeper. Select any screen to enlarge it.','以下每个界面均截自正在运行的原型。第一层是底部标签栏；每一行沿一条路径向下深入。点击任意界面可放大查看。'),
+    sides:[
+      {id:'user',label:p('User side','用户端'),
+       tabs:[{file:'discover',title:p('Discover','发现')},{file:'search',title:p('Search','搜索')},{file:'build',title:p('Build','搭配')},{file:'messages',title:p('Messages','消息')},{file:'profile',title:p('Profile','我的')}],
+       paths:[
+        {from:p('Discover → the core journey: from a picture to a booking','发现 → 核心路径：从一张图片到一次预约'),key:true,steps:[
+          {file:'detail',level:2,title:p('Real work, with its maker','真实作品与作者')},
+          {file:'make-it-real',level:'sheet',title:p('Make It Real','Make It Real')},
+          {file:'matches',level:3,title:p('Matches near you','附近匹配')},
+          {file:'creator',level:4,title:p('Creator portfolio','Creator 作品集')},
+          {file:'availability',level:'sheet',title:p('Pick a time','选择时间')},
+          {file:'summary',level:'sheet',title:p('Booking summary','预约摘要')},
+          {file:'booked',level:5,title:p('Booked','预约完成')},
+          {file:'chat',level:5,title:p('Chat with the Creator','与 Creator 沟通')}]},
+        {from:p('Discover → explore around one picture','发现 → 围绕一张图继续探索'),steps:[
+          {file:'similar',level:3,title:p('Similar work','相似作品')},
+          {file:'work-info',level:3,title:p('Work details & price','作品详情与价格')},
+          {file:'matches-map',level:3,title:p('Matches on a map','地图查看匹配')},
+          {file:'notifications',level:2,title:p('Notifications','通知')}]},
+        {from:p('Search & Build','搜索与搭配'),steps:[
+          {file:'creator-search',level:2,title:p('Search Creators','搜索 Creator')},
+          {file:'preview',level:2,title:p('Style preview','整体预览')}]},
+        {from:p('Profile','我的'),steps:[
+          {file:'saved',level:2,title:p('Saved','收藏')},
+          {file:'taste',level:2,title:p('My taste','我的审美')},
+          {file:'bookings',level:2,title:p('Bookings','我的预约')},
+          {file:'plus',level:2,title:p('LOOK Plus studio','LOOK Plus 造型室')},
+          {file:'settings',level:2,title:p('Settings & area','设置与区域')}]}]},
+      {id:'creator',label:p('Creator side','Creator 端'),
+       note:p('Discover and Search are shared with the user side; Creators see the same feed of real work.','发现与搜索与用户端共用；Creator 看到的是同一个真实作品流。'),
+       tabs:[{file:'c-home',title:p('Workbench','工作台')},{file:'c-messages',title:p('Messages','消息')},{file:'c-profile',title:p('Profile','我的')}],
+       paths:[
+        {from:p('Workbench → turn demand into bookings','工作台 → 把需求变成预约'),key:true,steps:[
+          {file:'c-requests',level:2,title:p('Style requests','风格需求')},
+          {file:'c-respond',level:'sheet',title:p('Answer with real work','用真实作品回应')},
+          {file:'c-calendar',level:2,title:p('Calendar','日程')},
+          {file:'c-bookings',level:2,title:p('Bookings','客户预约')},
+          {file:'c-insights',level:2,title:p('Local demand','附近需求')}]},
+        {from:p('Workbench → portfolio','工作台 → 作品集'),seq:true,steps:[
+          {file:'c-portfolio',level:2,title:p('Portfolio','作品集')},
+          {file:'c-upload',level:3,title:p('Upload work','上传作品')}]},
+        {from:p('Profile → business set-up','我的 → 经营设置'),steps:[
+          {file:'c-setup',level:2,title:p('Creator profile','职业档案')},
+          {file:'c-services',level:2,title:p('Services & prices','服务与价格')},
+          {file:'c-rules',level:2,title:p('Booking rules','预约规则')}]}]}
+    ]
+  },
+  details:[
+    {file:'zoom-real-work',title:p('Every picture names its maker','每张图都标明作者'),body:p('“Real work by …” sits under the image, and Make It Real is the one primary action. Inspiration leads straight to a person.','图片下方写明“Real work by…”，Make It Real 是唯一主操作：灵感直接通向一个人。')},
+    {file:'zoom-matches',title:p('Matches show proof, not just names','匹配结果展示证据'),body:p('Distance, starting price, rating and three similar pieces of their own work, so a user compares results before profiles.','距离、起价、评分，以及三张 TA 自己的相似作品：先比较作品，再看个人资料。')},
+    {file:'zoom-slots',title:p('Only real free times','只显示真实空闲时间'),body:p('Times that are taken or too short for the service are greyed out; the chosen slot is the only red element.','已被占用或放不下该服务的时间直接置灰；所选时段是唯一的红色元素。')},
+    {file:'zoom-respond',title:p('Creators answer with their own work','Creator 用自己的作品回应'),body:p('Replying to a style request means choosing the closest real piece from the portfolio, so the promise is backed by evidence.','回应风格需求时，必须从作品集中选出最接近的真实作品，承诺有据可查。')},
+    {file:'zoom-calendar',title:p('One calendar, three states','一个日程，三种状态'),body:p('Available, holiday and time off are set per day; breaks stay visible so the Creator sees the shape of the day at a glance.','按天设置可约、休假与临时休息；休息时段保留可见，一眼看清当天安排。')}
+  ],
   ia:[
     {title:p('Consumer navigation','消费者导航'),levels:[p('L1 · Discover / Search / Build / Messages / Profile','一级 · 发现 / 搜索 / 组合造型 / 消息 / 个人'),p('L2 · Look detail / saved board / matches / Creator profile / conversations','二级 · 造型详情 / 收藏板 / 匹配结果 / Creator 主页 / 会话'),p('L3 · Add to Look / edit tags / choose service and time / booking actions','三级 · 加入造型 / 编辑标签 / 选择服务与时间 / 订单操作')]},
     {title:p('Creator navigation','Creator 导航'),levels:[p('L1 · Home / Portfolio / Calendar / Messages / Profile','一级 · 首页 / 作品 / 日历 / 消息 / 个人'),p('L2 · Requests / work details / appointments / service settings','二级 · 客户请求 / 作品详情 / 预约 / 服务设置'),p('L3 · Reply / confirm or decline / update availability / publish work','三级 · 回复 / 确认或拒绝 / 调整空档 / 发布作品')]}
@@ -164,6 +221,40 @@ export const productCases=[{
     {title:p('Shop owner','店铺经营者'),body:p('See the day, enter a manual booking, adjust opening hours and resolve affected appointments.','查看当天安排、手动补录、调整开放时间，并处理受影响预约。')},
     {title:p('Customers without WeChat','不用微信的顾客'),body:p('Considered from the start; in V1 the owner adds them, with their own entry next.','从调研阶段就纳入考虑；第一版由店主补录，独立入口放到下一阶段。')}
   ],
+  screenMap:{
+    dir:'booking',
+    lead:p('Captured from the public prototype (English layer on). Level 1 is the bottom navigation; each row follows one path deeper. Select any screen to enlarge it.','截自公开原型（开启英文层）。第一层是底部导航；每一行沿一条路径向下深入。点击任意界面可放大查看。'),
+    sides:[
+      {id:'customer',label:p('Customer app','顾客端'),
+       tabs:[{file:'book',title:p('Book','预约')},{file:'mine',title:p('My bookings','我的预约')}],
+       paths:[
+        {from:p('Book → three steps','预约 → 三步完成'),key:true,steps:[
+          {file:'day',level:2,title:p('Choose a time','选择时间')},
+          {file:'confirm',level:3,title:p('Check before booking','核对')},
+          {file:'booked',level:3,title:p('Booked','预约成功')}]},
+        {from:p('Book → search by time of day','预约 → 按固定时间找'),steps:[
+          {file:'by-time',level:'mode',title:p('By time of day','按时间找')}]},
+        {from:p('My bookings → change of plan','我的预约 → 计划有变'),steps:[
+          {file:'reschedule',level:2,title:p('Change time','修改时间')},
+          {file:'cancel',level:2,title:p('Cancel','取消预约')}]}]},
+      {id:'shop',label:p('Shop admin','店铺后台'),
+       tabs:[{file:'today',title:p('Today','今天')},{file:'schedule',title:p('Schedule','日程')},{file:'window',title:p('Open for booking','开放预约')},{file:'more',title:p('More','更多')}],
+       paths:[
+        {from:p('Today → the owner’s routine','今天 → 店主的日常操作'),key:true,steps:[
+          {file:'add',level:2,title:p('Add a booking','补录预约')},
+          {file:'time-off',level:2,title:p('Take time off','临时休息')},
+          {file:'todo',level:2,title:p('Needs a new time','待改期')}]},
+        {from:p('Schedule & More','日程与更多'),steps:[
+          {file:'day-detail',level:2,title:p('A day in the diary','某一天的预约')},
+          {file:'services',level:2,title:p('Services & durations','服务与时长')}]}]}
+    ]
+  },
+  details:[
+    {file:'zoom-durations',title:p('Duration is chosen first','先选服务时长'),body:p('Each service shows its length, and the earliest free time updates with it, because duration decides what fits.','每项服务标明时长，最早可约时间随之更新：时长决定了哪里放得下。')},
+    {file:'zoom-day',title:p('The diary, not the chat','看预约本，而不是翻聊天'),body:p('The owner sees a day as times, services and status, with Add and Adjust one tap away.','店主看到的是一天的时间、服务与状态；补录与调整一步可达。')},
+    {file:'zoom-time-off',title:p('Time off never deletes a booking','休息不会删除预约'),body:p('The rule is written on the screen: bookings are kept and affected customers pick a new time.','规则直接写在界面上：预约保留，受影响的顾客重新选时间。')},
+    {file:'zoom-kept',title:p('Customers see why, and what to do','顾客知道原因与下一步'),body:p('A closure turns the booking into “Needs new time” with a one-tap way to choose again.','店铺休息后，预约变为“待改期”，并提供一键重新选择。')}
+  ],
   ia:[
     {title:p('Customer · three-step booking','顾客端 · 三级预约流程'),levels:[p('L1 · Service + date / My bookings','一级 · 服务与日期 / 我的预约'),p('L2 · Legal start times / appointment detail','二级 · 合法开始时间 / 预约详情'),p('L3 · Review and confirm / reschedule / cancel confirmation','三级 · 核对并确认 / 改期 / 取消确认')]},
     {title:p('Shop · task-based navigation','店铺端 · 按任务导航'),levels:[p('L1 · Today / Diary / Availability / More','一级 · 今天 / 日程 / 开放预约 / 更多'),p('L2 · Day detail / affected bookings / weekly opening rules','二级 · 当日详情 / 受影响预约 / 每周开放规则'),p('L3 · Add or edit appointment / temporary closure / restore availability','三级 · 补录或编辑预约 / 临时关闭 / 恢复开放')]}
@@ -205,9 +296,9 @@ export const caseLabels={
   system:p('How the system works','系统如何运转'),
   strategy:p('Strategy','策略'),
   iteration:p('Process & iteration','方法与迭代'),
-  structure:p('Information architecture','信息架构'),
+  structure:p('Screen map','界面地图'),
   flow:p('The end-to-end journey','完整体验流程'),
-  interfaces:p('Interface walkthrough','关键界面解读'),
+  interfaces:p('Design details','界面细节'),
   logic:p('Decisions & state logic','决策与状态逻辑'),
   research:p('Research & field testing','调研与实地测试'),
   release:p('Progress & release plan','当前进度与发布计划'),

@@ -56,6 +56,36 @@ export const productCases=[{
     ],note:p('A proposal to test, not validated revenue.','这是待验证的方案，不是已实现的收入。')}
   },
   // Screen map: every screen is a real capture from the running prototype, grouped by navigation level.
+  facts:[
+    {label:p('Type','类型'),value:p('Two-sided marketplace · mobile','双边平台 · 移动端')},
+    {label:p('Stage','阶段'),value:p('Working prototype, pre-pilot','可运行原型 · 试点前')},
+    {label:p('Built with','实现方式'),value:p('Spec-first, AI-assisted web prototype','先写规格，AI 辅助实现的网页原型')}
+  ],
+  build:{
+    lead:p('I wrote the product specification first, then built the prototype with AI coding tools inside clear rules, so every screen follows the same logic.','先写完整的产品规格，再在明确规则下用 AI 编程工具实现原型，让每个界面都遵循同一套逻辑。'),
+    steps:[
+      {title:p('Specification','产品规格'),body:p('One written spec covers both roles: feed, matching, booking, payment rules, cancellation and privacy.','一份规格覆盖两种身份：信息流、匹配、预约、付款、取消与隐私规则。')},
+      {title:p('Prototype','原型实现'),body:p('A mobile web app with about 40 routes across both roles. Data stays in the browser, on one demo clock in Europe/London time.','移动网页应用，两种身份共约 40 个路由；数据保存在浏览器中，统一使用伦敦时区的演示时钟。')},
+      {title:p('Rules in code','规则落到代码'),body:p('Search radius is a hard limit, a declined Creator is not shown again, pending requests expire, and the home address stays hidden until confirmed.','搜索半径是硬限制；拒绝过的 Creator 不再推荐；待确认请求会过期；家庭工作室地址确认前不公开。')},
+      {title:p('Checks','检查'),body:p('Automated checks run every main flow and edge case, and render every route in both roles.','自动检查覆盖每条主流程与边界情况，并在两种身份下渲染全部路由。')}
+    ],
+    stats:[{value:51,label:p('main-flow interaction checks','项主流程交互检查')},{value:56,label:p('edge-case checks','项边界检查')},{value:80,label:p('route renders across both roles','次双身份路由渲染')}],
+    note:p('Checks ran on a virtual DOM; the prototype has not yet been tested on real phones with real users.','检查在虚拟 DOM 中进行；尚未在真实手机上与真实用户测试。')
+  },
+  challenges:{
+    hard:[
+      {title:p('Cold start is a supply problem','冷启动首先是供给问题'),body:p('The feed only works if there are local Creators with real work nearby. A beautiful feed means nothing if no one in range can do the look.','只有附近有真实作品的 Creator，信息流才有意义；图片再好看，范围内没人能做也没有用。')},
+      {title:p('Similar is not the same as possible','相似不等于能做到'),body:p('A picture cannot show hair condition, time or materials, so a consultation or quote step is still needed before booking.','图片看不出发质、耗时与材料，预约前仍需要咨询或报价。')},
+      {title:p('Image rights and consent','图片授权与同意'),body:p('“Real work” must be the Creator’s own, with client consent. The prototype uses reference images that are not cleared for public use, so it is not public yet.','“真实作品”必须是 Creator 本人的，并获得客户同意。原型使用的参考图未获公开授权，因此暂未公开发布。')}
+    ],
+    gaps:[p('Real accounts, payments and notifications','真实账号、付款与通知'),p('Postcode geocoding and travel time','邮编定位与路程时间'),p('Real image matching (scores are demo values)','真实图像匹配（评分为演示值）'),p('Testing with Glasgow Creators and users','与格拉斯哥 Creator 和用户的测试')],
+    opportunities:[
+      {title:p('Portfolio as acquisition','作品集即获客'),body:p('A Creator’s portfolio brings first-time customers, so a first-customer fee aligns platform income with real value.','Creator 的作品集为其带来新客，按首单收费让平台收入与真实价值一致。')},
+      {title:p('Local demand insight','本地需求洞察'),body:p('Requests show what people nearby are looking for, which Creators can act on.','需求数据显示附近的人在找什么，Creator 可以据此调整作品与服务。')},
+      {title:p('Personal preview, if proven','个人预览（需验证）'),body:p('An AI preview on your own photo could be a paid feature, once quality, speed and cost are tested.','在本人照片上的 AI 预览可成为付费功能，前提是质量、速度与成本经过验证。')}
+    ],
+    success:[p('Searches with similar work in range','范围内能找到相似作品的搜索比例'),p('Match → message → booking conversion','匹配 → 咨询 → 预约的转化'),p('Creator reply time','Creator 回复时长'),p('Repeat bookings and shared results','复购与结果分享')]
+  },
   screenMap:{
     dir:'look',
     lead:p('Every screen below is captured from the running prototype. Level 1 is the tab bar; each row follows one path deeper. Select any screen to enlarge it.','以下每个界面均截自正在运行的原型。第一层是底部标签栏；每一行沿一条路径向下深入。点击任意界面可放大查看。'),
@@ -221,6 +251,36 @@ export const productCases=[{
     {title:p('Shop owner','店铺经营者'),body:p('See the day, enter a manual booking, adjust opening hours and resolve affected appointments.','查看当天安排、手动补录、调整开放时间，并处理受影响预约。')},
     {title:p('Customers without WeChat','不用微信的顾客'),body:p('Considered from the start; in V1 the owner adds them, with their own entry next.','从调研阶段就纳入考虑；第一版由店主补录，独立入口放到下一阶段。')}
   ],
+  facts:[
+    {label:p('Type','类型'),value:p('Service design · booking system','服务设计 · 预约系统')},
+    {label:p('Stage','阶段'),value:p('Working prototype, before owner testing','可运行原型 · 待店主测试')},
+    {label:p('Built with','实现方式'),value:p('TypeScript booking core, AI-assisted within rules','TypeScript 预约核心 · 规则内 AI 辅助开发')}
+  ],
+  build:{
+    lead:p('The logic was fixed before any screen: pain points, V1 scope, three user flows, then technical rules for the AI tools. Visual polish came last.','先定逻辑再做界面：痛点 → 第一版范围 → 三条用户流程 → 给 AI 工具的技术规则，视觉放在最后。'),
+    steps:[
+      {title:p('One booking core','一个预约核心'),body:p('Availability, booking, rescheduling, closures and admin actions live in one shared TypeScript core used by both sides.','可约时间、预约、改期、休息与店主操作都在同一个 TypeScript 核心中，双端共用。')},
+      {title:p('Guardrails for AI','给 AI 的边界'),body:p('A written spec, folder rules and a list of what the AI may and may not change kept generated code inside the design.','书面规格、文件夹规则，以及 AI 可改与不可改的范围，让生成的代码不偏离设计。')},
+      {title:p('Two front ends','两个前端'),body:p('A customer flow and a shop diary, both phone-sized; the target is a WeChat mini program with a separate entry for non-WeChat customers.','顾客流程与店铺预约本，均为手机尺寸；目标形态是微信小程序，并为不用微信的顾客提供独立入口。')},
+      {title:p('Public prototype','公开原型'),body:p('The real booking rules are bundled to run in the browser, so anyone can try both sides without a server.','真实预约规则被打包在浏览器中运行，无需服务器即可体验双端。')}
+    ],
+    stats:[{value:82,label:p('automated tests','项自动化测试')},{value:4,label:p('tabs for the owner','个店主标签页')},{value:3,label:p('steps for a customer to book','步完成顾客预约')}],
+    note:p('Tests check the rules; they do not show that the owner finds it easy. That needs the interview and on-site test below.','测试验证的是规则，不代表店主觉得好用；这需要下方的访谈与现场测试。')
+  },
+  challenges:{
+    hard:[
+      {title:p('A low-confidence user','数字信心较弱的使用者'),body:p('The owner is used to WeChat and a paper diary. Every extra step is a reason to go back to them, so the shop side had to shrink to four tabs.','店主习惯微信与纸质本，多一步就可能退回旧方式，因此店铺端收敛为四个标签页。')},
+      {title:p('Durations are uncertain','时长并不确定'),body:p('Hair length and colour change how long a service takes, so estimates can still overrun.','头发长度与染发会改变服务时长，估算仍可能超时。')},
+      {title:p('Two kinds of customer','两类顾客'),body:p('WeChat suits Chinese customers but not everyone else. V1 serves WeChat; others are added by the owner until their own entry is ready.','微信适合中国顾客，却不适合所有人。第一版服务微信顾客，其他顾客由店主代录，直到独立入口上线。')}
+    ],
+    gaps:[p('Cloud storage and real WeChat sign-in','云端存储与真实微信登录'),p('Reliable notifications after a closure','休息后可靠的通知'),p('Interview and on-site test with the owner','与店主的访谈与现场测试'),p('Own entry for non-WeChat customers','非微信顾客的独立入口')],
+    opportunities:[
+      {title:p('Fewer messages','更少的消息往来'),body:p('If customers can see free times themselves, most “are you open?” messages disappear.','顾客能自己看到空位，大部分“在吗、有空吗”的消息就会消失。')},
+      {title:p('A wider local audience','更广的本地客群'),body:p('A non-WeChat entry opens the shop to local customers who would never add a private WeChat.','非微信入口让不会添加私人微信的本地顾客也能预约。')},
+      {title:p('A pattern for other small shops','可复用于其他小店'),body:p('The same core could serve other one-person services with changing hours.','同一个核心可以服务其他营业时间多变的个体店。')}
+    ],
+    success:[p('Owner tasks in four taps or fewer','店主常用操作不超过 4 步'),p('Share of bookings made without chatting','无需聊天完成的预约比例'),p('Time spent rescheduling after a closure','休息后重新安排所花的时间'),p('Owner still using it after a month','一个月后店主仍在使用')]
+  },
   screenMap:{
     dir:'booking',
     lead:p('Captured from the public prototype (English layer on). Level 1 is the bottom navigation; each row follows one path deeper. Select any screen to enlarge it.','截自公开原型（开启英文层）。第一层是底部导航；每一行沿一条路径向下深入。点击任意界面可放大查看。'),
@@ -300,7 +360,9 @@ export const caseLabels={
   flow:p('The end-to-end journey','完整体验流程'),
   interfaces:p('Design details','界面细节'),
   logic:p('Decisions & state logic','决策与状态逻辑'),
-  research:p('Research & field testing','调研与实地测试'),
+  build:p('How it was built','如何实现'),
+  challenges:p('Challenges, gaps & opportunities','挑战、不足与机会'),
+  research:p('Validation plan','验证计划'),
   release:p('Progress & release plan','当前进度与发布计划'),
 };
 // Per-case wording for sections whose content differs.

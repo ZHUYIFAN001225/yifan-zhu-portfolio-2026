@@ -1,6 +1,11 @@
 // Display language for the LOOK prototype. The prototype was written with Chinese and English mixed;
 // this layer shows it in one language: ?lang=en (default) or ?lang=zh. Data and logic are unchanged.
 (function () {
+  // Embedded in a case page: never move the visitor's page by focusing inside the frame before they interact with it.
+  if (window !== window.top) {
+    var nativeFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function (opts) { if (!document.hasFocus()) return; return nativeFocus.call(this, Object.assign({}, opts, { preventScroll: true })); };
+  }
   var KEY = 'look-demo-lang';
   var params = new URLSearchParams(location.search);
   var lang = params.get('lang');

@@ -48,7 +48,7 @@ for (const c of productCases) {
     await tab.evaluate(() => { document.querySelectorAll('[data-anim]').forEach(g => g.classList.add('is-on')); document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager');
       // The live frame is not printed (see print CSS); give the reader the address under the title instead.
       const stage = document.querySelector('[data-demo-stage][data-public-demo]');
-      if (stage) { const p = document.createElement('p'); p.className = 'v3-demo-caption'; const zh = document.documentElement.lang.startsWith('zh'); const url = stage.dataset.publicDemo; p.innerHTML = (zh ? '在线试用交互原型：' : 'Try the interactive prototype: ') + '<a href="' + url + '">' + url.replace(/^https:\/\//, '') + '</a>'; document.querySelector('.v3-product-status').after(p); }
+      if (stage) { const p = document.createElement('p'); p.className = 'v3-demo-caption'; const zh = document.documentElement.lang.startsWith('zh'); const url = new URL(stage.dataset.publicDemo, 'https://yifan-zhu-portfolio-2026.vercel.app/').href; p.innerHTML = (zh ? '在线试用交互原型：' : 'Try the interactive prototype: ') + '<a href="' + url + '">' + url.replace(/^https:\/\//, '') + '</a>'; document.querySelector('.v3-product-status').after(p); }
     });
     await tab.evaluate(async () => { await Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; }))); await document.fonts.ready; });
     // Chrome stores WebP losslessly in a PDF; re-encode screen captures as compact JPEG for printing.

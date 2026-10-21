@@ -1,6 +1,18 @@
 // English layer for the public prototype. The product UI is written in Chinese (V1 serves WeChat customers);
 // this translates rendered text so English-speaking reviewers can use it. Default: English. ?lang=zh shows the original.
 (function () {
+  // Embedded in a case page: never move the visitor's page by focusing inside the frame before they interact with it.
+  if (window !== window.top) {
+    var nativeFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function (opts) { if (!document.hasFocus()) return; return nativeFocus.call(this, Object.assign({}, opts, { preventScroll: true })); };
+    // A #fragment present when the frame finishes loading makes the browser scroll the parent page to it; set it after load.
+    var nativeReplace = history.replaceState.bind(history);
+    history.replaceState = function (state, title, url) {
+      if (document.readyState === 'complete' || !url) return nativeReplace(state, title, url);
+      nativeReplace(state, title);
+      addEventListener('load', function () { nativeReplace(state, title, url); }, { once: true });
+    };
+  }
   var KEY = 'glasgow-booking-demo-lang';
   var q = new URLSearchParams(location.search).get('lang');
   var lang = q === 'zh' || q === 'en' ? q : null;

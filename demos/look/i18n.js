@@ -16,6 +16,47 @@
 
   var ZH_EN = {
     // entry & sign-in
+    "Chrome 镜面美甲": "Chrome nails",
+    "法式凝胶美甲": "French gel nails",
+    "设计款美甲": "Designer nails",
+    "精致法式美甲": "Refined French nails",
+    "透明感凝胶美甲": "Sheer gel nails",
+    "镜面光泽美甲": "Mirror-shine nails",
+    "Balayage 染发": "Balayage colour",
+    "全头染色": "Full colour",
+    "剪发 + 染发": "Cut + colour",
+    "剪发与日常造型": "Cut & everyday styling",
+    "短发修剪": "Short cut",
+    "自然挑染": "Natural highlights",
+    "有类似作品": "has similar work",
+    "发送服务 / 价格建议": "Send service / price suggestion",
+    "这个月": "this month",
+    "先建立一套 Look": "Build a Look first",
+    "已回应 · 用户可查看你提供的相似作品": "Replied · the client can see the similar work you sent",
+    "已完成服务 · ": "Completed · ",
+    "我的主页": "My page",
+    "本机模拟对话 · 当前身份：Creator": "Simulated chat on this device · role: Creator",
+    "查看评价": "View review",
+    "评价已保存，结果图已进入 Community 和 Tagged Work。": "Review saved. Your result photo is now in the community and in Tagged Work.",
+    "已模拟完成服务，用户可评价并发布 After Photo": "Service marked complete (demo). The client can now review and post an after-photo.",
+    "已用你的真实 Portfolio 作品回应需求": "You replied with your real portfolio work.",
+    "简单评价": "Short review",
+    "你喜欢这次的效果吗？": "How did you like the result?",
+    "上传 After Photo": "Upload after-photo",
+    "使用示例结果图": "Use a sample result",
+    "提交评价": "Submit review",
+    "完成服务后才可以评价": "You can review after the service",
+    "从精致法式到镜面光泽，为每一双手找到恰到好处的细节。喜欢干净线条，也喜欢一点小惊喜。": "From refined French to mirror shine, the right detail for every pair of hands. I love clean lines and a small surprise.",
+    "偏爱自然的层次、柔和的线条和好打理的发型。每一次改变，都从了解你的生活方式开始。": "I love natural layers, soft lines and hair that is easy to look after. Every change starts with how you live.",
+    "保留个人特色，用细腻妆感衬托气色。妆容的色调和浓度可以根据肤色、场合与喜好沟通调整。": "Keep what makes you you, with makeup that lifts your skin. Tone and coverage are agreed for your skin, the occasion and your taste.",
+    "在安静的空间里，给肌肤一点休息的时间。根据你的肤质与日常习惯，制定适合的护理方案。": "A quiet hour for your skin, with care planned around your skin type and routine.",
+    "用细腻的眉形与自然卷翘，衬托你原本的五官。专注睫毛提升与眉毛塑形。": "Soft brows and a natural curl that frame your features. Lash lifts and brow shaping.",
+    "让衣橱更简单，让表达更清晰。以日常需求为起点，为你找到舒适又有个人特色的搭配。": "A simpler wardrobe and a clearer style, starting from your everyday needs.",
+    "擅长把颜色融入发型，用自然渐变与柔和挑染，创造随光线变化的层次感。": "Colour woven into the cut: natural gradients and soft highlights that change with the light.",
+    "用透明感、细节和微妙的色彩，让日常美甲多一点温柔。专注极简与韩系设计。": "Sheer finishes, small details and subtle colour. Minimal and Korean-style designs.",
+    "自然光泽与柔和妆感，让你在重要时刻依然像自己。提供日常、活动与新娘妆容服务。": "A natural glow so you still look like you on big days. Everyday, event and bridal makeup.",
+    "给自己留出一段安静的护理时间。专业人士会先了解肌肤状态，再与你确认适合的护理内容。": "Time set aside for care. Your skin is assessed first, then the treatment is agreed with you.",
+    "注重轮廓、纹理和日常打理，也提供个人造型建议。": "Focus on shape, texture and easy care, with personal styling advice.",
     '先看见喜欢的，再遇见合适的人。': 'See what you love first, then meet the right person.',
     '今天，从哪个身份开始？': 'Who are you today?', '寻找你的风格，或让自己的作品被看见。': 'Find your style, or get your work seen.',
     'FOR ME · 用户': 'FOR ME · USER', '发现属于我的风格': 'Discover my style', '探索 · 收藏 · 搭配 · 预约': 'Explore · Save · Build · Book',
@@ -99,10 +140,32 @@
     '松弛感短发': 'Effortless bob', '微光美甲': 'Shimmer nails', '自然好气色': 'Fresh glow', '极简日常': 'Minimal everyday', '日系': 'Japanese', '法式': 'French', '自然': 'Natural', '短发': 'Short hair', '层次': 'Layered',
     '极简': 'Minimal', '银色': 'Silver', '金色': 'Gold', '粉色': 'Pink', '暖棕': 'Warm brown', '奶茶色': 'Milk tea', '卷翘': 'Curl', '眉毛': 'Brows', '睫毛': 'Lashes', '水光': 'Dewy', '珍珠': 'Pearl', '波浪': 'Waves',
     '直发': 'Straight', '日常': 'Everyday', '通勤': 'Commute', '活动': 'Events', '黑白': 'Black & white', '护理': 'Care', '补水': 'Hydration', '清洁': 'Cleansing', '放松': 'Relax', '衣橱': 'Wardrobe', '个人造型': 'Personal styling',
-    '作品': 'Work', '约 ': 'About ', '保存 ': 'Save ', '查看作品：': 'View work: ', '查看相似作品 ': 'View similar work ', '相似作品 ': 'Similar work ', '管理作品 ': 'Manage work ', '选择 ': 'Choose ',
+    '作品': 'Work', '保存 ': 'Save ', '查看作品：': 'View work: ', '查看相似作品 ': 'View similar work ', '相似作品 ': 'Similar work ', '管理作品 ': 'Manage work ', '选择 ': 'Choose ',
     '周一': 'Mon', '周二': 'Tue', '周三': 'Wed', '周四': 'Thu', '周五': 'Fri', '周六': 'Sat', '周日': 'Sun', '分钟': ' min'
   };
   var EN_ZH = {
+    "Hi Amy! I'd love the soft layered wolf cut. My hair is shoulder length now.": "Amy 你好！我很喜欢这款柔和层次狼尾，我现在是齐肩长发。",
+    "Could we keep most of the length at the back?": "后面的长度可以尽量保留吗？",
+    "Hi Jamie! Yes, we can keep the length at the back and add soft layers around the face.": "Jamie 你好！可以，后面保留长度，脸周做柔和的层次。",
+    "Bring a photo of how you usually style it — see you on Wednesday.": "带一张你平时打理后的照片来吧，周三见。",
+    "Hi Mia, could the chrome tips be a little softer, more silver than mirror?": "Mia 你好，镜面的指尖可以柔和一点吗？偏银色、不要太亮。",
+    "Of course! I'll do a softer silver chrome with a sheer pink base. See you Saturday!": "当然可以！做柔和的银色镜面，底色用透粉，周六见！",
+    "Hi Jamie, I saw you saved my butterfly layers. Happy to talk through how it would work with your hair type.": "Jamie 你好，看到你收藏了我的蝴蝶层次剪，可以聊聊它适不适合你的发质。",
+    "Amy listened to exactly what I wanted. The layers are soft, easy to style in the morning, and I kept my length.": "Amy 完全听懂了我想要的。层次很柔和，早上很好打理，长度也保留住了。",
+    "Soft layers · first visit": "柔和层次 · 第一次预约",
+    "Booked Amy after seeing her bob on LOOK. Exactly the picture, but it actually suits my face.": "在 LOOK 上看到 Amy 的波波头就约了她。和图片一模一样，而且真的适合我的脸型。",
+    "Pearl French for a wedding": "婚礼用的珍珠法式",
+    "Mia matched the photo I saved and made it a little more subtle for daytime.": "Mia 按我收藏的图片做的，又调得更适合白天一些。",
+    "Soft glam for graduation": "毕业典礼的柔和妆容",
+    "Sophie kept it light and it lasted all day. Lovely to find someone through her real work.": "Sophie 妆感很轻，一整天都没掉。通过真实作品找到她，感觉很好。",
+    "Layered Cut & Style · My Result": "层次剪发与造型 · 我的成果",
+    "Almond": "杏仁形",
+    "Gel": "凝胶",
+    "Dark Brown": "深棕",
+    "Medium Length": "中长发",
+    "COMPLETED": "已完成",
+    "Message Mia": "给 Mia 发消息",
+    "How did it go?": "这次服务怎么样？",
     'ONE APP. TWO PERSPECTIVES.': '一个应用，两种视角', 'I’M A CREATOR': '我是 Creator', 'Choose a few looks you like.': '选几个你喜欢的造型', 'Like': '喜欢', 'Skip': '跳过', 'Start discovering': '开始发现',
     'For You': '推荐', 'Hair': '发型', 'Nails': '美甲', 'Makeup': '妆容', 'Outfit': '穿搭', 'Accessories': '配饰', 'All': '全部', 'Inspiration': '灵感', 'Creator': 'Creator', '✓ Creator': '✓ Creator',
     'Discover': '发现', 'Search': '搜索', 'Build': '搭配', 'Messages': '消息', 'Profile': '我的', 'Show us what you like.': '告诉我们你喜欢什么', 'Upload anything that inspires you.': '上传任何给你灵感的图片',
@@ -140,6 +203,7 @@
   function toEn(s) {
     if (!HAN.test(s)) return s;
     var t = s.trim(); if (ZH_EN[t]) return s.replace(t, ZH_EN[t]);
+    s = s.replace(/(\S+(?: \S+)?) 的服务已完成。/g, '$1’s service is complete.').replace(/约\s*([\d.]+)\s*(miles|mi)/g, 'About $1 $2').replace(/最近可约/g, 'Next free');
     s = s.replace(/(\d+)月(\d+)日周([一二三四五六日])/g, function (m, mo, d, w) { return WD[w] + ' ' + d + ' ' + MON[mo - 1]; })
          .replace(/(\d+)月(\d+)日/g, function (m, mo, d) { return d + ' ' + MON[mo - 1]; });
     for (var i = 0; i < zhKeys.length; i++) if (s.indexOf(zhKeys[i]) >= 0) s = s.split(zhKeys[i]).join(ZH_EN[zhKeys[i]]);
@@ -147,7 +211,7 @@
   }
   // English phrases that also appear inside mixed Chinese strings; names, streets and the LOOK/Creator/Look terms stay.
   var PHRASES = {
-    'Soft Layered Wolf Cut': '柔和层次狼尾', 'Soft layered hairstyle': '柔和层次发型', 'Butterfly Layers': '蝴蝶层次剪', 'Copper Balayage': '铜色挑染', 'Curtain Bangs': '八字刘海',
+    'Soft Layered Wolf Cut': '柔和层次狼尾', 'Layered Cut & Style': '层次剪发与造型', 'My Result': '我的成果', 'How did it go?': '这次服务怎么样？', 'Booking': '预约', 'collage': '拼贴', 'Soft layers · first visit': '柔和层次 · 第一次预约', 'Soft layered hairstyle': '柔和层次发型', 'Butterfly Layers': '蝴蝶层次剪', 'Copper Balayage': '铜色挑染', 'Curtain Bangs': '八字刘海',
     'Korean Soft Perm': '韩式柔软烫', 'Clean Textured Cut': '清爽纹理短发', 'Not yet verified on platform': '平台尚未认证', 'Best matches': '最佳匹配', 'Confirm Booking': '确认预约',
     'Request Booking': '请求预约', 'Same category': '同类别', 'Home-based': '家庭工作室', 'Style Preview': '风格预览', 'Demo account': '演示账号', 'Share publicly': '公开分享',
     'After Photo': '成果照片', 'Tagged Work': '客户标记作品', 'minimum notice': '最短提前时间', 'Europe/London': '伦敦时间', 'Maps / Places': '地图服务', 'Studio Common': 'Studio Common',
@@ -166,13 +230,13 @@
   }
   function toZh(s) {
     var t = s.trim(); if (!t || !/[A-Za-z]/.test(t)) return s;
-    if (HAN.test(t)) { var mixed = phrases(t).replace(/([\u4e00-\u9fff]) (?=[\u4e00-\u9fff])/g, '$1'); return mixed === t ? s : s.replace(t, mixed); }
+    if (HAN.test(t)) { var mixed = phrases(t.split('How did it go? ').join('这次服务怎么样？')).replace(/([\u4e00-\u9fff]) (?=[\u4e00-\u9fff])/g, '$1'); return mixed === t ? s : s.replace(t, mixed); }
     if (EN_ZH[t]) return s.replace(t, EN_ZH[t]);
     // Segments joined by " · " or " / " are translated piece by piece; names and prices stay as they are.
     var parts = t.split(/( · | \/ )/); var changed = false;
     for (var i = 0; i < parts.length; i += 2) { var p = parts[i].trim(); if (EN_ZH[p]) { parts[i] = EN_ZH[p]; changed = true; } }
     var out = parts.join('');
-    out = out.replace(/^Real work by (.+)$/, '$1 的真实作品').replace(/^From £(\d+)$/, '£$1 起').replace(/^About ([\d.]+) miles$/, '约 $1 英里')
+    out = out.replace(/^Your booking with (.+) is tomorrow at ([\d:]+)$/, '明天 $2 与 $1 有预约').replace(/^Real work by (.+)$/, '$1 的真实作品').replace(/^From £(\d+)$/, '£$1 起').replace(/^About ([\d.]+) miles$/, '约 $1 英里')
              .replace(/(\d+) reviews/, '$1 条评价').replace(/(\d+) bookings/, '$1 次预约').replace(/^Full payment (£\d+)$/, '全额支付 $1').replace(/(\d+) mi\b/, '$1 英里');
     if (!NAMES.test(out) || /·/.test(out)) out = phrases(out);
     return (changed || out !== t) ? s.replace(t, out) : s;

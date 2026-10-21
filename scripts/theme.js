@@ -1,10 +1,10 @@
-// Apply the saved colour choice before stylesheets paint. Light keeps the
-// existing reading palette; a visitor's explicit choice persists across pages.
+// Apply the saved colour choice before stylesheets paint. Dark is the default;
+// a visitor's explicit choice persists across pages.
 (() => {
   const root = document.documentElement;
   const key = 'portfolio-color-theme';
   const valid = value => value === 'dark' || value === 'light';
-  let theme = 'light';
+  let theme = 'dark';
   try { const saved = localStorage.getItem(key); if (valid(saved)) theme = saved; } catch {}
   root.dataset.theme = theme;
 
@@ -36,9 +36,9 @@
   });
   document.addEventListener('portfolio:language', labels);
   window.addEventListener('storage', event => {
-    if (event.key === key || event.key === null) apply(valid(event.newValue) ? event.newValue : 'light');
+    if (event.key === key || event.key === null) apply(valid(event.newValue) ? event.newValue : 'dark');
   });
   window.addEventListener('pageshow', () => {
-    try { const saved = localStorage.getItem(key); apply(valid(saved) ? saved : 'light'); } catch { labels(); }
+    try { const saved = localStorage.getItem(key); apply(valid(saved) ? saved : 'dark'); } catch { labels(); }
   });
 })();

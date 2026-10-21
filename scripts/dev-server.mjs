@@ -44,6 +44,7 @@ http.createServer(async(req,res)=>{
     let file=path.resolve(root,name);
     if(!file.startsWith(root+path.sep)){res.writeHead(404);return res.end('Not found');}
     if(!path.extname(file)&&fs.existsSync(file+'.html'))file+='.html';
+    if(fs.existsSync(file)&&fs.statSync(file).isDirectory())file=path.join(file,'index.html');
     const stat=await fs.promises.stat(file);
     if(!stat.isFile()||!types[path.extname(file)]){res.writeHead(404);return res.end('Not found');}
     const headers={'Content-Type':types[path.extname(file)],'Accept-Ranges':'bytes','Cache-Control':'no-cache'};

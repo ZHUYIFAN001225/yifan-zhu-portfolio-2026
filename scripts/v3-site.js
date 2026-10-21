@@ -44,18 +44,19 @@
     const local=['127.0.0.1','localhost','::1'].includes(location.hostname);
     const ready=demos=>{
       stages.forEach(stage=>{
-        const key=stage.dataset.demoStage,url=(local&&demos[key])||stage.dataset.publicDemo;
+        // A build hosted with the site wins; the local demo services only fill in when there is none.
+        const key=stage.dataset.demoStage,url=stage.dataset.publicDemo||(local&&demos[key]);
         const unavailable=stage.parentElement.querySelector('[data-demo-unavailable]');
         if(!url){if(unavailable)unavailable.hidden=false;return;}
         // Public prototypes follow the portfolio language (they default to English).
-        const withLang=(u,embed)=>{if(local&&demos[key])return u;try{const x=new URL(u,location.href);x.searchParams.set('lang',(document.documentElement.lang||'en').startsWith('zh')?'zh':'en');if(embed)x.searchParams.set('embed','1');return x.href;}catch{return u;}};
+        const withLang=(u,embed)=>{if(!stage.dataset.publicDemo&&local&&demos[key])return u;try{const x=new URL(u,location.href);x.searchParams.set('lang',(document.documentElement.lang||'en').startsWith('zh')?'zh':'en');if(embed)x.searchParams.set('embed','1');return x.href;}catch{return u;}};
         const frame=stage.querySelector('[data-demo-frame]');frame.src=withLang(url,true);
         // Some prototypes refresh when their window gains focus, which swallowed the first tap.
         // Give the frame focus as the pointer arrives, so the first real click goes through.
         frame.addEventListener('pointerenter',()=>{try{if(document.activeElement!==frame)frame.contentWindow.focus();}catch{}});stage.hidden=false;if(unavailable)unavailable.hidden=true;
-        const links=()=>stage.querySelectorAll('[data-demo-launch]').forEach(a=>{const name=a.dataset.demoLaunch,route=(local&&demos[name])||(name===key?stage.dataset.publicDemo:name===key+'Admin'?stage.dataset.publicAdmin:'');if(route){a.href=local&&demos[name]?route:withLang(route);a.hidden=false;}});links();
+        const links=()=>stage.querySelectorAll('[data-demo-launch]').forEach(a=>{const name=a.dataset.demoLaunch,hosted=name===key?stage.dataset.publicDemo:name===key+'Admin'?stage.dataset.publicAdmin:'',route=hosted||(local&&demos[name]);if(route){a.href=hosted?withLang(route):route;a.hidden=false;}});links();
         document.addEventListener('portfolio:language',()=>{const next=withLang(url,true);if(frame.src!==next)frame.src=next;links();});
-        const note=stage.querySelector('[data-demo-local-note]');if(note)note.hidden=!(local&&demos[key]);
+        const note=stage.querySelector('[data-demo-local-note]');if(note)note.hidden=!(!stage.dataset.publicDemo&&local&&demos[key]);
         const cta=document.querySelector('[data-demo-cta]');
         if(cta){const label=()=>{cta.textContent=text('Try the prototype ↓','试用交互原型 ↓');};label();document.addEventListener('portfolio:language',label);}
       });

@@ -814,3 +814,16 @@ html.v3-header-hidden .site-header.v3-header{transform:translateY(-100%)}
 @media(max-width:620px){.ux-roles{grid-template-columns:1fr}.ux-build,.ux-success{grid-template-columns:1fr}}
 @media print{.ux-roles{display:none}}
 .ux-build-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.ux-build-stats div{display:flex;flex-direction:column;gap:4px}.ux-build-stats span{font-size:13px;color:var(--muted)}
+
+/* Case contents stay in reach: sticky under the header, with the current section highlighted */
+.ux-case-index{position:sticky;top:var(--v3-header-h,88px);z-index:25;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:0 24px;padding:0;margin-bottom:26px;background:var(--bg);box-shadow:0 0 0 100vmax var(--bg);clip-path:inset(0 -100vmax);border-bottom:1px solid var(--line);transition:top .45s var(--v3-ease-out,ease)}
+.ux-case-index::-webkit-scrollbar{display:none}
+html.v3-header-hidden .ux-case-index{top:0}
+.ux-case-index a{flex:0 0 auto;white-space:nowrap;text-decoration:none;color:var(--muted);border-bottom:2px solid transparent;min-height:48px;transition:color .2s,border-color .2s}
+.ux-case-index a:hover{color:var(--text)}
+.ux-case-index a[aria-current="location"]{color:var(--text);border-bottom-color:var(--text)}
+.ux-case-index .ux-index-top{margin-left:auto;padding-left:12px}
+.ux-case .ux-section,.ux-case #interactive-demo{scroll-margin-top:calc(var(--v3-header-h,88px) + 64px)}
+@media(prefers-reduced-motion:reduce){.ux-case-index{transition:none}}
+.ux-case-index .ux-index-try{margin-left:auto;color:var(--text);font-weight:600}
+.ux-case-index .ux-index-try+.ux-index-top{margin-left:0}

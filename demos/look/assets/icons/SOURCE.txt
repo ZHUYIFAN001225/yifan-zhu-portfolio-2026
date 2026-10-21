@@ -1,0 +1,2 @@
+Phosphor Icons core 2.1.1, MIT license
+https://github.com/phosphor-icons/core

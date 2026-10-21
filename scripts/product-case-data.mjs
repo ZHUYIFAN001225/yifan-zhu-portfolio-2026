@@ -76,7 +76,7 @@ export const productCases=[{
     hard:[
       {title:p('Cold start is a supply problem','冷启动首先是供给问题'),body:p('The feed only works if there are local Creators with real work nearby. A beautiful feed means nothing if no one in range can do the look.','只有附近有真实作品的 Creator，信息流才有意义；图片再好看，范围内没人能做也没有用。')},
       {title:p('Similar is not the same as possible','相似不等于能做到'),body:p('A picture cannot show hair condition, time or materials, so a consultation or quote step is still needed before booking.','图片看不出发质、耗时与材料，预约前仍需要咨询或报价。')},
-      {title:p('Image rights and consent','图片授权与同意'),body:p('“Real work” must be the Creator’s own, with client consent. The prototype uses reference images that are not cleared for public use, so it is not public yet.','“真实作品”必须是 Creator 本人的，并获得客户同意。原型使用的参考图未获公开授权，因此暂未公开发布。')}
+      {title:p('Image rights and consent','图片授权与同意'),body:p('“Real work” must be the Creator’s own, with client consent. The prototype still uses reference images collected for research; before any pilot they must be replaced with consented work from real Creators.','“真实作品”必须是 Creator 本人的，并获得客户同意。原型目前仍使用调研时收集的参考图；任何试点前，都必须换成真实 Creator 经同意提供的作品。')}
     ],
     gaps:[p('Real accounts, payments and notifications','真实账号、付款与通知'),p('Postcode geocoding and travel time','邮编定位与路程时间'),p('Real image matching (scores are demo values)','真实图像匹配（评分为演示值）'),p('Testing with Glasgow Creators and users','与格拉斯哥 Creator 和用户的测试')],
     opportunities:[
@@ -169,8 +169,8 @@ export const productCases=[{
     {title:p('Keep both sides consistent','保持双端一致'),why:p('Availability and price can change between browsing and booking.','浏览与预约之间，空档和价格可能发生变化。'),how:p('Booking conditions are rechecked on submit, and pending requests stay visible to both sides.','提交时重新检查预约条件，待处理请求对双方都保持可见。'),test:p('Test stale information, unavailable slots and declined requests before a real pilot.','真实试点前测试信息过期、空档失效与请求被拒绝等场景。')}
   ],
   demo:p('Choose the Consumer role and a preset demo name. Open a look → Make It Real → nearby Creators → service and availability. Switch to the matching Creator from Profile to inspect the same request. No real phone number or payment is needed.','选择消费者身份与预设演示称呼。打开造型 → Make It Real → 附近 Creator → 服务与空档。在个人页切换到对应 Creator，可查看同一请求。无需真实手机号或支付。'),
-  // Public deployment of the standalone prototype (separate repository). Empty until it is live.
-  publicDemo:'',
+  // Built prototype served with the portfolio (demos/look); source stays in its own project.
+  publicDemo:'demos/look/index.html',
   boundary:p('Creator identities, reviews, distances, payments and messages are simulated. Matching uses tags and rules; style preview is a collage. Browser storage does not provide production authentication or cross-device sync. A separate, narrower V1 includes persistent APIs and an iOS source project, but is not a launched product.','Creator 身份、评价、距离、支付与消息均为模拟。匹配基于标签与规则；造型预览为拼贴。浏览器存储不等于生产身份认证或跨设备同步。另有范围更小的 V1，包含持久化 API 与 iOS 源码，但尚未上线。'),
   research:[
     {title:p('Explore the real journey','了解真实服务旅程'),body:p('Ask consumers how they collect references, explain a look and decide whom to trust. Capture consented journey notes and anonymised examples.','了解消费者如何收集参考、表达造型并判断可信服务者；记录经同意的旅程笔记与匿名例子。')},
@@ -338,9 +338,9 @@ export const productCases=[{
   ],
   decisions:[],
   demo:p('Choose a service → an available day → a start time → review, and book. Then open the shop view: the same booking is in the owner’s diary. Try My bookings to reschedule or cancel. The booking rules run in your browser on sample data; Reset demo starts again.','选择服务 → 可约日期 → 开始时间 → 核对并预约。再打开店铺端，同一笔预约已出现在店主的预约本里。可在「我的预约」中改期或取消。预约规则在浏览器内运行，使用示例数据；「重置演示」可重新开始。'),
-  // Public deployment of the standalone prototype (separate repository: glasgow-salon-booking-prototype).
-  publicDemo:'https://zhuyifan001225.github.io/glasgow-salon-booking-prototype/',
-  publicAdmin:'https://zhuyifan001225.github.io/glasgow-salon-booking-prototype/admin.html',
+  // Built, browser-only prototype served with the portfolio (demos/salon-booking); source stays in its own project.
+  publicDemo:'demos/salon-booking/',
+  publicAdmin:'demos/salon-booking/admin.html',
   boundary:p('The public prototype runs the project’s real booking rules in the browser, with sample data stored only on the visitor’s device. The UI was written in Chinese for WeChat customers; an English layer is on by default. CloudBase persistence, real WeChat identity, reliable notifications and production deployment are unfinished. No real customer is charged or notified.','公开原型在浏览器中运行项目真实的预约规则，示例数据只保存在访问者本机。界面原本为微信顾客以中文设计，默认叠加英文层。CloudBase 持久化、真实微信身份、可靠通知与正式部署尚未完成，不会向真实顾客收费或发送通知。'),
   research:[
     {title:p('Observe a real booking','观察真实预约'),body:p('With permission, map how a request moves from a conversation to the diary, including changes and interruptions. Record steps without retaining private customer details.','获得同意后，记录需求如何从对话进入预约本，以及中途变动与打断；不保留顾客隐私信息。')},

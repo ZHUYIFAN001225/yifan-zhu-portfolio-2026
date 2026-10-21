@@ -210,7 +210,7 @@ window.addEventListener('pagereveal',event=>{
   const img=dialog.querySelector('img'),cap=dialog.querySelector('figcaption');
   let group=[],index=0,opener=null;
   const label=()=>{dialog.querySelector('[data-prev]').setAttribute('aria-label',zh()?'上一张':'Previous');dialog.querySelector('[data-next]').setAttribute('aria-label',zh()?'下一张':'Next');dialog.querySelector('[data-close]').setAttribute('aria-label',zh()?'关闭':'Close');};
-  const render=()=>{const b=group[index],name=b.querySelector('strong')?.textContent||b.dataset.caption||'';img.src=b.dataset.shot;img.alt=name;cap.innerHTML='';cap.append(name);const s=document.createElement('small');s.textContent=`${index+1} / ${group.length}`;cap.append(s);};
+  const render=()=>{const b=group[index],name=b.querySelector('strong')?.textContent||b.dataset.caption||'';img.src=zh()?b.dataset.shot.replace(/\/([^/]+)$/,'/zh/$1'):b.dataset.shot;img.alt=name;cap.innerHTML='';cap.append(name);const s=document.createElement('small');s.textContent=`${index+1} / ${group.length}`;cap.append(s);};
   const step=d=>{index=(index+d+group.length)%group.length;render();};
   shots.forEach(b=>b.addEventListener('click',()=>{const box=b.closest('.ux-smap-side,.ux-details')||document;group=[...box.querySelectorAll('[data-shot]')];index=group.indexOf(b);opener=b;label();render();dialog.showModal();}));
   dialog.querySelector('[data-prev]').addEventListener('click',()=>step(-1));
@@ -221,4 +221,25 @@ window.addEventListener('pagereveal',event=>{
   dialog.addEventListener('close',()=>opener?.focus());
   let x0=null;dialog.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
   dialog.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)step(dx<0?1:-1);x0=null;});
+})();
+
+// Case contents: keep the sticky index under the header and mark the section being read.
+(() => {
+  const index=document.querySelector('[data-case-index]');if(!index)return;
+  const header=document.querySelector('.site-header');
+  const setH=()=>document.documentElement.style.setProperty('--v3-header-h',(header?header.offsetHeight:0)+'px');
+  setH();addEventListener('resize',setH,{passive:true});
+  const links=[...index.querySelectorAll('a[href^="#"]:not(.ux-index-top):not(.ux-index-try)')];
+  const sections=links.map(a=>document.getElementById(a.hash.slice(1))).filter(Boolean);
+  let current=null;
+  const mark=id=>{if(id===current)return;current=id;links.forEach(a=>{const on=a.hash.slice(1)===id;on?a.setAttribute('aria-current','location'):a.removeAttribute('aria-current');if(on){const l=a.offsetLeft-24,r=a.offsetLeft+a.offsetWidth+24;if(l<index.scrollLeft||r>index.scrollLeft+index.clientWidth)index.scrollTo({left:Math.max(0,l),behavior:'smooth'});}});};
+  const pick=()=>{const line=innerHeight*.3;let id=null;for(const s of sections){if(s.getBoundingClientRect().top<=line)id=s.id;}mark(id);};
+  addEventListener('scroll',()=>requestAnimationFrame(pick),{passive:true});pick();
+})();
+
+// Product screenshots follow the page language: each image has a Chinese twin in a sibling zh/ folder.
+(() => {
+  const zhSrc=s=>s.replace(/\/([^/]+)$/,'/zh/$1');
+  const apply=()=>{const zh=document.documentElement.lang.startsWith('zh');document.querySelectorAll('img[data-i18n-img]').forEach(img=>{const en=img.dataset.enSrc||(img.dataset.enSrc=img.getAttribute('src'));const want=zh?zhSrc(en):en;if(img.getAttribute('src')!==want)img.setAttribute('src',want);});};
+  apply();document.addEventListener('portfolio:language',apply);
 })();

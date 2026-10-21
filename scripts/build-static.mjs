@@ -31,7 +31,8 @@ const entries = [
   "styles.css",
   "v3.css",
   "themes.css",
-  "assets"
+  "assets",
+  "demos"
 ];
 
 if (path.resolve(dist) !== path.join(path.resolve(root), "dist")) throw new Error("Unsafe output directory");

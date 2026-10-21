@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <script src="i18n.js"></script><script src="demo-backend.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>理发预约 · 手机交互预览</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="preview-switch" aria-label="切换检查端">
+    <a href="./" aria-current="page">顾客客户端</a>
+    <a href="admin.html">店铺后台</a>
+  <span class="demo-lang"><a href="./?lang=en" data-lang="en">EN</a><a href="./?lang=zh" data-lang="zh">中文</a></span><style>.demo-lang{margin-left:12px;display:inline-flex;gap:8px}.demo-lang a{opacity:.55}html[data-demo-lang=en] .demo-lang [data-lang=en],html[data-demo-lang=zh] .demo-lang [data-lang=zh]{opacity:1;font-weight:600}</style></nav>
+  <div class="device" aria-label="手机预览">
+    <div class="side-key"></div>
+    <div class="screen">
+      <div class="statusbar" aria-hidden="true"><span>9:41</span><i class="speaker"></i><span>▮▮▮ ▰</span></div>
+      <header class="appbar">
+        <button id="back" class="icon-button" aria-label="返回上一级" hidden>‹</button>
+        <div><h1 id="title" tabindex="-1">理发预约</h1><small id="subtitle">GLASGOW · 英国当地时间</small></div>
+        <button id="refresh" class="icon-button" aria-label="刷新空位">↻</button>
+      </header>
+      <div id="steps" class="steps" aria-label="预约步骤"></div>
+      <main id="main">
+        <div id="message" role="status" aria-live="polite"></div>
+        <section id="home">
+          <div class="heading"><h2>想做什么服务？</h2><small>预计时长</small></div>
+          <div id="services" class="services"></div>
+          <div id="earliest" class="earliest"></div>
+          <div class="heading"><h2>哪天方便？</h2><small id="until"></small></div>
+          <div class="segmented" aria-label="查找方式">
+            <button id="byDate" aria-pressed="true">按日期看</button>
+            <button id="byTime" aria-pressed="false">按固定时间找</button>
+          </div>
+          <div id="timeFilter" hidden><label for="preferred">开始时间</label><select id="preferred"></select></div>
+          <div class="week-pager"><button id="prevWeek" aria-label="上一周" disabled>‹</button><span id="weekLabel">第一周</span><button id="nextWeek" aria-label="下一周">›</button></div>
+          <div id="days" class="calendar" aria-busy="true"><p>正在查询空位…</p></div>
+          <p class="hint footnote">点日期选时间 · 当天不接受新预约</p>
+        </section>
+        <section id="day" hidden></section>
+        <section id="confirm" hidden></section>
+        <section id="mine" hidden></section>
+        <section id="cancel" hidden></section>
+      </main>
+      <div id="actionbar" class="actionbar" hidden></div>
+      <nav id="nav" class="bottom" aria-label="主要导航">
+        <button id="navBook" aria-current="page"><span aria-hidden="true">▦</span>预约</button>
+        <button id="navMine"><span aria-hidden="true">▤</span>我的预约 <b id="count"></b></button>
+      </nav>
+      <div class="home-indicator" aria-hidden="true"><i></i></div>
+    </div>
+  </div>
+  <p class="preview-caption">在手机内点击、返回与滚动 · 浏览器内演示，数据只存在本机 · <button type="button" class="demo-reset" data-demo-reset>重置演示</button></p>
+  <script type="module" src="client.js"></script>
+</body>
+</html>

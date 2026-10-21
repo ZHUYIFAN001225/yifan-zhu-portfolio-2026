@@ -843,3 +843,4 @@ html.v3-header-hidden .ux-case-index{top:0}
 .ux-hero-print{display:none}
 @media(max-width:760px){.v3-product-hero.ux-hero-demo{overflow:visible;scroll-snap-type:none;padding:14px 10px 18px}}
 @media print{.ux-hero-howto{display:none}.ux-hero-print{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}}
+.v3-try{text-decoration:none;gap:8px}.v3-try span{font-size:11px}

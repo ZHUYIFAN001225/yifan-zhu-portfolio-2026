@@ -22,10 +22,11 @@ function card(project,index) {
       ${project.preview ? `<video class="v3-hover-video" data-preview="${project.preview}" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>`:''}
       ${!project.video?`<span class="v3-hover-summary" aria-hidden="true">${pair(project.subtitle)}</span>`:''}
       <span class="v3-media-label">${pair(project.kind)}</span><span class="v3-media-arrow" aria-hidden="true">↗</span></a>
+      ${project.demo?`<a class="v3-play v3-try" data-case-link href="${project.href}#interactive-demo"><span aria-hidden="true">▶</span> ${t('Try the prototype','试用原型')}</a>`:''}
       ${project.video?`<button class="v3-play" type="button" data-play="${project.id}" aria-label="${t('Play video: '+project.title.en,'播放视频：'+project.title.zh)}">${t('Play','播放')} <span translate="no">${project.duration}</span></button>`:''}</div>
     <div class="v3-card-info"><div class="v3-card-status ${project.status.en==='Released product'?'v3-card-status--live':''}">${pair(project.status)}</div>
       <h3><a data-case-link href="${project.href}">${pair(project.title)}</a></h3><p>${pair(project.subtitle)}</p>
-      ${project.demo?`<a class="v3-demo-card-link" data-case-link href="${project.href}#interactive-demo">${t('Try the prototype','试用原型')} ↗</a>`:''}<div class="v3-card-tags">${project.tags.map(pair).map(s=>`<span>${s}</span>`).join('')}</div>
+      ${project.demo?`<a class="v3-demo-card-link" data-case-link href="${project.href}#interactive-demo">${t('Open the live prototype','打开可操作原型')} ↗</a>`:''}<div class="v3-card-tags">${project.tags.map(pair).map(s=>`<span>${s}</span>`).join('')}</div>
       ${project.external?`<a class="v3-demo-card-link v3-release-link" href="${project.external}" target="_blank" rel="noopener noreferrer">${pair(project.externalLabel)} ↗</a>`:''}
     </div>
   </div></article>`;

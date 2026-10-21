@@ -243,3 +243,13 @@ window.addEventListener('pagereveal',event=>{
   const apply=()=>{const zh=document.documentElement.lang.startsWith('zh');document.querySelectorAll('img[data-i18n-img]').forEach(img=>{const en=img.dataset.enSrc||(img.dataset.enSrc=img.getAttribute('src'));const want=zh?zhSrc(en):en;if(img.getAttribute('src')!==want)img.setAttribute('src',want);});};
   apply();document.addEventListener('portfolio:language',apply);
 })();
+
+// Arriving with #interactive-demo (from a homepage card): line the live prototype up under the header
+// once images and the frame have settled, so the first thing on screen is something to try.
+(() => {
+  if (location.hash !== '#interactive-demo') return;
+  const el = document.getElementById('interactive-demo'); if (!el) return;
+  // Wide screens show the title and the prototype side by side, so the top of the page is the right place.
+  const align = () => { if (matchMedia('(min-width: 761px)').matches) { scrollTo({ top: 0, behavior: 'auto' }); return; } const h = document.querySelector('.site-header')?.offsetHeight || 0; const y = el.getBoundingClientRect().top + scrollY - h - 16; scrollTo({ top: Math.max(0, y), behavior: 'auto' }); };
+  addEventListener('load', () => { align(); setTimeout(align, 400); }, { once: true });
+})();

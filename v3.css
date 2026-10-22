@@ -848,3 +848,8 @@ html.v3-header-hidden .ux-case-index{top:0}
 /* Nothing may widen the page: slide-in motion and decorative edges are clipped, so a phone can't wobble sideways. */
 html,body{overflow-x:clip}
 .ux-bridge,.ux-blueprint,.ux-flywheel,.ux-scenario,.ux-iterations{overflow-x:clip}
+.ux-live{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:14px 0 0;max-width:560px}
+.ux-live a{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:100px;border:1px solid var(--accent);color:var(--text);font-size:13px;font-weight:500;text-decoration:none}
+.ux-live a:hover{background:var(--panel)}
+.ux-live-dot{width:8px;height:8px;border-radius:50%;background:#3fbf7f;box-shadow:0 0 0 4px rgba(63,191,127,.18)}
+.ux-live small{flex-basis:100%;font-size:12px;line-height:1.6;color:var(--muted)}

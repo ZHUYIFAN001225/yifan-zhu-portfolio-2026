@@ -186,7 +186,8 @@ export const productCases=[{
   subtitle:p('One shared diary. Two clear experiences.','一本共享预约本，两端清晰体验。'),
   intro:p('A customer and shop booking system for a small Glasgow salon run by an older owner, who currently manages every appointment through WeChat, a paper diary and memory.','为格拉斯哥一家小理发店设计的顾客与店铺双端预约系统。店主年纪较大，目前所有预约都靠微信、纸质本和记忆管理。'),
   core:p('The aim is not to put booking online. It is to let the routine run itself, so the owner only steps in for the exceptions — without learning a complicated tool.','目标不是「把预约搬到线上」，而是让日常预约自己运转，店主只在出现异常时介入，而且不需要学习复杂的工具。'),
-  status:p('Interactive two-sided prototype · field research planned','可交互双端原型 · 现场调研待开展'),
+  status:p('Live since October 2026 · web version in Chinese and English, with an owner admin','2026 年 10 月已上线 · 中英文网页版 + 店主管理端'),
+  live:{url:'https://glasgow-booking-web.pages.dev/en/',urlZh:'https://glasgow-booking-web.pages.dev/',note:p('This is the shop’s real booking site, used by real customers. To try it freely, use the prototype here instead: it runs the same rules on sample data.','这是店里真实使用的预约网站，有真实顾客在约。想随便试的话，请用这里的原型：同一套规则，示例数据。')},
   role:p('Problem framing, service blueprint, booking rules, UI for both sides and AI-assisted prototyping','问题定义、服务蓝图、预约规则、双端界面与 AI 辅助原型'),
   scope:p('Customer booking + shop diary and availability','顾客预约 + 店铺排期与开放安排'),
   hero:['booking-customer','booking-admin'],
@@ -194,8 +195,8 @@ export const productCases=[{
   persona:{name:p('The owner','店主「阿姨」'),traits:[p('Runs the salon alone','独自经营小店'),p('WeChat + paper diary','微信 + 纸质预约本'),p('Hours change with health and travel','营业时间随身体和出行变化'),p('Away for two weeks recently','最近离开过半个月'),p('Needs tools she can read at a glance','工具必须一眼看懂')],quote:p('“Is anyone booked on Friday? Who do I need to tell?”','「周五有人约吗？我要通知谁？」')},
   whoNeeds:{title:p('Same booking, different questions','同一个预约，双方关心的完全不同'),left:{title:p('Customer asks','顾客关心'),items:[p('What services?','有哪些服务？'),p('Which days are open?','哪天营业？'),p('Which times are free?','哪些时间有空？'),p('What did I book?','我约了什么？')]},center:p('One shared diary','一本共享预约本'),right:{title:p('Owner asks','店主关心'),items:[p('How many today?','今天几位？'),p('Who, when, what, how long?','谁、几点、做什么、多久？'),p('Where is free time?','哪里还有空？'),p('Who is affected if I close?','停业会影响谁？')]}},
   flows:{title:p('Three users, three ways in','三类用户，三种入口'),lanes:[
-    {title:p('Chinese customers','中国顾客'),channel:p('WeChat mini program · V1','微信小程序 · 第一版'),steps:[p('Open','打开'),p('Service','选服务'),p('Time','选时间'),p('Confirm','确认')]},
-    {title:p('Non-WeChat customers','非微信顾客'),channel:p('Owner adds them · own entry next','先由店主补录 · 独立入口下一阶段'),steps:[p('Call or walk in','电话或到店'),p('Owner adds booking','店主补录'),p('Same diary','进入同一本日程')]},
+    {title:p('Chinese customers','中国顾客'),channel:p('Chinese website · live (mini program later)','中文网站 · 已上线（小程序之后）'),steps:[p('Open','打开'),p('Service','选服务'),p('Time','选时间'),p('Confirm','确认')]},
+    {title:p('Non-WeChat customers','非微信顾客'),channel:p('English website · live; owner can still add them','英文网站 · 已上线；店主仍可代为补录'),steps:[p('Open the link','打开链接'),p('Service & time','选服务和时间'),p('Google sign-in','Google 登录'),p('Same diary','进入同一本日程')]},
     {title:p('Owner','店主'),channel:p('Shop view','店铺端'),steps:[p('Today','看今天'),p('Set hours once','设一次营业时间'),p('Handle exceptions','只处理异常')]}
   ]},
   pains:[
@@ -204,7 +205,7 @@ export const productCases=[{
     {quote:p('Plans change — and every change means messaging everyone','安排一变，就要逐个通知'),body:p('Illness or travel = messaging everyone again.','生病或出行，就要逐个重新联系。')},
     {quote:p('Customers have to ask before they can book','顾客必须先问才能约'),body:p('No WeChat, no easy way in.','不用微信，就没有入口。')}
   ],
-  evidence:p('Built from my background and pain-point notes on the salon, a booking-logic specification and local self-tests. A structured interview and on-site test with the owner come next; services, hours and bookings in the demo are fixtures.','依据我对这家店整理的背景与痛点记录、预约逻辑规格和本地自测。下一步是与店主进行结构化访谈和现场测试；Demo 中的服务、营业时间和预约均为演示配置。'),
+  evidence:p('Built from my background and pain-point notes on the salon, a booking-logic specification and self-tests, and now live as a website. A structured interview and on-site observation with the owner come next; services, hours and bookings in the demo here are sample data.','依据我对这家店整理的背景与痛点记录、预约逻辑规格和自测，现已作为网站上线。下一步是与店主进行结构化访谈和现场观察；本页原型中的服务、营业时间和预约均为示例数据。'),
   system:{
     kind:'blueprint',
     title:p('Service blueprint: who does what','服务蓝图：谁在做什么'),
@@ -243,18 +244,18 @@ export const productCases=[{
       {title:p('Two developers, one core','两人协作，共享一个核心'),before:p('Customer and owner sides built separately','顾客端与店主端分开开发'),after:p('One shared booking core, changes agreed first','共用一个预约核心，改动先确认再执行'),note:p('e.g. how the owner adds a non-WeChat customer was raised as a change request.','例如「店主如何补录非微信顾客」就以变更请求提出。')}
     ],
     tasks:{title:p('Owner tasks, measured in taps','店主常用操作：实测点击步数'),target:4,items:[{label:p('See today','查看今天'),value:1},{label:p('Open the next two weeks','开放未来两周'),value:2},{label:p('Set a weekly day off','设置每周固定休息日'),value:3},{label:p('Close a day next week','下周某天全天休息'),value:6}],note:p('Target: 3–4 taps. Closing a future day still takes 6 — the next thing to simplify.','目标是 3–4 步。关闭未来某天仍需 6 步，是下一轮要简化的地方。')},
-    evidence:p('Design reviews and 82 automated tests, including the full cross-side closure scenario. Not yet tested with the owner herself.','依据设计复审和 82 项自动测试，包括完整的跨端停业场景。尚未与店主本人进行测试。')
+    evidence:p('Design reviews and automated tests (82 at prototype stage, 103 at launch), including the full cross-side closure scenario. Not yet tested in a structured session with the owner herself.','依据设计复审和自动测试（原型阶段 82 项，上线时 103 项），包括完整的跨端停业场景。尚未与店主本人进行结构化测试。')
   },
   objectives:[p('Reduce repeated messages about available times.','减少反复询问空档的沟通。'),p('Fit the complete service into a valid opening window.','让完整服务时长放入合法营业窗口。'),p('Preserve affected appointments when the shop changes its schedule.','店铺调整安排时，保留并处理受影响预约。')],
   audience:[
     {title:p('Customer','顾客'),body:p('Choose a service and time, understand the duration, then find and change the appointment.','选择服务与时间、理解时长，并能找到和修改预约。')},
     {title:p('Shop owner','店铺经营者'),body:p('See the day, enter a manual booking, adjust opening hours and resolve affected appointments.','查看当天安排、手动补录、调整开放时间，并处理受影响预约。')},
-    {title:p('Customers without WeChat','不用微信的顾客'),body:p('Considered from the start; in V1 the owner adds them, with their own entry next.','从调研阶段就纳入考虑；第一版由店主补录，独立入口放到下一阶段。')}
+    {title:p('Customers without WeChat','不用微信的顾客'),body:p('Considered from the start; the English website now gives them their own way in, and the owner can still add walk-ins.','从调研阶段就纳入考虑；现在英文网站给了他们自己的入口，店主仍可补录到店顾客。')}
   ],
   facts:[
     {label:p('Type','类型'),value:p('Service design · booking system','服务设计 · 预约系统')},
-    {label:p('Stage','阶段'),value:p('Working prototype, before owner testing','可运行原型 · 待店主测试')},
-    {label:p('Built with','实现方式'),value:p('TypeScript booking core, AI-assisted within rules','TypeScript 预约核心 · 规则内 AI 辅助开发')}
+    {label:p('Stage','阶段'),value:p('Live web version, launched 21 Oct 2026','网页版已上线（2026 年 10 月 21 日）')},
+    {label:p('Built with','实现方式'),value:p('TypeScript booking core, Cloudflare Pages + D1, Google sign-in; AI-assisted within rules','TypeScript 预约核心、Cloudflare Pages + D1、Google 登录；规则内 AI 辅助开发')}
   ],
   build:{
     lead:p('The logic was fixed before any screen: pain points, V1 scope, three user flows, then technical rules for the AI tools. Visual polish came last.','先定逻辑再做界面：痛点 → 第一版范围 → 三条用户流程 → 给 AI 工具的技术规则，视觉放在最后。'),
@@ -262,18 +263,19 @@ export const productCases=[{
       {title:p('One booking core','一个预约核心'),body:p('Availability, booking, rescheduling, closures and admin actions live in one shared TypeScript core used by both sides.','可约时间、预约、改期、休息与店主操作都在同一个 TypeScript 核心中，双端共用。')},
       {title:p('Guardrails for AI','给 AI 的边界'),body:p('A written spec, folder rules and a list of what the AI may and may not change kept generated code inside the design.','书面规格、文件夹规则，以及 AI 可改与不可改的范围，让生成的代码不偏离设计。')},
       {title:p('Two front ends','两个前端'),body:p('A customer flow and a shop diary, both phone-sized; the target is a WeChat mini program with a separate entry for non-WeChat customers.','顾客流程与店铺预约本，均为手机尺寸；目标形态是微信小程序，并为不用微信的顾客提供独立入口。')},
-      {title:p('Public prototype','公开原型'),body:p('The real booking rules are bundled to run in the browser, so anyone can try both sides without a server.','真实预约规则被打包在浏览器中运行，无需服务器即可体验双端。')}
+      {title:p('Launched on the web','网页版上线'),body:p('The first release is a website, not yet the mini program: Chinese and English booking pages and an owner admin share one database, and every booking is re-checked on the server. Browsing is open; booking needs a Google sign-in.','第一次上线是网页版，而不是小程序：中文、英文预约页和店主管理端共用一个数据库，每笔预约都在服务器端复核。查看空位无需登录，预约需要 Google 登录。')},
+      {title:p('Public prototype','公开原型'),body:p('The same booking rules are bundled to run in the browser on sample data, so anyone can try both sides without touching real bookings.','同一套预约规则被打包在浏览器里、用示例数据运行，任何人都能体验双端，而不会碰到真实预约。')}
     ],
-    stats:[{value:82,label:p('automated tests','项自动化测试')},{value:4,label:p('tabs for the owner','个店主标签页')},{value:3,label:p('steps for a customer to book','步完成顾客预约')}],
-    note:p('Tests check the rules; they do not show that the owner finds it easy. That needs the interview and on-site test below.','测试验证的是规则，不代表店主觉得好用；这需要下方的访谈与现场测试。')
+    stats:[{value:103,label:p('automated tests, incl. 20 requests racing for one slot','项自动化测试，含 20 个请求同时抢同一时段')},{value:4,label:p('tabs for the owner','个店主标签页')},{value:3,label:p('steps for a customer to book','步完成顾客预约')}],
+    note:p('Tests check the rules; they do not show that the owner finds it easy. Real phones, the WeChat in-app browser and launch bugs are being worked through now.','测试验证的是规则，不代表店主觉得好用。真实手机、微信内置浏览器的适配和上线后的问题正在逐一处理。')
   },
   challenges:{
     hard:[
       {title:p('A low-confidence user','数字信心较弱的使用者'),body:p('The owner is used to WeChat and a paper diary. Every extra step is a reason to go back to them, so the shop side had to shrink to four tabs.','店主习惯微信与纸质本，多一步就可能退回旧方式，因此店铺端收敛为四个标签页。')},
       {title:p('Durations are uncertain','时长并不确定'),body:p('Hair length and colour change how long a service takes, so estimates can still overrun.','头发长度与染发会改变服务时长，估算仍可能超时。')},
-      {title:p('Two kinds of customer','两类顾客'),body:p('WeChat suits Chinese customers but not everyone else. V1 serves WeChat; others are added by the owner until their own entry is ready.','微信适合中国顾客，却不适合所有人。第一版服务微信顾客，其他顾客由店主代录，直到独立入口上线。')}
+      {title:p('Two kinds of customer','两类顾客'),body:p('WeChat suits Chinese customers but not everyone else, and Google sign-in may not work inside WeChat. Launching on the web with Chinese and English pages serves both, at the cost of that sign-in friction.','微信适合中国顾客，却不适合所有人；而在微信里 Google 登录可能用不了。先以中英文网页上线能照顾两类顾客，代价是登录上的这点摩擦。')}
     ],
-    gaps:[p('Cloud storage and real WeChat sign-in','云端存储与真实微信登录'),p('Reliable notifications after a closure','休息后可靠的通知'),p('Interview and on-site test with the owner','与店主的访谈与现场测试'),p('Own entry for non-WeChat customers','非微信顾客的独立入口')],
+    gaps:[p('Bugs found after launch, being fixed','上线后发现的问题，正在修复'),p('Testing on real iPhone, Android and the WeChat in-app browser (which may block Google sign-in)','真实 iPhone、Android 与微信内置浏览器测试（微信内可能无法 Google 登录）'),p('No SMS or email reminders yet','尚无短信或邮件提醒'),p('Structured interview and observation with the owner','与店主的结构化访谈和现场观察'),p('Free hosting tier: some queries sit above its CPU guideline','免费套餐：部分查询超过其 CPU 指标')],
     opportunities:[
       {title:p('Fewer messages','更少的消息往来'),body:p('If customers can see free times themselves, most “are you open?” messages disappear.','顾客能自己看到空位，大部分“在吗、有空吗”的消息就会消失。')},
       {title:p('A wider local audience','更广的本地客群'),body:p('A non-WeChat entry opens the shop to local customers who would never add a private WeChat.','非微信入口让不会添加私人微信的本地顾客也能预约。')},
@@ -341,13 +343,13 @@ export const productCases=[{
   // Built, browser-only prototype served with the portfolio (demos/salon-booking); source stays in its own project.
   publicDemo:'demos/salon-booking/',
   publicAdmin:'demos/salon-booking/admin.html',
-  boundary:p('The public prototype runs the project’s real booking rules in the browser, with sample data stored only on the visitor’s device. The UI was written in Chinese for WeChat customers; an English layer is on by default. CloudBase persistence, real WeChat identity, reliable notifications and production deployment are unfinished. No real customer is charged or notified.','公开原型在浏览器中运行项目真实的预约规则，示例数据只保存在访问者本机。界面原本为微信顾客以中文设计，默认叠加英文层。CloudBase 持久化、真实微信身份、可靠通知与正式部署尚未完成，不会向真实顾客收费或发送通知。'),
+  boundary:p('The live website serves real customers in Chinese and English, with an owner admin, on one shared database (Cloudflare Pages + D1) and Google sign-in. It was checked end to end in production with real accounts: a booking, a reschedule and a cancellation showed up on every side. The prototype on this page runs the same rules in the browser on sample data. The WeChat mini program and automatic reminders are not released yet.','线上网站以中英文为真实顾客服务，配有店主管理端，共用一个数据库（Cloudflare Pages + D1）并使用 Google 登录。上线时用真实账号在生产环境完整走过一遍：新增、改期和取消预约，各端都同步显示。本页原型在浏览器里用示例数据运行同一套规则。微信小程序和自动提醒尚未发布。'),
   research:[
     {title:p('Observe a real booking','观察真实预约'),body:p('With permission, map how a request moves from a conversation to the diary, including changes and interruptions. Record steps without retaining private customer details.','获得同意后，记录需求如何从对话进入预约本，以及中途变动与打断；不保留顾客隐私信息。')},
     {title:p('Validate the operating rules','验证实际经营规则'),body:p('Confirm service lengths, opening windows, same-day policy, buffers and preferred language with the owner. Demo fixtures are not final business rules.','与经营者核实服务时长、开放窗口、当天预约政策、缓冲与语言偏好；演示配置不作为最终经营规则。')},
     {title:p('Test both sides of a change','测试变动后的双端体验'),body:p('Ask a customer to book and reschedule, then ask the owner to adjust a period and identify affected appointments. Record completion, errors, time and assistance.','请顾客预约并改期，再请经营者调整时段并找到受影响预约；记录完成情况、错误、耗时与所需帮助。')}
   ],
-  roadmap:[p('Now · customer and shop prototype, public and runnable in the browser','现在 · 顾客端与店铺端原型，可在浏览器中公开试用'),p('Next · owner interview, observation and two-sided task testing','下一步 · 店主访谈、现场观察与双端任务测试'),p('Then · refine service rules and run an agreed limited pilot','之后 · 修订服务规则并开展经同意的小范围试点'),p('Before release · persistent data, identity, notification delivery and recovery checks','发布前 · 持久化、身份、通知送达与恢复验证')],
+  roadmap:[p('Now · live website: Chinese and English booking + owner admin, one shared database','现在 · 网站已上线：中英文预约 + 店主管理端，共用一个数据库'),p('Next · fix launch bugs and test on real phones and the WeChat in-app browser','下一步 · 修复上线问题，在真实手机和微信内置浏览器中测试'),p('Then · owner interview and observation with real use; anonymous usage stats on this page','之后 · 结合真实使用情况做店主访谈与观察；在本页展示匿名使用数据'),p('Later · reminders and the WeChat mini program on the same booking core','再之后 · 提醒功能，以及基于同一预约核心的微信小程序')],
   evidenceItems:[],
   sourceDocs:['01_Background_and_Pain_Points.txt','Barbershop_Design_Logic_Framework.txt','preview/NAVIGATION_REVIEW.md','SELF_TEST_REPORT.md']
 }];

@@ -238,6 +238,12 @@ window.addEventListener('pagereveal',event=>{
   addEventListener('scroll',()=>requestAnimationFrame(pick),{passive:true});pick();
 })();
 
+// Links with a Chinese twin (data-href-zh) follow the page language.
+(() => {
+  const apply=()=>{const zh=document.documentElement.lang.startsWith('zh');document.querySelectorAll('a[data-href-zh]').forEach(a=>{const en=a.dataset.hrefEn||(a.dataset.hrefEn=a.getAttribute('href'));a.setAttribute('href',zh?a.dataset.hrefZh:en);});};
+  apply();document.addEventListener('portfolio:language',apply);
+})();
+
 // Product screenshots follow the page language: each image has a Chinese twin in a sibling zh/ folder.
 (() => {
   const zhSrc=s=>s.replace(/\/([^/]+)$/,'/zh/$1');

@@ -851,5 +851,16 @@ html,body{overflow-x:clip}
 .ux-live{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:14px 0 0;max-width:560px}
 .ux-live a{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:100px;border:1px solid var(--accent);color:var(--text);font-size:13px;font-weight:500;text-decoration:none}
 .ux-live a:hover{background:var(--panel)}
-.ux-live-dot{width:8px;height:8px;border-radius:50%;background:#3fbf7f;box-shadow:0 0 0 4px rgba(63,191,127,.18)}
+.ux-live-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#3fbf7f;box-shadow:0 0 0 4px rgba(63,191,127,.18)}
+/* "Live" cue: a radar pulse on the dot, a slow glow and a light sweep on the button, a nudge of the arrow on hover. */
+.ux-live-dot::after{content:'';position:absolute;inset:0;border-radius:50%;background:#3fbf7f;animation:ux-live-ping 1.8s cubic-bezier(0,0,.2,1) infinite}
+.ux-live a{position:relative;overflow:hidden;isolation:isolate;animation:ux-live-glow 2.6s ease-in-out infinite;transition:transform .2s ease,background .2s ease}
+.ux-live a::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 25%,rgba(63,191,127,.42) 50%,transparent 75%);transform:translateX(-120%);animation:ux-live-sweep 4s ease-in-out .6s infinite}
+.ux-live a:hover{transform:translateY(-1px)}
+.ux-live a .ux-live-arrow{display:inline-block;margin-left:4px;transition:transform .2s ease}
+.ux-live a:hover .ux-live-arrow{transform:translate(2px,-2px)}
+@keyframes ux-live-ping{0%{transform:scale(1);opacity:.75}80%,100%{transform:scale(3.2);opacity:0}}
+@keyframes ux-live-glow{0%,100%{box-shadow:0 0 0 0 rgba(63,191,127,0);border-color:var(--accent)}50%{box-shadow:0 0 0 5px rgba(63,191,127,.16),0 0 18px rgba(63,191,127,.28);border-color:#3fbf7f}}
+@keyframes ux-live-sweep{0%{transform:translateX(-120%)}55%,100%{transform:translateX(120%)}}
+@media (prefers-reduced-motion:reduce){.ux-live-dot::after,.ux-live a,.ux-live a::before{animation:none}.ux-live a::before{display:none}}
 .ux-live small{flex-basis:100%;font-size:12px;line-height:1.6;color:var(--muted)}

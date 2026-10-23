@@ -862,15 +862,21 @@ html,body{overflow-x:clip}
 @media (prefers-reduced-motion:reduce){.ux-live-dot::after,.ux-live a{animation:none}}
 .ux-live small{flex-basis:100%;font-size:12px;line-height:1.6;color:var(--muted)}
 
-/* Refined card hover (all work cards): no repeated text over the picture. The picture drifts slightly
-   under a faint veil, a glass arrow glides in, and the title underline draws (rule above). */
-.v3-hover-summary{inset:0;min-height:0;padding:0;font-size:0;color:transparent;background:rgba(12,13,16,.16);opacity:0;transform:none;transition:opacity .7s cubic-bezier(.16,1,.3,1)}
+/* Refined card hover (all work cards): the one-line summary appears over a dark frosted glass,
+   so anyone scanning can tell what the project is; the picture drifts slightly underneath. */
+.v3-hover-summary{inset:0;align-items:flex-end;padding:clamp(22px,2.2vw,34px);background:linear-gradient(to top,rgba(14,15,19,.86) 0%,rgba(14,15,19,.62) 55%,rgba(14,15,19,.38) 100%);backdrop-filter:blur(10px) saturate(115%);-webkit-backdrop-filter:blur(10px) saturate(115%);color:#f4f4f2;font-size:clamp(18px,1.5vw,25px);line-height:1.32;font-weight:400;letter-spacing:-.02em;text-wrap:pretty;opacity:0;transform:none;transition:opacity .55s cubic-bezier(.16,1,.3,1)}
+.v3-hover-summary>*{display:block;transform:translateY(10px);transition:transform .8s cubic-bezier(.16,1,.3,1)}
+:lang(zh) .v3-hover-summary{line-height:1.6;letter-spacing:.01em}
+.v3-card--product .v3-hover-summary{padding-bottom:88px}
 .v3-media-arrow{background:rgba(22,23,27,.5);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);width:38px;height:38px;font-size:15px;right:14px;top:14px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 @media(hover:hover) and (pointer:fine){
   .v3-media>img,.v3-media>video,.v3-product-cover-stack{transition:transform 1.4s cubic-bezier(.16,1,.3,1),opacity .45s ease}
   .v3-media:hover>img,.v3-card--still .v3-media:hover>img{transform:scale(1.03)}
   .v3-media:hover .v3-product-cover-stack{transform:scale(1.02)}
-  .v3-card--still .v3-media:hover .v3-hover-summary{opacity:1;transform:none}
+  .v3-card--still .v3-media:hover .v3-hover-summary{opacity:1}
+  .v3-card--still .v3-media:hover .v3-hover-summary>*{transform:none}
   .v3-media:hover .v3-media-label{transform:none}
 }
-@media (prefers-reduced-motion:reduce){.v3-media:hover>img,.v3-media:hover .v3-product-cover-stack{transform:none}}
+.v3-card--still .v3-media:focus-visible .v3-hover-summary{opacity:1}
+@media (prefers-reduced-motion:reduce){.v3-media:hover>img,.v3-media:hover .v3-product-cover-stack,.v3-hover-summary>*{transform:none}}
+.v3-card--still .v3-media .v3-media-label,.v3-card--still .v3-media .v3-media-arrow{z-index:4}

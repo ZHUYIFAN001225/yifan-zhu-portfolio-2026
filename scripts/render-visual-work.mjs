@@ -88,7 +88,7 @@ export function renderVisualWork(t,document,projects){
         <ul class="tag-list"><li>${t('Original films','原创影像')}</li><li>${t('Blender tools','Blender 工具')}</li><li>${t('Workflow publishing','工作流分享')}</li><li>${t('Creative resources','创作资源')}</li></ul>
       </div>
       <div class="metrics-grid compact-metrics">
-        <a href="https://www.douyin.com/video/7652021976073058661" target="_blank" rel="noopener noreferrer"><strong>381K+ views</strong><span>${t('54K+ likes on one original Douyin Blender visual reel','单条原创 Blender 影像获得 5.4 万+点赞')}</span><em>${t('View Douyin work','查看抖音作品')}</em></a>
+        <a href="https://www.douyin.com/user/MS4wLjABAAAA_lHmWTuM_a1k_09EF1ewxBH9vU3K2tYWuNJe-Mk7H_0" target="_blank" rel="noopener noreferrer"><strong>381K+ views</strong><span>${t('54K+ likes on one original Douyin Blender visual reel','单条原创 Blender 影像获得 5.4 万+点赞')}</span><em>${t('Open Douyin profile','打开抖音主页')}</em></a>
         <a href="https://xhslink.com/m/AZhAMj7fpc7" target="_blank" rel="noopener noreferrer"><strong>11.6K</strong><span>${t('likes & collects on Xiaohongshu / RED','小红书点赞与收藏')}</span><em>${t('Open RED profile','打开小红书主页')}</em></a>
         <a href="https://b23.tv/DQqusXX" target="_blank" rel="noopener noreferrer"><strong>141K+</strong><span>${t('total views on Bilibili','Bilibili 总播放量')}</span><em>${t('Open Bilibili','打开 Bilibili')}</em></a>
         <a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener noreferrer"><strong>1.1K+</strong><span>${t('free resource downloads / claims','免费资源下载 / 领取')}</span><em>${t('Visit resource website','访问资源网站')}</em></a>

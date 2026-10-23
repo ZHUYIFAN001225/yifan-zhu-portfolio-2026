@@ -241,16 +241,17 @@ export const productCases=[{
     items:[
       {title:p('Customer flow','顾客端流程'),before:p('One long schedule list on the home screen','首页一长列完整排期'),after:p('Three steps: week overview → valid times → confirm','三步：一周概览 → 合法时间 → 确认'),note:p('Detailed diary folded away; Back keeps the selection.','详细排期收起；返回时保留已选内容。')},
       {title:p('Owner’s side','店主端'),before:p('About 10 scattered settings pages','约 10 个分散的设置页'),after:p('4 time-first tabs: Today · Diary · Availability · More','4 个以时间为主的入口：今天 · 日程 · 开放预约 · 更多'),note:p('“No-show” moved under more actions, so the routine stays automatic.','「未到店」收进更多操作，让日常保持自动运转。')},
-      {title:p('Two developers, one core','两人协作，共享一个核心'),before:p('Customer and owner sides built separately','顾客端与店主端分开开发'),after:p('One shared booking core, changes agreed first','共用一个预约核心，改动先确认再执行'),note:p('e.g. how the owner adds a non-WeChat customer was raised as a change request.','例如「店主如何补录非微信顾客」就以变更请求提出。')}
+      {title:p('Two developers, one core','两人协作，共享一个核心'),before:p('Customer and owner sides built separately','顾客端与店主端分开开发'),after:p('One shared booking core, changes agreed first','共用一个预约核心，改动先确认再执行'),note:p('e.g. how the owner adds a non-WeChat customer was raised as a change request.','例如「店主如何补录非微信顾客」就以变更请求提出。')},
+      {title:p('After launch: one product, not two','上线后：一个产品，而不是两套'),before:p('English pages were a separate, older interface; time off meant one day at a time; walk-ins needed an account','英文页是另一套旧界面；休息只能一天一天关；到店顾客必须先有账号'),after:p('One set of screens with an English text layer; several days off at once or a 15-minute timeline; walk-ins added by name and phone','同一套界面加英文文字层；一次关闭多天，或在 15 分钟时间轴上关几个小时；到店顾客填姓名和电话即可'),note:p('Found by walking every flow on the live site myself; in the public demo now, and goes live with the next deploy.','来自我在线上网站逐条走查的结果；已在公开原型中可用，下次部署后上线。')}
     ],
-    tasks:{title:p('Owner tasks, measured in taps','店主常用操作：实测点击步数'),target:4,items:[{label:p('See today','查看今天'),value:1},{label:p('Open the next two weeks','开放未来两周'),value:2},{label:p('Set a weekly day off','设置每周固定休息日'),value:3},{label:p('Close a day next week','下周某天全天休息'),value:6}],note:p('Target: 3–4 taps. Closing a future day still takes 6 — the next thing to simplify.','目标是 3–4 步。关闭未来某天仍需 6 步，是下一轮要简化的地方。')},
-    evidence:p('Design reviews and automated tests (82 at prototype stage, 103 at launch), including the full cross-side closure scenario. Not yet tested in a structured session with the owner herself.','依据设计复审和自动测试（原型阶段 82 项，上线时 103 项），包括完整的跨端停业场景。尚未与店主本人进行结构化测试。')
+    tasks:{title:p('Owner tasks, measured in taps','店主常用操作：实测点击步数'),target:4,items:[{label:p('See today','查看今天'),value:1},{label:p('Open the next two weeks','开放未来两周'),value:2},{label:p('Set a weekly day off','设置每周固定休息日'),value:3},{label:p('Close a day next week','下周某天全天休息'),value:5}],note:p('Target: 3–4 taps. Closing a future day took 6 at launch; the post-launch redesign brings it to 5, including one confirmation — still one over target.','目标是 3–4 步。上线时关闭未来某天需要 6 步；上线后的改版降到 5 步（含一次确认），仍比目标多一步。')},
+    evidence:p('Design reviews and automated tests (82 at prototype stage, 103 at launch, 107 after the post-launch fixes), including the full cross-side closure scenario. Not yet tested in a structured session with the owner herself.','依据设计复审和自动测试（原型阶段 82 项，上线时 103 项，上线后修复后 107 项），包括完整的跨端停业场景。尚未与店主本人进行结构化测试。')
   },
   objectives:[p('Reduce repeated messages about available times.','减少反复询问空档的沟通。'),p('Fit the complete service into a valid opening window.','让完整服务时长放入合法营业窗口。'),p('Preserve affected appointments when the shop changes its schedule.','店铺调整安排时，保留并处理受影响预约。')],
   audience:[
     {title:p('Customer','顾客'),body:p('Choose a service and time, understand the duration, then find and change the appointment.','选择服务与时间、理解时长，并能找到和修改预约。')},
     {title:p('Shop owner','店铺经营者'),body:p('See the day, enter a manual booking, adjust opening hours and resolve affected appointments.','查看当天安排、手动补录、调整开放时间，并处理受影响预约。')},
-    {title:p('Customers without WeChat','不用微信的顾客'),body:p('Considered from the start; the English website now gives them their own way in, and the owner can still add walk-ins.','从调研阶段就纳入考虑；现在英文网站给了他们自己的入口，店主仍可补录到店顾客。')}
+    {title:p('Customers without WeChat','不用微信的顾客'),body:p('Considered from the start; the English website now gives them their own way in, and the owner can add phone or walk-in customers by name, with no account needed.','从调研阶段就纳入考虑；现在英文网站给了他们自己的入口，店主也可以只填姓名为电话或到店顾客加单，对方不需要账号。')}
   ],
   facts:[
     {label:p('Type','类型'),value:p('Service design · booking system','服务设计 · 预约系统')},
@@ -264,9 +265,9 @@ export const productCases=[{
       {title:p('Guardrails for AI','给 AI 的边界'),body:p('A written spec, folder rules and a list of what the AI may and may not change kept generated code inside the design.','书面规格、文件夹规则，以及 AI 可改与不可改的范围，让生成的代码不偏离设计。')},
       {title:p('Two front ends','两个前端'),body:p('A customer flow and a shop diary, both phone-sized; the target is a WeChat mini program with a separate entry for non-WeChat customers.','顾客流程与店铺预约本，均为手机尺寸；目标形态是微信小程序，并为不用微信的顾客提供独立入口。')},
       {title:p('Launched on the web','网页版上线'),body:p('The first release is a website, not yet the mini program: Chinese and English booking pages and an owner admin share one database, and every booking is re-checked on the server. Browsing is open; booking needs a Google sign-in.','第一次上线是网页版，而不是小程序：中文、英文预约页和店主管理端共用一个数据库，每笔预约都在服务器端复核。查看空位无需登录，预约需要 Google 登录。')},
-      {title:p('Public prototype','公开原型'),body:p('The same booking rules are bundled to run in the browser on sample data, so anyone can try both sides without touching real bookings.','同一套预约规则被打包在浏览器里、用示例数据运行，任何人都能体验双端，而不会碰到真实预约。')}
+      {title:p('Public demo','公开演示版'),body:p('The live website’s own screens and booking rules run in the browser on sample data, in Chinese and English, so anyone can try both sides without touching real bookings.','线上网站的同一套界面和预约规则，在浏览器里用示例数据运行，中英文都有；任何人都能体验双端，而不会碰到真实预约。')}
     ],
-    stats:[{value:103,label:p('automated tests, incl. 20 requests racing for one slot','项自动化测试，含 20 个请求同时抢同一时段')},{value:4,label:p('tabs for the owner','个店主标签页')},{value:3,label:p('steps for a customer to book','步完成顾客预约')}],
+    stats:[{value:107,label:p('automated tests, incl. 20 requests racing for one slot','项自动化测试，含 20 个请求同时抢同一时段')},{value:4,label:p('tabs for the owner','个店主标签页')},{value:3,label:p('steps for a customer to book','步完成顾客预约')}],
     note:p('Tests check the rules; they do not show that the owner finds it easy. Real phones, the WeChat in-app browser and launch bugs are being worked through now.','测试验证的是规则，不代表店主觉得好用。真实手机、微信内置浏览器的适配和上线后的问题正在逐一处理。')
   },
   challenges:{
@@ -275,7 +276,7 @@ export const productCases=[{
       {title:p('Durations are uncertain','时长并不确定'),body:p('Hair length and colour change how long a service takes, so estimates can still overrun.','头发长度与染发会改变服务时长，估算仍可能超时。')},
       {title:p('Two kinds of customer','两类顾客'),body:p('WeChat suits Chinese customers but not everyone else, and Google sign-in may not work inside WeChat. Launching on the web with Chinese and English pages serves both, at the cost of that sign-in friction.','微信适合中国顾客，却不适合所有人；而在微信里 Google 登录可能用不了。先以中英文网页上线能照顾两类顾客，代价是登录上的这点摩擦。')}
     ],
-    gaps:[p('Bugs found after launch, being fixed','上线后发现的问题，正在修复'),p('Testing on real iPhone, Android and the WeChat in-app browser (which may block Google sign-in)','真实 iPhone、Android 与微信内置浏览器测试（微信内可能无法 Google 登录）'),p('No SMS or email reminders yet','尚无短信或邮件提醒'),p('Structured interview and observation with the owner','与店主的结构化访谈和现场观察'),p('Free hosting tier: some queries sit above its CPU guideline','免费套餐：部分查询超过其 CPU 指标')],
+    gaps:[p('Post-launch fixes are built and tested, waiting for the next deploy','上线后的问题已修复并测试，等待下次部署'),p('Testing on real iPhone, Android and the WeChat in-app browser (which may block Google sign-in)','真实 iPhone、Android 与微信内置浏览器测试（微信内可能无法 Google 登录）'),p('No SMS or email reminders yet','尚无短信或邮件提醒'),p('Structured interview and observation with the owner','与店主的结构化访谈和现场观察'),p('Free hosting tier: some queries sit above its CPU guideline','免费套餐：部分查询超过其 CPU 指标')],
     opportunities:[
       {title:p('Fewer messages','更少的消息往来'),body:p('If customers can see free times themselves, most “are you open?” messages disappear.','顾客能自己看到空位，大部分“在吗、有空吗”的消息就会消失。')},
       {title:p('A wider local audience','更广的本地客群'),body:p('A non-WeChat entry opens the shop to local customers who would never add a private WeChat.','非微信入口让不会添加私人微信的本地顾客也能预约。')},
@@ -285,7 +286,7 @@ export const productCases=[{
   },
   screenMap:{
     dir:'booking',
-    lead:p('Captured from the public prototype (English layer on). Level 1 is the bottom navigation; each row follows one path deeper. Select any screen to enlarge it.','截自公开原型（开启英文层）。第一层是底部导航；每一行沿一条路径向下深入。点击任意界面可放大查看。'),
+    lead:p('Captured from the public demo, which runs the live website’s own screens on sample data. Level 1 is the main navigation; each row follows one path deeper. Select any screen to enlarge it.','截自公开演示版：线上网站的同一套界面，使用示例数据。第一层是主导航；每一行沿一条路径向下深入。点击任意界面可放大查看。'),
     sides:[
       {id:'customer',label:p('Customer app','顾客端'),
        tabs:[{file:'book',title:p('Book','预约')},{file:'mine',title:p('My bookings','我的预约')}],
@@ -298,14 +299,17 @@ export const productCases=[{
           {file:'by-time',level:'mode',title:p('By time of day','按时间找')}]},
         {from:p('My bookings → change of plan','我的预约 → 计划有变'),steps:[
           {file:'reschedule',level:2,title:p('Change time','修改时间')},
-          {file:'cancel',level:2,title:p('Cancel','取消预约')}]}]},
+          {file:'cancel',level:2,title:p('Cancel','取消预约')},
+          {file:'kept',level:2,title:p('Shop closed: pick again','店铺休息：重新选时间')}]}]},
       {id:'shop',label:p('Shop admin','店铺后台'),
-       tabs:[{file:'today',title:p('Today','今天')},{file:'schedule',title:p('Schedule','日程')},{file:'window',title:p('Open for booking','开放预约')},{file:'more',title:p('More','更多')}],
+       tabs:[{file:'today',title:p('Today','今天')},{file:'schedule',title:p('Diary','日程')},{file:'window',title:p('Opening','开放预约')},{file:'more',title:p('More','更多')}],
        paths:[
         {from:p('Today → the owner’s routine','今天 → 店主的日常操作'),key:true,steps:[
           {file:'add',level:2,title:p('Add a booking','补录预约')},
-          {file:'time-off',level:2,title:p('Take time off','临时休息')},
           {file:'todo',level:2,title:p('Needs a new time','待改期')}]},
+        {from:p('Opening → time off without deleting bookings','开放预约 → 休息，但不删除预约'),key:true,steps:[
+          {file:'time-off',level:2,title:p('Several days off','休息几天')},
+          {file:'time-off-hours',level:2,title:p('A few hours, on a timeline','在时间轴上关几个小时')}]},
         {from:p('Schedule & More','日程与更多'),steps:[
           {file:'day-detail',level:2,title:p('A day in the diary','某一天的预约')},
           {file:'services',level:2,title:p('Services & durations','服务与时长')}]}]}
@@ -313,8 +317,8 @@ export const productCases=[{
   },
   details:[
     {file:'zoom-durations',title:p('Duration is chosen first','先选服务时长'),body:p('Each service shows its length, and the earliest free time updates with it, because duration decides what fits.','每项服务标明时长，最早可约时间随之更新：时长决定了哪里放得下。')},
-    {file:'zoom-day',title:p('The diary, not the chat','看预约本，而不是翻聊天'),body:p('The owner sees a day as times, services and status, with Add and Adjust one tap away.','店主看到的是一天的时间、服务与状态；补录与调整一步可达。')},
-    {file:'zoom-time-off',title:p('Time off never deletes a booking','休息不会删除预约'),body:p('The rule is written on the screen: bookings are kept and affected customers pick a new time.','规则直接写在界面上：预约保留，受影响的顾客重新选时间。')},
+    {file:'zoom-day',title:p('Today, answered in one card','一张卡回答「今天怎么样」'),body:p('How many customers, how much time is still free and the next gap for a walk-in — the questions she asks every morning — with Add and Adjust one tap away.','今天几位客人、还空多少时间、下一个能接临时客人的空档——她每天早上会问的问题；补录与调整一步可达。')},
+    {file:'zoom-time-off',title:p('Close a few hours on a timeline','在时间轴上关几个小时'),body:p('Tap a start, then an end, in 15-minute steps. Bookings and earlier closures are marked, and the summary says who is affected before anything closes — bookings are never deleted.','在 15 分钟一格的时间轴上点开始、点结束。已有预约和已关闭时间都标在轴上，关闭前先告诉店主会影响谁——预约永远不会被删除。')},
     {file:'zoom-kept',title:p('Customers see why, and what to do','顾客知道原因与下一步'),body:p('A closure turns the booking into “Needs new time” with a one-tap way to choose again.','店铺休息后，预约变为“待改期”，并提供一键重新选择。')}
   ],
   ia:[

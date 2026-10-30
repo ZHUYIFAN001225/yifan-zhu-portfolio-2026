@@ -267,6 +267,48 @@ window.addEventListener('pagereveal',event=>{
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
   const zh = () => document.documentElement.lang.startsWith('zh');
 
+  // Opening on the homepage: the name rises, then fades into the page. Once per visit; any click or key skips it.
+  if (document.body.classList.contains('v3-index') && location.pathname.replace(/\/index\.html$/, '/').endsWith('/') && !calm.matches) {
+    let seen = false; try { seen = sessionStorage.getItem('v3-intro') === '1'; sessionStorage.setItem('v3-intro', '1'); } catch {}
+    if (!seen) {
+      const intro = document.createElement('div'); intro.className = 'v3-intro'; intro.setAttribute('aria-hidden', 'true');
+      intro.innerHTML = `<p class="v3-intro-name"><i><span>Yifan Zhu</span></i><small>${zh() ? '研究驱动的跨领域设计师' : 'Research-led Multidisciplinary Designer'}</small></p><button class="v3-intro-skip" type="button" tabindex="-1">${zh() ? '跳过' : 'Skip'}</button>`;
+      document.body.append(intro);
+      const done = skip => { if (intro.classList.contains('is-leaving')) return; if (skip) intro.classList.add('is-skipped'); intro.classList.add('is-leaving'); setTimeout(() => intro.remove(), skip ? 400 : 1400); };
+      requestAnimationFrame(() => requestAnimationFrame(() => intro.classList.add('is-named')));
+      const timer = setTimeout(() => done(false), 1700);
+      const skip = () => { clearTimeout(timer); done(true); };
+      intro.addEventListener('click', skip); addEventListener('keydown', skip, { once: true }); addEventListener('wheel', skip, { once: true, passive: true });
+    }
+  }
+
+  // Page transitions: fade the page out before following an internal link, and in on arrival.
+  if (!calm.matches) {
+    document.body.classList.add('v3-page-in');
+    document.addEventListener('click', e => {
+      const a = e.target.closest?.('a[href]');
+      if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (a.target && a.target !== '_self' || a.hasAttribute('download')) return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || url.protocol.indexOf('http') !== 0) return;
+      if (url.pathname === location.pathname && url.search === location.search) return; // same page / hash links
+      if (!/\.html$|\/$/.test(url.pathname)) return; // files such as PDFs
+      e.preventDefault();
+      document.documentElement.classList.add('is-page-leaving');
+      setTimeout(() => { location.href = url.href; }, 260);
+    });
+    addEventListener('pageshow', e => { if (e.persisted) document.documentElement.classList.remove('is-page-leaving'); });
+  }
+
+  // Sections rise gently into view as you scroll (content already on screen is left alone).
+  if (!calm.matches && 'IntersectionObserver' in window) {
+    const blocks = [...document.querySelectorAll('main section:not(.sc):not(.v3-hero), main .case-section, main article > section')]
+      .filter((el, i, all) => !all.some(o => o !== el && o.contains(el)) && el.getBoundingClientRect().top > innerHeight * 0.9);
+    const io = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
+    blocks.forEach(el => { el.classList.add('v3-rv'); io.observe(el); });
+    addEventListener('beforeprint', () => blocks.forEach(el => el.classList.add('is-in')));
+  }
+
   // Header links roll to a second copy of their label on hover.
   document.querySelectorAll('.v3-header nav > a').forEach(a => {
     const target = a.querySelector('.v3-contact-label') || (a.children.length ? null : a);
@@ -284,7 +326,7 @@ window.addEventListener('pagereveal',event=>{
     const tag = document.createElement('span'); dot.append(tag); document.body.append(dot);
     document.documentElement.classList.add('has-v3-cursor');
     let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, shown = false;
-    const words = { view: ['View', '查看'], try: ['Try it', '试一试'], play: ['Play', '播放'] };
+    const words = { view: ['View case', '查看案例'], try: ['Try it', '试一试'], play: ['Watch', '观看'] };
     addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse') return;
       x = e.clientX; y = e.clientY;
@@ -312,12 +354,14 @@ window.addEventListener('pagereveal',event=>{
   const sc = document.querySelector('[data-showcase]');
   if (!sc) return;
   const track = sc.querySelector('.sc-track'), scenes = [...sc.querySelectorAll('[data-sc-scene]')], links = [...sc.querySelectorAll('[data-sc-go]')];
+  const captions = [...sc.querySelectorAll('[data-sc-caption]')];
   const counter = sc.querySelector('[data-sc-current]'), bar = sc.querySelector('.sc-progress span');
   const wide = matchMedia('(min-width: 900px)');
   let active = -1;
   const setActive = i => {
     if (i === active) return; active = i;
     scenes.forEach((s, k) => { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); });
+    captions.forEach((c, k) => c.classList.toggle('is-active', k === i));
     links.forEach((a, k) => { if (k === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
     counter.textContent = String(i + 1).padStart(2, '0');
     const cs = scenes[i].style; sc.style.setProperty('--tone', cs.getPropertyValue('--tone')); sc.style.setProperty('--ink', cs.getPropertyValue('--ink'));
@@ -326,8 +370,10 @@ window.addEventListener('pagereveal',event=>{
   };
   const span = () => track.offsetHeight - innerHeight;
   const update = () => {
-    if (!wide.matches) { sc.style.removeProperty('--p'); return; }
-    const top = track.getBoundingClientRect().top, p = Math.min(1, Math.max(0, -top / Math.max(1, span())));
+    const box = track.getBoundingClientRect();
+    document.documentElement.classList.toggle('is-over-sc', wide.matches && box.bottom > 90);
+    if (!wide.matches) return;
+    const top = box.top, p = Math.min(1, Math.max(0, -top / Math.max(1, span())));
     const n = scenes.length, f = p * n, i = Math.min(n - 1, Math.floor(f));
     setActive(i);
     sc.style.setProperty('--local', (Math.min(1, f - i)).toFixed(3));

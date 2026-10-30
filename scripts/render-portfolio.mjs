@@ -155,19 +155,23 @@ const showcase = () => {
     if(p.preview)return `<span class="sc-film"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /><video data-sc-video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="${p.preview}"></video></span>`;
     return `<span class="sc-image"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /></span>`;
   };
-  const items=list.map((p,i)=>{const tone=tones[p.id]||['#ddd9d0','#34363b'];const live=p.status.en.startsWith('Live');
+  const actions=p=>`<a class="sc-btn" href="${p.href}">${t('View the case','查看案例')} <span aria-hidden="true">→</span></a>${p.demo?`<a class="sc-btn" href="${p.href}#interactive-demo">${t('Try the prototype','试用原型')} <span aria-hidden="true">↗</span></a>`:''}${p.video&&!p.demo?`<a class="sc-btn" href="${p.href}">${t('Watch the film','观看短片')} <span aria-hidden="true">▶</span></a>`:''}`;
+  const live=p=>p.status.en.startsWith('Live')?`<p class="sc-live"><i aria-hidden="true"></i>${pair(p.status)}</p>`:'';
+  const scenes=list.map((p,i)=>{const tone=tones[p.id]||['#ddd9d0','#34363b'];
     return `<article class="sc-scene${i?'':' is-active'}" data-sc-scene="${i}" style="--tone:${tone[0]};--ink:${tone[1]}">
-        <a class="sc-visual" href="${p.href}" data-cursor="${p.demo?'try':'view'}" aria-label="${pair(p.title)}">${scene(p)}</a>
-        <div class="sc-caption"><p class="sc-status${live?' is-live':''}">${live?'<i aria-hidden="true"></i>':''}${pair(p.status)}</p><h2 class="sc-title"><a href="${p.href}">${pair(p.title)}</a></h2><p class="sc-line">${t(...lines[p.id])}</p>
-          <div class="sc-actions"><a class="sc-btn sc-btn--solid" href="${p.href}">${t('View the case','查看案例')} <span aria-hidden="true">→</span></a>${p.demo?`<a class="sc-btn" href="${p.href}#interactive-demo">${t('Try the prototype','试用原型')}</a>`:''}${p.video&&!p.demo?`<a class="sc-btn" href="${p.href}">${t('Watch the film','观看短片')}</a>`:''}</div></div>
+        <a class="sc-visual" href="${p.href}" data-cursor="${p.demo?'try':p.video?'play':'view'}" aria-label="${pair(p.title)}">${scene(p)}</a>
+        <div class="sc-m">${live(p)}<p class="sc-mt">${pair(p.title)}</p><p class="sc-ml">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>
       </article>`;}).join('');
+  const captions=list.map((p,i)=>`<div class="sc-caption${i?'':' is-active'}" data-sc-caption="${i}">${live(p)}<p class="sc-line">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>`).join('');
   return `<section class="sc" data-showcase aria-label="${t('Featured work','精选作品')}" style="--count:${list.length}"><div class="sc-track"><div class="sc-stage">
-    <div class="sc-wash" aria-hidden="true"></div>
-    <div class="sc-side"><p class="sc-intro">${t('Yifan Zhu · Research-led Multidisciplinary Designer','朱异凡 · 研究驱动的跨领域设计师')}</p><p class="sc-heading">${t('Selected work','精选作品')}</p>
-      <p class="sc-count" aria-hidden="true"><span data-sc-current>01</span><small> / ${n}</small></p>
-      <ol class="sc-list">${list.map((p,i)=>`<li><a href="${p.href}" data-sc-go="${i}"${i?'':' aria-current="true"'}><span class="sc-num">${String(i+1).padStart(2,'0')}</span><span class="sc-name">${pair(p.title)}</span><span class="sc-kind">${pair(p.kind)}</span></a></li>`).join('')}</ol>
-      <p class="sc-hint"><span aria-hidden="true" class="sc-mouse"></span>${t('Scroll to browse','向下滚动浏览')}</p></div>
-    <div class="sc-scenes">${items}</div>
+    <div class="sc-scenes">${scenes}</div>
+    <div class="sc-shade" aria-hidden="true"></div>
+    <div class="sc-ui">
+      <div class="sc-side"><p class="sc-intro">${t('Selected work','精选作品')}</p><p class="sc-count" aria-hidden="true"><span data-sc-current>01</span> / ${n}</p>
+        <ol class="sc-list">${list.map((p,i)=>`<li><a href="${p.href}" data-sc-go="${i}"${i?'':' aria-current="true"'}><span class="sc-name">${pair(p.title)}</span><span class="sc-kind">${pair(p.kind)}</span></a></li>`).join('')}</ol></div>
+      <div class="sc-captions">${captions}</div>
+    </div>
+    <p class="sc-hint"><span aria-hidden="true" class="sc-mouse"></span>${t('Scroll to browse','向下滚动浏览')}</p>
     <div class="sc-progress" aria-hidden="true"><span></span></div>
   </div></div></section>`;
 };

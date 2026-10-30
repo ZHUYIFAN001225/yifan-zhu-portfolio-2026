@@ -64,6 +64,11 @@ export function renderProductDemos(t,document){
     return `<section class="st" data-story aria-labelledby="st-title"><div class="st-head"><p class="xp-kicker">${pair(st.kicker)}</p><h2 id="st-title">${pair(st.title)}</h2><p class="xp-lead">${pair(st.lead)}</p></div>
       <div class="st-body"><ol class="st-steps">${st.steps.map((x,i)=>`<li class="st-step${i?'':' is-on'}" data-st-step="${i}" data-side="${x.side}"${x.tap?` data-tap="${x.tap}"`:''} tabindex="0"><p class="st-meta"><b>${x.time}</b><em class="st-side st-side--${x.side}">${sides[x.side][0]}</em></p><h3>${pair(x.title)}</h3><p>${pair(x.body)}</p><img class="st-mshot" data-i18n-img src="assets/v3/screens/${dir}/${x.file}.webp" alt="" loading="lazy" decoding="async" /></li>`).join('')}<li class="st-end"><a class="v3-solid-button" href="#interactive-demo">${pair(st.cta)}<span aria-hidden="true"> →</span></a></li></ol>
         <div class="st-devices" aria-hidden="true">${devFor('customer')}${devFor('owner')}</div></div></section>`;};
+  // Hold it: a real 3D phone you can turn, with large type sliding past in opposite directions as you scroll.
+  const hold=()=>{const h=c.hold,dir=c.screenMap.dir;
+    return `<section class="hold" data-scrub aria-label="${pair(h.label)}"><div class="hold-type" aria-hidden="true">${h.lines.map((l,i)=>`<span class="hold-line" style="--dx:${i%2?-1:1}">${pair(l)}</span>`).join('')}</div>
+      <div class="hold-phone" data-phone3d data-status="1" data-zoom=".72" data-tilt-y="-.5" data-interval="2600" data-screens="${h.screens.map(f=>`assets/v3/screens/${dir}/${f}.webp`).join(',')}"></div>
+      <p class="hold-hint"><span aria-hidden="true">⟲</span>${t('Drag to turn it in your hand','拖动手机，像拿在手里一样转一转')}</p></section>`;};
   // Exploded view: real layers of one screen separate in 3D as you scroll; each layer carries one design reason.
   const explode=()=>{const x=c.explode;const src=f=>`assets/v3/explode/${x.dir}/${f}.webp`;
     return `<section class="xp" data-explode aria-labelledby="xp-title" style="--n:${x.layers.length}"><div class="xp-stage">
@@ -91,6 +96,7 @@ export function renderProductDemos(t,document){
     ${strategy()}
     ${iteration()}
     ${c.story?story():''}
+    ${c.hold?hold():''}
     ${c.explode?explode():''}
     ${c.screenMap?section('structure',screenMap()):section('structure',`<p>${pair(c.iaNote)}</p><div class="ux-architecture">${c.ia.map(a=>`<div><h3>${pair(a.title)}</h3><ol>${a.levels.map(v=>`<li>${pair(v)}</li>`).join('')}</ol></div>`).join('')}</div>`)}
     ${section('flow',`<ol class="ux-journey">${c.journey.map((j,i)=>`<li><span aria-hidden="true">0${i+1}</span><h3>${pair(j.title)}</h3><p>${pair(j.body)}</p></li>`).join('')}</ol><p class="ux-flow-note">${pair(c.journeyNote)}</p>`)}

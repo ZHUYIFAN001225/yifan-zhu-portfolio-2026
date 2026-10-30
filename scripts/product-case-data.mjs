@@ -285,6 +285,7 @@ export const productCases=[{
     success:[p('Owner tasks in four taps or fewer','店主常用操作不超过 4 步'),p('Share of bookings made without chatting','无需聊天完成的预约比例'),p('Time spent rescheduling after a closure','休息后重新安排所花的时间'),p('Owner still using it after a month','一个月后店主仍在使用')]
   },
   opening:{kicker:p('Service & product design · Live product · 2026','服务与产品设计 · 已上线产品 · 2026'),wall:['book','today','day','schedule','confirm','time-off-hours','booked','window','mine','add','reschedule','todo','by-time','day-detail','kept','services','cancel','more','time-off']},
+  hold:{label:p('The product in your hand','拿在手里的产品'),lines:[p('One shared','一本共享'),p('diary.','预约本。'),p('Two clear','两端'),p('sides.','各自清楚。')],screens:['book','today','day','schedule','confirm','time-off-hours','booked','add']},
   story:{
     kicker:p('A day with the system','系统里的一天'),
     title:p('One booking, from both sides.','一笔预约，两端各看到什么。'),

@@ -1,0 +1,2 @@
+three.js r170 — MIT License, Copyright © 2010-2024 three.js authors. https://github.com/mrdoob/three.js
+RoomEnvironment.js adapted from three.js examples (MIT).

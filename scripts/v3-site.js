@@ -512,3 +512,49 @@ window.addEventListener('pagereveal',event=>{
   }
   show(0);
 })();
+
+// Motion engine: inertial smooth scrolling (desktop), scroll-scrubbed elements, headings that rise from a mask, and the 3D phone.
+(() => {
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches, fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  // 1) Smooth, weighted scrolling for wheel/trackpad. Keyboard, scrollbar and links keep working; scrollable boxes and iframes scroll natively.
+  if (fine && !calm) {
+    const root = document.documentElement; root.classList.add('has-smooth');
+    let target = scrollY, current = scrollY, running = false, ours = false;
+    const max = () => root.scrollHeight - innerHeight;
+    const scrollable = el => { for (; el && el !== document.body; el = el.parentElement) { if (el.closest?.('[data-lenis-prevent]')) return true; const cs = getComputedStyle(el); if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 2) return true; } return false; };
+    const loop = () => {
+      const d = target - current;
+      if (Math.abs(d) < .4) { current = target; running = false; ours = true; scrollTo(0, current); return; }
+      current += d * .11; ours = true; scrollTo(0, current); requestAnimationFrame(loop);
+    };
+    addEventListener('wheel', e => {
+      if (e.ctrlKey || e.defaultPrevented || scrollable(e.target)) return;
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY;
+      if (!running) { target = current = scrollY; }
+      target = Math.max(0, Math.min(max(), target + dy));
+      e.preventDefault();
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    }, { passive: false });
+    addEventListener('scroll', () => { if (ours) { ours = false; return; } if (!running) { target = current = scrollY; } else if (Math.abs(scrollY - current) > 3) { target = current = scrollY; running = false; } }, { passive: true });
+  }
+  // 2) Scroll scrub: [data-scrub] gets --p from 0 (just entering at the bottom) to 1 (just leaving at the top).
+  const scrubs = [...document.querySelectorAll('[data-scrub]')];
+  if (scrubs.length && !calm) {
+    let q = false;
+    const run = () => { q = false; const vh = innerHeight; scrubs.forEach(el => { const r = el.getBoundingClientRect(); if (r.bottom < -vh || r.top > vh * 2) return; el.style.setProperty('--p', Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height))).toFixed(4)); }); };
+    addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
+  }
+  // 3) Section headings on case pages rise from a mask the first time they appear.
+  if (!calm && 'IntersectionObserver' in window) {
+    const heads = [...document.querySelectorAll('main :is(.ux-section > h2, .case-section h2, .xp-copy h2, .st-head h2, .v3-product-section > h2)')].filter(h => !h.querySelector('.v3-mask') && h.getBoundingClientRect().top > innerHeight * .8);
+    heads.forEach(h => { const m = document.createElement('span'), i = document.createElement('span'); m.className = 'v3-mask'; i.className = 'v3-mask-in'; while (h.firstChild) i.append(h.firstChild); m.append(i); h.append(m); });
+    const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.querySelector('.v3-mask')?.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -12% 0px' });
+    heads.forEach(h => io.observe(h));
+    addEventListener('beforeprint', () => heads.forEach(h => h.querySelector('.v3-mask')?.classList.add('is-in')));
+  }
+  // 4) The 3D phone loads only on pages that have one, and only where WebGL works.
+  if (document.querySelector('[data-phone3d]')) {
+    const ok = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } })();
+    if (ok) import('./phone3d.mjs').then(m => m.mountAll()).catch(() => {});
+  }
+})();

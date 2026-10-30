@@ -640,78 +640,81 @@ window.addEventListener('pagereveal',event=>{
   requestAnimationFrame(tick);
 })();
 
-// LOOK film: one pinned stage. Scroll position is the timeline, so every movement plays forward and backward with the wheel.
+// LOOK film: one pinned stage made of discrete moments. One wheel tick (or swipe, or key) moves to the next moment, and that
+// moment plays as a complete animation; nothing stops half-way. Scrolling by other means lands on the nearest moment.
 (() => {
   const fm = document.querySelector('[data-film]'); if (!fm) return;
   const calm = matchMedia('(prefers-reduced-motion: reduce)'), wide = matchMedia('(min-width: 761px)');
   const n = +fm.dataset.steps, n1 = +fm.dataset.split || n, OPEN = 1.6, DUO = 1.6, END = 1, U = OPEN + n + DUO + END;
-  const track = fm.querySelector('.fm-track'), stage = fm.querySelector('.fm-stage'), phone = fm.querySelector('.fm-phone'), zoom = fm.querySelector('.fm-zoom');
+  const track = fm.querySelector('.fm-track'), stage = fm.querySelector('.fm-stage'), phone = fm.querySelector('.fm-phone');
   const shots = [...fm.querySelectorAll('[data-fm-shot]')], steps = [...fm.querySelectorAll('[data-fm-step]')], dots = [...fm.querySelectorAll('[data-fm-dot]')];
-  const data = [...fm.querySelectorAll('.fm-data')], label = fm.querySelector('[data-fm-label]'), callout = fm.querySelector('.fm-callout'), view = fm.querySelector('.dev-view'), duo = fm.querySelector('.fm-duo');
-  track.style.setProperty('--units', U);
-  const cl = v => Math.min(1, Math.max(0, v)), sm = v => { v = cl(v); return v * v * (3 - 2 * v); }, lerp = (a, b, t) => a + (b - a) * t;
+  const data = [...fm.querySelectorAll('.fm-data')], label = fm.querySelector('[data-fm-label]'), callout = fm.querySelector('.fm-callout'), view = fm.querySelector('.dev-view');
   const set = (el, k, v) => el.style.setProperty(k, v);
-  let lastLabel = -1;
-  let uS = -1, uRaf = 0;
-  const target = () => { const r = track.getBoundingClientRect(); return cl(-r.top / Math.max(1, r.height - innerHeight)) * U; };
-  const glide = () => { uRaf = 0; const tg = target(); if (uS < 0 || Math.abs(tg - uS) > 3) uS = tg; else uS = tg; frame(uS); if (Math.abs(tg - uS) > .0008) uRaf = requestAnimationFrame(glide); };
-  const frame = (u) => {
-    if (!wide.matches || calm.matches) return;
-    const vh = innerHeight;
-    const o = sm(u / 1.4); set(fm, '--o', o.toFixed(4));
-    const toRight = sm((u - .3) / 1.2);
-    set(phone, '--phx', lerp(50, 70, toRight).toFixed(3) + '%'); set(phone, '--phs', lerp(1.12, 1, toRight).toFixed(4));
-    // timeline: opening → user steps → chapter switch → creator steps → end
-    const su0 = u - OPEN; let i, l, inStory = true, dt = -1;
-    if (su0 < 0) { i = 0; l = 0; inStory = false; }
-    else if (su0 < n1) { i = Math.floor(su0); l = su0 - i; }
-    else if (su0 < n1 + DUO) { i = n1 - 1; l = 1; inStory = false; dt = (su0 - n1) / DUO; }
-    else { const s2 = su0 - n1 - DUO; if (s2 >= n - n1) { i = n - 1; l = 1; inStory = false; } else { i = n1 + Math.floor(s2); l = s2 - Math.floor(s2); } }
-    const before = su0 < 0, inDuo = dt >= 0, after = !inStory && !before && !inDuo;
-    steps.forEach((st, k) => {
-      let m = 1, a = 0;
-      if (inStory && k === i) { const ein = sm(l / .26), eout = sm((l - .78) / .22); m = l < .5 ? 1 - ein : -eout; a = l < .5 ? ein : 1 - eout; }
-      else if (k < i || (k === i && !before)) m = -1;
-      set(st, '--m', m.toFixed(4)); set(st, '--a', a.toFixed(4));
-    });
-    // screens slide like an app push; the user chapter ends by sliding back to the feed for the switch
-    const lastOfUser = i === n1 - 1, next = lastOfUser ? 0 : i + 1 < n ? i + 1 : i;
-    const tt = inStory ? sm((l - .76) / .24) : inDuo ? 1 : 0;
-    shots.forEach((im, k) => {
-      let x = 100;
-      if (before) x = k === 0 ? 0 : 100;
-      else if (inDuo) x = k === 0 ? 0 : 100;
-      else if (after) x = k === n - 1 ? 0 : 100;
-      else { if (k === i) x = -30 * tt; if (k === next && next !== i && tt > 0) x = 100 - 100 * tt; }
-      im.style.setProperty('--sx', x.toFixed(2) + '%'); im.style.zIndex = (k === next && tt > 0 && !inDuo) ? 2 : (k === i ? 1 : 0);
-    });
-    const wipe = inDuo ? sm((dt - .3) / .55) : 0; set(fm, '--wipe', wipe.toFixed(4));
-    const da = inDuo ? sm(dt / .2) * (1 - sm((dt - .85) / .15)) : 0; set(fm, '--da', da.toFixed(3));
-    const dm = inDuo ? (dt < .5 ? 1 - sm(dt / .2) : -sm((dt - .85) / .15)) : 1;
-    duo.querySelectorAll('.fm-mask>span').forEach(e => e.style.transform = `translateY(${(dm * 105).toFixed(2)}%)`);
-    // spotlight + zoom on the exact part the text talks about
-    const d = data[i], sp = (d?.dataset.spot || '0,0,100,100').split(',').map(Number);
-    const so = inStory ? sm((l - .14) / .14) * (1 - sm((l - .74) / .1)) : 0;
-    const [sx, sy, sw, sh] = sp, cx = sx + sw / 2, cy = sy + sh / 2, zmax = Math.min(1.45, Math.max(1.05, 62 / sh));
-    set(zoom, '--sl', sx + '%'); set(zoom, '--st', sy + '%'); set(zoom, '--sw', sw + '%'); set(zoom, '--sh', sh + '%');
-    set(zoom, '--so', so.toFixed(4)); set(phone, '--so', so.toFixed(4));
-    const lift = inStory ? sm((l - .12) / .22) * (1 - sm((l - .7) / .14)) : 0; set(phone, '--lift', lift.toFixed(4));
-    set(phone, '--sl', sx + '%'); set(phone, '--st', sy + '%'); set(phone, '--sw', sw + '%'); set(phone, '--sh', sh + '%');
-    set(phone, '--lbs', `${(100 * 100 / sw).toFixed(3)}% ${(100 * 100 / sh).toFixed(3)}%`);
-    set(phone, '--lbp', `${sw >= 100 ? 0 : (sx / (100 - sw) * 100).toFixed(3)}% ${sh >= 100 ? 0 : (sy / (100 - sh) * 100).toFixed(3)}%`);
-    if (shots[i] && phone.dataset.limg !== String(i)) { phone.dataset.limg = String(i); set(phone, '--limg', `url("${shots[i].currentSrc || shots[i].src}")`); }
-    const story = sm((u - .6) / 1) * (1 - (inDuo ? sm(dt / .3) : 0) * .6);
-    set(phone, '--prx', (story * 14).toFixed(2) + 'deg'); set(phone, '--pry', (story * -22).toFixed(2) + 'deg'); set(phone, '--prz', (story * 3).toFixed(2) + 'deg');
-    if (i !== lastLabel) { lastLabel = i; label.textContent = d?.querySelector('.fm-label')?.textContent || ''; }
-    if (phone._cyFor !== i + ':' + innerWidth) { phone._cyFor = i + ':' + innerWidth; set(callout, '--cy', (view.offsetTop + view.offsetHeight * cy / 100).toFixed(1) + 'px'); }
-    const tp = (d?.dataset.tap || '').split(',').map(Number);
-    if (inStory && tp.length === 2) { const k = cl((l - .5) / .22); set(zoom, '--tx', tp[0] + '%'); set(zoom, '--ty', tp[1] + '%'); set(zoom, '--ta', (k <= 0 || k >= 1 ? 0 : k < .3 ? k / .3 : 1 - (k - .3) / .7).toFixed(3)); set(zoom, '--tk', (.4 + .9 * k).toFixed(3)); } else set(zoom, '--ta', 0);
-    set(fm, '--ra', (sm(su0 / .3) * (1 - sm((su0 - n - DUO) / .3))).toFixed(3));
-    dots.forEach((dt2, k) => set(dt2, '--f', (k < i || (k === i && (after || inDuo)) ? 1 : k === i && inStory ? l : 0).toFixed(3)));
+  track.style.setProperty('--units', U);
+  // moments: 0 = opening, 1..n1 = user steps, n1+1 = switch, then creator steps
+  const M = 1 + n1 + 1 + (n - n1);
+  const unitOf = m => m === 0 ? .2 : m <= n1 ? OPEN + (m - 1) + .5 : m === n1 + 1 ? OPEN + n1 + DUO / 2 : OPEN + n1 + DUO + (m - n1 - 2) + .5;
+  const stepOf = m => m >= 1 && m <= n1 ? m - 1 : m >= n1 + 2 ? m - 2 : -1;
+  const yOf = m => { const r = track.getBoundingClientRect(); return scrollY + r.top + unitOf(m) / U * (track.offsetHeight - innerHeight); };
+  let cur = -1, liftT = 0;
+  const show = m => {
+    if (m === cur) return; const prev = cur; cur = m; const i = stepOf(m);
+    fm.classList.toggle('is-story', m >= 1);
+    fm.classList.toggle('is-duo', m === n1 + 1);
+    fm.classList.toggle('is-after-duo', m > n1 + 1);
+    steps.forEach((st, k) => { st.classList.toggle('is-on', k === i); st.classList.toggle('is-past', i >= 0 ? k < i : (m > n1 + 1 ? true : m === n1 + 1 ? k < n1 : false)); });
+    // screens: the one in focus, the ones before it pushed left
+    const showIdx = m === 0 ? 0 : m === n1 + 1 ? 0 : i;
+    shots.forEach((im, k) => { im.classList.toggle('is-on', k === showIdx); im.classList.toggle('is-past', m !== n1 + 1 && m !== 0 && k < showIdx && !(m >= n1 + 2 && k < n1)); });
+    dots.forEach((d, k) => d.classList.toggle('is-done', i >= 0 ? k <= i : m === n1 + 1 ? k < n1 : false));
+    // lift: drop the current card, move the frame to the new part, lift again once the new screen has arrived
+    fm.classList.remove('is-lifted'); clearTimeout(liftT);
+    if (i >= 0) liftT = setTimeout(() => {
+      const d = data[i], [sx, sy, sw, sh] = (d?.dataset.spot || '0,0,100,100').split(',').map(Number);
+      for (const [k, v] of [['--sl', sx + '%'], ['--st', sy + '%'], ['--sw', sw + '%'], ['--sh', sh + '%']]) { set(phone, k, v); set(fm.querySelector('.fm-zoom'), k, v); }
+      set(phone, '--lbs', `${(1e4 / sw).toFixed(3)}% ${(1e4 / sh).toFixed(3)}%`);
+      set(phone, '--lbp', `${sw >= 100 ? 0 : (sx / (100 - sw) * 100).toFixed(3)}% ${sh >= 100 ? 0 : (sy / (100 - sh) * 100).toFixed(3)}%`);
+      set(phone, '--limg', `url("${shots[i].currentSrc || shots[i].src}")`);
+      label.textContent = d?.querySelector('.fm-label')?.textContent || '';
+      set(callout, '--cy', (view.offsetTop + view.offsetHeight * (sy + sh / 2) / 100).toFixed(1) + 'px');
+      fm.classList.add('is-lifted');
+    }, prev === 0 ? 1300 : 850);
   };
-  const on = () => { if (!uRaf) uRaf = requestAnimationFrame(glide); };
-  document.addEventListener('portfolio:language', () => setTimeout(() => { delete phone.dataset.limg; uS = -1; on(); }, 80));
-  addEventListener('scroll', on, { passive: true }); addEventListener('resize', () => { uS = -1; on(); }); on();
+  const nearest = () => { const r = track.getBoundingClientRect(), u = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight))) * U; let best = 0, bd = 1e9; for (let m = 0; m < M; m++) { const d = Math.abs(unitOf(m) - u); if (d < bd) { bd = d; best = m; } } return best; };
+  // smooth jump between moments
+  let jumping = 0, lockUntil = 0;
+  const glideTo = (y, ms = 900) => { const y0 = scrollY, t0 = performance.now(), e = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; cancelAnimationFrame(jumping); const go = now => { const t = Math.min(1, (now - t0) / ms); scrollTo(0, y0 + (y - y0) * e(t)); if (t < 1) jumping = requestAnimationFrame(go); else jumping = 0; }; jumping = requestAnimationFrame(go); };
+  const inside = () => { const r = track.getBoundingClientRect(); return r.top <= 2 && r.bottom >= innerHeight - 2; };
+  const move = dir => {
+    const now = performance.now(); if (now < lockUntil) return true;
+    const m = cur < 0 ? nearest() : cur, to = m + dir;
+    if (to < 0 || to >= M) return false; // leave the film normally at either end
+    lockUntil = now + 950; show(to); glideTo(yOf(to)); return true;
+  };
+  let acc = 0, accT = 0;
+  addEventListener('wheel', e => {
+    if (!wide.matches || calm.matches || !inside()) return;
+    const now = performance.now(); if (now - accT > 220) acc = 0; accT = now; acc += e.deltaY;
+    if (Math.abs(acc) < 18 && now >= lockUntil) { e.preventDefault(); e.stopImmediatePropagation(); return; }
+    const dir = acc > 0 ? 1 : -1;
+    if (now < lockUntil || move(dir)) { e.preventDefault(); e.stopImmediatePropagation(); acc = 0; }
+  }, { passive: false, capture: true });
+  addEventListener('keydown', e => {
+    if (!wide.matches || !inside() || e.target.closest?.('input,textarea,select')) return;
+    const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) ? 1 : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;
+    if (dir && move(dir)) e.preventDefault();
+  });
+  // any other way of scrolling (scrollbar, touchpad momentum after leaving, links) lands on the nearest moment
+  let st = 0; addEventListener('scroll', () => { if (!wide.matches || jumping) return; clearTimeout(st); st = setTimeout(() => { if (inside()) show(nearest()); else { const r = track.getBoundingClientRect(); show(r.top > 0 ? 0 : M - 1); } }, 60); }, { passive: true });
+  document.addEventListener('portfolio:language', () => { const m = cur; cur = -1; show(m < 0 ? 0 : m); });
+  show(nearest());
+  // the phone leans toward the pointer anywhere on the stage
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches && !calm.matches) {
+    const card = fm.querySelector('.fm-lift-img');
+    stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); set(phone, '--mrx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); set(phone, '--mry', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3));
+      if (fm.classList.contains('is-lifted')) { const c = card.getBoundingClientRect(); set(card, '--gx', ((e.clientX - c.left) / c.width * 100).toFixed(1) + '%'); set(card, '--gy', ((e.clientY - c.top) / c.height * 100).toFixed(1) + '%'); } });
+    stage.addEventListener('pointerleave', () => { set(phone, '--mrx', 0); set(phone, '--mry', 0); });
+  }
   // pointer depth for the floating work
   if (matchMedia('(hover:hover) and (pointer:fine)').matches && !calm.matches) {
     stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); const mx = (e.clientX - r.left) / r.width * 2 - 1, my = (e.clientY - r.top) / r.height * 2 - 1; set(fm, '--mx', mx.toFixed(3)); set(fm, '--my', my.toFixed(3)); set(stage, '--px', mx.toFixed(3)); });

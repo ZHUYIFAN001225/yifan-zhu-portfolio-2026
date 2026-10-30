@@ -61,11 +61,11 @@ export const productCases=[{
     title:p('The feed, taken apart.','把信息流拆开看。'),
     lead:p('The home feed of the prototype, layer by layer. Each layer has one job in getting from a picture to a person.','原型的首页信息流，一层一层拆开。每一层只负责一件事：让人从一张图走到一个人。'),
     layers:[
-      {file:'header',title:p('Where am I?','我在哪？'),body:p('Just the brand and notifications. Nothing competes with the pictures.','只有品牌和通知，没有任何东西和图片抢注意力。')},
-      {file:'chips',title:p('What kind of look?','想要哪类造型？'),body:p('Hair, nails, makeup, outfit. One tap narrows the feed without typing a single word.','发型、美甲、妆容、穿搭。点一下就能缩小范围，不用打字。')},
-      {file:'row1',title:p('Is this real?','这是真的吗？'),body:p('Every picture is real work by a local Creator, marked with a small Creator tag.','每张图都是本地 Creator 的真实作品，并标有 Creator 小标签。')},
-      {file:'row2',title:p('More like this?','还有类似的吗？'),body:p('The feed keeps going, and saving a picture teaches it your taste.','信息流继续往下，收藏一张图就能让它更懂你的口味。')},
-      {file:'nav',title:p('Where do I go next?','下一步去哪？'),body:p('Discover, search, build a look, messages and profile. The plus in the middle builds a whole look.','发现、搜索、组合造型、消息、个人。中间的加号用来组合一整套造型。')}
+      {band:'0,11.5',file:'header',title:p('Where am I?','我在哪？'),body:p('Just the brand and notifications. Nothing competes with the pictures.','只有品牌和通知，没有任何东西和图片抢注意力。')},
+      {band:'11.5,5.7',file:'chips',title:p('What kind of look?','想要哪类造型？'),body:p('Hair, nails, makeup, outfit. One tap narrows the feed without typing a single word.','发型、美甲、妆容、穿搭。点一下就能缩小范围，不用打字。')},
+      {band:'17.2,32.8',file:'row1',title:p('Is this real?','这是真的吗？'),body:p('Every picture is real work by a local Creator, marked with a small Creator tag.','每张图都是本地 Creator 的真实作品，并标有 Creator 小标签。')},
+      {band:'50,30',file:'row2',title:p('More like this?','还有类似的吗？'),body:p('The feed keeps going, and saving a picture teaches it your taste.','信息流继续往下，收藏一张图就能让它更懂你的口味。')},
+      {band:'80,13',file:'nav',title:p('Where do I go next?','下一步去哪？'),body:p('Discover, search, build a look, messages and profile. The plus in the middle builds a whole look.','发现、搜索、组合造型、消息、个人。中间的加号用来组合一整套造型。')}
     ]
   },
   film:{
@@ -351,11 +351,11 @@ export const productCases=[{
     title:p('One screen, taken apart.','把一屏拆开看。'),
     lead:p('The booking home screen from the live site, layer by layer. Each layer answers one question a customer has before they book.','线上网站的预约首页，一层一层拆开。每一层回答顾客预约前心里的一个问题。'),
     layers:[
-      {file:'header',title:p('Where am I?','我在哪一步？'),body:p('A plain title and a three-step bar: service and date, time, confirm. Customers always know how far they are.','一个直白的标题，加三步进度：服务和日期、时间、确认。顾客随时知道自己走到哪了。')},
-      {file:'services',title:p('How long will it take?','要做多久？'),body:p('Every service shows its length first, because length decides which times can fit in the day.','每项服务先写清时长，因为时长决定了一天里哪些时间放得下。')},
-      {file:'earliest',title:p('When is the soonest?','最早什么时候？'),body:p('The earliest free time updates with the service, so most people can book in one tap without browsing.','最早可约时间随服务自动更新，大多数人点一下就能约，不用翻日历。')},
-      {file:'calendar',title:p('Is that day open?','那天开门吗？'),body:p('Each date says Open or Closed, and dates beyond the booking window are simply not shown, so “not open yet” is never mistaken for “full”.','每个日期直接写“营业”或“休息”，还没开放的日子不显示，所以“暂未开放”不会被误以为“约满了”。')},
-      {file:'nav',title:p('Where are my bookings?','我的预约在哪？'),body:p('Only two places: Book and My bookings. Nothing else to learn.','只有两个入口：预约、我的预约。没有别的需要学。')}
+      {band:'0,18.7',file:'header',title:p('Where am I?','我在哪一步？'),body:p('A plain title and a three-step bar: service and date, time, confirm. Customers always know how far they are.','一个直白的标题，加三步进度：服务和日期、时间、确认。顾客随时知道自己走到哪了。')},
+      {band:'20.4,13.1',file:'services',title:p('How long will it take?','要做多久？'),body:p('Every service shows its length first, because length decides which times can fit in the day.','每项服务先写清时长，因为时长决定了一天里哪些时间放得下。')},
+      {band:'35.8,5.1',file:'earliest',title:p('When is the soonest?','最早什么时候？'),body:p('The earliest free time updates with the service, so most people can book in one tap without browsing.','最早可约时间随服务自动更新，大多数人点一下就能约，不用翻日历。')},
+      {band:'42.5,36',file:'calendar',title:p('Is that day open?','那天开门吗？'),body:p('Each date says Open or Closed, and dates beyond the booking window are simply not shown, so “not open yet” is never mistaken for “full”.','每个日期直接写“营业”或“休息”，还没开放的日子不显示，所以“暂未开放”不会被误以为“约满了”。')},
+      {band:'84,10.7',file:'nav',title:p('Where are my bookings?','我的预约在哪？'),body:p('Only two places: Book and My bookings. Nothing else to learn.','只有两个入口：预约、我的预约。没有别的需要学。')}
     ]
   },
   screenMap:{

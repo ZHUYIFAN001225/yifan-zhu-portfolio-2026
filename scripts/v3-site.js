@@ -486,7 +486,18 @@ window.addEventListener('pagereveal',event=>{
 (() => {
   const xp = document.querySelector('[data-explode]'); if (!xp) return;
   const items = [...xp.querySelectorAll('[data-xp-item]')], layers = [...xp.querySelectorAll('[data-xp-layer]')], scene = xp.querySelector('.xp-scene');
-  const focus = i => { xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); };
+  // camera poses: each layer gets its own angle and framing, like a product film cutting between shots
+  const phoneEl = xp.querySelector('.xp-phone');
+  const poses = [
+    { cx: '-6%', cy: '14%', crx: '48deg', crz: '-22deg', cry: '0deg', cs: 1.18 },
+    { cx: '-14%', cy: '10%', crx: '58deg', crz: '-40deg', cry: '-6deg', cs: 1.14 },
+    { cx: '10%', cy: '4%', crx: '42deg', crz: '-16deg', cry: '8deg', cs: 1.1 },
+    { cx: '-4%', cy: '-6%', crx: '56deg', crz: '-48deg', cry: '0deg', cs: 1.08 },
+    { cx: '6%', cy: '-14%', crx: '38deg', crz: '-28deg', cry: '-8deg', cs: 1.16 }
+  ];
+  const rest = { cx: '0%', cy: '2%', crx: '54deg', crz: '-34deg', cry: '0deg', cs: 1.06 };
+  const pose = p => Object.entries(p).forEach(([k, v]) => phoneEl.style.setProperty('--' + k, v));
+  const focus = i => { xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); pose(i >= 0 && matchMedia('(min-width: 761px)').matches ? poses[i % poses.length] : rest); };
   items.forEach((li, k) => { li.addEventListener('pointerenter', () => focus(k)); li.addEventListener('focus', () => focus(k)); li.addEventListener('click', () => focus(k)); });
   layers.forEach((l, k) => l.addEventListener('pointerenter', () => focus(k)));
   xp.querySelector('.xp-list').addEventListener('pointerleave', () => focus(-1));
@@ -662,6 +673,7 @@ window.addEventListener('pagereveal',event=>{
   const unitOf = m => m + .3;
   const yOf = m => { const r = track.getBoundingClientRect(); return scrollY + r.top + unitOf(m) / U2 * (track.offsetHeight - innerHeight); };
   const lys = [...fm.querySelectorAll('[data-ly]')];
+  const wheel = [...fm.querySelectorAll('[data-wh]')];
   const slots = [...fm.querySelectorAll('[data-slot]')];
   let cur = -1, curStep = -2, liftT = 0;
   const layout = (i, j, wait) => {
@@ -688,6 +700,7 @@ window.addEventListener('pagereveal',event=>{
     fm.classList.toggle('is-duo', mo.t === 'duo');
     fm.classList.toggle('is-after-duo', m > di);
     fm.classList.toggle('is-cfirst', i === n1);
+    wheel.forEach((w, k) => { const o = i < 0 ? 99 : k - i; w.style.setProperty('--o', Math.max(-2, Math.min(2, o))); w.classList.toggle('is-near', Math.abs(o) === 1); w.classList.toggle('is-cur', o === 0); });
     if (i !== curStep) {
       curStep = i;
       steps.forEach((st, k) => { st.classList.toggle('is-on', k === i); st.classList.toggle('is-past', i >= 0 ? k < i : (m > di ? true : mo.t === 'duo' ? k < n1 : false)); });
@@ -718,6 +731,8 @@ window.addEventListener('pagereveal',event=>{
     const dir = acc > 0 ? 1 : -1;
     if (now < lockUntil || move(dir)) { e.preventDefault(); e.stopImmediatePropagation(); acc = 0; }
   }, { passive: false, capture: true });
+  // the wheel: click the previous or next title to go there
+  wheel.forEach((w, k) => w.addEventListener('click', () => { const to = moms.findIndex(x => x.t === 'step' && x.i === k); if (to < 0) return; lockUntil = performance.now() + 950; show(to); glideTo(yOf(to)); }));
   addEventListener('keydown', e => {
     if (!wide.matches || !inside() || e.target.closest?.('input,textarea,select')) return;
     const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) ? 1 : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;

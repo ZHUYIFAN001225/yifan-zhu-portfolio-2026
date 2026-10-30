@@ -489,15 +489,20 @@ window.addEventListener('pagereveal',event=>{
   // camera poses: each layer gets its own angle and framing, like a product film cutting between shots
   const phoneEl = xp.querySelector('.xp-phone');
   const poses = [
-    { cx: '-6%', cy: '14%', crx: '48deg', crz: '-22deg', cry: '0deg', cs: 1.18 },
-    { cx: '-14%', cy: '10%', crx: '58deg', crz: '-40deg', cry: '-6deg', cs: 1.14 },
-    { cx: '10%', cy: '4%', crx: '42deg', crz: '-16deg', cry: '8deg', cs: 1.1 },
-    { cx: '-4%', cy: '-6%', crx: '56deg', crz: '-48deg', cry: '0deg', cs: 1.08 },
-    { cx: '6%', cy: '-14%', crx: '38deg', crz: '-28deg', cry: '-8deg', cs: 1.16 }
+    { cx: '-10%', cy: '12%', crx: '30deg', crz: '-8deg', cry: '-22deg', cs: .94 },
+    { cx: '-12%', cy: '14%', crx: '60deg', crz: '-60deg', cry: '-14deg', cs: 1.04 },
+    { cx: '12%', cy: '13%', crx: '38deg', crz: '26deg', cry: '24deg', cs: .86 },
+    { cx: '-6%', cy: '12%', crx: '64deg', crz: '-14deg', cry: '30deg', cs: 1.08 },
+    { cx: '-6%', cy: '6%', crx: '36deg', crz: '-70deg', cry: '-28deg', cs: 1.04 }
   ];
   const rest = { cx: '0%', cy: '2%', crx: '54deg', crz: '-34deg', cry: '0deg', cs: 1.06 };
+  // when nobody points at anything, the camera keeps moving around the phone like a product film
+  const orbit = [rest, { cx: '-8%', cy: '6%', crx: '40deg', crz: '-58deg', cry: '-18deg', cs: 1.12 }, { cx: '8%', cy: '4%', crx: '30deg', crz: '18deg', cry: '24deg', cs: .96 }, { cx: '0%', cy: '-3%', crx: '62deg', crz: '-10deg', cry: '12deg', cs: 1.02 }];
+  let orbitK = 0, orbitT = 0, focused = -1, xpVis = false;
   const pose = p => Object.entries(p).forEach(([k, v]) => phoneEl.style.setProperty('--' + k, v));
-  const focus = i => { xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); pose(i >= 0 && matchMedia('(min-width: 761px)').matches ? poses[i % poses.length] : rest); };
+  const idle = () => { clearTimeout(orbitT); if (focused >= 0 || !xpVis || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(min-width: 761px)').matches) return; orbitT = setTimeout(() => { orbitK = (orbitK + 1) % orbit.length; if (focused < 0) pose(orbit[orbitK]); idle(); }, 2400); };
+  new IntersectionObserver(es => { xpVis = es[0].isIntersecting; idle(); }, { threshold: .2 }).observe(xp);
+  const focus = i => { focused = i; idle(); xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); pose(i >= 0 && matchMedia('(min-width: 761px)').matches ? poses[i % poses.length] : orbit[orbitK]); };
   items.forEach((li, k) => { li.addEventListener('pointerenter', () => focus(k)); li.addEventListener('focus', () => focus(k)); li.addEventListener('click', () => focus(k)); });
   layers.forEach((l, k) => l.addEventListener('pointerenter', () => focus(k)));
   xp.querySelector('.xp-list').addEventListener('pointerleave', () => focus(-1));
@@ -839,7 +844,7 @@ window.addEventListener('pagereveal',event=>{
   const secs = [...document.querySelectorAll('.ux-case .v3-product-section.ux-section')].filter(s => lines[s.id]);
   if (!secs.length) return;
   const b = document.createElement('button'); b.type = 'button'; b.className = 'snip'; b.setAttribute('aria-label', 'Scissors'); b.dataset.cursor = 'snip';
-  b.innerHTML = `<span class="snip-body"><svg viewBox="0 0 80 80" aria-hidden="true"><g class="snip-blade snip-blade--a"><path d="M40 40 76 8" stroke="#e9e4ee" stroke-width="6" stroke-linecap="round"/><circle cx="24" cy="56" r="11" fill="none" stroke="#f59ab8" stroke-width="6"/><path d="M40 40 31 49" stroke="#f59ab8" stroke-width="6" stroke-linecap="round"/></g><g class="snip-blade snip-blade--b"><path d="M40 40 8 8" stroke="#e9e4ee" stroke-width="6" stroke-linecap="round"/><circle cx="56" cy="56" r="11" fill="none" stroke="#f59ab8" stroke-width="6"/><path d="M40 40 49 49" stroke="#f59ab8" stroke-width="6" stroke-linecap="round"/></g><circle cx="40" cy="40" r="4" fill="#120f16" stroke="#e9e4ee" stroke-width="2"/><g class="snip-eyes"><circle cx="33" cy="28" r="2.6" fill="#120f16"/><circle cx="47" cy="28" r="2.6" fill="#120f16"/></g></svg></span><span class="snip-say"></span>`;
+  b.innerHTML = `<span class="snip-body"><svg viewBox="0 0 80 80" aria-hidden="true"><g class="snip-blade snip-blade--a"><path d="M40 40 76 8" stroke="#2a1d30" stroke-width="6" stroke-linecap="round"/><circle cx="24" cy="56" r="11" fill="none" stroke="#f59ab8" stroke-width="6"/><path d="M40 40 31 49" stroke="#f59ab8" stroke-width="6" stroke-linecap="round"/></g><g class="snip-blade snip-blade--b"><path d="M40 40 8 8" stroke="#2a1d30" stroke-width="6" stroke-linecap="round"/><circle cx="56" cy="56" r="11" fill="none" stroke="#f59ab8" stroke-width="6"/><path d="M40 40 49 49" stroke="#f59ab8" stroke-width="6" stroke-linecap="round"/></g><circle cx="40" cy="40" r="4" fill="#120f16" stroke="#e9e4ee" stroke-width="2"/><g class="snip-eyes"><circle cx="33" cy="28" r="2.6" fill="#120f16"/><circle cx="47" cy="28" r="2.6" fill="#120f16"/></g></svg></span><span class="snip-say"></span>`;
   document.body.append(b);
   const say = b.querySelector('.snip-say');
   let pts = [], cx = 0, cy = 0, x = 0, y = 0, rot = 0, sc = 1, landed = -1, talkT = 0, pk = 0;
@@ -848,30 +853,36 @@ window.addEventListener('pagereveal',event=>{
   const target = () => {
     const mid = scrollY + innerHeight * .42;
     if (!pts.length) return null;
-    if (mid <= pts[0].y) return { x: pts[0].x, y: Math.max(mid, pts[0].y - innerHeight), k: 0, t: 0, a: pts[0], b: pts[0] };
+    if (mid <= pts[0].y) return { k: 0, t: 0, a: pts[0], b: pts[0] };
     for (let k = 0; k < pts.length - 1; k++) { const a = pts[k], c = pts[k + 1]; if (mid < c.y) { const t = (mid - a.y) / (c.y - a.y); return { k, t, a, b: c }; } }
     const L = pts[pts.length - 1]; return { k: pts.length - 1, t: 0, a: L, b: L };
   };
-  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  // like the bee: its position is a function of scroll. Between two sections it swings across the page,
+  // turning and growing in the middle of the swing; it never stops halfway because scroll drives it directly.
+  const ss = t => t * t * (3 - 2 * t);
+  let lastY = scrollY, spin = 0;
   const tick = () => {
     const g = target();
     if (g) {
-      // stay at a section for the first part of the gap, then fly in an arc to the next one
-      const hold = .55, tt = g.t < hold ? 0 : ease((g.t - hold) / (1 - hold));
-      const tx = g.a.x + (g.b.x - g.a.x) * tt, arc = Math.sin(tt * Math.PI) * -120;
-      const ty = scrollY + innerHeight * .36 + arc; // stays in view; only its side and pose change
-      cx += (tx - cx) * .12; cy = scrollY + innerHeight * .36 + ((cy - scrollY) - innerHeight * .36) * .88 + arc * .12;
-      const flying = tt > .02 && tt < .98;
+      const t = g.t, k = ss(Math.min(1, Math.max(0, t)));
+      const tx = g.a.x + (g.b.x - g.a.x) * k;
+      const swing = Math.sin(k * Math.PI);
+      const ty = innerHeight * (.34 + .16 * Math.sin(t * Math.PI * 2)) - swing * 60;
+      const vy = scrollY - lastY; lastY = scrollY; spin += vy * .35;
+      cx += (tx - cx) * .16; cy += (ty - cy) * .16;
       const dir = Math.sign(g.b.x - g.a.x) || 1;
-      rot += ((flying ? dir * (20 + Math.sin(tt * Math.PI) * 25) : Math.sin(performance.now() / 700) * 6) - rot) * .1;
-      sc += ((flying ? 1 + Math.sin(tt * Math.PI) * .6 : 1) - sc) * .1;
-      b.classList.toggle('is-flying', flying); b.classList.toggle('is-right', (flying ? g.b : g.a).right);
-      b.style.transform = `translate3d(${cx.toFixed(1)}px,${(cy - scrollY).toFixed(1)}px,0)`;
+      const tr = dir * swing * 38 + Math.sin(spin / 90) * 14 + Math.sin(performance.now() / 900) * 4;
+      rot += (tr - rot) * .15;
+      const ts = .9 + swing * .75; sc += (ts - sc) * .15;
+      const flying = swing > .12;
+      b.classList.toggle('is-flying', flying || Math.abs(vy) > 2); b.classList.toggle('is-right', cx > innerWidth / 2);
+      b.style.transform = `translate3d(${cx.toFixed(1)}px,${cy.toFixed(1)}px,0)`;
       b.querySelector('.snip-body').style.transform = `rotate(${rot.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
-      const at = !flying && g.t < hold ? g.k : -1;
+      const at = swing < .1 ? (t < .5 ? g.k : Math.min(g.k + 1, secs.length - 1)) : -1;
       if (at >= 0 && at !== landed) { landed = at; const l = lines[secs[at].id]; talk(zh() ? l[1] : l[0]); }
-      if (at < 0) landed = -1;
-      const vis = scrollY + innerHeight > pts[0].y && scrollY < pts[pts.length - 1].y + 600;
+      const xr = document.querySelector('[data-explode]')?.getBoundingClientRect();
+      const overXp = xr && xr.top < innerHeight * .7 && xr.bottom > innerHeight * .3;
+      const vis = !overXp && scrollY + innerHeight * .6 > pts[0].y && scrollY < pts[pts.length - 1].y + 400;
       b.classList.toggle('is-on', vis);
     }
     requestAnimationFrame(tick);
@@ -879,7 +890,7 @@ window.addEventListener('pagereveal',event=>{
   b.addEventListener('click', () => { b.classList.remove('is-snap'); void b.offsetWidth; b.classList.add('is-snap'); const l = pokes[pk++ % pokes.length]; talk(zh() ? l[1] : l[0], 1800); });
   addEventListener('resize', measure); document.addEventListener('portfolio:language', () => setTimeout(measure, 100));
   addEventListener('load', measure); setTimeout(measure, 600); measure();
-  const g0 = target(); if (g0) { cx = g0.a.x; cy = g0.a.y; }
+  const g0 = target(); if (g0) { cx = g0.a.x; cy = innerHeight * .34; }
   requestAnimationFrame(tick);
   // keep measurements fresh as images load and layouts settle
   new ResizeObserver(() => measure()).observe(document.body);
@@ -905,10 +916,26 @@ window.addEventListener('pagereveal',event=>{
   const masks = [...root.querySelectorAll('.lk-mask')];
   if (calm || !('IntersectionObserver' in window)) masks.forEach(m => m.classList.add('is-in'));
   else { const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -10% 0px' }); masks.forEach(m => io.observe(m)); }
-  if (!calm) { let q = false; const run = () => { q = false; const vh = innerHeight; masks.forEach(m => { const r = m.getBoundingClientRect(); if (r.bottom < 0 || r.top > vh) return; const p = (r.top + r.height / 2 - vh / 2) / vh; m.firstElementChild.style.setProperty('--iy', (p * -40).toFixed(1) + 'px'); }); }; addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run(); }
+  if (!calm) { let q = false; const run = () => { q = false; const vh = innerHeight; masks.forEach(m => { const r = m.getBoundingClientRect(); if (r.bottom < 0 || r.top > vh) return; const p = (r.top + r.height / 2 - vh / 2) / vh; m.style.setProperty('--iy', (p * -24).toFixed(1) + 'px'); }); }; addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run(); }
   if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
   const zh = () => document.documentElement.lang.startsWith('zh');
   const pill = document.createElement('div'); pill.className = 'lk-pill'; pill.setAttribute('aria-hidden', 'true'); document.body.append(pill);
   const words = [['.ux-pains>div', 'Problem?', '痛点？'], ['.ux-decisions article', 'Why this?', '为什么？'], ['.ux-principles>div', 'A rule', '一条规则'], ['.ux-challenge-grid>*', 'Still hard', '还难的地方'], ['.ux-build>li', 'How?', '怎么做的？'], ['.ux-details figure', 'Look closer', '凑近看'], ['.ux-journey>li', 'Next step', '下一步']];
   addEventListener('pointermove', e => { const w = words.find(([sel]) => e.target.closest?.(sel)); pill.classList.toggle('is-on', !!w); if (w) { pill.textContent = zh() ? w[2] : w[1]; pill.style.left = e.clientX + 'px'; pill.style.top = e.clientY + 'px'; } }, { passive: true });
+})();
+
+// LOOK lower half: one continuous coloured backdrop that changes colour block by block as you scroll (dark film → lilac → blush → pink...).
+(() => {
+  const root = document.querySelector('[data-product-case=beauty]'); if (!root || !document.querySelector('[data-film]')) return;
+  const bg = document.createElement('div'); bg.className = 'lk-bg'; bg.setAttribute('aria-hidden', 'true'); document.body.prepend(bg);
+  const cols = ['#e4d6ec', '#f6d2df', '#efe3d6', '#e4d6ec', '#f4bfd3', '#dfe3f2', '#f6d2df', '#e4d6ec', '#efe3d6', '#f6d2df'];
+  const zones = [...root.querySelectorAll('.v3-product-section.ux-section')];
+  zones.forEach((z, k) => z.dataset.lkBg = cols[k % cols.length]);
+  let q = false;
+  const run = () => { q = false; const mid = innerHeight * .55; let c = null;
+    for (const z of zones) { const r = z.getBoundingClientRect(); if (r.top < mid && r.bottom > mid) { c = z.dataset.lkBg; break; } }
+    const xp = document.querySelector('[data-explode]'), xr = xp?.getBoundingClientRect(); if (xr && xr.top < mid && xr.bottom > mid) c = null;
+    const first = zones[0]?.getBoundingClientRect(); if (first && first.top > mid) c = null;
+    document.body.classList.toggle('lk-light', !!c); if (c) bg.style.backgroundColor = c; };
+  addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
 })();

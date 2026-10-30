@@ -1774,3 +1774,34 @@ body:has([data-product-case=beauty]) .site-header.v3-header{background:#120d13;b
 [data-product-case=beauty] .ux-section :is(h3,strong){color:var(--text)}
 .fm-skip{position:absolute;right:clamp(16px,3vw,40px);bottom:clamp(16px,4vh,36px);z-index:30;padding:10px 16px;border-radius:999px;border:1px solid rgba(245,154,184,.4);background:rgba(18,13,19,.7);backdrop-filter:blur(8px);color:#f6eef6;font:500 13px/1 Inter,system-ui,sans-serif;cursor:pointer;transition:background .2s,color .2s}
 .fm-skip:hover{background:#f59ab8;color:#1a121c}
+/* ---- LOOK: bold colour blocks below the film (lilac / blush / cream / pink), dark plum type ---- */
+.lk-bg{position:fixed;inset:0;z-index:-1;background:#120d13;opacity:0;transition:opacity .7s ease,background-color .9s ease;pointer-events:none}
+body.lk-light .lk-bg{opacity:1}
+body:has([data-product-case=beauty]){transition:background-color .7s}
+body.lk-light:has([data-product-case=beauty]){background:#e4d6ec}
+[data-product-case=beauty] .v3-product-section.ux-section{--text:#2a1d30;--muted:#5d4a63;color:#2a1d30}
+[data-product-case=beauty] .v3-product-section.ux-section>h2{color:#2a1d30}
+[data-product-case=beauty] .v3-product-section.ux-section p,[data-product-case=beauty] .v3-product-section.ux-section li{color:#4d3b53}
+[data-product-case=beauty] .ux-section :is(h3,h4,strong,b){color:#2a1d30}
+[data-product-case=beauty] :is(.ux-pains>div,.ux-principles>div,.ux-challenge-grid>*,.ux-build>li,.ux-phases>li,.ux-journey>li,.ux-decisions article){background:rgba(255,255,255,.55);border:1px solid rgba(42,29,48,.08);box-shadow:0 30px 60px -30px rgba(80,40,90,.35);backdrop-filter:blur(6px)}
+[data-product-case=beauty] .ux-section :is(.ux-decisions dt,.ux-decisions span,[class*=label]){color:#c2457a}
+[data-product-case=beauty] .ux-section a{color:#2a1d30}
+/* the anatomy block keeps its dark stage, full width */
+[data-product-case=beauty] .xp{background:#120d13;box-shadow:0 0 0 100vmax #120d13;clip-path:inset(0 -100vmax);position:relative;z-index:1}
+.lk-pill{background:#2a1d30;color:#f6eef6}
+/* scissors: bigger, dark blades readable on the light blocks */
+.snip{width:92px;height:92px;margin:-46px 0 0 -46px}
+.snip-body{filter:drop-shadow(0 18px 18px rgba(60,20,60,.3))}
+.snip-say{background:#2a1d30;color:#f6eef6;left:100px}
+.snip.is-right .snip-say{right:100px}
+/* light blocks: every piece of copy goes dark plum; dark panels turn into light cards (screens inside figures keep their own look) */
+[data-product-case=beauty] .ux-section :is(p,li,dd,dt,span,small,em):not(figure *):not(.xp *),[data-product-case=beauty] .ux-section figure figcaption :is(p,span),[data-product-case=beauty] .ux-section figure figcaption{color:#4a3850!important}
+[data-product-case=beauty] .ux-section :is(h3,h4,strong,b):not(figure *):not(.xp *){color:#2a1d30!important}
+[data-product-case=beauty] .ux-section :is(.ux-world,.ux-world ul,.ux-world li,.ux-chips li,.ux-success li,.ux-evidence-note){background:rgba(255,255,255,.6)!important;border-color:rgba(42,29,48,.1)!important}
+[data-product-case=beauty] .ux-section .ux-world--real,[data-product-case=beauty] .ux-section .ux-world--real :is(ul,li){background:#f59ab8!important}
+[data-product-case=beauty] .ux-section .ux-world-tag{color:#c2457a!important}
+[data-product-case=beauty] .ux-section :is(.ux-flywheel li>span:first-child,.ux-phases li>span:first-child){background:#2a1d30!important;color:#f6d2df!important}
+[data-product-case=beauty] .v3-product-section.ux-section .ux-section-body p.ux-research-status.ux-research-status{background:#2a1d30!important;color:#f6eef6!important}
+/* never crop inside the frame: images are shown whole; the frame itself drifts instead */
+[data-product-case=beauty] .lk-mask>img{transform:none!important;width:100%;height:auto}
+[data-product-case=beauty] .lk-mask{transform:translateY(var(--iy,0px));transition:clip-path 1.2s cubic-bezier(.65,0,.25,1),transform .2s linear}

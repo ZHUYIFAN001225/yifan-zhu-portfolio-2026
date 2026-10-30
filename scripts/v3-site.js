@@ -269,8 +269,10 @@ window.addEventListener('pagereveal',event=>{
 
   // Opening on the homepage: the name rises, then fades into the page. Once per visit; any click or key skips it.
   if (document.body.classList.contains('v3-index') && location.pathname.replace(/\/index\.html$/, '/').endsWith('/') && !calm.matches) {
-    let seen = false; try { seen = sessionStorage.getItem('v3-intro') === '1'; sessionStorage.setItem('v3-intro', '1'); } catch {}
-    if (!seen) {
+    // Play on every direct visit; skip when arriving from another page of this site.
+    let internal = false; try { internal = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch {}
+    let off = false; try { off = sessionStorage.getItem('v3-intro-off') === '1'; } catch {}
+    if (!internal && !off) {
       const intro = document.createElement('div'); intro.className = 'v3-intro'; intro.setAttribute('aria-hidden', 'true');
       intro.innerHTML = `<p class="v3-intro-name"><i><span>Yifan Zhu</span></i><small>${zh() ? '研究驱动的跨领域设计师' : 'Research-led Multidisciplinary Designer'}</small></p><button class="v3-intro-skip" type="button" tabindex="-1">${zh() ? '跳过' : 'Skip'}</button>`;
       document.body.append(intro);
@@ -356,10 +358,54 @@ window.addEventListener('pagereveal',event=>{
   const track = sc.querySelector('.sc-track'), scenes = [...sc.querySelectorAll('[data-sc-scene]')], links = [...sc.querySelectorAll('[data-sc-go]')];
   const captions = [...sc.querySelectorAll('[data-sc-caption]')];
   const counter = sc.querySelector('[data-sc-current]'), bar = sc.querySelector('.sc-progress span');
-  const wide = matchMedia('(min-width: 900px)');
+  const wide = matchMedia('(min-width: 640px)');
   let active = -1;
+  // Particle dissolve: the outgoing picture is wiped away left to right, and the wiped edge breaks into fine dust that drifts off.
+  const dust = sc.querySelector('.sc-dust'), stageEl = sc.querySelector('.sc-stage');
+  let dustRun = 0, dusting = null;
+  const dissolve = scene => {
+    if (!dust || calm.matches || !wide.matches || !scene) return;
+    if (dusting) { dusting.classList.remove('is-dusting'); dusting.style.removeProperty('--wipe'); }
+    const W = stageEl.clientWidth, H = stageEl.clientHeight, sr = stageEl.getBoundingClientRect();
+    dust.width = W; dust.height = H;
+    const off = document.createElement('canvas'); off.width = W; off.height = H; const o = off.getContext('2d');
+    scene.querySelectorAll('img, video').forEach(m => {
+      const r = m.getBoundingClientRect(); if (!r.width || !r.height) return;
+      const iw = m.naturalWidth || m.videoWidth, ih = m.naturalHeight || m.videoHeight; if (!iw || !ih) return;
+      const fit = getComputedStyle(m).objectFit; let sx = 0, sy = 0, sw = iw, sh = ih;
+      if (fit === 'cover') { const k = Math.max(r.width / iw, r.height / ih); sw = r.width / k; sh = r.height / k; sx = (iw - sw) / 2; sy = (ih - sh) / 2; }
+      try { o.drawImage(m, sx, sy, sw, sh, r.left - sr.left, r.top - sr.top, r.width, r.height); } catch {}
+    });
+    let data; try { data = o.getImageData(0, 0, W, H).data; } catch { return; }
+    const step = 3, keep = Math.min(.6, 22000 / (W * H / (step * step))), parts = [], sweep = 1.05;
+    for (let y = 0; y < H; y += step) for (let x = 0; x < W; x += step) {
+      const k = (y * W + x) * 4; if (data[k + 3] < 40 || Math.random() > keep) continue;
+      parts.push({ x, y, c: `rgb(${data[k]},${data[k + 1]},${data[k + 2]})`, d: x / W * sweep + (Math.random() - .5) * .06, vx: 60 + Math.random() * 160, vy: -(30 + Math.random() * 120), w: Math.random() * 6.28, s: 1.1 + Math.random() * 1.9 });
+    }
+    const ctx = dust.getContext("2d"), run = ++dustRun, t0 = performance.now(), life = 1.25;
+    dusting = scene; scene.classList.add('is-dusting');
+    const frame = now => {
+      if (run !== dustRun) return;
+      const t = (now - t0) / 1000; ctx.clearRect(0, 0, W, H); let alive = false;
+      scene.style.setProperty('--wipe', Math.min(1.2, t / sweep).toFixed(3));
+      for (const p of parts) {
+        const k = (t - p.d) / life;
+        if (k >= 1) continue; alive = true; if (k <= 0) continue;
+        const e = k * k;
+        const x = p.x + p.vx * e * 1.6 + Math.sin(p.w + k * 7) * 12 * k, y = p.y + p.vy * e * 1.6 + Math.cos(p.w + k * 6) * 9 * k;
+        ctx.globalAlpha = (1 - k) * (1 - k) * .95; ctx.fillStyle = p.c; ctx.fillRect(x, y, p.s, p.s);
+      }
+      ctx.globalAlpha = 1;
+      if (alive || t < sweep + .1) requestAnimationFrame(frame);
+      else { ctx.clearRect(0, 0, W, H); scene.classList.remove('is-dusting'); scene.style.removeProperty('--wipe'); dusting = null; }
+    };
+    requestAnimationFrame(frame);
+  };
   const setActive = i => {
-    if (i === active) return; active = i;
+    if (i === active) return;
+    if (active >= 0) dissolve(scenes[active]);
+    scenes[i].classList.remove('is-dusting');
+    active = i;
     scenes.forEach((s, k) => { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); });
     captions.forEach((c, k) => c.classList.toggle('is-active', k === i));
     links.forEach((a, k) => { if (k === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
@@ -400,7 +446,7 @@ window.addEventListener('pagereveal',event=>{
 // Exploded UI view: tilt the phone, separate its layers, then walk through each layer as you scroll.
 (() => {
   const xp = document.querySelector('[data-explode]'); if (!xp) return;
-  const calm = matchMedia('(prefers-reduced-motion: reduce)'), wide = matchMedia('(min-width: 900px)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)'), wide = matchMedia('(min-width: 640px)');
   const track = xp.querySelector('.xp-track'), items = [...xp.querySelectorAll('[data-xp-item]')], layers = [...xp.querySelectorAll('[data-xp-layer]')];
   const ease = v => { v = Math.min(1, Math.max(0, v)); return v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
   let last = -2;
@@ -416,4 +462,10 @@ window.addEventListener('pagereveal',event=>{
   };
   let queued = false; const on = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; update(); }); };
   addEventListener('scroll', on, { passive: true }); addEventListener('resize', on); update();
+})();
+
+// Case opening: the wall of screens follows the pointer slightly.
+(() => {
+  const op = document.querySelector('[data-opening]'); if (!op || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  op.addEventListener('pointermove', e => { const r = op.getBoundingClientRect(); op.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); op.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3)); });
 })();

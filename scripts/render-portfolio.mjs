@@ -149,9 +149,16 @@ const showcase = () => {
   };
   const list=ids.map(id=>projects.find(p=>p.id===id)).filter(Boolean);
   const n=String(list.length).padStart(2,'0');
+  // A device frame (iPhone-like): bezel, island and an optional status bar above the real screenshot.
+  const dev=(view,{status=false,cls=''}={})=>`<span class="dev ${cls}"><span class="dev-screen">${status?`<span class="dev-status"><b>9:41</b><i aria-hidden="true"></i></span>`:''}<span class="dev-view">${view}</span></span></span>`;
   const scene=p=>{
-    if(p.demo){const pair2=p.demo==='beauty'?['beauty-discover','beauty-creator']:['booking-customer','booking-admin'];
-      return `<span class="sc-phones">${pair2.map((f,i)=>`<img class="sc-phone sc-phone--${i+1}" data-i18n-img src="assets/v3/products/${f}.jpg" alt="" ${i?'loading="lazy"':''} decoding="async" />`).join('')}</span>`;}
+    if(p.id==='salon-booking'){
+      const layers=[['header',22],['services',70],['earliest',96],['calendar',54],['nav',84]];
+      const front=`<img class="dev-base" data-i18n-img src="assets/v3/explode/booking/base.webp" alt="" decoding="async" />${layers.map(([f,z],i)=>`<span class="dev-layer" style="--z:${z}px;--d:${-i*0.7}s"><img data-i18n-img src="assets/v3/explode/booking/${f}.webp" alt="" decoding="async" /></span>`).join('')}`;
+      return `<span class="sc-devices sc-devices--booking">${dev(`<img class="dev-base" data-i18n-img src="assets/v3/products/booking-admin.jpg" alt="" loading="lazy" decoding="async" />`,{status:true,cls:'dev--back'})}${dev(front,{status:true,cls:'dev--front'})}</span>`;
+    }
+    if(p.demo){const pair2=['beauty-discover','beauty-creator'];
+      return `<span class="sc-devices sc-devices--pair">${pair2.map((f,i)=>dev(`<img class="dev-base" data-i18n-img src="assets/v3/products/${f}.jpg" alt="" ${i?'loading="lazy"':''} decoding="async" />`,{cls:i?'dev--back':'dev--front'})).join('')}</span>`;}
     if(p.preview)return `<span class="sc-film"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /><video data-sc-video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="${p.preview}"></video></span>`;
     return `<span class="sc-image"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /></span>`;
   };
@@ -159,12 +166,14 @@ const showcase = () => {
   const live=p=>p.status.en.startsWith('Live')?`<p class="sc-live"><i aria-hidden="true"></i>${pair(p.status)}</p>`:'';
   const scenes=list.map((p,i)=>{const tone=tones[p.id]||['#ddd9d0','#34363b'];
     return `<article class="sc-scene${i?'':' is-active'}" data-sc-scene="${i}" style="--tone:${tone[0]};--ink:${tone[1]}">
+        <p class="sc-mh"><span>${String(i+1).padStart(2,'0')}</span>${pair(p.title)}<small>${pair(p.kind)}</small></p>
         <a class="sc-visual" href="${p.href}" data-cursor="${p.demo?'try':p.video?'play':'view'}" aria-label="${pair(p.title)}">${scene(p)}</a>
-        <div class="sc-m">${live(p)}<p class="sc-mt">${pair(p.title)}</p><p class="sc-ml">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>
+        <div class="sc-m">${live(p)}<p class="sc-ml">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>
       </article>`;}).join('');
   const captions=list.map((p,i)=>`<div class="sc-caption${i?'':' is-active'}" data-sc-caption="${i}">${live(p)}<p class="sc-line">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>`).join('');
   return `<section class="sc" data-showcase aria-label="${t('Featured work','精选作品')}" style="--count:${list.length}"><div class="sc-track"><div class="sc-stage">
     <div class="sc-scenes">${scenes}</div>
+    <canvas class="sc-dust" aria-hidden="true"></canvas>
     <div class="sc-shade" aria-hidden="true"></div>
     <div class="sc-ui">
       <div class="sc-side"><p class="sc-intro">${t('Selected work','精选作品')}</p><p class="sc-count" aria-hidden="true"><span data-sc-current>01</span> / ${n}</p>

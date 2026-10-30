@@ -284,6 +284,7 @@ export const productCases=[{
     ],
     success:[p('Owner tasks in four taps or fewer','店主常用操作不超过 4 步'),p('Share of bookings made without chatting','无需聊天完成的预约比例'),p('Time spent rescheduling after a closure','休息后重新安排所花的时间'),p('Owner still using it after a month','一个月后店主仍在使用')]
   },
+  opening:{kicker:p('Service & product design · Live product · 2026','服务与产品设计 · 已上线产品 · 2026'),wall:['book','today','day','schedule','confirm','time-off-hours','booked','window','mine','add','reschedule','todo','by-time','day-detail','kept','services','cancel','more','time-off']},
   explode:{
     dir:'booking',
     kicker:p('Design anatomy','设计拆解'),

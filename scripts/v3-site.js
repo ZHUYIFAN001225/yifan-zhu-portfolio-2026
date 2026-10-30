@@ -666,16 +666,18 @@ window.addEventListener('pagereveal',event=>{
   const parts = data.map(d => (d.dataset.parts || '0,100').split(';').map(q => q.split(',').map(Number)));
   const labels = data.map(d => [...d.querySelectorAll('.fm-label')].map(x => x.textContent));
   const moms = [{ t: 'open' }];
-  for (let i = 0; i < n1; i++) parts[i].forEach((_, j) => moms.push({ t: 'step', i, j }));
+  for (let i = 0; i < n1; i++) moms.push({ t: 'step', i, j: 0 });
   moms.push({ t: 'duo' });
-  for (let i = n1; i < n; i++) parts[i].forEach((_, j) => moms.push({ t: 'step', i, j }));
+  for (let i = n1; i < n; i++) moms.push({ t: 'step', i, j: 0 });
   const M = moms.length, U2 = M + .6; track.style.setProperty('--units', U2);
   const unitOf = m => m + .3;
   const yOf = m => { const r = track.getBoundingClientRect(); return scrollY + r.top + unitOf(m) / U2 * (track.offsetHeight - innerHeight); };
   const lys = [...fm.querySelectorAll('[data-ly]')];
   const wheel = [...fm.querySelectorAll('[data-wh]')];
   const slots = [...fm.querySelectorAll('[data-slot]')];
-  let cur = -1, curStep = -2, liftT = 0;
+  let cur = -1, curStep = -2, liftT = 0, cycT = 0;
+  // one wheel tick per screen; the layers of that screen lift 1, 2, 3 by themselves
+  const cycle = (i, wait) => { clearTimeout(cycT); const len = parts[i].length; if (len < 2) return; let j = 0; const tick = () => { j = (j + 1) % len; layout(i, j, 0); cycT = setTimeout(tick, 1500); }; cycT = setTimeout(tick, wait + 1500); };
   const layout = (i, j, wait) => {
     clearTimeout(liftT);
     const go = () => {
@@ -708,9 +710,10 @@ window.addEventListener('pagereveal',event=>{
       shots.forEach((im, k) => { im.classList.toggle('is-on', k === showIdx); im.classList.toggle('is-past', false); });
       dots.forEach((d, k) => d.classList.toggle('is-done', i >= 0 ? k <= i : mo.t === 'duo' ? k < n1 : false));
       fm.classList.remove('is-lifted'); lys.forEach(l => l.classList.remove('is-on', 'is-focus')); slots.forEach(l => l.classList.remove('is-on'));
-      if (i >= 0) layout(i, mo.j, prevM <= 0 ? 1300 : 600);
-      else clearTimeout(liftT);
-    } else if (i >= 0) layout(i, mo.j, 0);
+      const w = prevM <= 0 ? 700 : 260;
+      if (i >= 0) { layout(i, 0, w); cycle(i, w); }
+      else { clearTimeout(liftT); clearTimeout(cycT); }
+    }
   };
   const nearest = () => { const r = track.getBoundingClientRect(), u = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight))) * U2; let best = 0, bd = 1e9; for (let m = 0; m < M; m++) { const d = Math.abs(unitOf(m) - u); if (d < bd) { bd = d; best = m; } } return best; };
   // smooth jump between moments
@@ -720,8 +723,9 @@ window.addEventListener('pagereveal',event=>{
   const move = dir => {
     const now = performance.now(); if (now < lockUntil) return true;
     const m = cur < 0 ? nearest() : cur, to = m + dir;
-    if (to < 0 || to >= M) return false; // leave the film normally at either end
-    const same = moms[to].t === 'step' && moms[cur]?.t === 'step' && moms[to].i === moms[cur].i; lockUntil = now + (same ? 520 : 950); show(to); glideTo(yOf(to), same ? 520 : 900); return true;
+    if (to < 0) return false;
+    if (to >= M) { const r = track.getBoundingClientRect(); const end = scrollY + r.bottom - innerHeight + 4; if (end - scrollY < 40) return false; lockUntil = now + 560; glideTo(end, 520); return true; } // one more tick leaves the film at once
+    const same = moms[to].t === 'step' && moms[cur]?.t === 'step' && moms[to].i === moms[cur].i; lockUntil = now + 560; show(to); glideTo(yOf(to), 520); return true;
   };
   let acc = 0, accT = 0;
   addEventListener('wheel', e => {
@@ -732,7 +736,9 @@ window.addEventListener('pagereveal',event=>{
     if (now < lockUntil || move(dir)) { e.preventDefault(); e.stopImmediatePropagation(); acc = 0; }
   }, { passive: false, capture: true });
   // the wheel: click the previous or next title to go there
-  wheel.forEach((w, k) => w.addEventListener('click', () => { const to = moms.findIndex(x => x.t === 'step' && x.i === k); if (to < 0) return; lockUntil = performance.now() + 950; show(to); glideTo(yOf(to)); }));
+  wheel.forEach((w, k) => w.addEventListener('click', () => { const to = moms.findIndex(x => x.t === 'step' && x.i === k); if (to < 0) return; lockUntil = performance.now() + 560; show(to); glideTo(yOf(to), 520); }));
+  // skip the whole demo and go straight to the thinking behind it
+  { const nx = fm.closest('section, .fm')?.parentElement?.querySelector('.ux-section') || document.querySelector('.ux-section'); const sk = document.createElement('button'); sk.type = 'button'; sk.className = 'fm-skip'; const txt = () => { sk.textContent = document.documentElement.lang.startsWith('zh') ? '跳过演示，看调研与思考 ↓' : 'Skip to the research ↓'; }; txt(); document.addEventListener('portfolio:language', txt); sk.addEventListener('click', () => { const r = track.getBoundingClientRect(); cancelAnimationFrame(jumping); jumping = 0; lockUntil = 0; scrollTo({ top: scrollY + r.bottom + 2, behavior: 'smooth' }); }); stage.append(sk); }
   addEventListener('keydown', e => {
     if (!wide.matches || !inside() || e.target.closest?.('input,textarea,select')) return;
     const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) ? 1 : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;

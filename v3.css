@@ -1772,3 +1772,5 @@ body:has([data-product-case=beauty]) .site-header.v3-header{background:#120d13;b
 [data-product-case=beauty] .v3-product-section.ux-section:nth-of-type(even)>:not(h2){margin-left:auto}
 [data-product-case=beauty] .v3-product-section p{color:var(--muted)}
 [data-product-case=beauty] .ux-section :is(h3,strong){color:var(--text)}
+.fm-skip{position:absolute;right:clamp(16px,3vw,40px);bottom:clamp(16px,4vh,36px);z-index:30;padding:10px 16px;border-radius:999px;border:1px solid rgba(245,154,184,.4);background:rgba(18,13,19,.7);backdrop-filter:blur(8px);color:#f6eef6;font:500 13px/1 Inter,system-ui,sans-serif;cursor:pointer;transition:background .2s,color .2s}
+.fm-skip:hover{background:#f59ab8;color:#1a121c}

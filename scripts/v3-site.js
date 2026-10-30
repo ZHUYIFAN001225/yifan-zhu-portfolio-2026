@@ -889,3 +889,20 @@ window.addEventListener('pagereveal',event=>{
   const run = () => { q = false; const vh = innerHeight; els.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return; const p = (r.top + r.height / 2 - vh / 2) / vh; e.style.setProperty('--py', (p * -60 * +e.style.getPropertyValue('--sp')).toFixed(1) + 'px'); }); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
 })();
+
+// LOOK page below the film: media reveal from the bottom inside a frame and drift inside it; cards show a small pill by the cursor.
+(() => {
+  const root = document.querySelector('[data-product-case=beauty]'); if (!root || !document.querySelector('[data-film]')) return;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const imgs = [...root.querySelectorAll('.ux-section img')].filter(i => !i.closest('.xp,.fm,.lk-mask,.ux-roles,.ux-demo-stage'));
+  imgs.forEach(img => { const m = document.createElement('span'); m.className = 'lk-mask'; img.parentNode.insertBefore(m, img); m.append(img); });
+  const masks = [...root.querySelectorAll('.lk-mask')];
+  if (calm || !('IntersectionObserver' in window)) masks.forEach(m => m.classList.add('is-in'));
+  else { const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -10% 0px' }); masks.forEach(m => io.observe(m)); }
+  if (!calm) { let q = false; const run = () => { q = false; const vh = innerHeight; masks.forEach(m => { const r = m.getBoundingClientRect(); if (r.bottom < 0 || r.top > vh) return; const p = (r.top + r.height / 2 - vh / 2) / vh; m.firstElementChild.style.setProperty('--iy', (p * -40).toFixed(1) + 'px'); }); }; addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run(); }
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  const zh = () => document.documentElement.lang.startsWith('zh');
+  const pill = document.createElement('div'); pill.className = 'lk-pill'; pill.setAttribute('aria-hidden', 'true'); document.body.append(pill);
+  const words = [['.ux-pains>div', 'Problem?', '痛点？'], ['.ux-decisions article', 'Why this?', '为什么？'], ['.ux-principles>div', 'A rule', '一条规则'], ['.ux-challenge-grid>*', 'Still hard', '还难的地方'], ['.ux-build>li', 'How?', '怎么做的？'], ['.ux-details figure', 'Look closer', '凑近看'], ['.ux-journey>li', 'Next step', '下一步']];
+  addEventListener('pointermove', e => { const w = words.find(([sel]) => e.target.closest?.(sel)); pill.classList.toggle('is-on', !!w); if (w) { pill.textContent = zh() ? w[2] : w[1]; pill.style.left = e.clientX + 'px'; pill.style.top = e.clientY + 'px'; } }, { passive: true });
+})();

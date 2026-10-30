@@ -1738,3 +1738,37 @@ html[data-theme=light] .snip-say{background:#1a141c;color:#f3eef6}
 [data-product-case=beauty] .ux-decisions article:nth-child(even){margin-left:clamp(0px,8vw,140px)}
 [data-product-case=beauty] .ux-decisions article{transition:background .4s;border-radius:18px;padding-inline:18px}
 [data-product-case=beauty] .ux-decisions article:hover{background:rgba(245,154,184,.06)}
+
+/* ======== LOOK page: black-pink world, zigzag sections, masked media with inner parallax (as on Léo's Playground) ======== */
+body:has([data-product-case=beauty]){--bg:#120d13;--panel:#1d1520;--panel-2:#26192a;--line:rgba(245,154,184,.16);--accent:#f59ab8;--muted:#b9a9bd;--text:#f6eef6;background:radial-gradient(1200px 800px at 85% 10%,rgba(245,154,184,.08),transparent 60%),#120d13;color:var(--text)}
+body:has([data-product-case=beauty]) .site-header.v3-header{background:#120d13;box-shadow:0 0 0 100vmax #120d13}
+[data-product-case=beauty] .v3-product-section.ux-section{position:relative;padding-top:clamp(80px,12vh,140px);padding-bottom:clamp(40px,6vh,80px);border-top:0}
+[data-product-case=beauty] .v3-product-section.ux-section>h2{font-size:clamp(40px,5.4vw,92px);line-height:.95;letter-spacing:-.05em;font-weight:600;text-transform:uppercase;max-width:12ch;margin-bottom:5vh;color:var(--text)}
+[data-product-case=beauty] .v3-product-section.ux-section:nth-of-type(even)>h2{margin-left:auto;text-align:right}
+[data-product-case=beauty] .v3-product-section.ux-section:nth-of-type(even)>.ux-section-body{margin-left:auto}
+[data-product-case=beauty] .ux-section-body{max-width:min(980px,100%)}
+/* zigzag cards: alternate sides with staggered vertical offsets */
+[data-product-case=beauty] :is(.ux-pains,.ux-principles,.ux-challenge-grid,.ux-build,.ux-phases,.ux-journey){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,3vw,48px) clamp(24px,6vw,110px)}
+[data-product-case=beauty] :is(.ux-pains,.ux-principles,.ux-challenge-grid,.ux-build,.ux-phases,.ux-journey)>:nth-child(even){margin-top:clamp(40px,10vh,140px)}
+[data-product-case=beauty] :is(.ux-pains>div,.ux-principles>div,.ux-challenge-grid>*,.ux-build>li,.ux-phases>li,.ux-journey>li,.ux-decisions article){background:linear-gradient(160deg,rgba(245,154,184,.07),rgba(255,255,255,.02));border:1px solid rgba(245,154,184,.14);border-radius:22px;padding:clamp(18px,2vw,28px)}
+/* media: framed, revealed from the bottom, image drifts inside the frame */
+[data-product-case=beauty] .lk-mask{display:block;overflow:hidden;border-radius:18px;clip-path:inset(100% 0 0 0 round 18px);transition:clip-path 1.2s cubic-bezier(.65,0,.25,1)}
+[data-product-case=beauty] .lk-mask.is-in{clip-path:inset(0 0 0 0 round 18px)}
+[data-product-case=beauty] .lk-mask>img{display:block;transform:translateY(var(--iy,0px)) scale(1.12);transition:transform .2s linear;will-change:transform}
+[data-product-case=beauty] .ux-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,5vw,90px)}
+[data-product-case=beauty] .ux-details figure:nth-child(even){margin-top:clamp(60px,14vh,200px)}
+[data-product-case=beauty] .ux-decisions{display:grid;gap:clamp(24px,5vh,60px)}
+[data-product-case=beauty] .ux-decisions article{width:min(760px,88%)}
+[data-product-case=beauty] .ux-decisions article:nth-child(even){margin-left:auto!important}
+/* hover pill near the cursor on cards, like "Problem?" on Léo's site */
+.lk-pill{position:fixed;left:0;top:0;z-index:70;padding:10px 16px;border-radius:999px;background:#f6eef6;color:#1a121c;font:500 14px/1 Inter,system-ui,sans-serif;pointer-events:none;opacity:0;transform:translate(-50%,-140%) scale(.85);transition:opacity .2s,transform .35s cubic-bezier(.16,1,.3,1)}
+.lk-pill.is-on{opacity:1;transform:translate(-50%,-160%) scale(1)}
+@media(max-width:760px){[data-product-case=beauty] :is(.ux-pains,.ux-principles,.ux-challenge-grid,.ux-build,.ux-phases,.ux-journey,.ux-details){grid-template-columns:1fr}[data-product-case=beauty] :is(.ux-pains,.ux-principles,.ux-challenge-grid,.ux-build,.ux-phases,.ux-journey,.ux-details)>:nth-child(even){margin-top:0}[data-product-case=beauty] .lk-mask{clip-path:none}}
+@media print{[data-product-case=beauty] .lk-mask{clip-path:none!important}}
+[data-product-case=beauty] .v3-product-section.ux-section{display:block}
+[data-product-case=beauty] .v3-product-section.ux-section>h2{max-width:none;margin:0 0 6vh}
+[data-product-case=beauty] .v3-product-section.ux-section:nth-of-type(even)>h2{text-align:right}
+[data-product-case=beauty] .v3-product-section.ux-section>:not(h2){max-width:min(1100px,100%)}
+[data-product-case=beauty] .v3-product-section.ux-section:nth-of-type(even)>:not(h2){margin-left:auto}
+[data-product-case=beauty] .v3-product-section p{color:var(--muted)}
+[data-product-case=beauty] .ux-section :is(h3,strong){color:var(--text)}

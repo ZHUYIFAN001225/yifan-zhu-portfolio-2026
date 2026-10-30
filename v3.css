@@ -1686,3 +1686,8 @@ html[data-theme=dark] .v3-buddy-say{background:#f4f3ee;color:#141518}
   background:linear-gradient(calc(115deg + var(--mrx,0) * 50deg),transparent 20%,rgba(255,255,255,.0) 34%,rgba(255,255,255,.85) calc(42% + var(--mrx,0) * 18%),rgba(255,255,255,0) calc(52% + var(--mrx,0) * 18%),transparent 80%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:.75;transition:opacity .4s}
 .fm.is-story .fm-prop{animation:none}
+
+/* a lifted layer leaves a truly empty, black slot in the screen */
+.fm-slot{position:absolute;z-index:4;left:0;right:0;top:var(--y,0%);height:var(--h,0%);background:#000;box-shadow:inset 0 12px 20px rgba(0,0,0,.9),inset 0 -1px 0 rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.04);opacity:0;transition:opacity .25s ease;pointer-events:none}
+.fm.is-lifted .fm-slot.is-on{opacity:1}
+.fm.is-lifted .fm-zoom::after{background:rgba(5,5,7,.25)}

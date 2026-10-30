@@ -662,16 +662,18 @@ window.addEventListener('pagereveal',event=>{
   const unitOf = m => m + .3;
   const yOf = m => { const r = track.getBoundingClientRect(); return scrollY + r.top + unitOf(m) / U2 * (track.offsetHeight - innerHeight); };
   const lys = [...fm.querySelectorAll('[data-ly]')];
+  const slots = [...fm.querySelectorAll('[data-slot]')];
   let cur = -1, curStep = -2, liftT = 0;
   const layout = (i, j, wait) => {
     clearTimeout(liftT);
     const go = () => {
       const src = `url("${shots[i].currentSrc || shots[i].src}")`, ps = parts[i];
       lys.forEach((ly, k) => {
-        const q = ps[k]; if (!q) { ly.classList.remove('is-on'); ly.style.setProperty('--z', 0); return; }
+        const q = ps[k]; if (!q) { slots[k]?.classList.remove('is-on'); ly.classList.remove('is-on'); ly.style.setProperty('--z', 0); return; }
         const [y, h] = q, d = Math.abs(k - j), z = d === 0 ? 90 : d === 1 ? 34 : 8;
         for (const [kk, v] of [['--sl', '2%'], ['--st', y + '%'], ['--sw', '96%'], ['--sh', h + '%'], ['--lbs', `${(1e4 / 96).toFixed(3)}% ${(1e4 / h).toFixed(3)}%`], ['--lbp', `50% ${h >= 100 ? 0 : (y / (100 - h) * 100).toFixed(3)}%`], ['--limg', src], ['--z', z], ['--lit', d === 0 ? 1 : d === 1 ? .72 : .5]]) set(ly, kk, v);
         ly.classList.add('is-on'); ly.classList.toggle('is-focus', d === 0);
+        const sl = slots[k]; if (sl) { set(sl, '--y', y + '%'); set(sl, '--h', h + '%'); sl.classList.add('is-on'); }
       });
       const [y, h] = ps[j]; label.textContent = labels[i][j] || '';
       set(callout, '--cy', (view.offsetTop + view.offsetHeight * (y + h / 2) / 100).toFixed(1) + 'px');
@@ -692,7 +694,7 @@ window.addEventListener('pagereveal',event=>{
       const showIdx = mo.t === 'open' || mo.t === 'duo' ? 0 : i;
       shots.forEach((im, k) => { im.classList.toggle('is-on', k === showIdx); im.classList.toggle('is-past', false); });
       dots.forEach((d, k) => d.classList.toggle('is-done', i >= 0 ? k <= i : mo.t === 'duo' ? k < n1 : false));
-      fm.classList.remove('is-lifted'); lys.forEach(l => l.classList.remove('is-on', 'is-focus'));
+      fm.classList.remove('is-lifted'); lys.forEach(l => l.classList.remove('is-on', 'is-focus')); slots.forEach(l => l.classList.remove('is-on'));
       if (i >= 0) layout(i, mo.j, prevM <= 0 ? 1300 : 600);
       else clearTimeout(liftT);
     } else if (i >= 0) layout(i, mo.j, 0);

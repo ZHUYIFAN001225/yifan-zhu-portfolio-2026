@@ -343,7 +343,7 @@ window.addEventListener('pagereveal',event=>{
     const tag = document.createElement('span'); dot.append(tag); document.body.append(dot);
     document.documentElement.classList.add('has-v3-cursor');
     let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, shown = false;
-    const words = { view: ['View case', '查看案例'], try: ['Try it', '试一试'], play: ['Watch', '观看'] };
+    const words = { view: ['View case', '查看案例'], try: ['Try it', '试一试'], play: ['Watch', '观看'], find: ['Click to find who', '点一下，找到谁能做'] };
     addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse') return;
       x = e.clientX; y = e.clientY;
@@ -595,8 +595,9 @@ window.addEventListener('pagereveal',event=>{
 
 // Doughnut: a small companion (after the Boy with doughnut handle) that trails the cursor and comments on what you point at.
 (() => {
+  // Lives only where a page gives it a home (see About); never as a site-wide sticker.
+  if (!document.querySelector('[data-buddy-home]')) return;
   if (!matchMedia('(hover:hover) and (pointer:fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  try { if (localStorage.getItem('v3-buddy-off') === '1') return; } catch {}
   const zh = () => document.documentElement.lang.startsWith('zh');
   const b = document.createElement('div'); b.className = 'v3-buddy'; b.setAttribute('aria-hidden', 'true');
   b.innerHTML = `<svg viewBox="0 0 60 60"><defs><radialGradient id="dn" cx="40%" cy="35%"><stop offset="0" stop-color="#f3c58a"/><stop offset="1" stop-color="#c98a4b"/></radialGradient></defs>
@@ -637,4 +638,93 @@ window.addEventListener('pagereveal',event=>{
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
+})();
+
+// LOOK film: one pinned stage. Scroll position is the timeline, so every movement plays forward and backward with the wheel.
+(() => {
+  const fm = document.querySelector('[data-film]'); if (!fm) return;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)'), wide = matchMedia('(min-width: 761px)');
+  const n = +fm.dataset.steps, n1 = +fm.dataset.split || n, OPEN = 1.6, DUO = 1.6, END = 1, U = OPEN + n + DUO + END;
+  const track = fm.querySelector('.fm-track'), stage = fm.querySelector('.fm-stage'), phone = fm.querySelector('.fm-phone'), zoom = fm.querySelector('.fm-zoom');
+  const shots = [...fm.querySelectorAll('[data-fm-shot]')], steps = [...fm.querySelectorAll('[data-fm-step]')], dots = [...fm.querySelectorAll('[data-fm-dot]')];
+  const data = [...fm.querySelectorAll('.fm-data')], label = fm.querySelector('[data-fm-label]'), callout = fm.querySelector('.fm-callout'), view = fm.querySelector('.dev-view'), duo = fm.querySelector('.fm-duo');
+  track.style.setProperty('--units', U);
+  const cl = v => Math.min(1, Math.max(0, v)), sm = v => { v = cl(v); return v * v * (3 - 2 * v); }, lerp = (a, b, t) => a + (b - a) * t;
+  const set = (el, k, v) => el.style.setProperty(k, v);
+  let lastLabel = -1;
+  const frame = () => {
+    if (!wide.matches || calm.matches) return;
+    const r = track.getBoundingClientRect(), vh = innerHeight, u = cl(-r.top / Math.max(1, r.height - vh)) * U;
+    const o = sm(u / 1.4); set(fm, '--o', o.toFixed(4));
+    const toRight = sm((u - .3) / 1.2);
+    set(phone, '--phx', lerp(50, 70, toRight).toFixed(3) + '%'); set(phone, '--phs', lerp(1.12, 1, toRight).toFixed(4));
+    // timeline: opening → user steps → chapter switch → creator steps → end
+    const su0 = u - OPEN; let i, l, inStory = true, dt = -1;
+    if (su0 < 0) { i = 0; l = 0; inStory = false; }
+    else if (su0 < n1) { i = Math.floor(su0); l = su0 - i; }
+    else if (su0 < n1 + DUO) { i = n1 - 1; l = 1; inStory = false; dt = (su0 - n1) / DUO; }
+    else { const s2 = su0 - n1 - DUO; if (s2 >= n - n1) { i = n - 1; l = 1; inStory = false; } else { i = n1 + Math.floor(s2); l = s2 - Math.floor(s2); } }
+    const before = su0 < 0, inDuo = dt >= 0, after = !inStory && !before && !inDuo;
+    steps.forEach((st, k) => {
+      let m = 1, a = 0;
+      if (inStory && k === i) { const ein = sm(l / .18), eout = sm((l - .84) / .16); m = l < .5 ? 1 - ein : -eout; a = l < .5 ? ein : 1 - eout; }
+      else if (k < i || (k === i && !before)) m = -1;
+      set(st, '--m', m.toFixed(4)); set(st, '--a', a.toFixed(4));
+    });
+    // screens slide like an app push; the user chapter ends by sliding back to the feed for the switch
+    const lastOfUser = i === n1 - 1, next = lastOfUser ? 0 : i + 1 < n ? i + 1 : i;
+    const tt = inStory ? sm((l - .82) / .18) : inDuo ? 1 : 0;
+    shots.forEach((im, k) => {
+      let x = 100;
+      if (before) x = k === 0 ? 0 : 100;
+      else if (inDuo) x = k === 0 ? 0 : 100;
+      else if (after) x = k === n - 1 ? 0 : 100;
+      else { if (k === i) x = -30 * tt; if (k === next && next !== i && tt > 0) x = 100 - 100 * tt; }
+      im.style.setProperty('--sx', x.toFixed(2) + '%'); im.style.zIndex = (k === next && tt > 0 && !inDuo) ? 2 : (k === i ? 1 : 0);
+    });
+    const wipe = inDuo ? sm((dt - .3) / .55) : 0; set(fm, '--wipe', wipe.toFixed(4));
+    const da = inDuo ? sm(dt / .2) * (1 - sm((dt - .85) / .15)) : 0; set(fm, '--da', da.toFixed(3));
+    const dm = inDuo ? (dt < .5 ? 1 - sm(dt / .2) : -sm((dt - .85) / .15)) : 1;
+    duo.querySelectorAll('.fm-mask>span').forEach(e => e.style.transform = `translateY(${(dm * 105).toFixed(2)}%)`);
+    // spotlight + zoom on the exact part the text talks about
+    const d = data[i], sp = (d?.dataset.spot || '0,0,100,100').split(',').map(Number);
+    const so = inStory ? sm((l - .14) / .14) * (1 - sm((l - .74) / .1)) : 0;
+    const [sx, sy, sw, sh] = sp, cx = sx + sw / 2, cy = sy + sh / 2, zmax = Math.min(1.45, Math.max(1.05, 62 / sh));
+    set(zoom, '--sl', sx + '%'); set(zoom, '--st', sy + '%'); set(zoom, '--sw', sw + '%'); set(zoom, '--sh', sh + '%');
+    set(zoom, '--ox', cx + '%'); set(zoom, '--oy', cy + '%'); set(zoom, '--z', (1 + (zmax - 1) * so).toFixed(4)); set(zoom, '--so', so.toFixed(4)); set(phone, '--so', so.toFixed(4));
+    if (i !== lastLabel) { lastLabel = i; label.textContent = d?.querySelector('.fm-label')?.textContent || ''; }
+    const vr = view.getBoundingClientRect(), pr = phone.getBoundingClientRect();
+    set(callout, '--cy', (vr.top - pr.top + vr.height * cy / 100).toFixed(1) + 'px');
+    const tp = (d?.dataset.tap || '').split(',').map(Number);
+    if (inStory && tp.length === 2) { const k = cl((l - .5) / .22); set(zoom, '--tx', tp[0] + '%'); set(zoom, '--ty', tp[1] + '%'); set(zoom, '--ta', (k <= 0 || k >= 1 ? 0 : k < .3 ? k / .3 : 1 - (k - .3) / .7).toFixed(3)); set(zoom, '--tk', (.4 + .9 * k).toFixed(3)); } else set(zoom, '--ta', 0);
+    set(fm, '--ra', (sm(su0 / .3) * (1 - sm((su0 - n - DUO) / .3))).toFixed(3));
+    dots.forEach((dt2, k) => set(dt2, '--f', (k < i || (k === i && (after || inDuo)) ? 1 : k === i && inStory ? l : 0).toFixed(3)));
+  };
+  let q = false; const on = () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; frame(); }); } };
+  addEventListener('scroll', on, { passive: true }); addEventListener('resize', on); frame();
+  // pointer depth for the floating work
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches && !calm.matches) {
+    stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); const mx = (e.clientX - r.left) / r.width * 2 - 1, my = (e.clientY - r.top) / r.height * 2 - 1; set(fm, '--mx', mx.toFixed(3)); set(fm, '--my', my.toFixed(3)); set(stage, '--px', mx.toFixed(3)); });
+    fm.querySelectorAll('.fm-photo').forEach(ph => { ph.addEventListener('pointermove', e => { const r = ph.getBoundingClientRect(); set(ph, '--ptilt', (((e.clientX - r.left) / r.width - .5) * 14).toFixed(1) + 'deg'); }); ph.addEventListener('pointerleave', () => set(ph, '--ptilt', '0deg')); });
+  }
+  // "Which look?": click the picture, it flies away and the headline rolls to who can make it.
+  const find = fm.querySelector('[data-find]');
+  if (find) {
+    const stack = find.querySelector('.fm-stack'), imgs = [...stack.querySelectorAll('img')], ans = [...find.querySelectorAll('[data-ans]')];
+    const split = el => { const txt = el.textContent; el.textContent = ''; [...txt].forEach((ch, k) => { const i = document.createElement('i'); i.textContent = ch === ' ' ? ' ' : ch; i.style.setProperty('--c', k); el.append(i); }); };
+    const prep = () => ans.forEach(a => a.querySelectorAll('.fm-roll').forEach(split));
+    prep(); document.addEventListener('portfolio:language', () => setTimeout(prep, 0));
+    let order = imgs.map((_, k) => k), cur = 0, busy = false;
+    const lay = () => order.forEach((k, d) => { imgs[k].style.setProperty('--d', d); imgs[k].toggleAttribute('data-top', d === 0); });
+    lay();
+    stack.addEventListener('click', () => {
+      if (busy) return; busy = true;
+      const top = imgs[order[0]]; top.classList.add('is-gone');
+      ans[cur].classList.remove('is-on'); ans[cur].classList.add('is-out');
+      const was = cur; cur = (cur + 1) % ans.length;
+      setTimeout(() => { ans[was].classList.remove('is-out'); ans[cur].classList.add('is-on'); }, 260);
+      order.push(order.shift()); lay();
+      setTimeout(() => { top.style.transition = 'none'; top.classList.remove('is-gone'); void top.offsetWidth; top.style.transition = ''; busy = false; }, 850);
+    });
+  }
 })();

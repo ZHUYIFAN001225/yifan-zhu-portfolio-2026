@@ -55,6 +55,37 @@ export const productCases=[{
       {title:p('Sponsored, later','后期推广'),body:p('Labelled promotion at scale.','规模化后的标注推广。')}
     ],note:p('A proposal to test, not validated revenue.','这是待验证的方案，不是已实现的收入。')}
   },
+  film:{
+    kicker:p('Two-sided marketplace · Interactive prototype · 2026','双边平台 · 可操作原型 · 2026'),
+    lines:[p('See the work.','先看作品，'),p('Book the person','再预约'),p('who made it.','做出它的人。')],
+    lead:p('Scroll to follow one picture all the way to a booking. The phone shows the real prototype; the frame marks what each step is about.','往下滚，跟着一张图片一路走到预约。手机里是真实原型，框出来的就是每一步在讲的地方。'),
+    steps:[
+      {file:'discover',spot:'1,18,44,33',tap:'22,32',label:p('Real work, not stock','真实作品，不是图库'),title:p('It starts with a picture','从一张图片开始'),body:p('The feed is only real work by local Creators. You don’t need to know what the style is called.','信息流里全是本地 Creator 的真实作品。不需要知道这个造型叫什么。')},
+      {file:'detail',spot:'2,57,96,24',tap:'50,77',label:p('Who made it, and its style','谁做的、什么风格'),title:p('Who made it is right there','作者就在图下面'),body:p('Every picture names its maker and is tagged by style, so “I like this” becomes something searchable.','每张图都写明作者，并按风格打上标签，“我喜欢这个”就变成了可以搜索的东西。')},
+      {file:'make-it-real',spot:'2,55,96,32',tap:'50,72',label:p('Make it real','把它变成现实'),title:p('Make it real','把它变成现实'),body:p('One button turns inspiration into a search for people nearby who can actually do it.','一个按钮，把灵感变成“附近谁真的能做”的搜索。')},
+      {file:'matches',spot:'2,30,96,34',tap:'50,32',label:p('Who nearby can do it','附近谁能做'),title:p('Matched by their work, not their shop','按作品匹配，而不是按店铺'),body:p('Creators are ranked by how close their own work is to your picture, with distance and price beside it.','按 Creator 自己的作品与你的图片有多像来排序，旁边写着距离和价格。')},
+      {file:'creator',spot:'2,45,96,30',tap:'66,76',label:p('Proof they can do it','能做到的证据'),title:p('Proof before you book','预约前先看证据'),body:p('Their similar work sits next to your reference, so trust comes from results, not stars.','和你的参考图相似的作品摆在一起，信任来自结果，而不是星级。')},
+      {file:'availability',spot:'2,40,96,42',tap:'82,64',label:p('A real time that fits','一个放得下的真实时间'),title:p('A real time, then book','选一个真实的时间'),body:p('Service, length and free times come from the Creator’s own diary. Your picture is attached automatically.','服务、时长和空位都来自 Creator 自己的日程，你的参考图会自动附上。')},
+      {file:'booked',spot:'2,15,96,32',label:p('Booked, picture attached','约好了，图也带上了'),title:p('Booked, with the look attached','约好了，造型图一起带上'),body:p('The Creator sees exactly what you want before you sit down. No more explaining with a blurry screenshot.','坐下之前，Creator 就知道你想要什么，不用再拿模糊截图解释。')},
+    ],
+    creator:[
+      {file:'c-home',spot:'2,62,96,20',label:p('A new booking, from a picture','一笔来自图片的新预约'),title:p('The same booking, from her side','同一笔预约，在她那一端'),body:p('Amy opens her workbench. The customer’s reference picture is already attached to the booking.','Amy 打开工作台，顾客的参考图已经附在这笔预约上。')},
+      {file:'c-requests',spot:'3,15,92,23',tap:'20,32',label:p('A request with a picture','带图的请求'),title:p('Requests arrive as pictures','请求是以图片的形式来的'),body:p('Before booking, people can ask “can you do this?”. She answers with one tap, or says it is not her style.','预约之前，顾客可以先问“你能做这个吗？”。她点一下就能答应，或者说明这不是她的风格。')},
+      {file:'c-respond',spot:'3,40,94,30',tap:'29,55',label:p('Answer with her own work','用自己的作品回答'),title:p('She answers with her own work','她用自己的作品来回答'),body:p('Instead of typing, she picks her closest real result. The customer sees proof, not promises.','不用打字解释，她挑一张最接近的真实作品。顾客看到的是证据，而不是承诺。')},
+      {file:'c-calendar',spot:'2,44,96,40',label:p('Her diary, her rules','她的日程，她说了算'),title:p('Her diary decides what can be booked','她的日程决定能约什么'),body:p('Available, break or holiday, set once. Only these times ever appear to customers.','可约、休息、假期，设置一次就好。顾客只会看到这些时间。')},
+      {file:'c-portfolio',spot:'2,18,96,48',tap:'22,22',label:p('Her work is her profile','作品就是她的主页'),title:p('Her work is her shop window','作品就是她的橱窗'),body:p('Every new result she uploads goes back into the feed, and the next customer finds her the same way.','她上传的每一个新作品都会回到信息流里，下一位顾客也会这样找到她。')}
+    ],
+    duo:{title:p('One app. Two perspectives.','一个 App，两种视角。'),body:p('Keep scrolling: the same phone switches from the person looking for a style to the Creator who gets booked.','继续往下滚：同一部手机，从找造型的人，切换到被预约的 Creator。'),left:p('User · finds a look','用户 · 找造型'),right:p('Creator · gets booked','Creator · 被预约'),from:'discover',to:'c-home'},
+    find:{title:p('Which look?','哪个造型？'),hint:p('Click the picture to find who can make it','点一下图片，找到谁能做'),note:p('Names, places and prices are demo data from the prototype.','名字、地点和价格是原型里的演示数据。'),
+      items:[
+        {img:'w1',style:p('Soft balayage bob','柔和挑染短发'),who:p('Amy Chen · 0.9 mi','Amy Chen · 0.9 英里')},
+        {img:'w3',style:p('Chrome French tips','镜面法式美甲'),who:p('3 nail artists nearby','附近 3 位美甲师')},
+        {img:'w2',style:p('Effortless French bob','法式慵懒短发'),who:p('Alex Morgan · city centre','Alex Morgan · 市中心')},
+        {img:'w4',style:p('Natural glam','自然妆容'),who:p('2 makeup artists nearby','附近 2 位化妆师')},
+        {img:'w5',style:p('Textured bob','纹理感短发'),who:p('Oliver James · Finnieston','Oliver James · Finnieston')}
+      ]},
+    cta:p('Now use it yourself','现在你自己用一用')
+  },
   // Screen map: every screen is a real capture from the running prototype, grouped by navigation level.
   facts:[
     {label:p('Type','类型'),value:p('Two-sided marketplace · mobile','双边平台 · 移动端')},

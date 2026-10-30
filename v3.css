@@ -1050,7 +1050,7 @@ html.has-v3-cursor :is(input:not([type=button]):not([type=submit]):not([type=che
 .sc-scene.is-active .sc-phone{opacity:1}
 .sc-scene.is-active .sc-phone--1{--rise:calc(var(--local) * -16);transition-delay:.05s}
 .sc-scene.is-active .sc-phone--2{--rise:calc(24 + var(--local) * -28);transition-delay:.12s}
-.sc-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(10,11,10,.78) 0%,rgba(10,11,10,.5) 30%,rgba(10,11,10,.08) 62%,rgba(10,11,10,0) 100%),linear-gradient(0deg,rgba(10,11,10,.72) 0%,rgba(10,11,10,0) 42%),linear-gradient(180deg,rgba(10,11,10,.55) 0%,rgba(10,11,10,0) 22%)}
+.sc-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(10,11,10,.86) 0%,rgba(10,11,10,.7) 28%,rgba(10,11,10,.3) 52%,rgba(10,11,10,.06) 75%),linear-gradient(0deg,rgba(10,11,10,.72) 0%,rgba(10,11,10,0) 42%),linear-gradient(180deg,rgba(10,11,10,.55) 0%,rgba(10,11,10,0) 22%)}
 .sc-ui{position:absolute;inset:0;z-index:2;display:grid;grid-template-columns:minmax(300px,40%) 1fr;grid-template-rows:1fr auto;padding:112px var(--v3-gutter) 34px;pointer-events:none}
 .sc-ui a,.sc-ui button{pointer-events:auto}
 .sc-side{grid-row:1/span 2;display:flex;flex-direction:column;justify-content:center;min-height:0}
@@ -1124,3 +1124,4 @@ html.has-v3-cursor :is(input:not([type=button]):not([type=submit]):not([type=che
   .sc-count span,.sc-mouse::after{animation:none}
 }
 @media(min-width:900px){.sc .sc-ui :is(a,p,span,li){color:#f4f3ee!important}.sc .sc-ui .sc-intro,.sc .sc-ui .sc-count{color:rgba(244,243,238,.6)!important}.sc .sc-ui .sc-live{color:rgba(244,243,238,.75)!important}.sc .sc-hint{color:rgba(244,243,238,.6)!important}}
+.sc-ui{text-shadow:0 1px 16px rgba(0,0,0,.4)}.sc-list a{opacity:.42}.sc-list a[aria-current]{opacity:1}

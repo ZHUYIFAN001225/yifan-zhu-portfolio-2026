@@ -1664,3 +1664,25 @@ html[data-theme=dark] .v3-buddy-say{background:#f4f3ee;color:#141518}
 .fm-stack img.is-gone{transition:transform .7s cubic-bezier(.5,0,.3,1),opacity .5s .2s}
 .fm-roll i{transition-duration:.45s;transition-delay:calc(var(--c) * 8ms)}
 .fm-ans.is-out .fm-roll i{transition-duration:.25s;transition-delay:calc(var(--c) * 4ms)}
+
+/* ======== film v5: each screen is split into its flow layers; the focused one floats highest and brightest ======== */
+.fm .fm-lift-img.fm-ly{opacity:0;transform:translateZ(0);transition:transform .8s var(--out),opacity .4s ease,filter .6s ease,box-shadow .8s var(--out);filter:brightness(var(--lit,1));box-shadow:0 0 0 1px rgba(255,255,255,.08),0 calc(var(--z) * .35px) calc(var(--z) * .6px) rgba(0,0,0,.45)}
+.fm .fm-lift-img.fm-ly::before{opacity:0;transition:opacity .4s}
+.fm .fm-lift-img.fm-ly::after{opacity:0}
+.fm.is-lifted .fm-ly.is-on{opacity:1;transform:translate3d(calc(var(--mrx,0) * var(--z) * .16px),calc(var(--mry,0) * var(--z) * .12px),calc(var(--z) * 1px)) scale(calc(1 + var(--z) * .0005))}
+.fm.is-lifted .fm-ly.is-focus{box-shadow:0 40px 60px rgba(0,0,0,.55),0 0 30px rgba(245,154,184,.18)}
+.fm.is-lifted .fm-ly.is-focus::before,.fm.is-lifted .fm-ly.is-focus::after{opacity:1}
+/* the slot each layer leaves behind in the screen */
+.fm-hole{display:none}
+.fm-spot{display:none!important}
+.fm-lift{z-index:3}
+.fm-zoom::after{content:'';position:absolute;inset:0;z-index:3;background:rgba(5,5,7,0);transition:background .5s;pointer-events:none}
+.fm.is-lifted .fm-zoom::after{background:rgba(5,5,7,.55)}
+
+/* ======== Phone body: real thickness and a metal edge that catches the light ======== */
+.dev-side{position:absolute;inset:0;border-radius:inherit;pointer-events:none;transform:translateZ(calc(var(--k) * -2.4px));background:linear-gradient(calc(110deg + var(--mrx,0) * 40deg),#2a2c31 0%,#6a6d75 calc(30% + var(--mrx,0) * 20%),#d9dbe0 calc(38% + var(--mrx,0) * 20%),#5c5f66 calc(46% + var(--mrx,0) * 20%),#1d1e22 100%)}
+.dev{--mrx:var(--mrx2,0)}
+.dev-shine{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;padding:calc(var(--dw,300px) * .012);
+  background:linear-gradient(calc(115deg + var(--mrx,0) * 50deg),transparent 20%,rgba(255,255,255,.0) 34%,rgba(255,255,255,.85) calc(42% + var(--mrx,0) * 18%),rgba(255,255,255,0) calc(52% + var(--mrx,0) * 18%),transparent 80%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:.75;transition:opacity .4s}
+.fm.is-story .fm-prop{animation:none}

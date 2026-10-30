@@ -651,37 +651,53 @@ window.addEventListener('pagereveal',event=>{
   const data = [...fm.querySelectorAll('.fm-data')], label = fm.querySelector('[data-fm-label]'), callout = fm.querySelector('.fm-callout'), view = fm.querySelector('.dev-view');
   const set = (el, k, v) => el.style.setProperty(k, v);
   track.style.setProperty('--units', U);
-  // moments: 0 = opening, 1..n1 = user steps, n1+1 = switch, then creator steps
-  const M = 1 + n1 + 1 + (n - n1);
-  const unitOf = m => m === 0 ? .2 : m <= n1 ? OPEN + (m - 1) + .5 : m === n1 + 1 ? OPEN + n1 + DUO / 2 : OPEN + n1 + DUO + (m - n1 - 2) + .5;
-  const stepOf = m => m >= 1 && m <= n1 ? m - 1 : m >= n1 + 2 ? m - 2 : -1;
-  const yOf = m => { const r = track.getBoundingClientRect(); return scrollY + r.top + unitOf(m) / U * (track.offsetHeight - innerHeight); };
-  let cur = -1, liftT = 0;
-  const show = m => {
-    if (m === cur) return; const prev = cur; cur = m; const i = stepOf(m);
-    fm.classList.toggle('is-story', m >= 1);
-    fm.classList.toggle('is-duo', m === n1 + 1);
-    fm.classList.toggle('is-after-duo', m > n1 + 1);
-    fm.classList.toggle('is-cfirst', m === n1 + 2);
-    steps.forEach((st, k) => { st.classList.toggle('is-on', k === i); st.classList.toggle('is-past', i >= 0 ? k < i : (m > n1 + 1 ? true : m === n1 + 1 ? k < n1 : false)); });
-    // screens: the one in focus, the ones before it pushed left
-    const showIdx = m === 0 ? 0 : m === n1 + 1 ? 0 : i;
-    shots.forEach((im, k) => { im.classList.toggle('is-on', k === showIdx); im.classList.toggle('is-past', m !== n1 + 1 && m !== 0 && k < showIdx && !(m >= n1 + 2 && k < n1)); });
-    dots.forEach((d, k) => d.classList.toggle('is-done', i >= 0 ? k <= i : m === n1 + 1 ? k < n1 : false));
-    // lift: drop the current card, move the frame to the new part, lift again once the new screen has arrived
-    fm.classList.remove('is-lifted'); clearTimeout(liftT);
-    if (i >= 0) liftT = setTimeout(() => {
-      const d = data[i], [sx, sy, sw, sh] = (d?.dataset.spot || '0,0,100,100').split(',').map(Number);
-      for (const [k, v] of [['--sl', sx + '%'], ['--st', sy + '%'], ['--sw', sw + '%'], ['--sh', sh + '%']]) { set(phone, k, v); set(fm.querySelector('.fm-zoom'), k, v); }
-      set(phone, '--lbs', `${(1e4 / sw).toFixed(3)}% ${(1e4 / sh).toFixed(3)}%`);
-      set(phone, '--lbp', `${sw >= 100 ? 0 : (sx / (100 - sw) * 100).toFixed(3)}% ${sh >= 100 ? 0 : (sy / (100 - sh) * 100).toFixed(3)}%`);
-      set(phone, '--limg', `url("${shots[i].currentSrc || shots[i].src}")`);
-      label.textContent = d?.querySelector('.fm-label')?.textContent || '';
-      set(callout, '--cy', (view.offsetTop + view.offsetHeight * (sy + sh / 2) / 100).toFixed(1) + 'px');
+  // moments: opening, then every layer of every user screen, the switch, then every layer of every Creator screen
+  const parts = data.map(d => (d.dataset.parts || '0,100').split(';').map(q => q.split(',').map(Number)));
+  const labels = data.map(d => [...d.querySelectorAll('.fm-label')].map(x => x.textContent));
+  const moms = [{ t: 'open' }];
+  for (let i = 0; i < n1; i++) parts[i].forEach((_, j) => moms.push({ t: 'step', i, j }));
+  moms.push({ t: 'duo' });
+  for (let i = n1; i < n; i++) parts[i].forEach((_, j) => moms.push({ t: 'step', i, j }));
+  const M = moms.length, U2 = M + .6; track.style.setProperty('--units', U2);
+  const unitOf = m => m + .3;
+  const yOf = m => { const r = track.getBoundingClientRect(); return scrollY + r.top + unitOf(m) / U2 * (track.offsetHeight - innerHeight); };
+  const lys = [...fm.querySelectorAll('[data-ly]')];
+  let cur = -1, curStep = -2, liftT = 0;
+  const layout = (i, j, wait) => {
+    clearTimeout(liftT);
+    const go = () => {
+      const src = `url("${shots[i].currentSrc || shots[i].src}")`, ps = parts[i];
+      lys.forEach((ly, k) => {
+        const q = ps[k]; if (!q) { ly.classList.remove('is-on'); ly.style.setProperty('--z', 0); return; }
+        const [y, h] = q, d = Math.abs(k - j), z = d === 0 ? 90 : d === 1 ? 34 : 8;
+        for (const [kk, v] of [['--sl', '2%'], ['--st', y + '%'], ['--sw', '96%'], ['--sh', h + '%'], ['--lbs', `${(1e4 / 96).toFixed(3)}% ${(1e4 / h).toFixed(3)}%`], ['--lbp', `50% ${h >= 100 ? 0 : (y / (100 - h) * 100).toFixed(3)}%`], ['--limg', src], ['--z', z], ['--lit', d === 0 ? 1 : d === 1 ? .72 : .5]]) set(ly, kk, v);
+        ly.classList.add('is-on'); ly.classList.toggle('is-focus', d === 0);
+      });
+      const [y, h] = ps[j]; label.textContent = labels[i][j] || '';
+      set(callout, '--cy', (view.offsetTop + view.offsetHeight * (y + h / 2) / 100).toFixed(1) + 'px');
       fm.classList.add('is-lifted');
-    }, prev === 0 ? 1300 : 850);
+    };
+    if (wait) liftT = setTimeout(go, wait); else go();
   };
-  const nearest = () => { const r = track.getBoundingClientRect(), u = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight))) * U; let best = 0, bd = 1e9; for (let m = 0; m < M; m++) { const d = Math.abs(unitOf(m) - u); if (d < bd) { bd = d; best = m; } } return best; };
+  const show = m => {
+    if (m === cur) return; const prevM = cur; cur = m; const mo = moms[m], i = mo.t === 'step' ? mo.i : -1;
+    const di = moms.findIndex(x => x.t === 'duo');
+    fm.classList.toggle('is-story', m >= 1);
+    fm.classList.toggle('is-duo', mo.t === 'duo');
+    fm.classList.toggle('is-after-duo', m > di);
+    fm.classList.toggle('is-cfirst', i === n1);
+    if (i !== curStep) {
+      curStep = i;
+      steps.forEach((st, k) => { st.classList.toggle('is-on', k === i); st.classList.toggle('is-past', i >= 0 ? k < i : (m > di ? true : mo.t === 'duo' ? k < n1 : false)); });
+      const showIdx = mo.t === 'open' || mo.t === 'duo' ? 0 : i;
+      shots.forEach((im, k) => { im.classList.toggle('is-on', k === showIdx); im.classList.toggle('is-past', false); });
+      dots.forEach((d, k) => d.classList.toggle('is-done', i >= 0 ? k <= i : mo.t === 'duo' ? k < n1 : false));
+      fm.classList.remove('is-lifted'); lys.forEach(l => l.classList.remove('is-on', 'is-focus'));
+      if (i >= 0) layout(i, mo.j, prevM <= 0 ? 1300 : 600);
+      else clearTimeout(liftT);
+    } else if (i >= 0) layout(i, mo.j, 0);
+  };
+  const nearest = () => { const r = track.getBoundingClientRect(), u = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight))) * U2; let best = 0, bd = 1e9; for (let m = 0; m < M; m++) { const d = Math.abs(unitOf(m) - u); if (d < bd) { bd = d; best = m; } } return best; };
   // smooth jump between moments
   let jumping = 0, lockUntil = 0;
   const glideTo = (y, ms = 900) => { const y0 = scrollY, t0 = performance.now(), e = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; cancelAnimationFrame(jumping); const go = now => { const t = Math.min(1, (now - t0) / ms); scrollTo(0, y0 + (y - y0) * e(t)); if (t < 1) jumping = requestAnimationFrame(go); else jumping = 0; }; jumping = requestAnimationFrame(go); };
@@ -690,7 +706,7 @@ window.addEventListener('pagereveal',event=>{
     const now = performance.now(); if (now < lockUntil) return true;
     const m = cur < 0 ? nearest() : cur, to = m + dir;
     if (to < 0 || to >= M) return false; // leave the film normally at either end
-    lockUntil = now + 950; show(to); glideTo(yOf(to)); return true;
+    const same = moms[to].t === 'step' && moms[cur]?.t === 'step' && moms[to].i === moms[cur].i; lockUntil = now + (same ? 520 : 950); show(to); glideTo(yOf(to), same ? 520 : 900); return true;
   };
   let acc = 0, accT = 0;
   addEventListener('wheel', e => {
@@ -707,13 +723,13 @@ window.addEventListener('pagereveal',event=>{
   });
   // any other way of scrolling (scrollbar, touchpad momentum after leaving, links) lands on the nearest moment
   let st = 0; addEventListener('scroll', () => { if (!wide.matches || jumping) return; clearTimeout(st); st = setTimeout(() => { if (inside()) show(nearest()); else { const r = track.getBoundingClientRect(); show(r.top > 0 ? 0 : M - 1); } }, 60); }, { passive: true });
-  document.addEventListener('portfolio:language', () => { const m = cur; cur = -1; show(m < 0 ? 0 : m); });
+  document.addEventListener('portfolio:language', () => { const m = cur; cur = -1; curStep = -2; show(m < 0 ? 0 : m); });
   show(nearest());
   // the phone leans toward the pointer anywhere on the stage
   if (matchMedia('(hover:hover) and (pointer:fine)').matches && !calm.matches) {
-    const card = fm.querySelector('.fm-lift-img');
+    const card0 = fm.querySelector('.fm-lift-img');
     stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); set(phone, '--mrx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); set(phone, '--mry', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3));
-      if (fm.classList.contains('is-lifted')) { const c = card.getBoundingClientRect(); set(card, '--gx', ((e.clientX - c.left) / c.width * 100).toFixed(1) + '%'); set(card, '--gy', ((e.clientY - c.top) / c.height * 100).toFixed(1) + '%'); } });
+      if (fm.classList.contains('is-lifted')) { const card = fm.querySelector('.fm-ly.is-focus') || card0; const c = card.getBoundingClientRect(); set(card, '--gx', ((e.clientX - c.left) / c.width * 100).toFixed(1) + '%'); set(card, '--gy', ((e.clientY - c.top) / c.height * 100).toFixed(1) + '%'); } });
     stage.addEventListener('pointerleave', () => { set(phone, '--mrx', 0); set(phone, '--mry', 0); });
   }
   // pointer depth for the floating work
@@ -764,4 +780,17 @@ window.addEventListener('pagereveal',event=>{
     lipstick() { fm.classList.toggle('is-lip'); }
   };
   fm.querySelectorAll('[data-prop]').forEach(b => b.addEventListener('click', () => { act[b.dataset.prop]?.(); b.classList.remove('is-hit'); void b.offsetWidth; b.classList.add('is-hit'); setTimeout(() => b.classList.remove('is-hit'), 300); }));
+})();
+
+// Phones get a body: stacked edge slices behind the frame (thickness) and a metal rim highlight that moves with the pointer.
+(() => {
+  const devs = [...document.querySelectorAll('.fm-phone .dev, .xp-phone')];
+  devs.forEach(d => {
+    if (d.querySelector('.dev-side')) return;
+    for (let k = 1; k <= 7; k++) { const e = document.createElement('i'); e.className = 'dev-side'; e.style.setProperty('--k', k); d.prepend(e); }
+    const sh = document.createElement('i'); sh.className = 'dev-shine'; d.append(sh);
+    d.style.transformStyle = 'preserve-3d';
+  });
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  addEventListener('pointermove', e => { const x = (e.clientX / innerWidth * 2 - 1).toFixed(3); devs.forEach(d => d.style.setProperty('--mrx2', x)); }, { passive: true });
 })();

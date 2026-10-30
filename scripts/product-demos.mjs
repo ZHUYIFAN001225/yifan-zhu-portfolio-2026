@@ -51,6 +51,13 @@ export function renderProductDemos(t,document){
         <div class="ux-demo-device"><iframe data-demo-frame title="${t(c.title[0]+' — interactive prototype',c.title[1]+' · 交互原型')}" loading="eager" referrerpolicy="no-referrer"></iframe></div>
         <div class="ux-demo-panel"><p class="ux-demo-live"><span aria-hidden="true"></span>${t('Live prototype · demo data only','可直接操作 · 仅为演示数据')}</p><p>${t('Use the prototype directly in the frame. Nothing you enter is real: accounts, prices and appointments are demo fixtures.','可以直接在框内操作原型。所有账号、价格与预约均为演示数据，不会产生真实操作。')}</p><div class="v3-demo-actions"><a class="v3-solid-button" data-demo-launch="${c.id}" href="#interactive-demo" target="_blank" rel="noopener" hidden>${t('Open full screen','全屏打开')} ↗</a>${c.id==='booking'?`<a class="v3-outline-button" data-demo-launch="bookingAdmin" href="#interactive-demo" target="_blank" rel="noopener" hidden>${t('Open shop view','打开店铺端')} ↗</a>`:''}</div><p class="v3-demo-caption" data-demo-local-note hidden>${t('Running from the local review environment. This prototype is not a live commercial service.','当前由本地审核环境运行。此原型并非已上线的商业服务。')}</p></div>
       </div>`;
+  // Exploded view: real layers of one screen separate in 3D as you scroll; each layer carries one design reason.
+  const explode=()=>{const x=c.explode;const src=f=>`assets/v3/explode/${x.dir}/${f}.webp`;
+    return `<section class="xp" data-explode aria-labelledby="xp-title" style="--n:${x.layers.length}"><div class="xp-track"><div class="xp-stage">
+      <div class="xp-copy"><p class="xp-kicker">${pair(x.kicker)}</p><h2 id="xp-title">${pair(x.title)}</h2><p class="xp-lead">${pair(x.lead)}</p>
+        <ol class="xp-list">${x.layers.map((l,i)=>`<li data-xp-item="${i}"><span class="xp-n">${String(i+1).padStart(2,'0')}</span><div><h3>${pair(l.title)}</h3><p>${pair(l.body)}</p></div></li>`).join('')}</ol></div>
+      <div class="xp-scene" aria-hidden="true"><div class="xp-phone"><img class="xp-layer xp-base" data-i18n-img src="${src('base')}" alt="" loading="lazy" decoding="async" />${x.layers.map((l,i)=>`<div class="xp-layer" data-xp-layer="${i}" style="--i:${i+1}"><img data-i18n-img src="${src(l.file)}" alt="" loading="lazy" decoding="async" /></div>`).join('')}</div></div>
+    </div></div></section>`;};
   // Screen map: real captures grouped by navigation level; any screen opens larger in the viewer.
   const lvl=v=>v==='sheet'?t('Sheet','弹层'):v==='mode'?t('Mode','模式'):`L${v}`;
   const shot=(dir,f,title,level,cls='')=>`<button type="button" class="ux-shot${cls}" data-shot="assets/v3/screens/${dir}/${f}.webp" data-caption="${pair(title)}"><img data-i18n-img src="assets/v3/screens/${dir}/${f}.webp" alt="" loading="lazy" decoding="async"${cls?'':' width="540" height="1170"'}>${level!==undefined?`<span class="ux-level">${lvl(level)}</span>`:''}<strong>${pair(title)}</strong></button>`;
@@ -70,6 +77,7 @@ export function renderProductDemos(t,document){
     ${system()}
     ${strategy()}
     ${iteration()}
+    ${c.explode?explode():''}
     ${c.screenMap?section('structure',screenMap()):section('structure',`<p>${pair(c.iaNote)}</p><div class="ux-architecture">${c.ia.map(a=>`<div><h3>${pair(a.title)}</h3><ol>${a.levels.map(v=>`<li>${pair(v)}</li>`).join('')}</ol></div>`).join('')}</div>`)}
     ${section('flow',`<ol class="ux-journey">${c.journey.map((j,i)=>`<li><span aria-hidden="true">0${i+1}</span><h3>${pair(j.title)}</h3><p>${pair(j.body)}</p></li>`).join('')}</ol><p class="ux-flow-note">${pair(c.journeyNote)}</p>`)}
     ${c.details?section('interfaces',details()):section('interfaces',`<p>${t('Actual screens from the existing running prototype. Read the sequence here, then follow the prototype steps below. Accounts, prices and appointments shown are demo fixtures.','以下为现有运行原型的真实界面截图。无需点开 Demo，也能按顺序了解产品。所示账号、价格与预约均为演示数据。')}</p><div class="ux-screens">${c.screens.map(s=>image(s)).join('')}</div>`)}

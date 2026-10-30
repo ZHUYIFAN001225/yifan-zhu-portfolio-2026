@@ -284,6 +284,19 @@ export const productCases=[{
     ],
     success:[p('Owner tasks in four taps or fewer','店主常用操作不超过 4 步'),p('Share of bookings made without chatting','无需聊天完成的预约比例'),p('Time spent rescheduling after a closure','休息后重新安排所花的时间'),p('Owner still using it after a month','一个月后店主仍在使用')]
   },
+  explode:{
+    dir:'booking',
+    kicker:p('Design anatomy','设计拆解'),
+    title:p('One screen, taken apart.','把一屏拆开看。'),
+    lead:p('The booking home screen from the live site, layer by layer. Each layer answers one question a customer has before they book.','线上网站的预约首页，一层一层拆开。每一层回答顾客预约前心里的一个问题。'),
+    layers:[
+      {file:'header',title:p('Where am I?','我在哪一步？'),body:p('A plain title and a three-step bar: service and date, time, confirm. Customers always know how far they are.','一个直白的标题，加三步进度：服务和日期、时间、确认。顾客随时知道自己走到哪了。')},
+      {file:'services',title:p('How long will it take?','要做多久？'),body:p('Every service shows its length first, because length decides which times can fit in the day.','每项服务先写清时长，因为时长决定了一天里哪些时间放得下。')},
+      {file:'earliest',title:p('When is the soonest?','最早什么时候？'),body:p('The earliest free time updates with the service, so most people can book in one tap without browsing.','最早可约时间随服务自动更新，大多数人点一下就能约，不用翻日历。')},
+      {file:'calendar',title:p('Is that day open?','那天开门吗？'),body:p('Each date says Open or Closed, and dates beyond the booking window are simply not shown, so “not open yet” is never mistaken for “full”.','每个日期直接写“营业”或“休息”，还没开放的日子不显示，所以“暂未开放”不会被误以为“约满了”。')},
+      {file:'nav',title:p('Where are my bookings?','我的预约在哪？'),body:p('Only two places: Book and My bookings. Nothing else to learn.','只有两个入口：预约、我的预约。没有别的需要学。')}
+    ]
+  },
   screenMap:{
     dir:'booking',
     lead:p('Captured from the public demo, which runs the live website’s own screens on sample data. Level 1 is the main navigation; each row follows one path deeper. Select any screen to enlarge it.','截自公开演示版：线上网站的同一套界面，使用示例数据。第一层是主导航；每一行沿一条路径向下深入。点击任意界面可放大查看。'),

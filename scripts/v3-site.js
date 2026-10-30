@@ -302,7 +302,7 @@ window.addEventListener('pagereveal',event=>{
 
   // Sections rise gently into view as you scroll (content already on screen is left alone).
   if (!calm.matches && 'IntersectionObserver' in window) {
-    const blocks = [...document.querySelectorAll('main section:not(.sc):not(.v3-hero), main .case-section, main article > section')]
+    const blocks = [...document.querySelectorAll('main section:not(.sc):not(.v3-hero):not(.xp), main .case-section, main article > section')]
       .filter((el, i, all) => !all.some(o => o !== el && o.contains(el)) && el.getBoundingClientRect().top > innerHeight * 0.9);
     const io = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
     blocks.forEach(el => { el.classList.add('v3-rv'); io.observe(el); });
@@ -395,4 +395,25 @@ window.addEventListener('pagereveal',event=>{
     stage.addEventListener('pointerleave', () => { sc.style.setProperty('--mx', 0); sc.style.setProperty('--my', 0); });
   }
   setActive(0); update();
+})();
+
+// Exploded UI view: tilt the phone, separate its layers, then walk through each layer as you scroll.
+(() => {
+  const xp = document.querySelector('[data-explode]'); if (!xp) return;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)'), wide = matchMedia('(min-width: 900px)');
+  const track = xp.querySelector('.xp-track'), items = [...xp.querySelectorAll('[data-xp-item]')], layers = [...xp.querySelectorAll('[data-xp-layer]')];
+  const ease = v => { v = Math.min(1, Math.max(0, v)); return v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
+  let last = -2;
+  const focus = i => { if (i === last) return; last = i; xp.classList.toggle('has-focus', i >= 0);
+    items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); };
+  const update = () => {
+    if (calm.matches || !wide.matches) { xp.style.removeProperty('--tilt'); xp.style.removeProperty('--spread'); focus(-1); items.forEach(li => li.classList.add('is-on')); return; }
+    const r = track.getBoundingClientRect(), span = Math.max(1, track.offsetHeight - innerHeight), p = Math.min(1, Math.max(0, -r.top / span));
+    xp.style.setProperty('--tilt', ease(p / .18).toFixed(4));
+    xp.style.setProperty('--spread', ease((p - .12) / .22).toFixed(4));
+    const n = layers.length, q = (p - .36) / .6;
+    focus(q < 0 ? -1 : Math.min(n - 1, Math.floor(q * n)));
+  };
+  let queued = false; const on = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; update(); }); };
+  addEventListener('scroll', on, { passive: true }); addEventListener('resize', on); update();
 })();

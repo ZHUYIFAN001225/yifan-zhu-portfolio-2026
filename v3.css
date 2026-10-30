@@ -1406,3 +1406,23 @@ html[data-theme=dark] .v3-buddy-say{background:#f4f3ee;color:#141518}
 .op--3d .op-sub{margin:0;font-size:17px;color:#eef3ee}
 .op--3d .op-phone{inset:0 22% 0 34%}
 .op--3d .op-scroll{display:none}
+
+/* ---------- Story v3: one crisp phone; the part of the screen the text talks about is spotlit and zoomed ---------- */
+.st-phone,.st-turn{display:none!important}
+.st-phone2{position:relative;flex:1;display:grid;place-items:center;perspective:1600px;width:100%}
+.st-phone2 .dev{transform:rotateY(var(--ry,-8deg)) rotateX(3deg);transition:transform .9s cubic-bezier(.65,0,.35,1)}
+.st-phone2.is-flip .dev{animation:st-flip .9s cubic-bezier(.65,0,.35,1)}
+@keyframes st-flip{0%{transform:rotateY(-8deg)}50%{transform:rotateY(90deg) scale(.94)}50.01%{transform:rotateY(-90deg) scale(.94)}100%{transform:rotateY(-8deg)}}
+.st-phone2 .dev-view{overflow:hidden;border-radius:0 0 calc(var(--dw) * .14) calc(var(--dw) * .14)}
+.st-zoom{position:absolute;inset:0;transform-origin:var(--ox,50%) var(--oy,50%);transform:scale(var(--z,1));transition:transform .9s cubic-bezier(.2,.7,.2,1),transform-origin .9s cubic-bezier(.2,.7,.2,1)}
+.st-shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease}
+.st-shot.is-on{opacity:1}
+.st-spot{position:absolute;left:var(--sx,0%);top:var(--sy,0%);width:var(--sw,100%);height:var(--sh,100%);border-radius:12px;box-shadow:0 0 0 2px #3fbf7f,0 0 0 999px rgba(12,14,18,.5);opacity:0;transition:left .8s cubic-bezier(.2,.7,.2,1),top .8s cubic-bezier(.2,.7,.2,1),width .8s cubic-bezier(.2,.7,.2,1),height .8s cubic-bezier(.2,.7,.2,1),opacity .4s ease;pointer-events:none}
+.st-phone2.has-spot .st-spot{opacity:1}
+.st-tap{position:absolute;left:var(--tx,50%);top:var(--ty,50%);width:44px;height:44px;translate:-50% -50%;border-radius:50%;background:rgba(63,191,127,.3);box-shadow:0 0 0 2px #3fbf7f;opacity:0;pointer-events:none}
+.st-tap.is-tap{animation:ply-tap .8s ease-out}
+.st-callout{position:absolute;left:calc(50% + var(--dw-px,150px) + 16px);top:var(--cy,50%);translate:0 -50%;display:flex;align-items:center;gap:10px;opacity:0;transition:top .8s cubic-bezier(.2,.7,.2,1),opacity .4s ease;pointer-events:none}
+.st-callout::before{content:'';width:34px;height:2px;background:#3fbf7f}
+.st-callout b{font-weight:500;font-size:14px;padding:8px 12px;border-radius:999px;background:#3fbf7f;color:#08130d;white-space:nowrap}
+.st-phone2.has-spot .st-callout{opacity:1}
+@media(max-width:1100px){.st-callout{left:auto;right:0}}

@@ -504,25 +504,46 @@ window.addEventListener('pagereveal',event=>{
   op.addEventListener('pointermove', e => { const r = op.getBoundingClientRect(); op.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); op.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3)); });
 })();
 
-// Story: as each moment reaches the middle of the screen (or is pointed at), the one phone shows that screen; it turns when the side changes.
+// Story: the step in the middle of the screen (or under the pointer) shows its screen on the phone,
+// spotlights and zooms into the exact part the text talks about, and taps where the user would tap. Switching side flips the phone.
 (() => {
   const st = document.querySelector('[data-story]'); if (!st) return;
-  const steps = [...st.querySelectorAll('[data-st-step]')], roles = [...st.querySelectorAll('[data-st-role]')], host = st.querySelector('.st-phone');
-  let cur = -1, side = steps[0]?.dataset.side;
+  const steps = [...st.querySelectorAll('[data-st-step]')], roles = [...st.querySelectorAll('[data-st-role]')];
+  const wrap = st.querySelector('.st-phone2'); if (!wrap) return;
+  const shots = [...wrap.querySelectorAll('[data-st-shot]')], zoom = wrap.querySelector('.st-zoom'), ring = wrap.querySelector('.st-tap'), label = wrap.querySelector('[data-st-label]'), callout = wrap.querySelector('.st-callout'), dev = wrap.querySelector('.dev');
+  let cur = -1, side = null, tm = [];
+  const later = (f, ms) => tm.push(setTimeout(f, ms));
   const show = i => {
-    if (i === cur) return; const prev = cur; cur = i; const step = steps[i];
+    if (i === cur) return; cur = i; tm.forEach(clearTimeout); tm = [];
+    const step = steps[i], flip = side && side !== step.dataset.side; side = step.dataset.side;
     steps.forEach((s, k) => s.classList.toggle('is-on', k === i));
-    roles.forEach(r => r.classList.toggle('is-on', r.dataset.stRole === step.dataset.side));
-    const turn = prev >= 0 && step.dataset.side !== side; side = step.dataset.side;
-    const tap = step.dataset.tap ? step.dataset.tap.split(',').map(Number) : null;
-    host?._phone?.show(i, { turn, tap });
+    roles.forEach(r => r.classList.toggle('is-on', r.dataset.stRole === side));
+    const apply = () => {
+      shots.forEach((s, k) => s.classList.toggle('is-on', k === i));
+      const sp = (step.dataset.spot || '').split(',').map(Number);
+      if (sp.length === 4) {
+        const [x, y, w, h] = sp, cx = x + w / 2, cy = y + h / 2, z = Math.min(1.35, Math.max(1, 70 / h));
+        zoom.style.setProperty('--sx', x + '%'); zoom.style.setProperty('--sy', y + '%'); zoom.style.setProperty('--sw', w + '%'); zoom.style.setProperty('--sh', h + '%');
+        zoom.style.setProperty('--ox', cx + '%'); zoom.style.setProperty('--oy', cy + '%'); zoom.style.setProperty('--z', '1');
+        wrap.classList.add('has-spot');
+        later(() => zoom.style.setProperty('--z', z.toFixed(2)), 500);
+        const vr = wrap.querySelector('.dev-view').getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+        callout.style.setProperty('--cy', (vr.top - wr.top + vr.height * cy / 100) + 'px');
+        callout.style.left = (vr.right - wr.left + 18) + 'px';
+        label.textContent = step.querySelector('.st-label')?.textContent || '';
+      } else { wrap.classList.remove('has-spot'); zoom.style.setProperty('--z', '1'); }
+      if (step.dataset.tap) later(() => { const [tx, ty] = step.dataset.tap.split(',').map(Number); ring.style.setProperty('--tx', tx + '%'); ring.style.setProperty('--ty', ty + '%'); ring.classList.remove('is-tap'); void ring.offsetWidth; ring.classList.add('is-tap'); }, 1300);
+    };
+    if (flip) { wrap.classList.remove('is-flip'); void wrap.offsetWidth; wrap.classList.add('is-flip'); wrap.classList.remove('has-spot'); zoom.style.setProperty('--z', '1'); later(apply, 450); later(() => wrap.classList.remove('is-flip'), 950); }
+    else apply();
   };
-  host?.addEventListener('phone-ready', () => { const i = Math.max(0, cur); cur = -1; side = steps[i].dataset.side; show(i); });
   steps.forEach((s, k) => { s.addEventListener('pointerenter', () => show(k)); s.addEventListener('focus', () => show(k)); });
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) show(+en.target.dataset.stStep); }), { rootMargin: '-45% 0px -45% 0px' });
     steps.forEach(s => io.observe(s));
   }
+  addEventListener('resize', () => { const k = cur; cur = -1; if (k >= 0) show(k); });
+  document.addEventListener('portfolio:language', () => { const k = cur; cur = -1; if (k >= 0) show(k); });
   show(0);
 })();
 

@@ -1805,3 +1805,33 @@ body.lk-light:has([data-product-case=beauty]){background:#e4d6ec}
 /* never crop inside the frame: images are shown whole; the frame itself drifts instead */
 [data-product-case=beauty] .lk-mask>img{transform:none!important;width:100%;height:auto}
 [data-product-case=beauty] .lk-mask{transform:translateY(var(--iy,0px));transition:clip-path 1.2s cubic-bezier(.65,0,.25,1),transform .2s linear}
+/* ---- LOOK: 3D beauty tools that travel with the scroll ---- */
+.lk-tool,.lk-hit,.lk-shadow,.lk-say{position:fixed;left:0;top:0;opacity:0;transition:opacity .45s ease;will-change:transform}
+body.lk-tool-on :is(.lk-tool,.lk-hit,.lk-shadow){opacity:1}
+.lk-tool{width:280px;height:280px;z-index:59;pointer-events:none}
+.lk-shadow{z-index:2;width:140px;height:34px;border-radius:50%;background:radial-gradient(closest-side,rgba(52,22,58,.42),rgba(52,22,58,.18) 55%,transparent);filter:blur(5px);pointer-events:none;transform-origin:50% 50%}
+body.lk-tool-on .lk-shadow{opacity:var(--so,1)}
+.lk-hit{z-index:61;width:120px;height:120px;border:0;border-radius:50%;background:transparent;cursor:pointer;pointer-events:none}
+body.lk-tool-on .lk-hit{pointer-events:auto}
+.lk-hit:focus-visible{outline:2px solid #c2457a;outline-offset:4px}
+.lk-say{z-index:62;max-width:240px;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#2a1d30;color:#f6eef6;font:500 14px/1.3 Inter,system-ui,sans-serif;box-shadow:0 14px 30px rgba(42,29,48,.25);pointer-events:none;translate:0 6px;transition:opacity .25s,translate .4s cubic-bezier(.16,1,.3,1)}
+.lk-say.is-right{border-radius:16px 16px 4px 16px;margin-left:-240px;text-align:right}
+body.lk-tool-on .lk-say.is-on{opacity:1;translate:0 0}
+.lk-poof{position:fixed;z-index:58;width:180px;height:180px;margin:-90px 0 0 -90px;border-radius:50%;border:2px solid rgba(194,69,122,.5);pointer-events:none;animation:lk-poof .7s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes lk-poof{from{transform:scale(.3);opacity:1}to{transform:scale(1.4);opacity:0}}
+.lk-drop{position:fixed;z-index:58;width:16px;height:22px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;box-shadow:inset -3px -4px 0 rgba(0,0,0,.12),0 4px 8px rgba(0,0,0,.15);pointer-events:none}
+.lk-splash{position:fixed;z-index:-1;border-radius:50%;pointer-events:none}
+.lk-ch{display:inline-block;white-space:pre}
+.lk-cut{animation:lk-cut 1.6s cubic-bezier(.3,0,.3,1) both;color:#c2457a}
+@keyframes lk-cut{0%{transform:none}8%{transform:translate(calc(var(--cx)*4px),-6px) rotate(calc(var(--cx)*-8deg))}45%{transform:translate(calc(var(--cx)*40px),70vh) rotate(calc(var(--cx)*160deg));opacity:1}46%{opacity:0;transform:translateY(-.4em) scale(.2)}60%{opacity:0;transform:translateY(-.4em) scale(.2)}100%{opacity:1;transform:none}}
+.lk-wave{animation:lk-wave .75s cubic-bezier(.34,1.56,.64,1) var(--d) both}
+@keyframes lk-wave{0%,100%{transform:none}40%{transform:translateY(-.22em) rotate(-5deg);color:#c2457a}}
+.lk-flutter{animation:lk-flutter 1s cubic-bezier(.2,.7,.3,1) var(--d) both}
+@keyframes lk-flutter{0%,100%{transform:none}25%{transform:translate(calc(var(--w)*16px),-8px) rotate(calc(var(--w)*16deg))}55%{transform:translate(calc(var(--w)*-5px),2px) rotate(calc(var(--w)*-5deg))}}
+.lk-gust{animation:lk-gust 1.1s cubic-bezier(.2,.7,.3,1) both}
+@keyframes lk-gust{0%,100%{translate:0 0;rotate:0deg}30%{translate:calc(var(--gd)*28px) -4px;rotate:calc(var(--gd)*1.6deg)}60%{translate:calc(var(--gd)*-8px) 0;rotate:calc(var(--gd)*-.5deg)}}
+[data-product-case=beauty] .v3-product-section.ux-section>h2{transition:color .6s ease}
+@media (prefers-reduced-motion:reduce){.lk-tool,.lk-hit,.lk-shadow,.lk-say{display:none}}
+[data-product-case=beauty] .ux-section .ux-world--real{background:#fbe1eb!important}
+[data-product-case=beauty] .ux-section .ux-world--real :is(ul,li){background:transparent!important}
+[data-product-case=beauty] .ux-section .ux-world--real li{background:rgba(255,255,255,.7)!important}

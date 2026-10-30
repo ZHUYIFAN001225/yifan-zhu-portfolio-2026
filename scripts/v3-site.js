@@ -841,6 +841,8 @@ window.addEventListener('pagereveal',event=>{
     release: ['Where it goes from here.', '接下来往哪走。']
   };
   const pokes = [['Snip snip!', '咔嚓咔嚓！'], ['Fresh cut ✂', '刚剪好 ✂'], ['Book me?', '约我吗？'], ['Hey, that tickles.', '哎，好痒。'], ['I only cut real work.', '我只剪真实作品。']];
+  // the 3D beauty tools take over from here (WebGL); the flat scissors below stay as the fallback
+  if (window.WebGLRenderingContext) { import('./look-tools.mjs').then(m => m.mount({ lines })).catch(() => {}); return; }
   const secs = [...document.querySelectorAll('.ux-case .v3-product-section.ux-section')].filter(s => lines[s.id]);
   if (!secs.length) return;
   const b = document.createElement('button'); b.type = 'button'; b.className = 'snip'; b.setAttribute('aria-label', 'Scissors'); b.dataset.cursor = 'snip';

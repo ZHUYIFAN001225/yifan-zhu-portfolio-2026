@@ -654,7 +654,7 @@ window.addEventListener('pagereveal',event=>{
   let lastLabel = -1;
   let uS = -1, uRaf = 0;
   const target = () => { const r = track.getBoundingClientRect(); return cl(-r.top / Math.max(1, r.height - innerHeight)) * U; };
-  const glide = () => { uRaf = 0; const tg = target(); if (uS < 0 || Math.abs(tg - uS) > 3) uS = tg; else uS += (tg - uS) * .14; frame(uS); if (Math.abs(tg - uS) > .0008) uRaf = requestAnimationFrame(glide); };
+  const glide = () => { uRaf = 0; const tg = target(); if (uS < 0 || Math.abs(tg - uS) > 3) uS = tg; else uS = tg; frame(uS); if (Math.abs(tg - uS) > .0008) uRaf = requestAnimationFrame(glide); };
   const frame = (u) => {
     if (!wide.matches || calm.matches) return;
     const vh = innerHeight;
@@ -703,8 +703,7 @@ window.addEventListener('pagereveal',event=>{
     const story = sm((u - .6) / 1) * (1 - (inDuo ? sm(dt / .3) : 0) * .6);
     set(phone, '--prx', (story * 14).toFixed(2) + 'deg'); set(phone, '--pry', (story * -22).toFixed(2) + 'deg'); set(phone, '--prz', (story * 3).toFixed(2) + 'deg');
     if (i !== lastLabel) { lastLabel = i; label.textContent = d?.querySelector('.fm-label')?.textContent || ''; }
-    const vr = view.getBoundingClientRect(), pr = phone.getBoundingClientRect();
-    set(callout, '--cy', (vr.top - pr.top + vr.height * cy / 100).toFixed(1) + 'px');
+    if (phone._cyFor !== i + ':' + innerWidth) { phone._cyFor = i + ':' + innerWidth; set(callout, '--cy', (view.offsetTop + view.offsetHeight * cy / 100).toFixed(1) + 'px'); }
     const tp = (d?.dataset.tap || '').split(',').map(Number);
     if (inStory && tp.length === 2) { const k = cl((l - .5) / .22); set(zoom, '--tx', tp[0] + '%'); set(zoom, '--ty', tp[1] + '%'); set(zoom, '--ta', (k <= 0 || k >= 1 ? 0 : k < .3 ? k / .3 : 1 - (k - .3) / .7).toFixed(3)); set(zoom, '--tk', (.4 + .9 * k).toFixed(3)); } else set(zoom, '--ta', 0);
     set(fm, '--ra', (sm(su0 / .3) * (1 - sm((su0 - n - DUO) / .3))).toFixed(3));
@@ -740,86 +739,4 @@ window.addEventListener('pagereveal',event=>{
   }
 })();
 
-// LOOK opening: the giant words are made of particles. Move the mouse (or drag a finger) through them and they scatter, then
-// spring back. Scrolling pulls each line apart in its own direction. On phones, tilting the device leans the particles and the
-// floating photos, like the parallax on a phone's home screen.
-(() => {
-  const fm = document.querySelector('[data-film]'); if (!fm) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const stage = fm.querySelector('.fm-stage'), cv = fm.querySelector('.fm-dust'), lines = [...fm.querySelectorAll('.fm-line>span')];
-  if (!cv || !cv.getContext) return;
-  const ctx = cv.getContext('2d');
-  let W = 0, H = 0, dpr = 1, parts = [], mx = -9999, my = -9999, active = false, tiltX = 0, tiltY = 0, raf = 0, visible = true, built = false;
-  const coarse = matchMedia('(pointer:coarse)').matches;
-  const build = () => {
-    const r = stage.getBoundingClientRect(); if (!r.width) return;
-    dpr = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height;
-    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const off = document.createElement('canvas'); off.width = W; off.height = H; const o = off.getContext('2d');
-    const step = coarse ? 3 : W > 1600 ? 4 : 3;
-    const old = parts; parts = [];
-    lines.forEach((sp, li) => {
-      o.clearRect(0, 0, W, H);
-      const cs = getComputedStyle(sp), lr = sp.getBoundingClientRect(), color = li === 1 ? '#f59ab8' : '#f3e6ee';
-      const prev = sp.style.transform; sp.style.transform = 'none'; const br = sp.getBoundingClientRect(); sp.style.transform = prev;
-      o.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; o.textBaseline = 'alphabetic'; o.fillStyle = '#fff';
-      try { o.letterSpacing = cs.letterSpacing; } catch {}
-      const text = (sp.firstChild && sp.firstChild.nodeType === 3 ? sp.firstChild.textContent : sp.textContent).toUpperCase === undefined ? '' : (sp.childNodes[0]?.textContent || '');
-      const t = cs.textTransform === 'uppercase' ? text.toUpperCase() : text;
-      const m = o.measureText(t), asc = m.actualBoundingBoxAscent || parseFloat(cs.fontSize) * .72;
-      const x0 = br.left - r.left, y0 = br.top - r.top + (br.height + asc) / 2 - (m.actualBoundingBoxDescent || 0) / 2;
-      o.fillText(t, x0, y0);
-      const img = o.getImageData(0, 0, W, H).data, dx = li % 2 ? 1 : -1;
-      for (let y = 0; y < H; y += step) for (let x = 0; x < W; x += step) {
-        if (img[(y * W + x) * 4 + 3] < 128) continue;
-        const prevP = old[parts.length];
-        parts.push({ hx: x, hy: y, x: prevP ? prevP.x : x + (Math.random() - .5) * W * .6, y: prevP ? prevP.y : y + (Math.random() - .5) * H * .8, vx: 0, vy: 0, c: color, dx, s: step * .82, k: .06 + Math.random() * .04, d: Math.random() });
-      }
-    });
-    built = true; fm.classList.add('has-dust');
-  };
-  const draw = () => {
-    raf = 0; if (!visible || !built) return;
-    const o = parseFloat(getComputedStyle(fm).getPropertyValue('--o')) || 0;
-    ctx.clearRect(0, 0, W, H);
-    const R = coarse ? 70 : 110, R2 = R * R; let moving = false;
-    const pull = o * W * .38, lean = tiltX * 26, leanY = tiltY * 18;
-    let lastC = '';
-    for (const p of parts) {
-      const tx = p.hx + p.dx * pull + lean * (.6 + p.d * .8), ty = p.hy + leanY * (.6 + p.d * .8);
-      p.vx += (tx - p.x) * p.k; p.vy += (ty - p.y) * p.k;
-      const ddx = p.x - mx, ddy = p.y - my, d2 = ddx * ddx + ddy * ddy;
-      if (d2 < R2) { const f = (1 - d2 / R2) * 9 / Math.sqrt(d2 + 1); p.vx += ddx * f + (Math.random() - .5) * 2; p.vy += ddy * f + (Math.random() - .5) * 2; }
-      p.vx *= .82; p.vy *= .82; p.x += p.vx; p.y += p.vy;
-      if (Math.abs(p.vx) + Math.abs(p.vy) > .05) moving = true;
-      if (p.c !== lastC) { ctx.fillStyle = p.c; lastC = p.c; }
-      ctx.globalAlpha = Math.max(0, 1 - o * 1.25);
-      ctx.fillRect(p.x, p.y, p.s, p.s);
-    }
-    if (moving || active) raf = requestAnimationFrame(draw);
-  };
-  const kick = () => { if (!raf) raf = requestAnimationFrame(draw); };
-  const toLocal = (cx, cy) => { const r = stage.getBoundingClientRect(); mx = cx - r.left; my = cy - r.top; };
-  stage.addEventListener('pointermove', e => { toLocal(e.clientX, e.clientY); active = true; kick(); }, { passive: true });
-  stage.addEventListener('pointerdown', e => { toLocal(e.clientX, e.clientY); active = true; kick(); }, { passive: true });
-  stage.addEventListener('pointerleave', () => { mx = my = -9999; active = false; kick(); });
-  stage.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') { mx = my = -9999; active = false; kick(); } });
-  addEventListener('scroll', kick, { passive: true });
-  new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) kick(); }).observe(stage);
-  let rt = 0; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { build(); kick(); }, 200); });
-  document.addEventListener('portfolio:language', () => setTimeout(() => { parts = []; build(); kick(); }, 60));
-  // wait for the entrance of the words, then turn them into particles that fly in from the scatter
-  (document.fonts?.ready || Promise.resolve()).then(() => setTimeout(() => { build(); kick(); }, 250));
-  // device tilt (phones and tablets): lean the particles and the floating work
-  const applyTilt = (g, b) => { tiltX = Math.max(-1, Math.min(1, g / 25)); tiltY = Math.max(-1, Math.min(1, (b - 45) / 25)); fm.style.setProperty('--mx', (-tiltX).toFixed(3)); fm.style.setProperty('--my', (-tiltY).toFixed(3)); stage.style.setProperty('--px', tiltX.toFixed(3)); kick(); };
-  const listen = () => addEventListener('deviceorientation', e => { if (e.gamma == null) return; applyTilt(e.gamma, e.beta); }, { passive: true });
-  if (coarse && 'DeviceOrientationEvent' in window) {
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS asks for permission, which must come from a tap
-      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'fm-tilt is-needed';
-      const zh = () => document.documentElement.lang.startsWith('zh'); btn.textContent = zh() ? '轻点，然后晃晃手机' : 'Tap, then tilt your phone';
-      stage.append(btn);
-      btn.addEventListener('click', () => DeviceOrientationEvent.requestPermission().then(r => { if (r === 'granted') listen(); btn.remove(); }).catch(() => btn.remove()));
-    } else listen();
-  }
-})();
+

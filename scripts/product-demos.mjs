@@ -56,7 +56,7 @@ export function renderProductDemos(t,document){
     const spark=`<svg class="fm-spark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2c1.6 9.5 8.5 16.4 18 18-9.5 1.6-16.4 8.5-18 18-1.6-9.5-8.5-16.4-18-18C11.5 18.4 18.4 11.5 20 2z"/></svg>`;
     const photos=[['w1',-1.15,-0.62,.9,-8],['w2',1.05,-0.7,.7,7],['w3',-1.35,0.42,.6,6],['w4',1.3,0.36,.8,-6],['w6',-0.62,-1.05,.5,4],['w7',.6,1.05,.55,-5]];
     return `<section class="fm" data-film data-steps="${f.steps.length}" data-split="${n1}" aria-label="${pair(c.title)}"><div class="fm-track"><div class="fm-stage">
-      <canvas class="fm-dust" aria-hidden="true"></canvas><div class="fm-type" aria-hidden="true">${f.lines.map((l,i)=>`<span class="fm-line" style="--i:${i};--dx:${i%2?1:-1}"><span>${pair(l)}${i===0?spark:''}</span></span>`).join('')}</div>
+      <div class="fm-type" aria-hidden="true">${f.lines.map((l,i)=>`<span class="fm-line" style="--i:${i};--dx:${i%2?1:-1}"><span>${pair(l)}${i===0?spark:''}</span></span>`).join('')}</div>
       <div class="fm-photos" aria-hidden="true">${photos.map(([im,x,y,z,r],i)=>`<span class="fm-photo" style="--x:${x};--y:${y};--z:${z};--r:${r}deg;--i:${i}"><img src="${ph(im)}" alt="" decoding="async" /></span>`).join('')}</div>
       <p class="fm-kicker">${pair(f.kicker)}</p>
       <div class="fm-steps">${f.steps.map((x,i)=>`<article class="fm-step" data-fm-step="${i}"><p class="fm-num"><b>${i<n1?t('User side','用户端'):t('Creator side','Creator 端')}</b> <em>${String((i<n1?i:i-n1)+1).padStart(2,'0')}</em> <span>/ ${String(i<n1?n1:f.steps.length-n1).padStart(2,'0')}</span></p><h2><span class="fm-mask"><span>${pair(x.title)}</span></span></h2><p class="fm-body"><span class="fm-mask"><span>${pair(x.body)}</span></span></p></article>`).join('')}</div>

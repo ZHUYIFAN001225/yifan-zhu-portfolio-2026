@@ -285,6 +285,22 @@ export const productCases=[{
     success:[p('Owner tasks in four taps or fewer','店主常用操作不超过 4 步'),p('Share of bookings made without chatting','无需聊天完成的预约比例'),p('Time spent rescheduling after a closure','休息后重新安排所花的时间'),p('Owner still using it after a month','一个月后店主仍在使用')]
   },
   opening:{kicker:p('Service & product design · Live product · 2026','服务与产品设计 · 已上线产品 · 2026'),wall:['book','today','day','schedule','confirm','time-off-hours','booked','window','mine','add','reschedule','todo','by-time','day-detail','kept','services','cancel','more','time-off']},
+  story:{
+    kicker:p('A day with the system','系统里的一天'),
+    title:p('One booking, from both sides.','一笔预约，两端各看到什么。'),
+    lead:p('Scroll through an ordinary day. Each moment shows the real screen the customer or the owner sees at that point.','往下滚，走过普通的一天。每一刻都对应顾客或店主那时看到的真实界面。'),
+    cta:p('Now try it yourself','现在你自己试试'),
+    steps:[
+      {side:'owner',time:'08:50',file:'today',title:p('Before opening, one look','开门前，看一眼就够'),body:p('Four customers, the next free gap, one person to rebook. The owner sees her day without scrolling through chats.','四位客人、下一个空档、一位要改期的顾客。店主不用翻聊天记录，就知道今天怎么安排。')},
+      {side:'customer',time:'12:10',file:'book',tap:'9,60',title:p('At lunch, a customer picks a service and a day','午休时，顾客选服务、选日期'),body:p('The service comes first, with its length, because the length decides which days and times can fit.','先选服务、看时长，因为时长决定了哪些日子、哪些时间放得下。')},
+      {side:'customer',time:'12:11',file:'day',tap:'72,36',title:p('Only times that fit are offered','只给放得下的时间'),body:p('No “are you free at 2?” messages. Every time shown can actually take a 30-minute haircut.','不用再问“两点有空吗”。列出来的每个时间，都真的放得下 30 分钟的剪发。')},
+      {side:'customer',time:'12:12',file:'confirm',tap:'50,69',title:p('One check, then book','核对一次，就约好了'),body:p('Date, time and length in one place, plus an optional phone number in case plans change.','日期、时间、时长放在一起核对，可以留个电话，计划有变时店里能联系到。')},
+      {side:'owner',time:'12:12',file:'schedule',title:p('It lands in the diary by itself','自动出现在店主的日程里'),body:p('The owner does nothing. The booking is already in her week, at the right length.','店主什么都不用做，这笔预约已经按正确时长排进她这一周。')},
+      {side:'owner',time:'17:40',file:'time-off-hours',tap:'25,64',title:p('Next Tuesday, she must close for two hours','下周二，她要临时关两个小时'),body:p('She taps a start and an end on a 15-minute timeline. Bookings and earlier closures are marked before anything closes.','在 15 分钟一格的时间轴上点开始、点结束。关之前，已有预约和已关闭的时间都标得清清楚楚。')},
+      {side:'customer',time:'17:41',file:'kept',tap:'25,53',title:p('Nobody is deleted','没有人被删掉'),body:p('The affected customer sees why, keeps her service, and picks a new time in one tap.','受影响的顾客看到原因，服务保留，点一下就能重新选时间。')},
+      {side:'owner',time:'18:05',file:'add',tap:'19,77',title:p('A regular phones instead of booking online','老顾客打电话来约'),body:p('The owner adds him by name in a few taps. No account, no WeChat needed.','店主填个名字，点几下就加上了。顾客不需要账号，也不需要微信。')}
+    ]
+  },
   explode:{
     dir:'booking',
     kicker:p('Design anatomy','设计拆解'),

@@ -152,13 +152,10 @@ const showcase = () => {
   // A device frame (iPhone-like): bezel, island and an optional status bar above the real screenshot.
   const dev=(view,{status=false,cls=''}={})=>`<span class="dev ${cls}"><span class="dev-screen">${status?`<span class="dev-status"><b>9:41</b><i aria-hidden="true"></i></span>`:''}<span class="dev-view">${view}</span></span></span>`;
   const scene=p=>{
-    if(p.id==='salon-booking'){
-      const layers=[['header',22],['services',70],['earliest',96],['calendar',54],['nav',84]];
-      const front=`<img class="dev-base" data-i18n-img src="assets/v3/explode/booking/base.webp" alt="" decoding="async" />${layers.map(([f,z],i)=>`<span class="dev-layer" style="--z:${z}px;--d:${-i*0.7}s"><img data-i18n-img src="assets/v3/explode/booking/${f}.webp" alt="" decoding="async" /></span>`).join('')}`;
-      return `<span class="sc-devices sc-devices--booking">${dev(`<img class="dev-base" data-i18n-img src="assets/v3/products/booking-admin.jpg" alt="" loading="lazy" decoding="async" />`,{status:true,cls:'dev--back'})}${dev(front,{status:true,cls:'dev--front'})}</span>`;
-    }
-    if(p.demo){const pair2=['beauty-discover','beauty-creator'];
-      return `<span class="sc-devices sc-devices--pair">${pair2.map((f,i)=>dev(`<img class="dev-base" data-i18n-img src="assets/v3/products/${f}.jpg" alt="" ${i?'loading="lazy"':''} decoding="async" />`,{cls:i?'dev--back':'dev--front'})).join('')}</span>`;}
+    // Before you click, each product quietly uses itself: the front phone plays the real flow with taps; the back phone cycles the other side.
+    const play=(dir,steps,{fade=false,dark=false}={})=>`<span class="ply${fade?' ply--fade':''}${dark?' ply--dark':''}" data-play>${steps.map(([f,taps],i)=>`<img class="ply-s${i?'':' is-on'}" data-i18n-img src="assets/v3/screens/${dir}/${f}.webp" alt="" ${i?'loading="lazy"':''} decoding="async"${taps?` data-taps="${taps}"`:''} />`).join('')}<i class="ply-tap" aria-hidden="true"></i></span>`;
+    if(p.id==='salon-booking')return `<span class="sc-devices sc-devices--booking">${dev(play('booking',[['today'],['schedule'],['time-off-hours','25,64']],{fade:true}),{status:true,cls:'dev--back'})}${dev(play('booking',[['book','9,60'],['day','72,36;50,60'],['confirm','50,69'],['booked']]),{status:true,cls:'dev--front'})}</span>`;
+    if(p.id==='beauty-marketplace')return `<span class="sc-devices sc-devices--pair">${dev(play('look',[['discover','22,32'],['detail','50,77'],['make-it-real','50,72'],['matches','50,32'],['creator','66,76'],['availability','82,64'],['booked']],{dark:true}),{cls:'dev--front'})}${dev(play('look',[['c-home'],['c-requests'],['c-calendar']],{fade:true,dark:true}),{cls:'dev--back'})}</span>`;
     if(p.preview)return `<span class="sc-film"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /><video data-sc-video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="${p.preview}"></video></span>`;
     return `<span class="sc-image"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /></span>`;
   };
@@ -173,7 +170,6 @@ const showcase = () => {
   const captions=list.map((p,i)=>`<div class="sc-caption${i?'':' is-active'}" data-sc-caption="${i}">${live(p)}<p class="sc-line">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>`).join('');
   return `<section class="sc" data-showcase aria-label="${t('Featured work','精选作品')}" style="--count:${list.length}"><div class="sc-track"><div class="sc-stage">
     <div class="sc-scenes">${scenes}</div>
-    <canvas class="sc-dust" aria-hidden="true"></canvas>
     <div class="sc-shade" aria-hidden="true"></div>
     <div class="sc-ui">
       <div class="sc-side"><p class="sc-intro">${t('Selected work','精选作品')}</p><p class="sc-count" aria-hidden="true"><span data-sc-current>01</span> / ${n}</p>

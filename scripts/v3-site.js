@@ -403,8 +403,7 @@ window.addEventListener('pagereveal',event=>{
   };
   const setActive = i => {
     if (i === active) return;
-    if (active >= 0) dissolve(scenes[active]);
-    scenes[i].classList.remove('is-dusting');
+    if (active >= 0) { const old = scenes[active]; sc.dataset.dir = i > active ? 'fwd' : 'back'; scenes.forEach(x => x.classList.remove('is-leaving')); old.classList.add('is-leaving'); clearTimeout(old._lv); old._lv = setTimeout(() => old.classList.remove('is-leaving'), 1100); sc.classList.add('is-ready'); }
     active = i;
     scenes.forEach((s, k) => { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); });
     captions.forEach((c, k) => c.classList.toggle('is-active', k === i));
@@ -441,31 +440,75 @@ window.addEventListener('pagereveal',event=>{
     stage.addEventListener('pointerleave', () => { sc.style.setProperty('--mx', 0); sc.style.setProperty('--my', 0); });
   }
   setActive(0); update();
+  // Phones in the showcase play their real flow while their project is on screen.
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  sc.querySelectorAll('[data-play]').forEach(pl => {
+    const shots = [...pl.querySelectorAll('.ply-s')], ring = pl.querySelector('.ply-tap'), fade = pl.classList.contains('ply--fade'), host = pl.closest('.sc-scene');
+    let k = 0;
+    const live = () => host.classList.contains('is-active') && !document.hidden && !calm.matches;
+    const tap = async (x, y) => { ring.style.setProperty('--tx', x + '%'); ring.style.setProperty('--ty', y + '%'); ring.classList.remove('is-tap'); void ring.offsetWidth; ring.classList.add('is-tap'); await sleep(650); };
+    (async function loop() {
+      for (;;) {
+        await sleep(fade ? 3400 : 1300);
+        if (!live()) { await sleep(400); continue; }
+        const taps = (shots[k].dataset.taps || '').split(';').filter(Boolean);
+        for (const t of taps) { const [x, y] = t.split(',').map(Number); await tap(x, y); if (!live()) break; }
+        if (!live()) continue;
+        if (!taps.length && !fade) await sleep(1300);
+        const next = (k + 1) % shots.length, back = next === 0;
+        shots.forEach(s => s.classList.remove('is-out'));
+        if (!fade && !back) shots[k].classList.add('is-out');
+        if (!fade && back) { shots.forEach(s => { s.style.transition = 'none'; }); }
+        shots[k].classList.remove('is-on'); shots[next].classList.add('is-on');
+        if (!fade && back) { void pl.offsetWidth; shots.forEach(s => { s.style.transition = ''; }); }
+        k = next;
+      }
+    })();
+  });
 })();
 
-// Exploded UI view: tilt the phone, separate its layers, then walk through each layer as you scroll.
+// Exploded UI view: opens once when it comes into view. Hover (or focus) a line or a layer to light it; the phone follows the pointer.
 (() => {
   const xp = document.querySelector('[data-explode]'); if (!xp) return;
-  const calm = matchMedia('(prefers-reduced-motion: reduce)'), wide = matchMedia('(min-width: 640px)');
-  const track = xp.querySelector('.xp-track'), items = [...xp.querySelectorAll('[data-xp-item]')], layers = [...xp.querySelectorAll('[data-xp-layer]')];
-  const ease = v => { v = Math.min(1, Math.max(0, v)); return v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
-  let last = -2;
-  const focus = i => { if (i === last) return; last = i; xp.classList.toggle('has-focus', i >= 0);
-    items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); };
-  const update = () => {
-    if (calm.matches || !wide.matches) { xp.style.removeProperty('--tilt'); xp.style.removeProperty('--spread'); focus(-1); items.forEach(li => li.classList.add('is-on')); return; }
-    const r = track.getBoundingClientRect(), span = Math.max(1, track.offsetHeight - innerHeight), p = Math.min(1, Math.max(0, -r.top / span));
-    xp.style.setProperty('--tilt', ease(p / .18).toFixed(4));
-    xp.style.setProperty('--spread', ease((p - .12) / .22).toFixed(4));
-    const n = layers.length, q = (p - .36) / .6;
-    focus(q < 0 ? -1 : Math.min(n - 1, Math.floor(q * n)));
-  };
-  let queued = false; const on = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; update(); }); };
-  addEventListener('scroll', on, { passive: true }); addEventListener('resize', on); update();
+  const items = [...xp.querySelectorAll('[data-xp-item]')], layers = [...xp.querySelectorAll('[data-xp-layer]')], scene = xp.querySelector('.xp-scene');
+  const focus = i => { xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); };
+  items.forEach((li, k) => { li.addEventListener('pointerenter', () => focus(k)); li.addEventListener('focus', () => focus(k)); li.addEventListener('click', () => focus(k)); });
+  layers.forEach((l, k) => l.addEventListener('pointerenter', () => focus(k)));
+  xp.querySelector('.xp-list').addEventListener('pointerleave', () => focus(-1));
+  scene.addEventListener('pointerleave', () => { focus(-1); xp.style.setProperty('--rx', 0); xp.style.setProperty('--ry', 0); });
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches) scene.addEventListener('pointermove', e => { const r = scene.getBoundingClientRect(); xp.style.setProperty('--rx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); xp.style.setProperty('--ry', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3)); });
+  if (!('IntersectionObserver' in window)) { xp.classList.add('is-open'); return; }
+  const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { xp.classList.add('is-open'); io.disconnect(); } }), { threshold: .35 });
+  io.observe(xp); addEventListener('beforeprint', () => xp.classList.add('is-open'));
 })();
 
 // Case opening: the wall of screens follows the pointer slightly.
 (() => {
   const op = document.querySelector('[data-opening]'); if (!op || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  const sy = () => op.style.setProperty('--sy', Math.max(0, -op.getBoundingClientRect().top).toFixed(1)); addEventListener('scroll', sy, { passive: true }); sy();
   op.addEventListener('pointermove', e => { const r = op.getBoundingClientRect(); op.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); op.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3)); });
+})();
+
+// Story: as each moment reaches the middle of the screen (or is pointed at), its phone lights up, taps and shows that screen.
+(() => {
+  const st = document.querySelector('[data-story]'); if (!st) return;
+  const steps = [...st.querySelectorAll('[data-st-step]')], devs = [...st.querySelectorAll('[data-st-dev]')];
+  let cur = -1, timer = 0;
+  const show = i => {
+    if (i === cur) return; cur = i; const step = steps[i];
+    steps.forEach((s, k) => s.classList.toggle('is-on', k === i));
+    devs.forEach(d => d.classList.toggle('is-on', d.dataset.stDev === step.dataset.side));
+    const dev = devs.find(d => d.dataset.stDev === step.dataset.side), shots = [...dev.querySelectorAll('[data-st-shot]')], target = shots.find(x => +x.dataset.stShot === i), ring = dev.querySelector('.ply-tap');
+    const onIdx = shots.findIndex(x => x.classList.contains('is-on')), toIdx = shots.indexOf(target);
+    shots.forEach(x => x.classList.remove('is-out'));
+    if (onIdx !== toIdx) { if (onIdx >= 0 && toIdx > onIdx) shots[onIdx].classList.add('is-out'); shots.forEach(x => x.classList.toggle('is-on', x === target)); }
+    clearTimeout(timer);
+    if (step.dataset.tap) timer = setTimeout(() => { const [x, y] = step.dataset.tap.split(',').map(Number); ring.style.setProperty('--tx', x + '%'); ring.style.setProperty('--ty', y + '%'); ring.classList.remove('is-tap'); void ring.offsetWidth; ring.classList.add('is-tap'); }, 700);
+  };
+  steps.forEach((s, k) => { s.addEventListener('pointerenter', () => show(k)); s.addEventListener('focus', () => show(k)); });
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) show(+en.target.dataset.stStep); }), { rootMargin: '-45% 0px -45% 0px' });
+    steps.forEach(s => io.observe(s));
+  }
+  show(0);
 })();

@@ -284,22 +284,37 @@ window.addEventListener('pagereveal',event=>{
     }
   }
 
-  // Page transitions: fade the page out before following an internal link, and in on arrival.
+  // Page transitions: a coloured curtain rises over the page carrying the next title, then lifts on the new page.
+  const curtain = (color, title) => { const c = document.createElement('div'); c.className = 'v3-curtain'; c.style.setProperty('--curtain', color); c.setAttribute('aria-hidden', 'true'); c.innerHTML = `<b><span></span></b>`; c.querySelector('span').textContent = title || ''; document.body.append(c); return c; };
+  try {
+    const came = JSON.parse(sessionStorage.getItem('v3-curtain') || 'null'); sessionStorage.removeItem('v3-curtain');
+    if (came && Date.now() - came.t < 4000) {
+      const c = curtain(came.color, came.title); c.classList.add('is-in'); c.style.transition = 'none';
+      requestAnimationFrame(() => { document.documentElement.classList.remove('is-curtained'); requestAnimationFrame(() => { c.style.transition = ''; setTimeout(() => { c.classList.add('is-out'); setTimeout(() => c.remove(), 900); }, calm.matches ? 0 : 280); }); });
+    } else document.documentElement.classList.remove('is-curtained');
+  } catch { document.documentElement.classList.remove('is-curtained'); }
   if (!calm.matches) {
-    document.body.classList.add('v3-page-in');
     document.addEventListener('click', e => {
       const a = e.target.closest?.('a[href]');
       if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       if (a.target && a.target !== '_self' || a.hasAttribute('download')) return;
       const url = new URL(a.href, location.href);
       if (url.origin !== location.origin || url.protocol.indexOf('http') !== 0) return;
-      if (url.pathname === location.pathname && url.search === location.search) return; // same page / hash links
-      if (!/\.html$|\/$/.test(url.pathname)) return; // files such as PDFs
+      if (url.pathname === location.pathname && url.search === location.search) return;
+      if (!/\.html$|\/$/.test(url.pathname)) return;
       e.preventDefault();
-      document.documentElement.classList.add('is-page-leaving');
-      setTimeout(() => { location.href = url.href; }, 260);
+      const host = a.closest('[style*="--ink"],[style*="--project-ink"]');
+      const ink = host ? (getComputedStyle(host).getPropertyValue('--ink') || getComputedStyle(host).getPropertyValue('--project-ink')).trim() : '';
+      // The curtain carries the destination project's name when we know it, otherwise the link text.
+      const named = [...document.querySelectorAll('.sc-list a, .v3-card h3 a, .project-nav a')].find(x => { try { return new URL(x.href).pathname === url.pathname; } catch { return false; } });
+      const title = ((named && (named.querySelector('.sc-name') || named).textContent) || a.getAttribute('aria-label') || a.textContent || '').replace(/[↗→▶]/g, '').trim().slice(0, 60);
+      const color = ink || '#0f1a14';
+      try { sessionStorage.setItem('v3-curtain', JSON.stringify({ color, title, t: Date.now() })); } catch {}
+      const c = curtain(color, title); c.getBoundingClientRect(); c.classList.add('is-in');
+      c.addEventListener('transitionend', ev => { if (ev.target === c && ev.propertyName === 'transform') location.href = url.href; }, { once: true });
+      setTimeout(() => { location.href = url.href; }, 900);
     });
-    addEventListener('pageshow', e => { if (e.persisted) document.documentElement.classList.remove('is-page-leaving'); });
+    addEventListener('pageshow', e => { if (e.persisted) document.querySelectorAll('.v3-curtain').forEach(c => c.remove()); });
   }
 
   // Sections rise gently into view as you scroll (content already on screen is left alone).
@@ -489,22 +504,20 @@ window.addEventListener('pagereveal',event=>{
   op.addEventListener('pointermove', e => { const r = op.getBoundingClientRect(); op.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); op.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3)); });
 })();
 
-// Story: as each moment reaches the middle of the screen (or is pointed at), its phone lights up, taps and shows that screen.
+// Story: as each moment reaches the middle of the screen (or is pointed at), the one phone shows that screen; it turns when the side changes.
 (() => {
   const st = document.querySelector('[data-story]'); if (!st) return;
-  const steps = [...st.querySelectorAll('[data-st-step]')], devs = [...st.querySelectorAll('[data-st-dev]')];
-  let cur = -1, timer = 0;
+  const steps = [...st.querySelectorAll('[data-st-step]')], roles = [...st.querySelectorAll('[data-st-role]')], host = st.querySelector('.st-phone');
+  let cur = -1, side = steps[0]?.dataset.side;
   const show = i => {
-    if (i === cur) return; cur = i; const step = steps[i];
+    if (i === cur) return; const prev = cur; cur = i; const step = steps[i];
     steps.forEach((s, k) => s.classList.toggle('is-on', k === i));
-    devs.forEach(d => d.classList.toggle('is-on', d.dataset.stDev === step.dataset.side));
-    const dev = devs.find(d => d.dataset.stDev === step.dataset.side), shots = [...dev.querySelectorAll('[data-st-shot]')], target = shots.find(x => +x.dataset.stShot === i), ring = dev.querySelector('.ply-tap');
-    const onIdx = shots.findIndex(x => x.classList.contains('is-on')), toIdx = shots.indexOf(target);
-    shots.forEach(x => x.classList.remove('is-out'));
-    if (onIdx !== toIdx) { if (onIdx >= 0 && toIdx > onIdx) shots[onIdx].classList.add('is-out'); shots.forEach(x => x.classList.toggle('is-on', x === target)); }
-    clearTimeout(timer);
-    if (step.dataset.tap) timer = setTimeout(() => { const [x, y] = step.dataset.tap.split(',').map(Number); ring.style.setProperty('--tx', x + '%'); ring.style.setProperty('--ty', y + '%'); ring.classList.remove('is-tap'); void ring.offsetWidth; ring.classList.add('is-tap'); }, 700);
+    roles.forEach(r => r.classList.toggle('is-on', r.dataset.stRole === step.dataset.side));
+    const turn = prev >= 0 && step.dataset.side !== side; side = step.dataset.side;
+    const tap = step.dataset.tap ? step.dataset.tap.split(',').map(Number) : null;
+    host?._phone?.show(i, { turn, tap });
   };
+  host?.addEventListener('phone-ready', () => { const i = Math.max(0, cur); cur = -1; side = steps[i].dataset.side; show(i); });
   steps.forEach((s, k) => { s.addEventListener('pointerenter', () => show(k)); s.addEventListener('focus', () => show(k)); });
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) show(+en.target.dataset.stStep); }), { rootMargin: '-45% 0px -45% 0px' });
@@ -557,4 +570,50 @@ window.addEventListener('pagereveal',event=>{
     const ok = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } })();
     if (ok) import('./phone3d.mjs').then(m => m.mountAll()).catch(() => {});
   }
+})();
+
+// Doughnut: a small companion (after the Boy with doughnut handle) that trails the cursor and comments on what you point at.
+(() => {
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  try { if (localStorage.getItem('v3-buddy-off') === '1') return; } catch {}
+  const zh = () => document.documentElement.lang.startsWith('zh');
+  const b = document.createElement('div'); b.className = 'v3-buddy'; b.setAttribute('aria-hidden', 'true');
+  b.innerHTML = `<svg viewBox="0 0 60 60"><defs><radialGradient id="dn" cx="40%" cy="35%"><stop offset="0" stop-color="#f3c58a"/><stop offset="1" stop-color="#c98a4b"/></radialGradient></defs>
+    <circle cx="30" cy="31" r="25" fill="url(#dn)"/><path d="M8 27c3-12 15-19 27-17 9 2 16 8 18 17 1 5-3 6-5 3-2-3-5 1-8-1-3-2-6 3-9 0-3-3-6 2-9-1-3-2-5 3-8 1-3-1-7 3-6-2z" fill="#f59ab8"/>
+    <circle cx="30" cy="30" r="7" fill="#141518" opacity=".9"/><g fill="#fff"><rect x="16" y="17" width="5" height="1.8" rx=".9" transform="rotate(-30 18 18)"/><rect x="40" y="16" width="5" height="1.8" rx=".9" transform="rotate(25 42 17)"/><rect x="25" y="13" width="5" height="1.8" rx=".9"/></g>
+    <g class="eyes"><circle cx="22" cy="42" r="4.2" fill="#fff"/><circle cx="38" cy="42" r="4.2" fill="#fff"/><circle class="pupil" cx="22" cy="42" r="2" fill="#141518"/><circle class="pupil" cx="38" cy="42" r="2" fill="#141518"/></g>
+    <path d="M26 49q4 3 8 0" stroke="#7a4a22" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg><span class="v3-buddy-say"></span>`;
+  document.body.append(b);
+  const say = b.querySelector('.v3-buddy-say'), pupils = [...b.querySelectorAll('.pupil')];
+  const lines = [
+    ['[data-phone3d]', 'Grab it, it turns!', '抓住它，可以转！'],
+    ['.ux-live a', 'This one is live. Real customers!', '这个真的上线了，有真实顾客！'],
+    ['[data-st-step]', 'Watch the phone on the right', '看右边那部手机'],
+    ['[data-xp-item], .xp-layer', 'Each layer answers one question', '每一层回答一个问题'],
+    ['.sc-visual, .v3-card .v3-media', 'Click to step inside', '点进去看看'],
+    ['a[href^="mailto:"]', 'Say hi to Yifan!', '跟异凡打个招呼！'],
+    ['iframe', '', '']
+  ];
+  const idle = [['Hi, I am Doughnut. I will tag along.', '嗨，我是甜甜圈，我陪你逛。'], ['Psst, the phones are real screens.', '悄悄说：手机里都是真实界面。'], ['Scroll slowly, things move.', '慢慢滚，东西会动。']];
+  let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, last = '', quiet = 0, shown = false, talkT = 0, idleK = 0;
+  const talk = text => { if (!text) { b.classList.remove('is-talking'); last = ''; return; } if (text !== last) { say.textContent = text; last = text; } b.classList.add('is-talking'); clearTimeout(talkT); talkT = setTimeout(() => { b.classList.remove('is-talking'); last = ''; }, 2600); };
+  addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return; x = e.clientX; y = e.clientY; quiet = 0;
+    if (!shown) { shown = true; cx = x; cy = y; b.classList.add('is-on'); }
+    const hit = lines.find(([sel]) => e.target.closest?.(sel));
+    if (hit && hit[0] === 'iframe') { b.classList.remove('is-on'); shown = false; return; }
+    if (hit) talk(zh() ? hit[2] : hit[1]);
+  }, { passive: true });
+  document.addEventListener('pointerleave', () => { b.classList.remove('is-on'); shown = false; });
+  document.addEventListener('pointerdown', () => { b.classList.remove('is-happy'); void b.offsetWidth; b.classList.add('is-happy'); });
+  setInterval(() => { if (!shown) return; quiet++; if (quiet === 5) { const l = idle[idleK++ % idle.length]; talk(zh() ? l[1] : l[0]); } }, 1000);
+  const tick = () => {
+    const tx = x + 26, ty = y + 22; cx += (tx - cx) * .08; cy += (ty - cy) * .08;
+    const left = cx > innerWidth - 260; b.classList.toggle('is-left', left);
+    b.style.transform = `translate3d(${(left ? cx - 90 : cx).toFixed(1)}px,${cy.toFixed(1)}px,0)`;
+    const dx = Math.max(-1.6, Math.min(1.6, (x - cx) / 40)), dy = Math.max(-1.4, Math.min(1.4, (y - cy) / 40));
+    pupils.forEach(p => p.setAttribute('transform', `translate(${dx.toFixed(2)} ${dy.toFixed(2)})`));
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 })();

@@ -4,6 +4,7 @@ import * as THREE from '../assets/v3/lib/three/three.module.min.js';
 import { RoomEnvironment } from '../assets/v3/lib/three/RoomEnvironment.js';
 
 const zh = () => document.documentElement.lang.startsWith('zh');
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const zhSrc = s => s.replace(/\/([^/]+)$/, '/zh/$1');
 const load = src => new Promise(res => { const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 
@@ -57,7 +58,7 @@ function buildPhone(screenTex) {
 }
 
 // Draws one real screen into the display texture, with an iPhone status bar and island above it.
-function paint(ctx, img, status) {
+function paint(ctx, img, status, tap) {
   const c = ctx.canvas, W = c.width, H = c.height, top = status ? Math.round(W * .118) : 0;
   ctx.fillStyle = status ? '#fbfafc' : '#000'; ctx.fillRect(0, 0, W, H);
   if (img) ctx.drawImage(img, 0, top, W, H - top);
@@ -67,6 +68,11 @@ function paint(ctx, img, status) {
     const bx = W * .79, by = top * .56; // battery and signal, simplified
     ctx.fillRect(bx - W * .13, by - 2, W * .012, 7); ctx.fillRect(bx - W * .112, by - 5, W * .012, 10); ctx.fillRect(bx - W * .094, by - 8, W * .012, 13);
     ctx.strokeStyle = 'rgba(29,29,31,.5)'; ctx.lineWidth = 3; ctx.strokeRect(bx, by - 11, W * .07, 22); ctx.fillRect(bx + 4, by - 7, W * .05, 14);
+  }
+  if (tap && tap.a > 0) { // a finger-tap ripple drawn into the screen itself
+    const x = tap.x / 100 * W, y = top + tap.y / 100 * (H - top), r = W * (.05 + tap.k * .07);
+    ctx.save(); ctx.globalAlpha = tap.a; ctx.fillStyle = 'rgba(92,102,155,.28)'; ctx.strokeStyle = 'rgba(92,102,155,.75)'; ctx.lineWidth = W * .006;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
   }
   // dynamic island
   ctx.fillStyle = '#050506'; const iw = W * .3, ih = W * .085, ix = (W - iw) / 2, iy = W * .028;
@@ -93,7 +99,20 @@ export function mountPhone(host) {
   let imgs = [], k = 0, visible = false;
   const loadAll = async () => { imgs = await Promise.all(list.map(s => load(zh() ? zhSrc(s) : s))); paint(ctx, imgs[k], status); tex.needsUpdate = true; };
   loadAll(); document.addEventListener('portfolio:language', loadAll);
-  const cycle = setInterval(() => { if (!visible || !imgs.length || list.length < 2) return; k = (k + 1) % imgs.length; paint(ctx, imgs[k], status); tex.needsUpdate = true; }, interval);
+  const manual = host.dataset.mode === 'manual';
+  const cycle = setInterval(() => { if (manual || !visible || !imgs.length || list.length < 2) return; k = (k + 1) % imgs.length; paint(ctx, imgs[k], status); tex.needsUpdate = true; }, interval);
+  let spin = null, tapAnim = null, pending = -1;
+  const draw = () => { paint(ctx, imgs[k], status, tapAnim && tapAnim.state); tex.needsUpdate = true; };
+  const ctl = {
+    show(i, { turn = false, tap = null } = {}) {
+      if (!imgs.length) { k = i; return; }
+      tapAnim = null;
+      if (turn && !calm) { pending = i; spin = { from: ry, start: performance.now(), dur: 1100, swapped: false, tap }; }
+      else { k = i; draw(); if (tap) ctl.tap(tap); }
+    },
+    tap([x, y]) { if (calm) return; tapAnim = { x, y, start: performance.now() + 450, state: null }; },
+  };
+  host._phone = ctl; host.dispatchEvent(new CustomEvent('phone-ready'));
   const resize = () => { const r = host.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const fit = Math.max(1, 1.9 / (r.width / r.height)); camera.position.z = 4.4 * Math.min(fit, 1.6) * (+(host.dataset.zoom || 1)); };
   new ResizeObserver(resize).observe(host); resize();
   const el = renderer.domElement;
@@ -108,7 +127,14 @@ export function mountPhone(host) {
     requestAnimationFrame(tick);
     if (!visible || document.hidden) return;
     const t = (now - t0) / 1000;
-    if (!dragging) {
+    if (spin) { // a full turn; the screen swaps while the back faces you
+      const q = Math.min(1, (now - spin.start) / spin.dur), e = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+      ry = spin.from + e * Math.PI * 2; idle = 0;
+      if (!spin.swapped && q > .5) { spin.swapped = true; k = pending; draw(); }
+      if (q >= 1) { const tp = spin.tap; spin = null; if (tp) ctl.tap(tp); }
+    }
+    if (tapAnim) { const q = (now - tapAnim.start) / 700; if (q >= 0) { tapAnim.state = { x: tapAnim.x, y: tapAnim.y, k: Math.min(1, q), a: q < .25 ? q / .25 : Math.max(0, 1 - (q - .25) / .75) }; draw(); if (q >= 1) { tapAnim = null; draw(); } } }
+    if (!dragging && !spin) {
       ry += vy; rx += vx; vy *= .94; vx *= .94; idle += 1 / 60;
       if (idle > 1.6) { // drift back toward a flattering angle and sway
         rx += ((base.x + Math.sin(t * .6) * .05) - rx) * .02;

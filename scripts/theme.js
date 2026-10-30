@@ -7,6 +7,8 @@
   let theme = 'dark';
   try { const saved = localStorage.getItem(key); if (valid(saved)) theme = saved; } catch {}
   root.dataset.theme = theme;
+  // Arriving through the page-transition curtain: keep the screen covered until the page can lift it.
+  try { const c = JSON.parse(sessionStorage.getItem('v3-curtain') || 'null'); if (c && Date.now() - c.t < 4000) { root.classList.add('is-curtained'); root.style.setProperty('--curtain', c.color); } } catch {}
 
   function labels() {
     const zh = root.lang.startsWith('zh');

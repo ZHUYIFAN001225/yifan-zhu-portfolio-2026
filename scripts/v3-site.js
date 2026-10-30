@@ -652,9 +652,12 @@ window.addEventListener('pagereveal',event=>{
   const cl = v => Math.min(1, Math.max(0, v)), sm = v => { v = cl(v); return v * v * (3 - 2 * v); }, lerp = (a, b, t) => a + (b - a) * t;
   const set = (el, k, v) => el.style.setProperty(k, v);
   let lastLabel = -1;
-  const frame = () => {
+  let uS = -1, uRaf = 0;
+  const target = () => { const r = track.getBoundingClientRect(); return cl(-r.top / Math.max(1, r.height - innerHeight)) * U; };
+  const glide = () => { uRaf = 0; const tg = target(); if (uS < 0 || Math.abs(tg - uS) > 3) uS = tg; else uS += (tg - uS) * .14; frame(uS); if (Math.abs(tg - uS) > .0008) uRaf = requestAnimationFrame(glide); };
+  const frame = (u) => {
     if (!wide.matches || calm.matches) return;
-    const r = track.getBoundingClientRect(), vh = innerHeight, u = cl(-r.top / Math.max(1, r.height - vh)) * U;
+    const vh = innerHeight;
     const o = sm(u / 1.4); set(fm, '--o', o.toFixed(4));
     const toRight = sm((u - .3) / 1.2);
     set(phone, '--phx', lerp(50, 70, toRight).toFixed(3) + '%'); set(phone, '--phs', lerp(1.12, 1, toRight).toFixed(4));
@@ -667,13 +670,13 @@ window.addEventListener('pagereveal',event=>{
     const before = su0 < 0, inDuo = dt >= 0, after = !inStory && !before && !inDuo;
     steps.forEach((st, k) => {
       let m = 1, a = 0;
-      if (inStory && k === i) { const ein = sm(l / .18), eout = sm((l - .84) / .16); m = l < .5 ? 1 - ein : -eout; a = l < .5 ? ein : 1 - eout; }
+      if (inStory && k === i) { const ein = sm(l / .26), eout = sm((l - .78) / .22); m = l < .5 ? 1 - ein : -eout; a = l < .5 ? ein : 1 - eout; }
       else if (k < i || (k === i && !before)) m = -1;
       set(st, '--m', m.toFixed(4)); set(st, '--a', a.toFixed(4));
     });
     // screens slide like an app push; the user chapter ends by sliding back to the feed for the switch
     const lastOfUser = i === n1 - 1, next = lastOfUser ? 0 : i + 1 < n ? i + 1 : i;
-    const tt = inStory ? sm((l - .82) / .18) : inDuo ? 1 : 0;
+    const tt = inStory ? sm((l - .76) / .24) : inDuo ? 1 : 0;
     shots.forEach((im, k) => {
       let x = 100;
       if (before) x = k === 0 ? 0 : 100;
@@ -691,7 +694,14 @@ window.addEventListener('pagereveal',event=>{
     const so = inStory ? sm((l - .14) / .14) * (1 - sm((l - .74) / .1)) : 0;
     const [sx, sy, sw, sh] = sp, cx = sx + sw / 2, cy = sy + sh / 2, zmax = Math.min(1.45, Math.max(1.05, 62 / sh));
     set(zoom, '--sl', sx + '%'); set(zoom, '--st', sy + '%'); set(zoom, '--sw', sw + '%'); set(zoom, '--sh', sh + '%');
-    set(zoom, '--ox', cx + '%'); set(zoom, '--oy', cy + '%'); set(zoom, '--z', (1 + (zmax - 1) * so).toFixed(4)); set(zoom, '--so', so.toFixed(4)); set(phone, '--so', so.toFixed(4));
+    set(zoom, '--so', so.toFixed(4)); set(phone, '--so', so.toFixed(4));
+    const lift = inStory ? sm((l - .12) / .22) * (1 - sm((l - .7) / .14)) : 0; set(phone, '--lift', lift.toFixed(4));
+    set(phone, '--sl', sx + '%'); set(phone, '--st', sy + '%'); set(phone, '--sw', sw + '%'); set(phone, '--sh', sh + '%');
+    set(phone, '--lbs', `${(100 * 100 / sw).toFixed(3)}% ${(100 * 100 / sh).toFixed(3)}%`);
+    set(phone, '--lbp', `${sw >= 100 ? 0 : (sx / (100 - sw) * 100).toFixed(3)}% ${sh >= 100 ? 0 : (sy / (100 - sh) * 100).toFixed(3)}%`);
+    if (shots[i] && phone.dataset.limg !== String(i)) { phone.dataset.limg = String(i); set(phone, '--limg', `url("${shots[i].currentSrc || shots[i].src}")`); }
+    const story = sm((u - .6) / 1) * (1 - (inDuo ? sm(dt / .3) : 0) * .6);
+    set(phone, '--prx', (story * 14).toFixed(2) + 'deg'); set(phone, '--pry', (story * -22).toFixed(2) + 'deg'); set(phone, '--prz', (story * 3).toFixed(2) + 'deg');
     if (i !== lastLabel) { lastLabel = i; label.textContent = d?.querySelector('.fm-label')?.textContent || ''; }
     const vr = view.getBoundingClientRect(), pr = phone.getBoundingClientRect();
     set(callout, '--cy', (vr.top - pr.top + vr.height * cy / 100).toFixed(1) + 'px');
@@ -700,8 +710,9 @@ window.addEventListener('pagereveal',event=>{
     set(fm, '--ra', (sm(su0 / .3) * (1 - sm((su0 - n - DUO) / .3))).toFixed(3));
     dots.forEach((dt2, k) => set(dt2, '--f', (k < i || (k === i && (after || inDuo)) ? 1 : k === i && inStory ? l : 0).toFixed(3)));
   };
-  let q = false; const on = () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; frame(); }); } };
-  addEventListener('scroll', on, { passive: true }); addEventListener('resize', on); frame();
+  const on = () => { if (!uRaf) uRaf = requestAnimationFrame(glide); };
+  document.addEventListener('portfolio:language', () => setTimeout(() => { delete phone.dataset.limg; uS = -1; on(); }, 80));
+  addEventListener('scroll', on, { passive: true }); addEventListener('resize', () => { uS = -1; on(); }); on();
   // pointer depth for the floating work
   if (matchMedia('(hover:hover) and (pointer:fine)').matches && !calm.matches) {
     stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); const mx = (e.clientX - r.left) / r.width * 2 - 1, my = (e.clientY - r.top) / r.height * 2 - 1; set(fm, '--mx', mx.toFixed(3)); set(fm, '--my', my.toFixed(3)); set(stage, '--px', mx.toFixed(3)); });

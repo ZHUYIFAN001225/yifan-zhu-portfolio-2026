@@ -1541,3 +1541,16 @@ html[data-theme=dark] .v3-buddy-say{background:#f4f3ee;color:#141518}
 .fm.has-dust .fm-line .fm-spark{fill:#f59ab8}
 .fm-tilt{position:absolute;z-index:4;left:50%;bottom:76px;translate:-50% 0;margin:0;padding:10px 16px;border:0;border-radius:999px;background:rgba(255,255,255,.12);color:#f3eef6;font:inherit;font-size:13px;backdrop-filter:blur(8px);display:none}
 @media(hover:none) and (pointer:coarse){.fm-tilt.is-needed{display:block}}
+
+/* film v3: the part being discussed lifts out of the tilted phone as its own layer (no zoom) */
+.fm-stage{perspective:2000px;perspective-origin:65% 45%}
+.fm-phone{transform:translate(-50%,-50%) rotateX(var(--prx,0deg)) rotateY(var(--pry,0deg)) rotateZ(var(--prz,0deg)) scale(var(--phs,1))}
+.fm-phone .dev,.fm-phone .dev-screen{transform-style:preserve-3d}
+.fm-zoom{transform:none!important}
+.fm-spot{box-shadow:0 0 0 999px rgba(10,8,12,calc(var(--so,0) * .45));border-radius:10px;opacity:1}
+.fm-lift{position:absolute;inset:0;pointer-events:none;transform-style:preserve-3d}
+.fm-lift-img{position:absolute;left:var(--sl,0%);top:var(--st,0%);width:var(--sw,100%);height:var(--sh,100%);border-radius:12px;background-image:var(--limg);background-repeat:no-repeat;background-size:var(--lbs,100% 100%);background-position:var(--lbp,0 0);
+  transform:translateZ(calc(var(--lift,0) * 70px)) scale(calc(1 + var(--lift,0) * .05));opacity:calc(var(--lift,0) * 6);
+  box-shadow:0 0 0 2px rgba(245,154,184,calc(var(--lift,0))),0 calc(var(--lift,0) * 40px) calc(var(--lift,0) * 60px) rgba(0,0,0,calc(var(--lift,0) * .55))}
+.fm-callout{opacity:var(--lift,0);transform:translateZ(calc(var(--lift,0) * 70px))}
+.fm-step,.fm-duo{will-change:transform}

@@ -1712,3 +1712,29 @@ html[data-theme=dark] .v3-buddy-say{background:#f4f3ee;color:#141518}
 .fm-wh.is-near span::before{content:'';display:inline-block;width:6px;height:6px;margin:0 10px 3px 0;border-radius:50%;background:currentColor;opacity:.6}
 .fm.is-duo .fm-wh{opacity:0!important;pointer-events:none}
 @media(max-width:760px){.fm-wheel{display:none}}
+
+/* ---------- Snip, the scissors companion on the LOOK case ---------- */
+.snip{position:fixed;left:0;top:0;z-index:60;width:64px;height:64px;margin:-32px 0 0 -32px;padding:0;border:0;background:none;cursor:pointer;opacity:0;transition:opacity .5s;pointer-events:none}
+.snip.is-on{opacity:1;pointer-events:auto}
+.snip-body{display:block;width:100%;height:100%;filter:drop-shadow(0 14px 16px rgba(0,0,0,.45))}
+.snip svg{width:100%;height:100%;overflow:visible}
+.snip-blade{transform-origin:40px 40px;transition:transform .25s ease}
+.snip.is-flying .snip-blade--a{animation:snip-a .5s ease-in-out infinite}
+.snip.is-flying .snip-blade--b{animation:snip-b .5s ease-in-out infinite}
+.snip.is-snap .snip-blade--a{animation:snip-a .18s ease-in-out 3}
+.snip.is-snap .snip-blade--b{animation:snip-b .18s ease-in-out 3}
+.snip.is-snap .snip-body{animation:snip-hop .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes snip-a{50%{transform:rotate(14deg)}}
+@keyframes snip-b{50%{transform:rotate(-14deg)}}
+@keyframes snip-hop{40%{translate:0 -18px}}
+.snip-eyes{animation:snip-blink 4s infinite;transform-origin:40px 28px}
+@keyframes snip-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.snip-say{position:absolute;left:72px;top:-6px;white-space:nowrap;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#f3eef6;color:#1a141c;font:500 14px/1.2 Inter,system-ui,sans-serif;box-shadow:0 12px 26px rgba(0,0,0,.3);opacity:0;transform:translateY(6px) scale(.9);transform-origin:0 100%;transition:opacity .25s,transform .4s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.snip.is-right .snip-say{left:auto;right:72px;border-radius:16px 16px 4px 16px;transform-origin:100% 100%}
+.snip.is-talking .snip-say{opacity:1;transform:none}
+html[data-theme=light] .snip-say{background:#1a141c;color:#f3eef6}
+/* rhythm below the film: cards drift at different speeds and sit in a staggered grid */
+.v3-par{transform:translateY(var(--py,0px));will-change:transform}
+[data-product-case=beauty] .ux-decisions article:nth-child(even){margin-left:clamp(0px,8vw,140px)}
+[data-product-case=beauty] .ux-decisions article{transition:background .4s;border-radius:18px;padding-inline:18px}
+[data-product-case=beauty] .ux-decisions article:hover{background:rgba(245,154,184,.06)}

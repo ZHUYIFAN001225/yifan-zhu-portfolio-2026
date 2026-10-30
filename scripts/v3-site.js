@@ -343,7 +343,7 @@ window.addEventListener('pagereveal',event=>{
     const tag = document.createElement('span'); dot.append(tag); document.body.append(dot);
     document.documentElement.classList.add('has-v3-cursor');
     let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, shown = false;
-    const words = { view: ['View case', '查看案例'], try: ['Try it', '试一试'], play: ['Watch', '观看'], find: ['Click to find who', '点一下，找到谁能做'], scissors: ['Snip', '剪一下'], polish: ['New colour', '换个颜色'], comb: ['Comb it', '梳一梳'], dryer: ['Blow-dry', '吹一下'], lipstick: ['Draw a line', '画一笔'] };
+    const words = { view: ['View case', '查看案例'], try: ['Try it', '试一试'], play: ['Watch', '观看'], find: ['Click to find who', '点一下，找到谁能做'], scissors: ['Snip', '剪一下'], polish: ['New colour', '换个颜色'], comb: ['Comb it', '梳一梳'], dryer: ['Blow-dry', '吹一下'], lipstick: ['Draw a line', '画一笔'], snip: ['Poke me', '戳我一下'] };
     addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse') return;
       x = e.clientX; y = e.clientY;
@@ -810,4 +810,82 @@ window.addEventListener('pagereveal',event=>{
   });
   if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
   addEventListener('pointermove', e => { const x = (e.clientX / innerWidth * 2 - 1).toFixed(3); devs.forEach(d => d.style.setProperty('--mrx2', x)); }, { passive: true });
+})();
+
+// Snip: a small pair of scissors that travels down the case with you. It flies from section to section along a curve,
+// leaning and growing mid-flight, lands beside each section with one line about it, and reacts when clicked.
+(() => {
+  if (!document.querySelector('[data-film]') || matchMedia('(max-width: 760px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const zh = () => document.documentElement.lang.startsWith('zh');
+  const lines = {
+    overview: ['It all starts with a picture.', '一切从一张图片开始。'],
+    system: ['One feed, two kinds of people.', '一个信息流，两种人。'],
+    strategy: ['Supply first. No Creators, no feed.', '先有供给。没有 Creator 就没有信息流。'],
+    flow: ['Picture → person → booking.', '图片 → 人 → 预约。'],
+    interfaces: ['Look closer, the details matter.', '凑近看看，细节很重要。'],
+    logic: ['Location before ranking!', '先看距离，再排顺序！'],
+    build: ['Built with AI, inside the rules.', '用 AI 做的，但守着规则。'],
+    challenges: ['Honest bit: what is still hard.', '说实话：还有哪些难点。'],
+    research: ['Next: real people, real salons.', '下一步：真实的人，真实的店。'],
+    release: ['Where it goes from here.', '接下来往哪走。']
+  };
+  const pokes = [['Snip snip!', '咔嚓咔嚓！'], ['Fresh cut ✂', '刚剪好 ✂'], ['Book me?', '约我吗？'], ['Hey, that tickles.', '哎，好痒。'], ['I only cut real work.', '我只剪真实作品。']];
+  const secs = [...document.querySelectorAll('.ux-case .v3-product-section.ux-section')].filter(s => lines[s.id]);
+  if (!secs.length) return;
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'snip'; b.setAttribute('aria-label', 'Scissors'); b.dataset.cursor = 'snip';
+  b.innerHTML = `<span class="snip-body"><svg viewBox="0 0 80 80" aria-hidden="true"><g class="snip-blade snip-blade--a"><path d="M40 40 76 8" stroke="#e9e4ee" stroke-width="6" stroke-linecap="round"/><circle cx="24" cy="56" r="11" fill="none" stroke="#f59ab8" stroke-width="6"/><path d="M40 40 31 49" stroke="#f59ab8" stroke-width="6" stroke-linecap="round"/></g><g class="snip-blade snip-blade--b"><path d="M40 40 8 8" stroke="#e9e4ee" stroke-width="6" stroke-linecap="round"/><circle cx="56" cy="56" r="11" fill="none" stroke="#f59ab8" stroke-width="6"/><path d="M40 40 49 49" stroke="#f59ab8" stroke-width="6" stroke-linecap="round"/></g><circle cx="40" cy="40" r="4" fill="#120f16" stroke="#e9e4ee" stroke-width="2"/><g class="snip-eyes"><circle cx="33" cy="28" r="2.6" fill="#120f16"/><circle cx="47" cy="28" r="2.6" fill="#120f16"/></g></svg></span><span class="snip-say"></span>`;
+  document.body.append(b);
+  const say = b.querySelector('.snip-say');
+  let pts = [], cx = 0, cy = 0, x = 0, y = 0, rot = 0, sc = 1, landed = -1, talkT = 0, pk = 0;
+  const measure = () => { pts = secs.map((s, k) => { const r = s.getBoundingClientRect(); const right = k % 2 === 1; return { x: right ? innerWidth - 120 : 70, y: r.top + scrollY + 40, right }; }); };
+  const talk = (t, ms = 2600) => { say.textContent = t; b.classList.add('is-talking'); clearTimeout(talkT); talkT = setTimeout(() => b.classList.remove('is-talking'), ms); };
+  const target = () => {
+    const mid = scrollY + innerHeight * .42;
+    if (!pts.length) return null;
+    if (mid <= pts[0].y) return { x: pts[0].x, y: Math.max(mid, pts[0].y - innerHeight), k: 0, t: 0, a: pts[0], b: pts[0] };
+    for (let k = 0; k < pts.length - 1; k++) { const a = pts[k], c = pts[k + 1]; if (mid < c.y) { const t = (mid - a.y) / (c.y - a.y); return { k, t, a, b: c }; } }
+    const L = pts[pts.length - 1]; return { k: pts.length - 1, t: 0, a: L, b: L };
+  };
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const tick = () => {
+    const g = target();
+    if (g) {
+      // stay at a section for the first part of the gap, then fly in an arc to the next one
+      const hold = .55, tt = g.t < hold ? 0 : ease((g.t - hold) / (1 - hold));
+      const tx = g.a.x + (g.b.x - g.a.x) * tt, arc = Math.sin(tt * Math.PI) * -120;
+      const ty = scrollY + innerHeight * .36 + arc; // stays in view; only its side and pose change
+      cx += (tx - cx) * .12; cy = scrollY + innerHeight * .36 + ((cy - scrollY) - innerHeight * .36) * .88 + arc * .12;
+      const flying = tt > .02 && tt < .98;
+      const dir = Math.sign(g.b.x - g.a.x) || 1;
+      rot += ((flying ? dir * (20 + Math.sin(tt * Math.PI) * 25) : Math.sin(performance.now() / 700) * 6) - rot) * .1;
+      sc += ((flying ? 1 + Math.sin(tt * Math.PI) * .6 : 1) - sc) * .1;
+      b.classList.toggle('is-flying', flying); b.classList.toggle('is-right', (flying ? g.b : g.a).right);
+      b.style.transform = `translate3d(${cx.toFixed(1)}px,${(cy - scrollY).toFixed(1)}px,0)`;
+      b.querySelector('.snip-body').style.transform = `rotate(${rot.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
+      const at = !flying && g.t < hold ? g.k : -1;
+      if (at >= 0 && at !== landed) { landed = at; const l = lines[secs[at].id]; talk(zh() ? l[1] : l[0]); }
+      if (at < 0) landed = -1;
+      const vis = scrollY + innerHeight > pts[0].y && scrollY < pts[pts.length - 1].y + 600;
+      b.classList.toggle('is-on', vis);
+    }
+    requestAnimationFrame(tick);
+  };
+  b.addEventListener('click', () => { b.classList.remove('is-snap'); void b.offsetWidth; b.classList.add('is-snap'); const l = pokes[pk++ % pokes.length]; talk(zh() ? l[1] : l[0], 1800); });
+  addEventListener('resize', measure); document.addEventListener('portfolio:language', () => setTimeout(measure, 100));
+  addEventListener('load', measure); setTimeout(measure, 600); measure();
+  const g0 = target(); if (g0) { cx = g0.a.x; cy = g0.a.y; }
+  requestAnimationFrame(tick);
+  // keep measurements fresh as images load and layouts settle
+  new ResizeObserver(() => measure()).observe(document.body);
+  setInterval(measure, 600);
+})();
+
+// Parallax rhythm for the case content below the film: cards in a row drift at different speeds.
+(() => {
+  if (!document.querySelector('[data-film]') || matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(max-width: 760px)').matches) return;
+  const els = [...document.querySelectorAll('.ux-decisions article, .ux-details figure, .ux-principles>div, .ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*')];
+  els.forEach((e, k) => { e.classList.add('v3-par'); e.style.setProperty('--sp', [0.6, -0.35, 1, -0.6, 0.3][k % 5]); });
+  let q = false;
+  const run = () => { q = false; const vh = innerHeight; els.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return; const p = (r.top + r.height / 2 - vh / 2) / vh; e.style.setProperty('--py', (p * -60 * +e.style.getPropertyValue('--sp')).toFixed(1) + 'px'); }); };
+  addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
 })();

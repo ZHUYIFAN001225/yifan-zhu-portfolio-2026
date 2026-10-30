@@ -136,13 +136,48 @@ function anxiety() {
       <p class="am-take">${t('The biggest shift for me: from designing an object to designing a capability, and from promising “less anxiety” to a claim the evidence could actually carry.','对我来说最大的转变：从设计一个物件，转向培养一种能力；从承诺“减少焦虑”，转向一个证据真正撑得住的结论。')}</p>`,'reflect')}
     <nav class="project-nav"><a href="project-cross-culture.html">${t('Cross-Culture Icebreaker','跨文化破冰包')}</a><a class="back-link" href="work.html">${t('Back to All Work','返回全部作品')}</a></nav></article>`);
 }
+// Featured showcase on the homepage: one project per screen while scrolling, with a numbered list and a plain one-line summary.
+const showcase = () => {
+  const ids=['salon-booking','beauty-marketplace','anxiety-market','biodiversity-clock','blender-reel'];
+  const tones={'salon-booking':['#cedbd2','#263e32'],'beauty-marketplace':['#ddd3e2','#3e3047'],'anxiety-market':['#dce3ed','#35445a'],'biodiversity-clock':['#dfe5be','#414b2f'],'blender-reel':['#d6d2cc','#2f2e2c']};
+  const lines={
+    'salon-booking':['A booking website a real Glasgow salon now uses: customers book in Chinese or English, the owner runs her day from one screen.','一家格拉斯哥理发店正在使用的预约网站：顾客用中文或英文预约，店主在一个页面管好一整天。'],
+    'beauty-marketplace':['A two-sided beauty marketplace: find a look you love, then book a local creator who can do it.','双边美业平台：找到喜欢的造型，再预约附近能做出来的服务者。'],
+    'anxiety-market':['Service design research: why graduates can’t use the help around them, tested over two prototype rounds.','服务设计研究：毕业生为什么用不上身边的帮助？经过两轮原型测试。'],
+    'biodiversity-clock':['A museum and park experience that lets visitors feel ecological time, not just read about it.','一个博物馆与公园体验，让参观者感受生态时间，而不只是读到它。'],
+    'blender-reel':['An original Blender film: environment design, spacecraft animation and cinematic lighting, made end to end.','原创 Blender 短片：从环境设计、飞行器动画到电影感灯光，全部独立完成。']
+  };
+  const list=ids.map(id=>projects.find(p=>p.id===id)).filter(Boolean);
+  const n=String(list.length).padStart(2,'0');
+  const scene=p=>{
+    if(p.demo){const pair2=p.demo==='beauty'?['beauty-discover','beauty-creator']:['booking-customer','booking-admin'];
+      return `<span class="sc-phones">${pair2.map((f,i)=>`<img class="sc-phone sc-phone--${i+1}" data-i18n-img src="assets/v3/products/${f}.jpg" alt="" ${i?'loading="lazy"':''} decoding="async" />`).join('')}</span>`;}
+    if(p.preview)return `<span class="sc-film"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /><video data-sc-video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="${p.preview}"></video></span>`;
+    return `<span class="sc-image"><img src="${p.cover}" alt="" loading="lazy" decoding="async" /></span>`;
+  };
+  const items=list.map((p,i)=>{const tone=tones[p.id]||['#ddd9d0','#34363b'];const live=p.status.en.startsWith('Live');
+    return `<article class="sc-scene${i?'':' is-active'}" data-sc-scene="${i}" style="--tone:${tone[0]};--ink:${tone[1]}">
+        <a class="sc-visual" href="${p.href}" data-cursor="${p.demo?'try':'view'}" aria-label="${pair(p.title)}">${scene(p)}</a>
+        <div class="sc-caption"><p class="sc-status${live?' is-live':''}">${live?'<i aria-hidden="true"></i>':''}${pair(p.status)}</p><h2 class="sc-title"><a href="${p.href}">${pair(p.title)}</a></h2><p class="sc-line">${t(...lines[p.id])}</p>
+          <div class="sc-actions"><a class="sc-btn sc-btn--solid" href="${p.href}">${t('View the case','查看案例')} <span aria-hidden="true">→</span></a>${p.demo?`<a class="sc-btn" href="${p.href}#interactive-demo">${t('Try the prototype','试用原型')}</a>`:''}${p.video&&!p.demo?`<a class="sc-btn" href="${p.href}">${t('Watch the film','观看短片')}</a>`:''}</div></div>
+      </article>`;}).join('');
+  return `<section class="sc" data-showcase aria-label="${t('Featured work','精选作品')}" style="--count:${list.length}"><div class="sc-track"><div class="sc-stage">
+    <div class="sc-wash" aria-hidden="true"></div>
+    <div class="sc-side"><p class="sc-intro">${t('Yifan Zhu · Research-led Multidisciplinary Designer','朱异凡 · 研究驱动的跨领域设计师')}</p><p class="sc-heading">${t('Selected work','精选作品')}</p>
+      <p class="sc-count" aria-hidden="true"><span data-sc-current>01</span><small> / ${n}</small></p>
+      <ol class="sc-list">${list.map((p,i)=>`<li><a href="${p.href}" data-sc-go="${i}"${i?'':' aria-current="true"'}><span class="sc-num">${String(i+1).padStart(2,'0')}</span><span class="sc-name">${pair(p.title)}</span><span class="sc-kind">${pair(p.kind)}</span></a></li>`).join('')}</ol>
+      <p class="sc-hint"><span aria-hidden="true" class="sc-mouse"></span>${t('Scroll to browse','向下滚动浏览')}</p></div>
+    <div class="sc-scenes">${items}</div>
+    <div class="sc-progress" aria-hidden="true"><span></span></div>
+  </div></div></section>`;
+};
 export async function renderPortfolio() {
   for(const key of Object.keys(dictionary))delete dictionary[key];
   const home = `<section class="v3-hero"><div><p class="v3-eyebrow">${t('Research-led Multidisciplinary Designer','研究驱动的跨领域设计师')}</p><h1>${t('Research-led.','以研究为起点。')}<br><span>${t('Made tangible.','让想法可体验。')}</span></h1></div><div class="v3-hero-note"><p>${t('I turn complex questions into experiences you can see, use and test.','我将复杂的问题转化为可看见、可使用、可测试的体验。')}</p><span>${t('Products. Moving images. Systems.','产品、动态影像与系统。')}</span></div></section>`;
   const work = `<section class="v3-hero v3-hero--work"><div><p class="v3-eyebrow">${t('The work of Yifan Zhu','朱异凡的设计实践')}</p><h1>${t('Different disciplines.','跨越不同领域。')}<br><span>${t('One curious mind.','始于同一份好奇。')}</span></h1></div><div class="v3-hero-note"><p>${t('Find the perspective that fits your team.','找到适合你的团队的设计视角。')}</p><span>${t('Explore a collection. Open the full story.','按方向浏览，深入完整案例。')}</span></div></section>`;
   // The homepage opens straight on the collection, so a reviewer can pick a discipline in one click.
   const homeHero = work.replace(`${t('The work of Yifan Zhu','朱异凡的设计实践')}`,t('Yifan Zhu · Research-led Multidisciplinary Designer','朱异凡 · 研究驱动的跨领域设计师'));
-  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',homeHero+gallery(),'v3-index'));
+  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',showcase()+work+gallery(),'v3-index'));
   await fs.writeFile('practice.html',renderVisualWork(t,document,projects));
   await fs.writeFile('work.html',document('Yifan Zhu | All Work',work+gallery(),'v3-index'));
   await fs.writeFile('project-anxiety-market.html',anxiety());

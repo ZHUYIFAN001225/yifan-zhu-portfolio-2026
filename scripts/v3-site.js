@@ -260,3 +260,93 @@ window.addEventListener('pagereveal',event=>{
   const align = () => { if (matchMedia('(min-width: 761px)').matches) { scrollTo({ top: 0, behavior: 'auto' }); return; } const h = document.querySelector('.site-header')?.offsetHeight || 0; const y = el.getBoundingClientRect().top + scrollY - h - 16; scrollTo({ top: Math.max(0, y), behavior: 'auto' }); };
   addEventListener('load', () => { align(); setTimeout(align, 400); }, { once: true });
 })();
+
+// Motion layer: custom cursor, rolling nav labels and the homepage showcase.
+(() => {
+  const fine = matchMedia('(hover:hover) and (pointer:fine)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const zh = () => document.documentElement.lang.startsWith('zh');
+
+  // Header links roll to a second copy of their label on hover.
+  document.querySelectorAll('.v3-header nav > a').forEach(a => {
+    const target = a.querySelector('.v3-contact-label') || (a.children.length ? null : a);
+    if (!target || target.querySelector('.v3-roll')) return;
+    const label = target.textContent.trim(); if (!label) return;
+    target.textContent = '';
+    const roll = document.createElement('span'); roll.className = 'v3-roll';
+    for (const k of [0, 1]) { const s = document.createElement('span'); s.textContent = label; if (k) s.setAttribute('aria-hidden', 'true'); roll.append(s); }
+    target.append(roll);
+  });
+
+  // A small dot that follows the pointer; it grows into a labelled disc over project visuals.
+  if (fine.matches && !calm.matches) {
+    const dot = document.createElement('div'); dot.className = 'v3-cursor'; dot.setAttribute('aria-hidden', 'true');
+    const tag = document.createElement('span'); dot.append(tag); document.body.append(dot);
+    document.documentElement.classList.add('has-v3-cursor');
+    let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, shown = false;
+    const words = { view: ['View', '查看'], try: ['Try it', '试一试'], play: ['Play', '播放'] };
+    addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse') return;
+      x = e.clientX; y = e.clientY;
+      if (!shown) { cx = x; cy = y; shown = true; dot.classList.add('is-on'); }
+      const hit = e.target.closest?.('[data-cursor]');
+      const link = e.target.closest?.('a,button,[role="button"],summary,label,select');
+      dot.classList.toggle('is-label', !!hit);
+      dot.classList.toggle('is-link', !hit && !!link);
+      if (hit) tag.textContent = (words[hit.dataset.cursor] || words.view)[zh() ? 1 : 0];
+    }, { passive: true });
+    // Content can move under a still pointer (scrolling the showcase), so re-check what it is over.
+    let recheck = 0; addEventListener('scroll', () => { clearTimeout(recheck); recheck = setTimeout(() => { if (!shown) return; const el = document.elementFromPoint(x, y); const hit = el?.closest?.('[data-cursor]'); const link = el?.closest?.('a,button,[role="button"],summary,label,select');
+      dot.classList.toggle('is-label', !!hit); dot.classList.toggle('is-link', !hit && !!link); if (hit) tag.textContent = (words[hit.dataset.cursor] || words.view)[zh() ? 1 : 0]; }, 90); }, { passive: true });
+    document.addEventListener('pointerleave', () => { shown = false; dot.classList.remove('is-on'); });
+    addEventListener('blur', () => { shown = false; dot.classList.remove('is-on'); });
+    document.addEventListener('pointerdown', () => dot.classList.add('is-down'));
+    document.addEventListener('pointerup', () => dot.classList.remove('is-down'));
+    // Iframes swallow pointer events, so hide the dot while the pointer is over one.
+    document.querySelectorAll('iframe').forEach(f => f.addEventListener('pointerenter', () => { shown = false; dot.classList.remove('is-on'); }));
+    const tick = () => { cx += (x - cx) * 0.22; cy += (y - cy) * 0.22; dot.style.transform = `translate3d(${cx}px,${cy}px,0)`; requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
+
+  // Homepage showcase: the section is tall; a sticky stage swaps projects as you scroll through it.
+  const sc = document.querySelector('[data-showcase]');
+  if (!sc) return;
+  const track = sc.querySelector('.sc-track'), scenes = [...sc.querySelectorAll('[data-sc-scene]')], links = [...sc.querySelectorAll('[data-sc-go]')];
+  const counter = sc.querySelector('[data-sc-current]'), bar = sc.querySelector('.sc-progress span');
+  const wide = matchMedia('(min-width: 900px)');
+  let active = -1;
+  const setActive = i => {
+    if (i === active) return; active = i;
+    scenes.forEach((s, k) => { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); });
+    links.forEach((a, k) => { if (k === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    counter.textContent = String(i + 1).padStart(2, '0');
+    const cs = scenes[i].style; sc.style.setProperty('--tone', cs.getPropertyValue('--tone')); sc.style.setProperty('--ink', cs.getPropertyValue('--ink'));
+    scenes.forEach((s, k) => { const v = s.querySelector('video[data-sc-video]'); if (!v) return;
+      if (k === i && !calm.matches) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); });
+  };
+  const span = () => track.offsetHeight - innerHeight;
+  const update = () => {
+    if (!wide.matches) { sc.style.removeProperty('--p'); return; }
+    const top = track.getBoundingClientRect().top, p = Math.min(1, Math.max(0, -top / Math.max(1, span())));
+    const n = scenes.length, f = p * n, i = Math.min(n - 1, Math.floor(f));
+    setActive(i);
+    sc.style.setProperty('--local', (Math.min(1, f - i)).toFixed(3));
+    if (bar) bar.style.transform = `scaleY(${p.toFixed(4)})`;
+  };
+  let queued = false;
+  const onScroll = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; update(); }); };
+  addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); wide.addEventListener?.('change', onScroll);
+  links.forEach((a, k) => a.addEventListener('click', e => {
+    if (!wide.matches) return;
+    e.preventDefault();
+    const y = scrollY + track.getBoundingClientRect().top + span() * (k + 0.5) / scenes.length;
+    scrollTo({ top: y, behavior: calm.matches ? 'auto' : 'smooth' });
+  }));
+  // Gentle tilt and depth that follow the pointer over the stage.
+  if (fine.matches && !calm.matches) {
+    const stage = sc.querySelector('.sc-stage');
+    stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); sc.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); sc.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3)); });
+    stage.addEventListener('pointerleave', () => { sc.style.setProperty('--mx', 0); sc.style.setProperty('--my', 0); });
+  }
+  setActive(0); update();
+})();

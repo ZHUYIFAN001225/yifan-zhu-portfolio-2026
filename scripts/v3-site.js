@@ -343,7 +343,7 @@ window.addEventListener('pagereveal',event=>{
     const tag = document.createElement('span'); dot.append(tag); document.body.append(dot);
     document.documentElement.classList.add('has-v3-cursor');
     let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, shown = false;
-    const words = { view: ['View case', '查看案例'], try: ['Try it', '试一试'], play: ['Watch', '观看'], find: ['Click to find who', '点一下，找到谁能做'] };
+    const words = { view: ['View case', '查看案例'], try: ['Try it', '试一试'], play: ['Watch', '观看'], find: ['Click to find who', '点一下，找到谁能做'], scissors: ['Snip', '剪一下'], polish: ['New colour', '换个颜色'], comb: ['Comb it', '梳一梳'], dryer: ['Blow-dry', '吹一下'], lipstick: ['Draw a line', '画一笔'] };
     addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse') return;
       x = e.clientX; y = e.clientY;
@@ -662,6 +662,7 @@ window.addEventListener('pagereveal',event=>{
     fm.classList.toggle('is-story', m >= 1);
     fm.classList.toggle('is-duo', m === n1 + 1);
     fm.classList.toggle('is-after-duo', m > n1 + 1);
+    fm.classList.toggle('is-cfirst', m === n1 + 2);
     steps.forEach((st, k) => { st.classList.toggle('is-on', k === i); st.classList.toggle('is-past', i >= 0 ? k < i : (m > n1 + 1 ? true : m === n1 + 1 ? k < n1 : false)); });
     // screens: the one in focus, the ones before it pushed left
     const showIdx = m === 0 ? 0 : m === n1 + 1 ? 0 : i;
@@ -727,19 +728,40 @@ window.addEventListener('pagereveal',event=>{
     const split = el => { const txt = el.textContent; el.textContent = ''; [...txt].forEach((ch, k) => { const i = document.createElement('i'); i.textContent = ch === ' ' ? ' ' : ch; i.style.setProperty('--c', k); el.append(i); }); };
     const prep = () => ans.forEach(a => a.querySelectorAll('.fm-roll').forEach(split));
     prep(); document.addEventListener('portfolio:language', () => setTimeout(prep, 0));
-    let order = imgs.map((_, k) => k), cur = 0, busy = false;
+    // Rapid clicks: every click flies a copy of the top card away and rotates the stack at once; nothing waits for the last click.
+    let order = imgs.map((_, k) => k), cur = 0;
     const lay = () => order.forEach((k, d) => { imgs[k].style.setProperty('--d', d); imgs[k].toggleAttribute('data-top', d === 0); });
     lay();
     stack.addEventListener('click', () => {
-      if (busy) return; busy = true;
-      const top = imgs[order[0]]; top.classList.add('is-gone');
-      ans[cur].classList.remove('is-on'); ans[cur].classList.add('is-out');
+      const top = imgs[order[0]], ghost = top.cloneNode(); ghost.removeAttribute('data-top'); ghost.style.setProperty('--d', 0); ghost.style.zIndex = 20; ghost.style.pointerEvents = 'none';
+      stack.append(ghost); void ghost.offsetWidth; ghost.classList.add('is-gone'); setTimeout(() => ghost.remove(), 900);
       const was = cur; cur = (cur + 1) % ans.length;
-      setTimeout(() => { ans[was].classList.remove('is-out'); ans[cur].classList.add('is-on'); }, 260);
+      ans.forEach(a => a.classList.remove('is-on', 'is-out'));
+      ans[was].classList.add('is-out'); setTimeout(() => ans[was].classList.remove('is-out'), 380);
+      ans[cur].classList.add('is-on');
       order.push(order.shift()); lay();
-      setTimeout(() => { top.style.transition = 'none'; top.classList.remove('is-gone'); void top.offsetWidth; top.style.transition = ''; busy = false; }, 850);
     });
   }
 })();
 
 
+
+// Opening toys: each beauty tool does something to the headline.
+(() => {
+  const fm = document.querySelector('[data-film]'); if (!fm) return;
+  const lines = [...fm.querySelectorAll('.fm-line>span')];
+  const split = () => lines.forEach(sp => { const t = sp.childNodes[0]; if (!t || t.nodeType !== 3) return; const txt = t.textContent; const frag = document.createDocumentFragment(); [...txt].forEach((ch, k) => { const i = document.createElement('span'); i.className = 'fm-ch'; i.textContent = ch; i.style.setProperty('--c', k); frag.append(i); }); sp.replaceChild(frag, t); });
+  split(); document.addEventListener('portfolio:language', () => setTimeout(split, 30));
+  const chars = () => [...fm.querySelectorAll('.fm-ch')].filter(c => c.textContent.trim());
+  const colours = ['#f59ab8', '#c7a6ff', '#ff7a59', '#7fd8aa', '#ffd166'];
+  let ci = 0, timers = {};
+  const once = (cls, ms) => { fm.classList.remove(cls); void fm.offsetWidth; fm.classList.add(cls); clearTimeout(timers[cls]); timers[cls] = setTimeout(() => fm.classList.remove(cls), ms); };
+  const act = {
+    scissors() { const cs = chars(); for (let n = 0; n < 2; n++) { const c = cs[Math.floor(Math.random() * cs.length)]; c.classList.remove('is-snip'); void c.offsetWidth; c.classList.add('is-snip'); setTimeout(() => c.classList.remove('is-snip'), 1500); } },
+    polish() { ci = (ci + 1) % colours.length; fm.style.setProperty('--polish', colours[ci]); },
+    comb() { once('is-comb', 1600); },
+    dryer() { chars().forEach(c => { c.style.setProperty('--wx', (20 + Math.random() * 60).toFixed(0)); c.style.setProperty('--wy', ((Math.random() - .5) * 30).toFixed(0)); c.style.setProperty('--wr', ((Math.random() - .3) * 24).toFixed(0)); }); fm.classList.add('is-blow'); clearTimeout(timers.b); timers.b = setTimeout(() => fm.classList.remove('is-blow'), 380); },
+    lipstick() { fm.classList.toggle('is-lip'); }
+  };
+  fm.querySelectorAll('[data-prop]').forEach(b => b.addEventListener('click', () => { act[b.dataset.prop]?.(); b.classList.remove('is-hit'); void b.offsetWidth; b.classList.add('is-hit'); setTimeout(() => b.classList.remove('is-hit'), 300); }));
+})();

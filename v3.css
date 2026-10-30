@@ -1618,3 +1618,49 @@ html[data-theme=dark] .v3-buddy-say{background:#f4f3ee;color:#141518}
 
 .xp-phone--dark .dev-screen{background:#000}
 .xp-phone--dark .dev-base{border-radius:calc(var(--dw,300px) * .14)}
+
+/* ---------- Opening toys: five beauty tools; each one does something to the headline ---------- */
+.fm-prop{position:absolute;left:50%;top:50%;width:clamp(64px,6vw,96px);aspect-ratio:1;padding:12px;border:0;border-radius:28px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 20px 40px rgba(0,0,0,.35);backdrop-filter:blur(6px);cursor:pointer;pointer-events:auto;
+  transform:translate(-50%,-50%) translate(calc(var(--x) * 30vw + var(--mx,0) * -26px),calc(var(--y) * 30vh + var(--my,0) * -18px)) rotate(var(--r));transition:transform 1.4s var(--ease,ease),opacity 1s ease,background .3s;animation:fm-pop 1.1s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(.5s + var(--i) * .1s)}
+.fm-prop svg{width:100%;height:100%;display:block;overflow:visible;animation:fm-bob 5s ease-in-out infinite;animation-delay:calc(var(--i) * -1.1s);transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.fm-prop:hover{background:rgba(255,255,255,.12)}
+.fm-prop:hover svg{transform:scale(1.15) rotate(-8deg)}
+.fm-prop:active svg,.fm-prop.is-hit svg{transform:scale(.88) rotate(10deg)}
+.fm-prop:focus-visible{outline:2px solid #f59ab8;outline-offset:4px}
+.fm.is-story .fm-prop{transform:translate(-50%,-50%) translate(calc(var(--x) * 75vw),calc(var(--y) * 70vh - 30vh)) rotate(calc(var(--r) * 3));opacity:0;pointer-events:none}
+/* letters are individual so the tools can act on them */
+.fm-line .fm-ch{display:inline-block;white-space:pre;transition:transform .7s cubic-bezier(.34,1.56,.64,1),color .6s ease}
+.fm-line:nth-child(2)>span{color:var(--polish,#f59ab8);transition:color .6s ease}
+/* scissors: a letter is snipped, falls, and grows back */
+.fm-ch.is-snip{animation:fm-snip 1.4s cubic-bezier(.4,0,.2,1)}
+@keyframes fm-snip{0%{transform:none;opacity:1}25%{transform:translate(8px,40px) rotate(28deg);opacity:0}55%{transform:scale(0);opacity:0}100%{transform:none;opacity:1}}
+/* comb: letters fall into a neat wave */
+.fm.is-comb .fm-ch{animation:fm-wave .9s ease-in-out;animation-delay:calc(var(--c) * 35ms)}
+@keyframes fm-wave{0%,100%{transform:none}40%{transform:translateY(-14%)}70%{transform:translateY(5%)}}
+/* dryer: letters are blown and settle back */
+.fm.is-blow .fm-ch{transform:translate(calc(var(--wx) * 1px),calc(var(--wy) * 1px)) rotate(calc(var(--wr) * 1deg));transition:transform .35s ease-out}
+/* lipstick: a swash is drawn under the pink line */
+.fm-swash{position:absolute;z-index:0;left:22%;width:56%;top:calc(50% + .2em);height:9vh;pointer-events:none;overflow:visible}
+.fm-swash path{fill:none;stroke:#ff5f8f;stroke-width:10;stroke-linecap:round;stroke-dasharray:1200;stroke-dashoffset:1200;transition:stroke-dashoffset 1.1s cubic-bezier(.65,0,.35,1)}
+.fm.is-lip .fm-swash path{stroke-dashoffset:0}
+.fm.is-story .fm-swash{opacity:0;transition:opacity .5s}
+.fm-toyhint{position:absolute;z-index:3;right:4vw;top:110px;margin:0;font-size:12px;color:rgba(243,238,246,.6);transition:opacity .6s}
+.fm.is-story .fm-toyhint{opacity:0}
+@media(max-width:760px){.fm-prop{width:56px;padding:9px;border-radius:20px}}
+@media(prefers-reduced-motion:reduce){.fm-prop svg{animation:none}}
+
+/* when a part lifts out, it leaves an empty dark slot in the screen behind it */
+.fm .fm-spot{background:transparent;box-shadow:0 0 0 999px rgba(10,8,12,.32);transition:opacity .5s ease,background .35s ease}
+.fm.is-lifted .fm-spot{background:#050507;box-shadow:inset 0 10px 24px rgba(0,0,0,.9),inset 0 0 0 1px rgba(245,154,184,.22),0 0 0 999px rgba(10,8,12,.32)}
+
+/* tools sit above the phone so they can always be clicked */
+.fm-photos{z-index:3}
+/* the Creator-side wipe: stays in place when the first Creator step begins, so nothing flashes */
+.fm .fm-shot--to{clip-path:inset(0 0 0 100%);transition:none}
+.fm.is-duo .fm-shot--to{clip-path:inset(0 0 0 0);transition:clip-path 1.1s var(--ease) .4s}
+.fm.is-cfirst .fm-shot--to{clip-path:inset(0 0 0 0)}
+
+.fm-stack img{transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .4s}
+.fm-stack img.is-gone{transition:transform .7s cubic-bezier(.5,0,.3,1),opacity .5s .2s}
+.fm-roll i{transition-duration:.45s;transition-delay:calc(var(--c) * 8ms)}
+.fm-ans.is-out .fm-roll i{transition-duration:.25s;transition-delay:calc(var(--c) * 4ms)}

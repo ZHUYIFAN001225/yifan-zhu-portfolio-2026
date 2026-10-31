@@ -2329,3 +2329,9 @@ body.bk-rail-on .bk-rail{opacity:1}
 .bk-day .bk-map-text .ux-shot strong{font-size:13px}
 .bk-day .bk-map-text :is(.ux-smap-row,.ux-smap-steps){display:flex!important;flex-wrap:wrap;gap:8px;grid-template-columns:none!important}
 .bk-day .bk-map-text .ux-smap-steps li{width:auto!important}
+/* the opening phone hands over to the travelling one (same model, same place) */
+@media (min-width:1000px){body.bk-hero-handover [data-opening] .op-phone{visibility:hidden}}
+.bk-day .bk-points{cursor:help;transition:box-shadow .3s,outline-color .3s;outline:2px solid transparent;outline-offset:3px}
+.bk-day .bk-points.is-pointed{outline-color:#3fe2a0}
+.bk-phone.is-pointing .bk-phone-label{opacity:0}
+.bk-phone-hint{display:none!important}

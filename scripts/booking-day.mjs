@@ -22,6 +22,7 @@ export function mount() {
   if (matchMedia('(min-width: 900px)').matches && !calm) timeline(root, moments);
   if (matchMedia('(min-width: 1000px)').matches) traveller(root, calm);
   paper(root);
+  parallax(root, calm);
 }
 
 // the clock digits roll to the moment's time once it is well in view, starting from the previous moment's time
@@ -159,7 +160,6 @@ function traveller(root, calm) {
   document.body.append(wrap);
   const host = wrap.querySelector('[data-phone3d]'), lab = wrap.querySelector('.bk-phone-label span'), hint = wrap.querySelector('.bk-phone-hint');
   hint.textContent = zh() ? '拖动它试试' : 'Drag to turn it';
-  import('./phone3d.mjs').then(m => m.mountPhone(host)).catch(() => {});
   // chapters (between clock moments) keep the phone on one side; it crosses during the clock moments
   const CH = { overview: 'right', system: 'left', strategy: 'left', iteration: 'left', structure: 'right', flow: 'right', interfaces: 'right', build: 'left', challenges: 'left', research: 'left', release: 'left' };
   const secs = [...root.querySelectorAll('.v3-product-section.ux-section')].filter(x => CH[x.id]);
@@ -171,8 +171,16 @@ function traveller(root, calm) {
   const docY = e => e.getBoundingClientRect().top + scrollY;
   const build = () => {
     const vh = innerHeight, K = [];
-    const first = root.querySelector('.bk-moment');
-    if (first) { K.push({ at: docY(first) - vh * .2, x: .85, y: 1.25, s: .6, o: 0 }); }
+    const first = root.querySelector('.bk-moment'), heroEl = document.querySelector('.op-phone [data-phone3d]') || document.querySelector('.op-phone');
+    if (heroEl) {
+      // it IS the opening phone: starts exactly where that one stands, then drifts up slower than the page (parallax)
+      const hr = heroEl.getBoundingClientRect(), hy = hr.top + scrollY, op = document.querySelector('[data-opening]'), opH = op ? op.offsetHeight : vh;
+      const s0 = Math.max(.6, Math.min(1.6, hr.height * .82 / (wrap.offsetHeight || 600)));
+      const x0 = (hr.left + hr.width / 2) / innerWidth, y0 = (hy + hr.height / 2) / vh;
+      K.push({ at: vh * .5, x: x0, y: y0, s: s0, o: 1 });
+      K.push({ at: vh * .5 + opH, x: x0, y: y0 - opH * .45 / vh, s: s0 * .92, o: 1 });
+      if (first) K.push({ at: docY(first) - vh * .25, x: .85, y: .55, s: .9, o: 1 });
+    } else if (first) { K.push({ at: docY(first) - vh * .2, x: .85, y: 1.25, s: .6, o: 0 }); }
     root.querySelectorAll('.v3-product-section.ux-section, .bk-moment, .st, .xp').forEach(e => {
       const top = docY(e), h = e.offsetHeight;
       if (e.matches('.bk-moment')) { const next = e.nextElementSibling?.closest?.('*'); let n = e.nextElementSibling; while (n && !CH[n.id]) n = n.nextElementSibling; const prevSide = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; const to = n ? CH[n.id] : prevSide;
@@ -186,11 +194,39 @@ function traveller(root, calm) {
   const ss = t => t * t * (3 - 2 * t);
   const at = y => { if (!keys.length) return null; if (y <= keys[0].at) return keys[0]; for (let i = 0; i < keys.length - 1; i++) { const a = keys[i], b = keys[i + 1]; if (y < b.at) { const t = ss((y - a.at) / Math.max(1, b.at - a.at)); const o = {}; for (const k of ['x', 'y', 's', 'o']) o[k] = a[k] + (b[k] - a[k]) * t; return o; } } return keys[keys.length - 1]; };
   let cur = -1, px = .85, override = null;
+  const SPOT = { today: [2, 22, 96, 28], book: [2, 19, 96, 13], day: [2, 31, 96, 28], confirm: [2, 27, 96, 24], schedule: [4, 52, 94, 34], 'time-off-hours': [2, 35, 96, 27], kept: [2, 33, 96, 28], add: [2, 24, 96, 30], mine: [2, 18, 96, 30], services: [2, 16, 96, 42], 'by-time': [2, 22, 96, 40], booked: [2, 14, 96, 34], reschedule: [2, 22, 96, 36], window: [2, 22, 96, 36] };
+  const HOVER = [
+    ['#overview .ux-pains>div', ['schedule', 'day', 'time-off-hours', 'book']],
+    ['#overview .ux-persona', ['today']],
+    ['#system .ux-bp-row, #system .ux-needs>div, #system .ux-lanes>div', ['book', 'today', 'mine', 'add']],
+    ['#strategy .ux-principles>div', ['today', 'services', 'day', 'by-time', 'window', 'day', 'kept', 'schedule']],
+    ['#iteration .ux-process>li, #iteration .ux-before-after>*', ['confirm', 'today', 'book']],
+    ['#flow .ux-journey>li', ['book', 'day', 'confirm', 'mine', 'reschedule']],
+    ['#interfaces .bk-textonly', ['book', 'today', 'time-off-hours', 'kept']],
+    ['#build .ux-build>li', ['book', 'add', 'confirm', 'today', 'book']],
+    ['#challenges .ux-challenge-grid>div, #challenges .ux-success>li', ['add', 'services', 'book', 'today', 'mine', 'reschedule', 'today']],
+    ['#research .ux-research-plan>div', ['booked', 'services', 'time-off-hours']]
+  ];
+  HOVER.forEach(([sel, list]) => root.querySelectorAll(sel).forEach((el, i) => {
+    const scr = list[i % list.length]; if (!files.includes(scr)) files.push(scr);
+    el.classList.add('bk-points');
+    el.addEventListener('pointerenter', () => {
+      if (!wrap.classList.contains('is-on')) return;
+      override = scr; const head = (el.querySelector('h3,h4,strong,b')?.textContent || el.textContent || '').trim().replace(/\s+/g, ' ');
+      const r = SPOT[scr] || [2, 20, 96, 30];
+      host._phone?.show(files.indexOf(scr)); host._phone?.spot({ x: r[0], y: r[1], w: r[2], h: r[3], label: head.length > 34 ? head.slice(0, 32) + '…' : head });
+      el.classList.add('is-pointed'); wrap.classList.add('is-pointing');
+    });
+    el.addEventListener('pointerleave', () => { override = null; cur = -1; host._phone?.spot(null); el.classList.remove('is-pointed'); wrap.classList.remove('is-pointing'); });
+  }));
+  // reload the phone's screen list if hover added screens
+  host.dataset.screens = files.map(f => B + f + '.webp').join(',');
   // hovering a screen name in the screen map shows it on the phone
-  root.querySelectorAll('#structure [data-screen]').forEach(b => { b.addEventListener('pointerenter', () => { override = b.dataset.screen; host._phone?.show(files.indexOf(override)); lab.textContent = (b.querySelector('strong')?.textContent || override); }); b.addEventListener('pointerleave', () => { override = null; cur = -1; }); });
+  root.querySelectorAll('#structure [data-screen]').forEach(b => { b.addEventListener('pointerenter', () => { override = b.dataset.screen; host._phone?.spot(null); host._phone?.show(files.indexOf(override)); lab.textContent = (b.querySelector('strong')?.textContent || override); }); b.addEventListener('pointerleave', () => { override = null; cur = -1; }); });
   const tick = () => {
     requestAnimationFrame(tick);
     const vh = innerHeight, y = scrollY + vh * .5, k = at(y); if (!k) return;
+    document.body.classList.toggle('bk-hero-handover', true);
     const W = innerWidth, w = wrap.offsetWidth;
     const vx = k.x - px; px = k.x;
     wrap.style.opacity = k.o.toFixed(3); wrap.classList.toggle('is-on', k.o > .5);
@@ -202,7 +238,21 @@ function traveller(root, calm) {
     const mid = vh * .55; let b = -1; beats.forEach((bt, i) => { if (bt.el.getBoundingClientRect().top < mid) b = i; });
     if (b >= 0 && b !== cur) { cur = b; host._phone?.show(files.indexOf(beats[b].file)); lab.textContent = beats[b].label[zh() ? 1 : 0]; wrap.dataset.who = /Owner|店主/.test(lab.textContent) ? 'owner' : 'customer'; wrap.classList.remove('is-swap'); void wrap.offsetWidth; wrap.classList.add('is-swap'); }
   };
+  import('./phone3d.mjs').then(m => m.mountPhone(host)).catch(() => {});
   host.addEventListener('pointerdown', () => wrap.classList.add('was-dragged'), { once: true });
   document.addEventListener('portfolio:language', () => { cur = -1; hint.textContent = zh() ? '拖动它试试' : 'Drag to turn it'; });
   requestAnimationFrame(tick);
+}
+
+// parallax: the opening's big words sink slower than the page, and pieces of each page float at their own speed
+function parallax(root, calm) {
+  if (calm) return;
+  const type = document.querySelector('[data-opening] .op-type');
+  const items = [...root.querySelectorAll('.bk-sticky, .bk-appt, .bk-slip, .bk-moment-line, .bk-moment-cap, .ux-persona, .ux-blueprint, .bk-check')];
+  items.forEach((e, i) => e.style.setProperty('--ps', [.12, -.08, .18, -.05, .1][i % 5]));
+  let q = false;
+  const run = () => { q = false; const vh = innerHeight;
+    if (type) type.style.transform = `translate3d(0,${(scrollY * .38).toFixed(1)}px,0)`;
+    items.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -100 || r.top > vh + 100) return; const p = (r.top + r.height / 2 - vh / 2); e.style.translate = `0 ${(p * -+e.style.getPropertyValue('--ps')).toFixed(1)}px`; }); };
+  addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
 }

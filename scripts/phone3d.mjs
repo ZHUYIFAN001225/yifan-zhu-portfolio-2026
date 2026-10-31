@@ -58,7 +58,7 @@ function buildPhone(screenTex) {
 }
 
 // Draws one real screen into the display texture, with an iPhone status bar and island above it.
-function paint(ctx, img, status, tap) {
+function paint(ctx, img, status, tap, spot) {
   const c = ctx.canvas, W = c.width, H = c.height, top = status ? Math.round(W * .118) : 0;
   ctx.fillStyle = status ? '#fbfafc' : '#000'; ctx.fillRect(0, 0, W, H);
   if (img) ctx.drawImage(img, 0, top, W, H - top);
@@ -73,6 +73,18 @@ function paint(ctx, img, status, tap) {
     const x = tap.x / 100 * W, y = top + tap.y / 100 * (H - top), r = W * (.05 + tap.k * .07);
     ctx.save(); ctx.globalAlpha = tap.a; ctx.fillStyle = 'rgba(92,102,155,.28)'; ctx.strokeStyle = 'rgba(92,102,155,.75)'; ctx.lineWidth = W * .006;
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+  }
+  if (spot) { // like the anatomy view: the rest of the screen dims, the part being talked about lifts out of it and glows
+    const sx = spot.x / 100 * W, sy = top + spot.y / 100 * (H - top), sw = spot.w / 100 * W, sh = spot.h / 100 * (H - top), r = W * .03;
+    ctx.save(); ctx.fillStyle = 'rgba(30,30,36,.42)'; ctx.fillRect(0, 0, W, H); ctx.restore();
+    if (img) {
+      const g = 1.07, lw = sw * g, lh = sh * g, lx = sx + sw / 2 - lw / 2, ly = sy + sh / 2 - lh / 2 - W * .02;
+      const iy = (sy - top) / (H - top) * img.height, ih = sh / (H - top) * img.height, ix = sx / W * img.width, iw = sw / W * img.width;
+      ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = W * .06; ctx.shadowOffsetY = W * .03;
+      ctx.beginPath(); ctx.roundRect(lx, ly, lw, lh, r); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.roundRect(lx, ly, lw, lh, r); ctx.clip(); ctx.drawImage(img, ix, iy, iw, ih, lx, ly, lw, lh); ctx.restore();
+      ctx.save(); ctx.shadowColor = 'rgba(245,154,184,.8)'; ctx.shadowBlur = W * .04; ctx.strokeStyle = '#f59ab8'; ctx.lineWidth = W * .01; ctx.beginPath(); ctx.roundRect(lx - W * .008, ly - W * .008, lw + W * .016, lh + W * .016, r * 1.3); ctx.stroke(); ctx.restore();
+    }
   }
   // dynamic island
   ctx.fillStyle = '#050506'; const iw = W * .3, ih = W * .085, ix = (W - iw) / 2, iy = W * .028;
@@ -101,8 +113,8 @@ export function mountPhone(host) {
   loadAll(); document.addEventListener('portfolio:language', loadAll);
   const manual = host.dataset.mode === 'manual';
   const cycle = setInterval(() => { if (manual || !visible || !imgs.length || list.length < 2) return; k = (k + 1) % imgs.length; paint(ctx, imgs[k], status); tex.needsUpdate = true; }, interval);
-  let spin = null, tapAnim = null, pending = -1;
-  const draw = () => { paint(ctx, imgs[k], status, tapAnim && tapAnim.state); tex.needsUpdate = true; };
+  let spin = null, tapAnim = null, pending = -1, spotR = null;
+  const draw = () => { paint(ctx, imgs[k], status, tapAnim && tapAnim.state, spotR); tex.needsUpdate = true; };
   const ctl = {
     show(i, { turn = false, tap = null } = {}) {
       if (!imgs.length) { k = i; return; }
@@ -112,6 +124,7 @@ export function mountPhone(host) {
     },
     tap([x, y]) { if (calm) return; tapAnim = { x, y, start: performance.now() + 450, state: null }; },
     // turn to face a side (radians around the vertical axis); used by the booking case's travelling phone
+    spot(r) { spotR = r; if (imgs.length) draw(); },
     lean(y, x) { base.y = y; if (x !== undefined) base.x = x; idle = 2; },
   };
   host._phone = ctl; host.dispatchEvent(new CustomEvent('phone-ready'));

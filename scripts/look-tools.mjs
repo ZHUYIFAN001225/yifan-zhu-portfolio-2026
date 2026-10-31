@@ -40,6 +40,7 @@ export function mount() {
   applyInk(); document.addEventListener('portfolio:language', () => setTimeout(applyInk, 60));
   fold(root);
   bridge(root);
+  rail(root);
   const acts = mountActs(root, calm);
   // the dial and the ropes need a wide window; if the page opened narrow (a new tab or window still sizing up), add them as soon as it is wide
   let loopOn = false, ropesOn = false;
@@ -101,6 +102,31 @@ function bridge(root) {
   link.append(el); link.classList.add('has-flip');
   const words = () => { el.querySelector('.lk-flip-u b').textContent = zh() ? '对用户：灵感' : 'For the user: inspiration'; el.querySelector('.lk-flip-c b').textContent = zh() ? '对 Creator：作品集' : 'For the Creator: portfolio'; };
   words(); document.addEventListener('portfolio:language', words);
+}
+
+// Business model: price tags on a clothes rail. A hair dryer holds the left end of the rail; click it and the tags blow about.
+function rail(root) {
+  const box = root.querySelector('.ux-principles--4'); if (!box || box.querySelector('.lk-dryer')) return;
+  box.classList.add('lk-rail');
+  const tags = [...box.children]; tags.forEach((t, i) => { t.classList.add('lk-tag'); t.style.setProperty('--i', i); });
+  const svg = document.querySelector('.fm-prop[data-prop="dryer"] svg')?.outerHTML || '';
+  const d = document.createElement('button'); d.type = 'button'; d.className = 'lk-dryer'; d.dataset.cursor = 'dryer';
+  d.innerHTML = `${svg}<span class="lk-wind"><i></i><i></i><i></i></span>`;
+  const lab = () => d.setAttribute('aria-label', zh() ? '吹风机：吹一下这些价格牌' : 'Hair dryer: blow the price tags'); lab(); document.addEventListener('portfolio:language', lab);
+  box.prepend(d);
+  // each tag swings like a pendulum hanging from its string
+  const st = tags.map(() => ({ a: 0, v: 0, lift: 0 })); let raf = 0;
+  const step = () => { raf = 0; let moving = false;
+    st.forEach((s, i) => { s.v += -s.a * .045; s.v *= .965; s.a += s.v; s.lift *= .94; tags[i].style.setProperty('--sw', s.a.toFixed(2) + 'deg'); tags[i].style.setProperty('--lift', s.lift.toFixed(1) + 'px'); if (Math.abs(s.a) > .05 || Math.abs(s.v) > .05 || s.lift > .3) moving = true; });
+    if (moving) raf = requestAnimationFrame(step); };
+  const kick = (i, f) => { st[i].v += f; if (!raf) raf = requestAnimationFrame(step); };
+  let gusts = 0, gustT = 0;
+  d.addEventListener('click', () => {
+    const now = performance.now(); gusts = now - gustT < 1600 ? gusts + 1 : 1; gustT = now;
+    d.classList.remove('is-blow'); void d.offsetWidth; d.classList.add('is-blow');
+    tags.forEach((t, i) => setTimeout(() => { kick(i, -(5 + gusts * 2.4) * (1 - i * .12)); st[i].lift += 8 + gusts * 3; }, 90 + i * 110));
+  });
+  tags.forEach((t, i) => t.addEventListener('pointerenter', () => kick(i, 1.6 * (Math.random() > .5 ? 1 : -1))));
 }
 
 // ---------- acts ----------

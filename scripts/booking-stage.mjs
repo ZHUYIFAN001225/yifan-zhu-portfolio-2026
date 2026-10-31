@@ -28,15 +28,15 @@ export const STEPS = [
   { c: 'book', o: 'schedule', kicker: ['12:10 · Lunch break', '12:10 · 午休'], title: ['One booking, from both sides.', '一笔预约，两端同时发生。'], body: ['Keep scrolling: follow a single booking from the customer’s phone into the owner’s diary.', '往下滚：跟着一笔预约，从顾客的手机走进店主的日程。'],
     d: { c: [.58, .52, .62, .05, .42, 0, 0], o: [.82, .55, .62, .05, -.42, 0, 0] }, m: { c: [.3, .3, .38, .05, .4, 0, 0], o: [.7, .31, .38, .05, -.4, 0, 0] } },
   { c: 'book', o: 'schedule', fg: 'c', spot: SPOT.book, spin: { c: 1 }, kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'],
-    d: { c: [.66, .53, .9, .03, .14, 0, 0], o: [.95, .28, .42, .12, -.9, .12, -2.2] }, m: { c: [.5, .31, .5, .02, .1, 0, 0], o: [.88, .14, .26, .1, -.9, .1, -2] } },
+    d: { c: [.64, .52, .78, .03, .14, 0, 0], o: [.9, .3, .36, .12, -.9, .12, -2.2] }, m: { c: [.5, .31, .5, .02, .1, 0, 0], o: [.88, .14, .26, .1, -.9, .1, -2] } },
   { c: 'day', o: 'schedule', fg: 'c', spot: SPOT.day, kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'],
-    d: { c: [.64, .52, .9, .02, -.14, 0, 0], o: [.95, .3, .42, .12, -.9, .12, -2.2] }, m: { c: [.5, .31, .5, .02, -.1, 0, 0], o: [.88, .15, .26, .1, -.9, .1, -2] } },
+    d: { c: [.62, .52, .78, .02, -.14, 0, 0], o: [.9, .32, .36, .12, -.9, .12, -2.2] }, m: { c: [.5, .31, .5, .02, -.1, 0, 0], o: [.88, .15, .26, .1, -.9, .1, -2] } },
   { c: 'confirm', o: 'schedule', fg: 'c', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling and watch it leave her phone.', '日期、时间、时长都在一张卡里。继续滚，看它离开她的手机。'],
-    d: { c: [.57, .52, .82, .03, .22, 0, 0], o: [.85, .55, .62, .05, -.36, 0, -.4] }, m: { c: [.36, .31, .44, .03, .18, 0, 0], o: [.76, .33, .36, .05, -.3, 0, -.4] } },
+    d: { c: [.57, .52, .74, .03, .22, 0, 0], o: [.84, .55, .6, .05, -.36, 0, -.4] }, m: { c: [.36, .31, .44, .03, .18, 0, 0], o: [.76, .33, .36, .05, -.3, 0, -.4] } },
   { c: 'booked', o: 'schedule', fg: 'o', spot: SPOT.schedule, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'],
-    d: { o: [.7, .53, .9, .03, -.14, 0, 0], c: [.46, .3, .4, .12, .9, -.1, -2.4] }, m: { o: [.5, .31, .5, .02, -.1, 0, 0], c: [.13, .15, .26, .1, .9, -.1, -2] } },
+    d: { o: [.7, .52, .78, .03, -.14, 0, 0], c: [.47, .3, .36, .12, .9, -.1, -2.4] }, m: { o: [.5, .31, .5, .02, -.1, 0, 0], c: [.13, .15, .26, .1, .9, -.1, -2] } },
   { c: 'kept', o: 'time-off-hours', fg: 'o', spot: SPOT['time-off-hours'], spin: { o: -1 }, kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'],
-    d: { o: [.68, .52, .9, .03, .14, 0, 0], c: [.46, .32, .4, .12, .9, -.1, -2.4] }, m: { o: [.5, .31, .5, .02, .1, 0, 0], c: [.13, .15, .26, .1, .9, -.1, -2] } },
+    d: { o: [.68, .52, .78, .03, .14, 0, 0], c: [.47, .32, .36, .12, .9, -.1, -2.4] }, m: { o: [.5, .31, .5, .02, .1, 0, 0], c: [.13, .15, .26, .1, .9, -.1, -2] } },
   { c: 'kept', o: 'today', spin: { c: 1, o: -1 }, kicker: ['18:30 · Closed', '18:30 · 打烊'], title: ['The routine runs itself.', '日常，自己运转。'], body: ['Next: the screens, the rules and how it was built.', '接下来是界面、规则，以及它是怎么做出来的。'],
     d: { c: [.58, .52, .6, .05, .42, 0, 0], o: [.82, .55, .6, .05, -.42, 0, 0] }, m: { c: [.3, .3, .38, .05, .4, 0, 0], o: [.7, .31, .38, .05, -.4, 0, 0] } }
 ];
@@ -133,6 +133,9 @@ export function mountStage(root) {
   const flyMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, toneMapped: false }), flyGlowMat = new THREE.MeshBasicMaterial({ color: 0xf59ab8, transparent: true, opacity: 0, depthWrite: false });
   const fly = new THREE.Group(), flyGlow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), flyGlowMat), flyCard = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), flyMat);
   flyGlow.position.z = -.003; fly.add(flyGlow, flyCard); fly.visible = false; scene.add(fly);
+  const FR = SPOT.confirm, FW = FR[2] / 100 * SW, FH = FR[3] / 100 * (1 - TF) * SH, slot = r => [-SW / 2 + (r[0] + r[2] / 2) / 100 * SW, SH / 2 - (TF + (1 - TF) * (r[1] + r[3] / 2) / 100) * SH];
+  const flyTex = async () => { const im = await getImg('confirm'); if (!im) return; const [x, y, w, h] = FR, iw = im.naturalWidth, ih = im.naturalHeight, c = document.createElement('canvas'); c.width = Math.round(w / 100 * iw); c.height = Math.round(h / 100 * ih); c.getContext('2d').drawImage(im, x / 100 * iw, y / 100 * ih, w / 100 * iw, h / 100 * ih, 0, 0, c.width, c.height); flyMat.map?.dispose(); flyMat.map = new THREE.CanvasTexture(c); flyMat.map.colorSpace = THREE.SRGBColorSpace; flyMat.needsUpdate = true; };
+  flyTex(); document.addEventListener('portfolio:language', flyTex);
 
   // ---------- stations along the page ----------
   const docY = e => e.getBoundingClientRect().top + scrollY;
@@ -142,7 +145,7 @@ export function mountStage(root) {
     let tc = 0, to = 0, last = null;
     const push = (at, st) => {
       // spin a full turn when the phone changes role, side or kind of place, like the objects in Silencio
-      if (last) {
+      if (last && !last.travel) {
         const sideOf = q => q.x < .5 ? -1 : 1;
         const swap = st.fg !== last.fg && st.fg && last.fg;
         if (st.spin) { tc += st.spin.c || 0; to += st.spin.o || 0; }
@@ -197,7 +200,7 @@ export function mountStage(root) {
         if (who === 'c') cf = b.file; else of = b.file;
         const R = side === 'right', X = R ? .84 : .16;
         const fg = P7([X, .53, .62, .04, R ? -.3 : .3, 0, 0]);
-        const bg = P7([R ? .955 : .045, .3, .4, .12, R ? -.95 : .95, R ? .14 : -.14, -2.2]);
+        const bg = P7([R ? .93 : .07, .27, .34, .12, R ? -.95 : .95, R ? .14 : -.14, -2.2]);
         const at = j === 0 ? top + vh * .1 : Math.max(docY(b.el) - vh * .05, top + vh * .1);
         push(at, { kind: 'section', c: who === 'c' ? fg : bg, o: who === 'c' ? bg : fg, cf, of, fg: who, spot: SPOT[b.file] || [2, 20, 96, 30], label: b.label });
       });
@@ -289,19 +292,16 @@ export function mountStage(root) {
       }
     }
     // the booking card flies from her phone into the owner's diary (story step "one check" → "lands in her diary")
-    const flying = a.st.travel && a.st !== b.st && e > .001 && e < .999 && P.c.tex;
+    const flying = a.st.travel && a.st !== b.st && e > .001 && e < .999 && flyMat.map;
     fly.visible = !!flying;
     if (flying) {
-      const k = e, c = P.c, o = P.o;
-      va.set(c.lift.position.x, c.lift.position.y, .26); c.g.localToWorld(va);
-      const r = SPOT.schedule, lx = -SW / 2 + (r[0] + r[2] / 2) / 100 * SW, ly = SH / 2 - (TF + (1 - TF) * (r[1] + r[3] / 2) / 100) * SH;
-      vb.set(lx, ly, .26); o.g.localToWorld(vb);
-      fly.position.copy(va).lerp(vb, k); fly.position.y += Math.sin(k * Math.PI) * .5; fly.position.z += Math.sin(k * Math.PI) * .9;
-      c.g.getWorldQuaternion(qa); o.g.getWorldQuaternion(qb); fly.quaternion.copy(qa).slerp(qb, k); fly.rotateZ(Math.sin(k * Math.PI) * .25);
-      const sc = lerp(c.g.scale.x, o.g.scale.x, k) * (1 + Math.sin(k * Math.PI) * .25);
-      flyCard.scale.set(c.pw * sc, c.ph * sc, 1); flyGlow.scale.set((c.pw + .03) * sc, (c.ph + .03) * sc, 1);
-      if (flyMat.map !== c.tex) { flyMat.map = c.tex; flyMat.needsUpdate = true; }
-      flyMat.opacity = 1; flyGlowMat.opacity = .85 * (1 - Math.max(0, k - .85) / .15);
+      const k = e, c = P.c, o = P.o, [ax, ay] = slot(FR), [bx, by] = slot(SPOT.schedule);
+      va.set(ax, ay, .26); c.g.localToWorld(va); vb.set(bx, by, .26); o.g.localToWorld(vb);
+      fly.position.copy(va).lerp(vb, k); fly.position.y += Math.sin(k * Math.PI) * .45; fly.position.z += Math.sin(k * Math.PI) * 1.1;
+      c.g.getWorldQuaternion(qa); o.g.getWorldQuaternion(qb); fly.quaternion.copy(qa).slerp(qb, k); fly.rotateZ(Math.sin(k * Math.PI) * .22);
+      const sc = lerp(c.g.scale.x, o.g.scale.x, k) * (1 + Math.sin(k * Math.PI) * .3);
+      flyCard.scale.set(FW * sc, FH * sc, 1); flyGlow.scale.set((FW + .03) * sc, (FH + .03) * sc, 1);
+      flyMat.opacity = 1; flyGlowMat.opacity = .85;
     }
     // camera: a slight drift with the pointer, more depth while the page moves
     cam.position.x += (mx * .22 - cam.position.x) * E(3); cam.position.y += (-my * .14 - cam.position.y) * E(3);

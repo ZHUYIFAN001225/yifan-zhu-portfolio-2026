@@ -2307,3 +2307,25 @@ body.bk-rail-on .bk-rail{opacity:1}
   body.bk-has-phone .bk-day .bk-with-phone[data-phone=left]{padding-left:calc(34vw + 40px)!important}
   body.bk-has-phone .bk-day .bk-with-phone[data-phone=left]::before{left:calc(34vw + 18px)}
 }
+/* continuous phone: no fade-in/out by class, the script drives it every frame */
+.bk-phone{top:0!important;transition:none!important;transform-origin:50% 50%;will-change:transform,opacity;width:min(300px,21vw);height:min(600px,66vh)}
+.bk-phone:not(.is-on){pointer-events:none}
+.bk-phone-hint{position:absolute;left:50%;top:-10px;transform:translateX(-50%);margin:0;font:500 11px/1 Inter,system-ui,sans-serif;color:var(--bk-ink2,#4d6157);opacity:.8;white-space:nowrap;transition:opacity .4s}
+.bk-phone.was-dragged .bk-phone-hint{opacity:0}
+@media (min-width:1000px){
+  body.bk-has-phone .bk-day .bk-with-phone[data-phone=right]{padding-right:30vw!important}
+  body.bk-has-phone .bk-day .bk-with-phone[data-phone=left]{padding-left:calc(28vw + 40px)!important}
+  body.bk-has-phone .bk-day .bk-with-phone[data-phone=left]::before{left:calc(28vw + 18px)}
+}
+/* screens shown by the phone instead of as pictures */
+.bk-day #interfaces .ux-details{display:grid;grid-template-columns:1fr;gap:16px}
+.bk-day #interfaces .bk-textonly{display:block;margin:0;padding:18px 20px 18px 24px;background:#fff;border-left:5px solid var(--bk-mint);border-radius:6px 16px 16px 6px;box-shadow:0 12px 26px -20px rgba(23,54,43,.45)}
+.bk-day #interfaces .bk-textonly>button,.bk-day #interfaces .bk-textonly img{display:none!important}
+.bk-day #interfaces .bk-textonly figcaption h4{margin:0 0 6px;font-size:18px}
+.bk-day .bk-map-text .ux-shot img{display:none!important}
+.bk-day .bk-map-text .ux-shot{display:inline-flex;align-items:center;min-height:0!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;border:1px solid rgba(23,54,43,.14)!important;cursor:pointer;transition:background .25s,color .25s,transform .3s}
+.bk-day .bk-map-text .ux-shot:hover{background:var(--bk-ink)!important;transform:translateY(-2px)}
+.bk-day .bk-map-text .ux-shot:hover *{color:#fff!important}
+.bk-day .bk-map-text .ux-shot strong{font-size:13px}
+.bk-day .bk-map-text :is(.ux-smap-row,.ux-smap-steps){display:flex!important;flex-wrap:wrap;gap:8px;grid-template-columns:none!important}
+.bk-day .bk-map-text .ux-smap-steps li{width:auto!important}

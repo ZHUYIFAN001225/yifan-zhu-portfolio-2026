@@ -144,50 +144,65 @@ const BEATS = [
   ['#release', 'booked', ['Customer · booked, in English or Chinese', '顾客 · 中英文都能约']]
 ];
 function traveller(root, calm) {
+  // the interface close-ups and the screen map become text: the phone shows the screens
+  const DETAIL = ['book', 'today', 'time-off-hours', 'kept'];
+  root.querySelectorAll('#interfaces .ux-details figure').forEach((f, i) => { f.classList.add('bk-textonly'); f.dataset.screen = DETAIL[i % DETAIL.length]; });
+  root.querySelectorAll('#structure .ux-shot').forEach(b => { const src = b.dataset.shot || b.querySelector('img')?.getAttribute('src') || ''; const m = src.match(/booking\/(?:zh\/)?([\w-]+)\.webp/); if (m) { b.dataset.screen = m[1]; b.classList.add('bk-textonly'); } });
+  root.querySelector('#structure')?.classList.add('bk-map-text');
   const beats = BEATS.map(([sel, file, label]) => ({ el: root.querySelector(sel), file, label })).filter(b => b.el);
-  if (!beats.length) return;
-  const files = [...new Set(beats.map(b => b.file))];
+  root.querySelectorAll('#interfaces .ux-details figure').forEach(f => beats.push({ el: f, file: f.dataset.screen, label: [f.querySelector('h4')?.textContent || '', f.querySelector('h4')?.textContent || ''] }));
+  beats.sort((a, b) => a.el.getBoundingClientRect().top - b.el.getBoundingClientRect().top);
+  const hoverScreens = [...root.querySelectorAll('#structure [data-screen]')].map(b => b.dataset.screen);
+  const files = [...new Set([...beats.map(b => b.file), ...hoverScreens])];
   const wrap = document.createElement('div'); wrap.className = 'bk-phone'; wrap.setAttribute('aria-hidden', 'true');
-  wrap.innerHTML = `<div class="bk-phone-3d" data-phone3d data-mode="manual" data-follow="1" data-status="1" data-zoom=".62" data-tilt-y="0" data-screens="${files.map(f => B + f + '.webp').join(',')}"></div><p class="bk-phone-label"><i></i><span></span></p>`;
+  wrap.innerHTML = `<div class="bk-phone-3d" data-phone3d data-mode="manual" data-follow="1" data-status="1" data-zoom=".62" data-tilt-y="0" data-screens="${files.map(f => B + f + '.webp').join(',')}"></div><p class="bk-phone-label"><i></i><span></span></p><p class="bk-phone-hint"></p>`;
   document.body.append(wrap);
-  const host = wrap.querySelector('[data-phone3d]'), lab = wrap.querySelector('.bk-phone-label span');
+  const host = wrap.querySelector('[data-phone3d]'), lab = wrap.querySelector('.bk-phone-label span'), hint = wrap.querySelector('.bk-phone-hint');
+  hint.textContent = zh() ? '拖动它试试' : 'Drag to turn it';
   import('./phone3d.mjs').then(m => m.mountPhone(host)).catch(() => {});
-  // sections alternate: text on one side, phone on the other
-  const secs = [...root.querySelectorAll('.v3-product-section.ux-section')].filter(sec => beats.some(b => sec.contains(b.el)));
-  secs.forEach((sec, i) => { sec.classList.add('bk-with-phone'); sec.dataset.phone = i % 2 ? 'left' : 'right'; });
+  // chapters (between clock moments) keep the phone on one side; it crosses during the clock moments
+  const CH = { overview: 'right', system: 'left', strategy: 'left', iteration: 'left', structure: 'right', flow: 'right', interfaces: 'right', build: 'left', challenges: 'left', research: 'left', release: 'left' };
+  const secs = [...root.querySelectorAll('.v3-product-section.ux-section')].filter(x => CH[x.id]);
+  secs.forEach(sec => { sec.classList.add('bk-with-phone'); sec.dataset.phone = CH[sec.id]; });
   document.body.classList.add('bk-has-phone');
-  let x = innerWidth * .78, vx = 0, side = 'right', cur = -1, shown = false, raf = 0;
-  const pick = () => {
-    const mid = innerHeight * .55; let k = -1;
-    beats.forEach((b, i) => { if (b.el.getBoundingClientRect().top < mid) k = i; });
-    if (k < 0) return null;
-    const sec = beats[k].el.closest('.bk-with-phone'), r = sec?.getBoundingClientRect();
-    // only while its section is on screen, and never over the story phone, the anatomy, the screen map or a clock moment
-    const blocked = [...root.querySelectorAll('.st, .xp, #structure, .bk-moment')].some(e => { const q = e.getBoundingClientRect(); return q.top < innerHeight * .7 && q.bottom > innerHeight * .3; });
-    // and never while text from a section on the other side is still where the phone would stand
-    const clash = root.querySelectorAll('.bk-with-phone'); let busy = false;
-    clash.forEach(o => { if (o === sec || o.dataset.phone === sec.dataset.phone) return; const q = o.getBoundingClientRect(); if (q.top < innerHeight * .82 && q.bottom > innerHeight * .18) busy = true; });
-    if (!sec || r.bottom < innerHeight * .35 || r.top > innerHeight * .65 || blocked || busy) return null;
-    return { k, side: sec.dataset.phone };
+  const XS = { right: .85, left: .15 };
+  // keyframes along the page: where the phone is (x across the screen, y in the screen, size, visibility) at each point
+  let keys = [];
+  const docY = e => e.getBoundingClientRect().top + scrollY;
+  const build = () => {
+    const vh = innerHeight, K = [];
+    const first = root.querySelector('.bk-moment');
+    if (first) { K.push({ at: docY(first) - vh * .2, x: .85, y: 1.25, s: .6, o: 0 }); }
+    root.querySelectorAll('.v3-product-section.ux-section, .bk-moment, .st, .xp').forEach(e => {
+      const top = docY(e), h = e.offsetHeight;
+      if (e.matches('.bk-moment')) { const next = e.nextElementSibling?.closest?.('*'); let n = e.nextElementSibling; while (n && !CH[n.id]) n = n.nextElementSibling; const prevSide = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; const to = n ? CH[n.id] : prevSide;
+        K.push({ at: top + h * .2, x: XS[prevSide], y: .55, s: .9, o: 1 }); K.push({ at: top + h * .5, x: .5, y: 1.22, s: .5, o: 1 }); K.push({ at: top + h * .85, x: XS[to], y: .55, s: .9, o: 1 }); return; }
+      if (e.matches('.st, .xp')) { const side = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; K.push({ at: top - vh * .75, x: XS[side], y: .55, s: .9, o: 1 }); K.push({ at: top - vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .7, x: XS[side], y: .55, s: .9, o: 1 }); return; }
+      const side = CH[e.id]; if (!side) return; K.push({ at: top + vh * .1, x: XS[side], y: .52, s: 1, o: 1 }); K.push({ at: top + h - vh * .2, x: XS[side], y: .52, s: 1, o: 1 });
+    });
+    K.sort((a, b) => a.at - b.at); keys = K;
   };
+  build(); addEventListener('resize', build); setInterval(build, 1500);
+  const ss = t => t * t * (3 - 2 * t);
+  const at = y => { if (!keys.length) return null; if (y <= keys[0].at) return keys[0]; for (let i = 0; i < keys.length - 1; i++) { const a = keys[i], b = keys[i + 1]; if (y < b.at) { const t = ss((y - a.at) / Math.max(1, b.at - a.at)); const o = {}; for (const k of ['x', 'y', 's', 'o']) o[k] = a[k] + (b[k] - a[k]) * t; return o; } } return keys[keys.length - 1]; };
+  let cur = -1, px = .85, override = null;
+  // hovering a screen name in the screen map shows it on the phone
+  root.querySelectorAll('#structure [data-screen]').forEach(b => { b.addEventListener('pointerenter', () => { override = b.dataset.screen; host._phone?.show(files.indexOf(override)); lab.textContent = (b.querySelector('strong')?.textContent || override); }); b.addEventListener('pointerleave', () => { override = null; cur = -1; }); });
   const tick = () => {
-    raf = requestAnimationFrame(tick);
-    const p = pick();
-    const on = !!p; if (on !== shown) { shown = on; wrap.classList.toggle('is-on', on); }
-    if (!p) return;
-    if (p.side !== side) { side = p.side; host._phone?.lean(side === 'right' ? .9 : -.9); setTimeout(() => host._phone?.lean(side === 'right' ? .38 : -.38), 700); }
-    if (p.k !== cur) {
-      const turn = cur >= 0 && beats[cur].file !== beats[p.k].file && !calm;
-      cur = p.k; host._phone?.show(files.indexOf(beats[cur].file), { turn: false });
-      lab.textContent = beats[cur].label[zh() ? 1 : 0]; wrap.dataset.who = /Owner|店主/.test(lab.textContent) ? 'owner' : 'customer';
-      wrap.classList.remove('is-swap'); void wrap.offsetWidth; wrap.classList.add('is-swap');
-    }
-    const tx = side === 'right' ? innerWidth * .78 : innerWidth * .22;
-    vx += (tx - x) * .045; vx *= .78; x += vx;
-    const lean = Math.max(-1, Math.min(1, vx / 30));
-    wrap.style.transform = `translate3d(${(x - wrap.offsetWidth / 2).toFixed(1)}px,-50%,0) rotate(${(lean * 6).toFixed(2)}deg)`;
+    requestAnimationFrame(tick);
+    const vh = innerHeight, y = scrollY + vh * .5, k = at(y); if (!k) return;
+    const W = innerWidth, w = wrap.offsetWidth;
+    const vx = k.x - px; px = k.x;
+    wrap.style.opacity = k.o.toFixed(3); wrap.classList.toggle('is-on', k.o > .5);
+    wrap.style.transform = `translate3d(${(k.x * W - w / 2).toFixed(1)}px,${(k.y * vh - wrap.offsetHeight / 2).toFixed(1)}px,0) scale(${k.s.toFixed(3)})`;
+    // it faces the text it stands beside, and swings round as it travels
+    const face = k.x > .5 ? .38 : -.38;
+    host._phone?.lean(face + Math.max(-1.2, Math.min(1.2, vx * 160)));
+    if (override) return;
+    const mid = vh * .55; let b = -1; beats.forEach((bt, i) => { if (bt.el.getBoundingClientRect().top < mid) b = i; });
+    if (b >= 0 && b !== cur) { cur = b; host._phone?.show(files.indexOf(beats[b].file)); lab.textContent = beats[b].label[zh() ? 1 : 0]; wrap.dataset.who = /Owner|店主/.test(lab.textContent) ? 'owner' : 'customer'; wrap.classList.remove('is-swap'); void wrap.offsetWidth; wrap.classList.add('is-swap'); }
   };
-  host.addEventListener('phone-ready', () => { host._phone.lean(.38); }, { once: true });
-  document.addEventListener('portfolio:language', () => { if (cur >= 0) lab.textContent = beats[cur].label[zh() ? 1 : 0]; });
-  raf = requestAnimationFrame(tick);
+  host.addEventListener('pointerdown', () => wrap.classList.add('was-dragged'), { once: true });
+  document.addEventListener('portfolio:language', () => { cur = -1; hint.textContent = zh() ? '拖动它试试' : 'Drag to turn it'; });
+  requestAnimationFrame(tick);
 }

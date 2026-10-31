@@ -6,9 +6,9 @@ import { RoomEnvironment } from '../assets/v3/lib/three/RoomEnvironment.js';
 const zh = () => document.documentElement.lang.startsWith('zh');
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const zhSrc = s => s.replace(/\/([^/]+)$/, '/zh/$1');
-const load = src => new Promise(res => { const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+export const load = src => new Promise(res => { const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 
-function roundedRect(w, h, r) {
+export function roundedRect(w, h, r) {
   const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
   s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
   s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
@@ -16,13 +16,13 @@ function roundedRect(w, h, r) {
   s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
   return s;
 }
-function planeUV(geo) {
+export function planeUV(geo) {
   geo.computeBoundingBox(); const b = geo.boundingBox, p = geo.attributes.position, uv = [];
   for (let i = 0; i < p.count; i++) uv.push((p.getX(i) - b.min.x) / (b.max.x - b.min.x), (p.getY(i) - b.min.y) / (b.max.y - b.min.y));
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); return geo;
 }
 
-function buildPhone(screenTex) {
+export function buildPhone(screenTex) {
   const W = .76, H = 1.62, D = .07, R = .13, bevel = .016;
   const g = new THREE.Group();
   const metal = new THREE.MeshPhysicalMaterial({ color: 0x5b5e66, metalness: 1, roughness: .28, clearcoat: .4, clearcoatRoughness: .25 });
@@ -58,7 +58,7 @@ function buildPhone(screenTex) {
 }
 
 // Draws one real screen into the display texture, with an iPhone status bar and island above it.
-function paint(ctx, img, status, tap, spot) {
+export function paint(ctx, img, status, tap, spot) {
   const c = ctx.canvas, W = c.width, H = c.height, top = status ? Math.round(W * .118) : 0;
   ctx.fillStyle = status ? '#fbfafc' : '#000'; ctx.fillRect(0, 0, W, H);
   if (img) ctx.drawImage(img, 0, top, W, H - top);

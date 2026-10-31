@@ -20,6 +20,7 @@ export function mount() {
   checklist(root, calm);
   slips(root, calm);
   if (matchMedia('(min-width: 900px)').matches && !calm) timeline(root, moments);
+  if (matchMedia('(min-width: 1000px)').matches && !calm) scene3d(root);
   if (matchMedia('(min-width: 1000px)').matches) traveller(root, calm);
   paper(root);
   parallax(root, calm);
@@ -64,7 +65,8 @@ function timeline(root, moments) {
   const run = () => {
     q = false; const y = scrollY + innerHeight * .5;
     const first = moments[0].getBoundingClientRect(), last = moments[moments.length - 1].getBoundingClientRect();
-    const on = first.top < innerHeight * .8 && last.bottom > innerHeight * .2; document.body.classList.toggle('bk-rail-on', on);
+    const sc = root.querySelector('.bk-scene')?.getBoundingClientRect(), inScene = sc && sc.top < innerHeight * .5 && sc.bottom > innerHeight * .5;
+    const on = !inScene && first.top < innerHeight * .8 && last.bottom > innerHeight * .2; document.body.classList.toggle('bk-rail-on', on);
     let t = S[0].t; if (y <= S[0].y) t = H0 + (S[0].t - H0) * clamp(1 - (S[0].y - y) / innerHeight);
     else if (y >= S[S.length - 1].y) t = S[S.length - 1].t;
     else for (let k = 0; k < S.length - 1; k++) if (y < S[k + 1].y) { const f = (y - S[k].y) / (S[k + 1].y - S[k].y); t = S[k].t + (S[k + 1].t - S[k].t) * f; break; }
@@ -181,11 +183,11 @@ function traveller(root, calm) {
       K.push({ at: vh * .5 + opH, x: x0, y: y0 - opH * .45 / vh, s: s0 * .92, o: 1 });
       if (first) K.push({ at: docY(first) - vh * .25, x: .85, y: .55, s: .9, o: 1 });
     } else if (first) { K.push({ at: docY(first) - vh * .2, x: .85, y: 1.25, s: .6, o: 0 }); }
-    root.querySelectorAll('.v3-product-section.ux-section, .bk-moment, .st, .xp').forEach(e => {
+    root.querySelectorAll('.v3-product-section.ux-section, .bk-moment, .bk-scene, .xp').forEach(e => {
       const top = docY(e), h = e.offsetHeight;
       if (e.matches('.bk-moment')) { const next = e.nextElementSibling?.closest?.('*'); let n = e.nextElementSibling; while (n && !CH[n.id]) n = n.nextElementSibling; const prevSide = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; const to = n ? CH[n.id] : prevSide;
         K.push({ at: top + h * .2, x: XS[prevSide], y: .55, s: .9, o: 1 }); K.push({ at: top + h * .5, x: .5, y: 1.55, s: .5, o: 1 }); K.push({ at: top + h * .85, x: XS[to], y: .55, s: .9, o: 1 }); return; }
-      if (e.matches('.st, .xp')) { const side = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; K.push({ at: top - vh * .75, x: XS[side], y: .55, s: .9, o: 1 }); K.push({ at: top - vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .7, x: XS[side], y: .55, s: .9, o: 1 }); return; }
+      if (e.matches('.bk-scene, .xp')) { const side = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; K.push({ at: top - vh * .75, x: XS[side], y: .55, s: .9, o: 1 }); K.push({ at: top - vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .7, x: XS[side], y: .55, s: .9, o: 1 }); return; }
       const side = CH[e.id]; if (!side) return; K.push({ at: top + vh * .1, x: XS[side], y: .52, s: 1, o: 1 }); K.push({ at: top + h - vh * .2, x: XS[side], y: .52, s: 1, o: 1 });
     });
     K.sort((a, b) => a.at - b.at); keys = K;
@@ -300,4 +302,13 @@ function cssPhone(host, files, calm) {
   // each part of the story gets its own camera angle, eased slowly like a camera move
   const SHOTS = [[0, 0], [7, -9], [-5, 11], [10, 5], [-3, -12], [6, 8]];
   return { show, spot, lean: y => { face = y; }, shot: i => { const s2 = SHOTS[i % SHOTS.length]; tShX = s2[0]; tShY = s2[1]; } };
+}
+
+// the story of one booking, as a 3D studio scene the wheel moves a camera through (replaces the flat phone story on wide screens)
+function scene3d(root) {
+  const st = root.querySelector('.st'); if (!st || root.querySelector('.bk-scene')) return;
+  const sec = document.createElement('section'); sec.className = 'bk-scene'; sec.setAttribute('aria-label', zh() ? '一笔预约的 3D 场景' : 'One booking, in 3D');
+  sec.innerHTML = `<div class="bk-scene-pin"><canvas></canvas><div class="bk-scene-cap"><p class="bk-scene-n"></p><p class="bk-scene-k"></p><p class="bk-scene-t"></p><p class="bk-scene-b"></p></div><div class="bk-scene-bar"><i></i></div><p class="bk-scene-hint">${zh() ? '滚动 · 镜头跟着这笔预约' : 'Scroll · the camera follows the booking'}</p></div>`;
+  st.before(sec); st.classList.add('bk-st-hidden');
+  import('./booking-scene.mjs').then(m => m.mountScene(sec)).catch(e => { console.error(e); sec.remove(); st.classList.remove('bk-st-hidden'); });
 }

@@ -96,21 +96,28 @@ function mountThreads(root, acts) {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'lk-threads'); svg.setAttribute('aria-hidden', 'true');
   const mk = (tag, cls) => { const e = document.createElementNS(NS, tag); e.setAttribute('class', cls); svg.append(e); return e; };
-  const pathU = mk('path', 'lk-th lk-th--u'), pathC = mk('path', 'lk-th lk-th--c'), pathJ = mk('path', 'lk-th lk-th--j'), knot = mk('path', 'lk-th-knot');
+  // each rope: a soft shadow on the page, the rope itself, and a twisted highlight so it reads as braided cord
+  const shU = mk('path', 'lk-rope-sh'), shC = mk('path', 'lk-rope-sh'), shJ = mk('path', 'lk-rope-sh');
+  const pathU = mk('path', 'lk-th lk-th--u'), pathC = mk('path', 'lk-th lk-th--c'), pathJ = mk('path', 'lk-th lk-th--j');
+  const twU = mk('path', 'lk-rope-tw'), twC = mk('path', 'lk-rope-tw'), twJ = mk('path', 'lk-rope-tw');
+  const knotSh = mk('path', 'lk-rope-sh lk-knot-sh'), knot = mk('path', 'lk-th-knot');
   const dotU = mk('circle', 'lk-dot lk-dot--u'), dotC = mk('circle', 'lk-dot lk-dot--c'); [dotU, dotC].forEach(d => d.setAttribute('r', 5));
   // behind everything on the page, just above the coloured backdrop
   const bg = document.querySelector('.lk-bg'); bg ? bg.after(svg) : document.body.prepend(svg);
   const mkLabel = cls => { const p = document.createElement('p'); p.className = 'lk-th-label ' + cls; p.setAttribute('aria-hidden', 'true'); document.body.append(p); return p; };
   const labU = mkLabel('lk-th-label--u'), labC = mkLabel('lk-th-label--c'), knotSay = mkLabel('lk-knot-say');
   const note = mkLabel('lk-th-note');
-  const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'lk-chip'; chip.innerHTML = '<i class="u"></i><b><s></s></b><i class="c"></i><span></span>'; document.body.append(chip);
-  chip.addEventListener('click', () => { const last = acts[acts.length - 1]?.el; last && last.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  // touch a rope and it says what that side is going through
+  const say = document.createElement('div'); say.className = 'lk-rope-say'; say.setAttribute('aria-live', 'polite'); document.body.append(say);
+  const SAY = { u: [['“I love it, but I don’t know what it’s called.”', '“我觉得好看，但不知道它叫什么。”'], ['“Pinterest shows me looks, not who can do them.”', '“Pinterest 给我看造型，却不告诉我谁能做。”'], ['“I have to pick a salon before I see the work.”', '“我得先选店，才能看到作品。”']],
+    c: [['“Instagram gives me likes, not bookings.”', '“Instagram 给我点赞，不给我预约。”'], ['“I post real work every day, but few new customers find me.”', '“我每天发真实作品，却很少带来新客户。”'], ['“My work should be my shop window.”', '“我的作品，就该是我的橱窗。”']] };
+  const sayK = { u: 0, c: 0 }; let sayT = 0, touching = '';
+  const speak = (side, x, y) => { const l = SAY[side][sayK[side]++ % SAY[side].length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; say.style.transform = `translate3d(${Math.min(innerWidth - 300, Math.max(16, x + (side === 'u' ? 22 : -282))).toFixed(0)}px,${Math.max(70, y - 30).toFixed(0)}px,0)`; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => say.classList.remove('is-on'), 3200); };
   const words = () => {
     labU.innerHTML = zh() ? '<strong>用户</strong>想找到做这个造型的人' : '<strong>User</strong>looking for who made a look';
     labC.innerHTML = zh() ? '<strong>Creator</strong>想让作品带来客人' : '<strong>Creator</strong>wants their work to bring customers';
     note.textContent = zh() ? '往下看，平台会把他们连起来 ↓' : 'Keep scrolling: the platform brings them together ↓';
     knotSay.textContent = zh() ? '用户和 Creator，连上了。' : 'User and Creator, connected.';
-    chip.setAttribute('aria-label', zh() ? '用户和 Creator 之间的距离；点一下跳到他们连上的地方' : 'How far apart the user and the Creator are; click to jump to where they meet');
   };
   words(); document.addEventListener('portfolio:language', words);
 
@@ -121,6 +128,11 @@ function mountThreads(root, acts) {
     knotDoc = last.querySelector('.lk-act-cap').getBoundingClientRect().bottom + scrollY + 46;
     endY = last.getBoundingClientRect().bottom + scrollY;
   };
+  // the big words of every act, in page coordinates: the ropes go round them, never through them
+  let boxesT = [];
+  const measureType = () => { boxesT = acts.map(a => { const r = a.el.querySelector('.lk-act-type').getBoundingClientRect(), k = a.el.querySelector('.lk-act-kicker').getBoundingClientRect(); return { t: k.top + scrollY - 24, b: r.bottom + scrollY + 24, l: r.left - 34, r: r.right + 34 }; }); };
+  measureType(); addEventListener('resize', measureType); setInterval(measureType, 1000);
+  const avoid = (docY, p) => { for (const q of boxesT) { const f = Math.min(ss(q.t - 80, q.t, docY), 1 - ss(q.b, q.b + 80, docY)); if (f <= 0) continue; p.u = Math.min(p.u, p.u + (q.l - p.u) * f); p.c = Math.max(p.c, p.c + (q.r - p.c) * f); } return p; };
   measure(); addEventListener('resize', measure); addEventListener('load', measure); setInterval(measure, 1000);
 
   // where each line is at a point of the page: apart at the start, together at the knot
@@ -128,7 +140,7 @@ function mountThreads(root, acts) {
   const base = docY => {
     const W = innerWidth, P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.15));
     const wave = Math.sin(docY / 520) * W * .022 * (1 - e);
-    return { u: W * .045 + (W * .5 - W * .045) * e + wave, c: W * .955 - (W * .955 - W * .5) * e - Math.sin(docY / 520 + 1.3) * W * .022 * (1 - e) };
+    return avoid(docY, { u: W * .045 + (W * .5 - W * .045) * e + wave, c: W * .955 - (W * .955 - W * .5) * e - Math.sin(docY / 520 + 1.3) * W * .022 * (1 - e) });
   };
   // the pointer pushes a line aside like a string
   let mx = -1e4, my = -1e4, pmx = -1e4; const spring = { u: { a: 0, v: 0 }, c: { a: 0, v: 0 } };
@@ -149,6 +161,8 @@ function mountThreads(root, acts) {
     const now = performance.now();
     for (const k of ['u', 'c']) { const s = spring[k], d = mx - at[k], T = Math.abs(d) < 190 && my > 0 ? -Math.sign(d) * (190 - Math.abs(d)) * .55 : 0; s.v += (T - s.a) * .14; s.v *= .78; s.a += s.v;
       if (pmx > -1e3 && Math.sign(pmx - at[k]) !== Math.sign(mx - at[k]) && Math.abs(mx - pmx) > 3) { ripples.push({ side: k, y: my, t: now, amp: Math.min(30, 6 + Math.abs(mx - pmx) * 1.2) }); s.v += Math.sign(mx - pmx) * 6; } }
+    // speak when the pointer first touches a rope
+    { const near = Math.abs(mx - at.u) < 26 ? 'u' : Math.abs(mx - at.c) < 26 ? 'c' : ''; if (near && near !== touching && my > startY - sy && my < knotDoc - sy) speak(near, mx, my); touching = near; }
     pmx = mx; while (ripples.length && now - ripples[0].t > 2600) ripples.shift();
     const y0 = Math.max(0, startY - sy), y1 = Math.min(vh, endY - sy), yk = knotDoc - sy;
     let dU = '', dC = '', dJ = '';
@@ -157,27 +171,24 @@ function mountThreads(root, acts) {
       if (y <= yk) {
         const u = b.u + spring.u.a * g + wave('u', y, now), c = b.c + spring.c.a * g + wave('c', y, now);
         dU += (dU ? 'L' : 'M') + u.toFixed(1) + ' ' + y.toFixed(1); dC += (dC ? 'L' : 'M') + c.toFixed(1) + ' ' + y.toFixed(1);
-      } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
+      } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 30, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
     }
-    pathU.setAttribute('d', dU); pathC.setAttribute('d', dC); pathJ.setAttribute('d', dJ);
+    [[pathU, shU, twU, dU], [pathC, shC, twC, dC], [pathJ, shJ, twJ, dJ]].forEach(([a, b, c, d]) => { a.setAttribute('d', d); b.setAttribute('d', d); c.setAttribute('d', d); });
     // a dot rides each line in the middle of the screen
     const mid = vh * .5, bm = base(sy + mid), gm = Math.exp(-Math.pow((mid - my) / 110, 2));
     const showDots = mid >= y0 && mid <= Math.min(y1, yk);
-    [[dotU, bm.u + spring.u.a * gm], [dotC, bm.c + spring.c.a * gm]].forEach(([d, x]) => { d.setAttribute('cx', x.toFixed(1)); d.setAttribute('cy', mid); d.style.opacity = showDots ? 1 : 0; });
+    [[dotU, bm.u + spring.u.a * gm], [dotC, bm.c + spring.c.a * gm]].forEach(([d, x]) => { d.setAttribute('cx', x.toFixed(1)); d.setAttribute('cy', mid); d.style.opacity = 0; });
     // labels once, where the lines begin
     const ls = startY - sy + 34, bl = base(startY + 34);
     labU.style.transform = `translate3d(${(bl.u + 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`; labC.style.transform = `translate3d(${(bl.c - 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`;
     const lv = ls > 40 && ls < vh - 60; labU.classList.toggle('is-on', lv); labC.classList.toggle('is-on', lv);
     note.style.transform = `translate3d(${innerWidth / 2}px,${(ls + 6).toFixed(1)}px,0)`; note.classList.toggle('is-on', lv);
-    // the chip: how far apart they still are
-    const P = clamp((sy + vh * .5 - startY) / Math.max(1, knotDoc - startY)), left = Math.round((1 - ease(Math.pow(P, 1.15))) * 100);
-    chip.style.setProperty('--gap', (left / 100).toFixed(2)); chip.classList.toggle('is-done', left <= 0);
-    chip.querySelector('span').textContent = left <= 0 ? (zh() ? '已连接' : 'Connected') : (zh() ? `距离连接还有 ${left}%` : `${left}% apart`);
     // the knot where they meet
     const kx = innerWidth / 2, kv = yk > -30 && yk < vh + 30;
-    if (kv) { const r = 13; knot.setAttribute('d', `M${kx - r} ${yk}c0-${r * 1.2} ${r * 2}-${r * 1.2} ${r * 2} 0s-${r * 2} ${r * 1.2}-${r * 2} 0z`); }
-    knot.style.opacity = kv ? 1 : 0;
-    knotSay.style.transform = `translate3d(${kx}px,${(yk + 24).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
+    // a real knot: two loops crossing, with the two colours twisting into one
+    if (kv) { const d = `M${kx - 30} ${yk - 34}C${kx - 4} ${yk - 20} ${kx + 22} ${yk - 4} ${kx + 12} ${yk + 10}S${kx - 20} ${yk + 8} ${kx - 12} ${yk - 6}S${kx + 26} ${yk - 22} ${kx + 30} ${yk - 34}M${kx - 2} ${yk + 8}L${kx} ${yk + 30}`; knot.setAttribute('d', d); knotSh.setAttribute('d', d); }
+    knot.style.opacity = knotSh.style.opacity = kv ? 1 : 0;
+    knotSay.style.transform = `translate3d(${kx}px,${(yk + 44).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
   };
   raf = requestAnimationFrame(frame);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(frame); });

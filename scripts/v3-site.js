@@ -906,7 +906,7 @@ window.addEventListener('pagereveal',event=>{
   // LOOK: stronger depth — each card in a group sits on its own layer (near cards move more, far ones less and are a touch smaller)
   els.forEach((e, k) => { e.classList.add('v3-par'); const d = [1, .35, .75, .15, .55][k % 5]; e.style.setProperty('--sp', beauty ? (d * 2.4 - .6).toFixed(2) : [0.6, -0.35, 1, -0.6, 0.3][k % 5]); if (beauty) { e.style.setProperty('--depth', d); } });
   let q = false;
-  const run = () => { q = false; const vh = innerHeight; els.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return; const p = (r.top + r.height / 2 - vh / 2) / vh; e.style.setProperty('--py', (p * (beauty ? -80 : -60) * +e.style.getPropertyValue('--sp')).toFixed(1) + 'px'); if (beauty) e.style.setProperty('--pr', (p * 3 * (+e.style.getPropertyValue('--sp') - .6)).toFixed(2) + 'deg'); }); };
+  const run = () => { q = false; const vh = innerHeight; els.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return; const p = (r.top + r.height / 2 - vh / 2) / vh; const sp = +e.style.getPropertyValue('--sp'); let py = p * (beauty ? -40 : -60) * sp; if (beauty) { const d = +e.style.getPropertyValue('--depth') || .5, rise = Math.min(1, Math.max(0, (r.top - vh * .55) / (vh * .45))); py += rise * rise * (140 + d * 160); } e.style.setProperty('--py', py.toFixed(1) + 'px'); if (beauty) e.style.setProperty('--pr', (p * 3 * (+e.style.getPropertyValue('--sp') - .6)).toFixed(2) + 'deg'); }); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
 })();
 

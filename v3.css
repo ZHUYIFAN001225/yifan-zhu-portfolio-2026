@@ -2181,3 +2181,6 @@ body.lk-dark .lk-glow{mix-blend-mode:screen;opacity:.35}
 .lk-glow{mix-blend-mode:overlay;filter:blur(16px) saturate(1)}
 body.lk-dark .lk-glow{mix-blend-mode:screen;opacity:.22}
 .lk-act :is(h2,h3,h4,p,li,span,a,strong,b,em,small){text-shadow:none!important}
+.lk-glow{filter:blur(6px)!important;mix-blend-mode:soft-light!important;opacity:1!important}
+body.lk-dark .lk-glow{mix-blend-mode:screen!important;opacity:.28!important}
+.lk-glow{mix-blend-mode:overlay!important}

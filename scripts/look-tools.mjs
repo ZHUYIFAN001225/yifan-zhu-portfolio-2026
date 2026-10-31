@@ -140,23 +140,32 @@ function glowTrail() {
   if (document.querySelector('.lk-glow') || !matchMedia('(hover:hover) and (pointer:fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const cv = document.createElement('canvas'); cv.className = 'lk-glow'; cv.setAttribute('aria-hidden', 'true');
   const bg = document.querySelector('.lk-bg'); bg ? bg.after(cv) : document.body.prepend(cv);
-  const ctx = cv.getContext('2d'), S = .25; let W = 0, H = 0;
+  const ctx = cv.getContext('2d'), S = .5; let W = 0, H = 0;
   const size = () => { W = cv.width = Math.ceil(innerWidth * S); H = cv.height = Math.ceil(innerHeight * S); }; size(); addEventListener('resize', size);
-  const blobs = []; let lx = null, ly = null, lt = 0, raf = 0, idle = 0;
-  addEventListener('pointermove', e => {
-    const now = performance.now(), x = e.clientX, y = e.clientY;
-    if (lx !== null) { const dt = Math.max(8, now - lt), d = Math.hypot(x - lx, y - ly), v = Math.min(3, d / dt);
-      const n = Math.max(1, Math.round(d / 30));
-      for (let k = 1; k <= n; k++) blobs.push({ x: (lx + (x - lx) * k / n) * S, y: (ly + (y - ly) * k / n) * S, r: (26 + v * 55) * S, a: .1 + v * .14, g: 1 + v * .6 }); }
-    lx = x; ly = y; lt = now; idle = 0; if (blobs.length > 160) blobs.splice(0, blobs.length - 160); if (!raf) raf = requestAnimationFrame(tick);
-  }, { passive: true });
+  // one soft body of light: a head that chases the pointer and a tail that chases the head, so it stretches into a
+  // comet when you move fast and gathers back into a round glow when you stop
+  const N = 22, pts = Array.from({ length: N }, () => ({ x: -999, y: -999 }));
+  let tx = -999, ty = -999, energy = 0, raf = 0, seen = false;
+  addEventListener('pointermove', e => { const x = e.clientX * S, y = e.clientY * S; if (!seen) { pts.forEach(p => { p.x = x; p.y = y; }); seen = true; } energy = Math.min(1, energy + Math.hypot(x - tx, y - ty) / 260); tx = x; ty = y; if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
+  document.addEventListener('pointerleave', () => { energy *= .5; });
   const tick = () => {
-    raf = 0; ctx.clearRect(0, 0, W, H);
-    for (const b of blobs) { b.r += b.g * S * 2.2; b.a *= .955;
-      const gr = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r); gr.addColorStop(0, `rgba(255,255,255,${b.a})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 6.283); ctx.fill(); }
-    for (let i = blobs.length - 1; i >= 0; i--) if (blobs[i].a < .004) blobs.splice(i, 1);
-    if (blobs.length) raf = requestAnimationFrame(tick);
+    raf = 0;
+    pts[0].x += (tx - pts[0].x) * .22; pts[0].y += (ty - pts[0].y) * .22;
+    for (let i = 1; i < N; i++) { pts[i].x += (pts[i - 1].x - pts[i].x) * .34; pts[i].y += (pts[i - 1].y - pts[i].y) * .34; }
+    energy *= .985;
+    ctx.clearRect(0, 0, W, H);
+    const R = (110 + energy * 70) * S, A = .25 + energy * .55;
+    // tail first, head last, all in one colour so they melt into a single shape
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = N - 1; i >= 0; i--) {
+      const f = 1 - i / N, r = R * (.45 + .55 * f), p = pts[i];
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+      g.addColorStop(0, `rgba(255,255,255,${(A * f * .5).toFixed(3)})`); g.addColorStop(.6, `rgba(255,255,255,${(A * f * .32).toFixed(3)})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    const still = Math.hypot(tx - pts[N - 1].x, ty - pts[N - 1].y) < .5;
+    if (!(still && energy < .01)) raf = requestAnimationFrame(tick); else ctx.clearRect(0, 0, W, H);
   };
 }
 

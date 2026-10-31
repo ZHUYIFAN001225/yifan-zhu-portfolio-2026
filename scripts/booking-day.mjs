@@ -184,7 +184,7 @@ function traveller(root, calm) {
     root.querySelectorAll('.v3-product-section.ux-section, .bk-moment, .st, .xp').forEach(e => {
       const top = docY(e), h = e.offsetHeight;
       if (e.matches('.bk-moment')) { const next = e.nextElementSibling?.closest?.('*'); let n = e.nextElementSibling; while (n && !CH[n.id]) n = n.nextElementSibling; const prevSide = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; const to = n ? CH[n.id] : prevSide;
-        K.push({ at: top + h * .2, x: XS[prevSide], y: .55, s: .9, o: 1 }); K.push({ at: top + h * .5, x: .5, y: 1.22, s: .5, o: 1 }); K.push({ at: top + h * .85, x: XS[to], y: .55, s: .9, o: 1 }); return; }
+        K.push({ at: top + h * .2, x: XS[prevSide], y: .55, s: .9, o: 1 }); K.push({ at: top + h * .5, x: .5, y: 1.55, s: .5, o: 1 }); K.push({ at: top + h * .85, x: XS[to], y: .55, s: .9, o: 1 }); return; }
       if (e.matches('.st, .xp')) { const side = K.length ? (K[K.length - 1].x < .5 ? 'left' : 'right') : 'right'; K.push({ at: top - vh * .75, x: XS[side], y: .55, s: .9, o: 1 }); K.push({ at: top - vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .05, x: XS[side] < .5 ? -.1 : 1.1, y: .55, s: .7, o: 0 }); K.push({ at: top + h + vh * .7, x: XS[side], y: .55, s: .9, o: 1 }); return; }
       const side = CH[e.id]; if (!side) return; K.push({ at: top + vh * .1, x: XS[side], y: .52, s: 1, o: 1 }); K.push({ at: top + h - vh * .2, x: XS[side], y: .52, s: 1, o: 1 });
     });
@@ -193,7 +193,7 @@ function traveller(root, calm) {
   build(); addEventListener('resize', build); setInterval(build, 1500);
   const ss = t => t * t * (3 - 2 * t);
   const at = y => { if (!keys.length) return null; if (y <= keys[0].at) return keys[0]; for (let i = 0; i < keys.length - 1; i++) { const a = keys[i], b = keys[i + 1]; if (y < b.at) { const t = ss((y - a.at) / Math.max(1, b.at - a.at)); const o = {}; for (const k of ['x', 'y', 's', 'o']) o[k] = a[k] + (b[k] - a[k]) * t; return o; } } return keys[keys.length - 1]; };
-  let cur = -1, px = .85, override = null;
+  let cur = -1, px = .85, override = null, sm = scrollY;
   const SPOT = { today: [2, 22, 96, 28], book: [2, 19, 96, 13], day: [2, 31, 96, 28], confirm: [2, 27, 96, 24], schedule: [4, 52, 94, 34], 'time-off-hours': [2, 35, 96, 27], kept: [2, 33, 96, 28], add: [2, 24, 96, 30], mine: [2, 18, 96, 30], services: [2, 16, 96, 42], 'by-time': [2, 22, 96, 40], booked: [2, 14, 96, 34], reschedule: [2, 22, 96, 36], window: [2, 22, 96, 36] };
   const HOVER = [
     ['#overview .ux-pains>div', ['schedule', 'day', 'time-off-hours', 'book']],
@@ -217,7 +217,7 @@ function traveller(root, calm) {
       host._phone?.show(files.indexOf(scr)); host._phone?.spot({ x: r[0], y: r[1], w: r[2], h: r[3], label: head.length > 34 ? head.slice(0, 32) + '…' : head });
       el.classList.add('is-pointed'); wrap.classList.add('is-pointing');
     });
-    el.addEventListener('pointerleave', () => { override = null; cur = -1; host._phone?.spot(null); el.classList.remove('is-pointed'); wrap.classList.remove('is-pointing'); });
+    el.addEventListener('pointerleave', () => { override = null; cur = -1; el.classList.remove('is-pointed'); wrap.classList.remove('is-pointing'); });
   }));
   // reload the phone's screen list if hover added screens
   host.dataset.screens = files.map(f => B + f + '.webp').join(',');
@@ -225,7 +225,8 @@ function traveller(root, calm) {
   root.querySelectorAll('#structure [data-screen]').forEach(b => { b.addEventListener('pointerenter', () => { override = b.dataset.screen; host._phone?.spot(null); host._phone?.show(files.indexOf(override)); lab.textContent = (b.querySelector('strong')?.textContent || override); }); b.addEventListener('pointerleave', () => { override = null; cur = -1; }); });
   const tick = () => {
     requestAnimationFrame(tick);
-    const vh = innerHeight, y = scrollY + vh * .5, k = at(y); if (!k) return;
+    const vh = innerHeight; sm += (scrollY - sm) * .12; if (Math.abs(scrollY - sm) > vh * 3) sm = scrollY; // damped like a camera dolly
+    const y = sm + vh * .5, k = at(y); if (!k) return;
     document.body.classList.toggle('bk-hero-handover', true);
     const W = innerWidth, w = wrap.offsetWidth;
     const vx = k.x - px; px = k.x;
@@ -236,7 +237,7 @@ function traveller(root, calm) {
     host._phone?.lean(face + Math.max(-1.2, Math.min(1.2, vx * 160)));
     if (override) return;
     const mid = vh * .55; let b = -1; beats.forEach((bt, i) => { if (bt.el.getBoundingClientRect().top < mid) b = i; });
-    if (b >= 0 && b !== cur) { cur = b; host._phone?.show(files.indexOf(beats[b].file)); lab.textContent = beats[b].label[zh() ? 1 : 0]; wrap.dataset.who = /Owner|店主/.test(lab.textContent) ? 'owner' : 'customer'; wrap.classList.remove('is-swap'); void wrap.offsetWidth; wrap.classList.add('is-swap'); }
+    if (b >= 0 && b !== cur) { cur = b; host._phone?.show(files.indexOf(beats[b].file)); { const r = SPOT[beats[b].file] || [2, 20, 96, 30]; host._phone?.spot({ x: r[0], y: r[1], w: r[2], h: r[3], zoom: 1.28 }); host._phone?.shot(b); } lab.textContent = beats[b].label[zh() ? 1 : 0]; wrap.dataset.who = /Owner|店主/.test(lab.textContent) ? 'owner' : 'customer'; wrap.classList.remove('is-swap'); void wrap.offsetWidth; wrap.classList.add('is-swap'); }
   };
   host._phone = cssPhone(host, files, calm);
   host.addEventListener('pointerdown', () => wrap.classList.add('was-dragged'), { once: true });
@@ -265,10 +266,11 @@ function cssPhone(host, files, calm) {
   const imgs = {};
   const img = f => { if (!imgs[f]) { const i = document.createElement('img'); i.alt = ''; i.decoding = 'async'; i.src = src(f); shots.append(i); imgs[f] = i; } return imgs[f]; };
   document.addEventListener('portfolio:language', () => Object.entries(imgs).forEach(([f, i]) => { i.src = src(f); }));
-  let curF = null, face = .38, lifted = 0, liftT = 0, zoom = 1, oy = 50, spotCy = 50, rx = 16, ry = -18, rz = -6, mx = 0, my = 0, dragX = 0, dragY = 0, drag = null;
+  let curF = null, face = .38, lifted = 0, liftT = 0, zoom = 1, zoomT = 1, oy = 50, spotCy = 50, shX = 0, shY = 0, tShX = 0, tShY = 0, t0 = performance.now(), rx = 16, ry = -18, rz = -6, mx = 0, my = 0, dragX = 0, dragY = 0, drag = null;
   const show = i => { const f = files[i]; if (!f || f === curF) return; curF = f; const n = img(f); Object.values(imgs).forEach(x => x.classList.toggle('is-on', x === n)); if (lift.classList.contains('is-on')) limg.style.backgroundImage = `url("${src(f)}")`; };
   const spot = r => {
-    if (!r) { lift.classList.remove('is-on'); host.classList.remove('is-lifted'); liftT = 0; return; }
+    if (!r) { lift.classList.remove('is-on'); host.classList.remove('is-lifted'); liftT = 0; zoomT = 1; return; }
+    zoomT = r.zoom || 1.55;
     const [x, y, w, h] = [r.x, r.y, r.w, r.h];
     lift.style.cssText = `left:${x}%;top:${y}%;width:${w}%;height:${h}%`;
     limg.style.backgroundImage = `url("${src(curF)}")`; limg.style.backgroundSize = `${(1e4 / w).toFixed(2)}% ${(1e4 / h).toFixed(2)}%`;
@@ -287,12 +289,15 @@ function cssPhone(host, files, calm) {
     // readable angles (like LOOK's anatomy): a gentle turn towards the text; when a part lifts, the camera moves in on it and straightens
     const tY = -side * (14 - lifted * 7) + swing * -40 + mx * 8 + dragY, tX = 8 + lifted * 6 + my * -6 + dragX, tZ = -side * (3 - lifted * 2);
     const k = calm ? 1 : .07; ry += (tY - ry) * k; rx += (tX - rx) * k; rz += (tZ - rz) * k;
-    zoom += ((liftT ? 1.55 : 1) - zoom) * k; oy += (spotCy - oy) * k;
+    zoom += (zoomT - zoom) * k * .8; oy += (spotCy - oy) * k * .8; shX += (tShX - shX) * .04; shY += (tShY - shY) * .04;
+    const t = (performance.now() - t0) / 1000, fx = calm ? 0 : Math.sin(t * .5) * 2.2, fy = calm ? 0 : Math.sin(t * .37) * 3, fl = calm ? 0 : Math.sin(t * .8) * 6;
     dev.style.transformOrigin = `50% ${oy.toFixed(1)}%`;
-    dev.style.transform = `translateY(${((50 - oy) * (zoom - 1) * .9).toFixed(1)}%) scale(${zoom.toFixed(3)}) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
+    dev.style.transform = `translateY(calc(${((50 - oy) * (zoom - 1) * .9).toFixed(1)}% + ${fl.toFixed(1)}px)) scale(${zoom.toFixed(3)}) rotateX(${(rx + shX + fx).toFixed(2)}deg) rotateY(${(ry + shY + fy).toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
     dev.style.setProperty('--gl', (50 + ry * 1.5).toFixed(1) + '%');
   };
   requestAnimationFrame(tick);
   show(0);
-  return { show, spot, lean: y => { face = y; } };
+  // each part of the story gets its own camera angle, eased slowly like a camera move
+  const SHOTS = [[0, 0], [7, -9], [-5, 11], [10, 5], [-3, -12], [6, 8]];
+  return { show, spot, lean: y => { face = y; }, shot: i => { const s2 = SHOTS[i % SHOTS.length]; tShX = s2[0]; tShY = s2[1]; } };
 }

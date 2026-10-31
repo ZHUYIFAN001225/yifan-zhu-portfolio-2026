@@ -2184,3 +2184,7 @@ body.lk-dark .lk-glow{mix-blend-mode:screen;opacity:.22}
 .lk-glow{filter:blur(6px)!important;mix-blend-mode:soft-light!important;opacity:1!important}
 body.lk-dark .lk-glow{mix-blend-mode:screen!important;opacity:.28!important}
 .lk-glow{mix-blend-mode:overlay!important}
+/* the fluid light: black = no change; brighter = the page colour lifted, like Leo's colour * 1.25 */
+.lk-glow{filter:none!important;mix-blend-mode:color-dodge!important;opacity:1!important;image-rendering:auto}
+body.lk-dark .lk-glow{mix-blend-mode:screen!important;opacity:.6!important}
+.lk-glow,body.lk-dark .lk-glow{mix-blend-mode:soft-light!important;opacity:1!important}

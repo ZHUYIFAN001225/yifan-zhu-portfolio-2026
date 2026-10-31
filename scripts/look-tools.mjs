@@ -138,34 +138,46 @@ function rail(root) {
 // faster moves make bigger, brighter swells that spread out and fade.
 function glowTrail() {
   if (document.querySelector('.lk-glow') || !matchMedia('(hover:hover) and (pointer:fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Like Léo Parpeix's playground: a small fluid simulation. The pointer stirs the fluid, the fluid keeps flowing and
+  // settles, and wherever it moves the page colour is brightened (colour-dodge), so the light always takes the page's hue.
   const cv = document.createElement('canvas'); cv.className = 'lk-glow'; cv.setAttribute('aria-hidden', 'true');
+  const gl = cv.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, premultipliedAlpha: false });
+  if (!gl || !gl.getExtension('EXT_color_buffer_float')) return;
   const bg = document.querySelector('.lk-bg'); bg ? bg.after(cv) : document.body.prepend(cv);
-  const ctx = cv.getContext('2d'), S = .5; let W = 0, H = 0;
-  const size = () => { W = cv.width = Math.ceil(innerWidth * S); H = cv.height = Math.ceil(innerHeight * S); }; size(); addEventListener('resize', size);
-  // one soft body of light: a head that chases the pointer and a tail that chases the head, so it stretches into a
-  // comet when you move fast and gathers back into a round glow when you stop
-  const N = 22, pts = Array.from({ length: N }, () => ({ x: -999, y: -999 }));
-  let tx = -999, ty = -999, energy = 0, raf = 0, seen = false;
-  addEventListener('pointermove', e => { const x = e.clientX * S, y = e.clientY * S; if (!seen) { pts.forEach(p => { p.x = x; p.y = y; }); seen = true; } energy = Math.min(1, energy + Math.hypot(x - tx, y - ty) / 260); tx = x; ty = y; if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
-  document.addEventListener('pointerleave', () => { energy *= .5; });
+  const VS = `#version 300 es\nin vec2 p;out vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}`;
+  const H = '#version 300 es\nprecision highp float;in vec2 uv;out vec4 o;';
+  const FS = {
+    advect: H + 'uniform sampler2D vel;uniform float dt,diss;uniform vec2 ratio;void main(){vec2 v=texture(vel,uv).xy;o=vec4(texture(vel,uv-v*dt*ratio).xy*diss,0.,1.);}',
+    force: H + 'uniform sampler2D vel;uniform vec2 c,f,r;void main(){float d=1.-min(length((uv-c)/r),1.);d*=d;o=vec4(texture(vel,uv).xy+f*d,0.,1.);}',
+    div: H + 'uniform sampler2D vel;uniform vec2 px;uniform float dt;void main(){float x0=texture(vel,uv-vec2(px.x,0)).x,x1=texture(vel,uv+vec2(px.x,0)).x,y0=texture(vel,uv-vec2(0,px.y)).y,y1=texture(vel,uv+vec2(0,px.y)).y;o=vec4((x1-x0+y1-y0)/2./dt);}',
+    poisson: H + 'uniform sampler2D pr,dv;uniform vec2 px;void main(){float p0=texture(pr,uv+vec2(px.x*2.,0)).r,p1=texture(pr,uv-vec2(px.x*2.,0)).r,p2=texture(pr,uv+vec2(0,px.y*2.)).r,p3=texture(pr,uv-vec2(0,px.y*2.)).r;o=vec4((p0+p1+p2+p3)/4.-texture(dv,uv).r);}',
+    project: H + 'uniform sampler2D pr,vel;uniform vec2 px;uniform float dt;void main(){float p0=texture(pr,uv+vec2(px.x,0)).r,p1=texture(pr,uv-vec2(px.x,0)).r,p2=texture(pr,uv+vec2(0,px.y)).r,p3=texture(pr,uv-vec2(0,px.y)).r;vec2 v=texture(vel,uv).xy-vec2(p0-p1,p2-p3)*.5*dt;o=vec4(v,0.,1.);}',
+    show: H + 'uniform sampler2D vel;uniform float k;void main(){float l=clamp(length(texture(vel,uv).xy)*.75,0.,1.);o=vec4(vec3(.5+l*k),1.);}'
+  };
+  const sh = (t, src) => { const x = gl.createShader(t); gl.shaderSource(x, src); gl.compileShader(x); return x; };
+  const prog = {}; for (const [n, f] of Object.entries(FS)) { const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, f)); gl.bindAttribLocation(pr, 0, 'p'); gl.linkProgram(pr); if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { cv.remove(); return; } const u = {}; const nu = gl.getProgramParameter(pr, gl.ACTIVE_UNIFORMS); for (let q = 0; q < nu; q++) { const a = gl.getActiveUniform(pr, q); u[a.name] = gl.getUniformLocation(pr, a.name); } prog[n] = { pr, u }; }
+  const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  let W = 0, Hh = 0, tex = {};
+  const target = () => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG16F, W, Hh, 0, gl.RG, gl.HALF_FLOAT, null); for (const [a, b] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, a, b); const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0); return { t, f }; };
+  const size = () => { W = Math.max(16, Math.round(innerWidth * .2)); Hh = Math.max(16, Math.round(innerHeight * .2)); cv.width = W; cv.height = Hh; tex = { v0: target(), v1: target(), dv: target(), p0: target(), p1: target() }; };
+  size(); addEventListener('resize', size);
+  const pass = (name, out, set) => { const { pr, u } = prog[name]; gl.useProgram(pr); let unit = 0; set((n, v) => { const l = u[n]; if (l == null) return; if (v && v.t) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, v.t); gl.uniform1i(l, unit++); } else if (Array.isArray(v)) gl.uniform2f(l, v[0], v[1]); else gl.uniform1f(l, v); }); gl.bindFramebuffer(gl.FRAMEBUFFER, out ? out.f : null); gl.viewport(0, 0, W, Hh); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); };
+  let mx = -1, my = -1, dx = 0, dy = 0, last = 0, raf = 0, seen = false;
+  addEventListener('pointermove', e => { const x = e.clientX / innerWidth, y = 1 - e.clientY / innerHeight; if (seen) { dx += x - mx; dy += y - my; } seen = true; mx = x; my = y; last = performance.now(); if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
+  const dt = .015 * .875, diss = Math.pow(.98, .875), px = () => [1 / W, 1 / Hh];
   const tick = () => {
-    raf = 0;
-    pts[0].x += (tx - pts[0].x) * .22; pts[0].y += (ty - pts[0].y) * .22;
-    for (let i = 1; i < N; i++) { pts[i].x += (pts[i - 1].x - pts[i].x) * .34; pts[i].y += (pts[i - 1].y - pts[i].y) * .34; }
-    energy *= .985;
-    ctx.clearRect(0, 0, W, H);
-    const R = (110 + energy * 70) * S, A = .25 + energy * .55;
-    // tail first, head last, all in one colour so they melt into a single shape
-    ctx.globalCompositeOperation = 'lighter';
-    for (let i = N - 1; i >= 0; i--) {
-      const f = 1 - i / N, r = R * (.45 + .55 * f), p = pts[i];
-      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-      g.addColorStop(0, `rgba(255,255,255,${(A * f * .5).toFixed(3)})`); g.addColorStop(.6, `rgba(255,255,255,${(A * f * .32).toFixed(3)})`); g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill();
-    }
-    ctx.globalCompositeOperation = 'source-over';
-    const still = Math.hypot(tx - pts[N - 1].x, ty - pts[N - 1].y) < .5;
-    if (!(still && energy < .01)) raf = requestAnimationFrame(tick); else ctx.clearRect(0, 0, W, H);
+    raf = 0; const ratio = [Math.max(W, Hh) / W, Math.max(W, Hh) / Hh];
+    pass('advect', tex.v1, s => { s('vel', tex.v0); s('dt', dt); s('diss', diss); s('ratio', ratio); });
+    // the push: mouse movement in screen space, like mouse_force 80 over a 40-cell cursor
+    const f = [dx * 80 * 1.75, dy * 80 * 1.75]; dx = dy = 0;
+    pass('force', tex.v0, s => { s('vel', tex.v1); s('c', [mx, my]); s('f', f); s('r', [40 / W, 40 / Hh]); });
+    pass('div', tex.dv, s => { s('vel', tex.v0); s('px', px()); s('dt', dt); });
+    let a = tex.p0, b = tex.p1; for (let k = 0; k < 4; k++) { pass('poisson', b, s => { s('pr', a); s('dv', tex.dv); s('px', px()); }); [a, b] = [b, a]; }
+    pass('project', tex.v1, s => { s('pr', a); s('vel', tex.v0); s('px', px()); s('dt', dt); });
+    [tex.v0, tex.v1] = [tex.v1, tex.v0];
+    const dark = document.body.classList.contains('lk-dark');
+    pass('show', null, s => { s('vel', tex.v0); s('k', dark ? .5 : .42); });
+    if (performance.now() - last < 6000) raf = requestAnimationFrame(tick);
   };
 }
 

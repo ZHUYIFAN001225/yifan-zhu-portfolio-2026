@@ -2288,3 +2288,22 @@ body.bk-rail-on .bk-rail{opacity:1}
 @media (max-width:760px){.bk-day .ux-pains{grid-template-columns:1fr}.bk-day .ux-principles.bk-table{grid-template-columns:1fr;padding-left:0}}
 @media (min-width:900px){.bk-day .v3-product-section.ux-section{padding-left:78px}.bk-day .v3-product-section.ux-section::before{left:18px}}
 .bk-day .ux-pains>div.bk-sticky p{color:#4b4a3a!important;opacity:1!important;max-height:none!important;border-top:1px dashed rgba(23,54,43,.18)!important;padding-top:10px!important}
+/* ======== booking: the travelling phone ======== */
+.bk-phone{position:fixed;left:0;top:52%;z-index:25;width:min(330px,24vw);height:min(640px,72vh);pointer-events:none;opacity:0;transition:opacity .6s ease}
+.bk-phone.is-on{opacity:1;pointer-events:auto}
+.bk-phone-3d{position:absolute;inset:0}
+.bk-phone-3d canvas{width:100%!important;height:100%!important}
+.bk-phone-label{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;margin:0;padding:7px 12px;border-radius:999px;background:var(--bk-ink,#17362b);color:#fff;font:600 12px/1 Inter,system-ui,sans-serif;white-space:nowrap;box-shadow:0 10px 24px -10px rgba(23,54,43,.6)}
+.bk-phone-label i{width:8px;height:8px;border-radius:50%;background:#3fe2a0}
+.bk-phone[data-who=owner] .bk-phone-label i{background:#f0b44c}
+.bk-phone.is-swap .bk-phone-label{animation:bk-pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bk-pop{40%{transform:translateX(-50%) scale(1.08)}}
+/* sections make room for the phone on their phone side; the spread becomes a single column */
+@media (min-width:1000px){
+  body.bk-has-phone .bk-day .bk-spread.bk-with-phone{display:block!important}
+  body.bk-has-phone .bk-day .bk-with-phone .bk-left-in{position:static}
+  body.bk-has-phone .bk-day .bk-with-phone .bk-left .bk-note{max-width:24ch}
+  body.bk-has-phone .bk-day .bk-with-phone[data-phone=right]{padding-right:38vw!important}
+  body.bk-has-phone .bk-day .bk-with-phone[data-phone=left]{padding-left:calc(34vw + 40px)!important}
+  body.bk-has-phone .bk-day .bk-with-phone[data-phone=left]::before{left:calc(34vw + 18px)}
+}

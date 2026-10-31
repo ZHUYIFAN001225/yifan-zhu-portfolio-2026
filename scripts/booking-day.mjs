@@ -20,6 +20,7 @@ export function mount() {
   checklist(root, calm);
   slips(root, calm);
   if (matchMedia('(min-width: 900px)').matches && !calm) timeline(root, moments);
+  if (matchMedia('(min-width: 1000px)').matches) traveller(root, calm);
   paper(root);
 }
 
@@ -119,4 +120,74 @@ function checklist(root, calm) {
   const items = [...list.children]; items.forEach((li, i) => { li.style.setProperty('--d', (i * 380) + 'ms'); const b = document.createElement('i'); b.className = 'bk-box'; b.innerHTML = '<svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9"/></svg>'; li.prepend(b); });
   if (calm || !('IntersectionObserver' in window)) return list.classList.add('is-in');
   const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { list.classList.add('is-in'); io.disconnect(); } }, { rootMargin: '0px 0px -30% 0px' }); io.observe(list);
+}
+
+// One phone travels with the story. It stands beside the text it illustrates, crosses to the other side when the
+// text does, turning as it goes, and its screen always shows the screen the words are talking about.
+const B = 'assets/v3/screens/booking/';
+const BEATS = [
+  ['#overview .ux-pains', 'schedule', ['Owner · the whole diary in her head', '店主 · 整本预约都记在脑子里']],
+  ['#overview .ux-persona', 'today', ['Owner · what she needs at a glance', '店主 · 一眼要看到的']],
+  ['#system .ux-blueprint', 'book', ['Customer · picks a service first', '顾客 · 先选服务']],
+  ['#system .ux-needs', 'today', ['Owner · her day, not a chat', '店主 · 她的一天，不是聊天记录']],
+  ['#system .ux-lanes', 'mine', ['Customer · my bookings', '顾客 · 我的预约']],
+  ['#strategy .ux-principles', 'day', ['Customer · only times that fit', '顾客 · 只给放得下的时间']],
+  ['#strategy .ux-chips', 'services', ['Owner · services and lengths', '店主 · 服务和时长']],
+  ['#iteration', 'confirm', ['Customer · one check, then book', '顾客 · 核对一次就约好']],
+  ['#flow', 'by-time', ['Customer · find a time', '顾客 · 找一个时间']],
+  ['#flow .ux-journey', 'booked', ['Customer · booked', '顾客 · 约好了']],
+  ['#interfaces', 'time-off-hours', ['Owner · close a few hours', '店主 · 临时关几个小时']],
+  ['#interfaces .ux-details', 'kept', ['Customer · nobody is deleted', '顾客 · 没有人被删掉']],
+  ['#build', 'add', ['Owner · add a regular by name', '店主 · 填名字加老顾客']],
+  ['#challenges', 'reschedule', ['Customer · pick a new time', '顾客 · 重新选个时间']],
+  ['#research', 'today', ['Owner · her day, live', '店主 · 她今天的真实日程']],
+  ['#release', 'booked', ['Customer · booked, in English or Chinese', '顾客 · 中英文都能约']]
+];
+function traveller(root, calm) {
+  const beats = BEATS.map(([sel, file, label]) => ({ el: root.querySelector(sel), file, label })).filter(b => b.el);
+  if (!beats.length) return;
+  const files = [...new Set(beats.map(b => b.file))];
+  const wrap = document.createElement('div'); wrap.className = 'bk-phone'; wrap.setAttribute('aria-hidden', 'true');
+  wrap.innerHTML = `<div class="bk-phone-3d" data-phone3d data-mode="manual" data-follow="1" data-status="1" data-zoom=".62" data-tilt-y="0" data-screens="${files.map(f => B + f + '.webp').join(',')}"></div><p class="bk-phone-label"><i></i><span></span></p>`;
+  document.body.append(wrap);
+  const host = wrap.querySelector('[data-phone3d]'), lab = wrap.querySelector('.bk-phone-label span');
+  import('./phone3d.mjs').then(m => m.mountPhone(host)).catch(() => {});
+  // sections alternate: text on one side, phone on the other
+  const secs = [...root.querySelectorAll('.v3-product-section.ux-section')].filter(sec => beats.some(b => sec.contains(b.el)));
+  secs.forEach((sec, i) => { sec.classList.add('bk-with-phone'); sec.dataset.phone = i % 2 ? 'left' : 'right'; });
+  document.body.classList.add('bk-has-phone');
+  let x = innerWidth * .78, vx = 0, side = 'right', cur = -1, shown = false, raf = 0;
+  const pick = () => {
+    const mid = innerHeight * .55; let k = -1;
+    beats.forEach((b, i) => { if (b.el.getBoundingClientRect().top < mid) k = i; });
+    if (k < 0) return null;
+    const sec = beats[k].el.closest('.bk-with-phone'), r = sec?.getBoundingClientRect();
+    // only while its section is on screen, and never over the story phone, the anatomy, the screen map or a clock moment
+    const blocked = [...root.querySelectorAll('.st, .xp, #structure, .bk-moment')].some(e => { const q = e.getBoundingClientRect(); return q.top < innerHeight * .7 && q.bottom > innerHeight * .3; });
+    // and never while text from a section on the other side is still where the phone would stand
+    const clash = root.querySelectorAll('.bk-with-phone'); let busy = false;
+    clash.forEach(o => { if (o === sec || o.dataset.phone === sec.dataset.phone) return; const q = o.getBoundingClientRect(); if (q.top < innerHeight * .82 && q.bottom > innerHeight * .18) busy = true; });
+    if (!sec || r.bottom < innerHeight * .35 || r.top > innerHeight * .65 || blocked || busy) return null;
+    return { k, side: sec.dataset.phone };
+  };
+  const tick = () => {
+    raf = requestAnimationFrame(tick);
+    const p = pick();
+    const on = !!p; if (on !== shown) { shown = on; wrap.classList.toggle('is-on', on); }
+    if (!p) return;
+    if (p.side !== side) { side = p.side; host._phone?.lean(side === 'right' ? .9 : -.9); setTimeout(() => host._phone?.lean(side === 'right' ? .38 : -.38), 700); }
+    if (p.k !== cur) {
+      const turn = cur >= 0 && beats[cur].file !== beats[p.k].file && !calm;
+      cur = p.k; host._phone?.show(files.indexOf(beats[cur].file), { turn: false });
+      lab.textContent = beats[cur].label[zh() ? 1 : 0]; wrap.dataset.who = /Owner|店主/.test(lab.textContent) ? 'owner' : 'customer';
+      wrap.classList.remove('is-swap'); void wrap.offsetWidth; wrap.classList.add('is-swap');
+    }
+    const tx = side === 'right' ? innerWidth * .78 : innerWidth * .22;
+    vx += (tx - x) * .045; vx *= .78; x += vx;
+    const lean = Math.max(-1, Math.min(1, vx / 30));
+    wrap.style.transform = `translate3d(${(x - wrap.offsetWidth / 2).toFixed(1)}px,-50%,0) rotate(${(lean * 6).toFixed(2)}deg)`;
+  };
+  host.addEventListener('phone-ready', () => { host._phone.lean(.38); }, { once: true });
+  document.addEventListener('portfolio:language', () => { if (cur >= 0) lab.textContent = beats[cur].label[zh() ? 1 : 0]; });
+  raf = requestAnimationFrame(tick);
 }

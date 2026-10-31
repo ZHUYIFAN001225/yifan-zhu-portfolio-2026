@@ -111,6 +111,8 @@ export function mountPhone(host) {
       else { k = i; draw(); if (tap) ctl.tap(tap); }
     },
     tap([x, y]) { if (calm) return; tapAnim = { x, y, start: performance.now() + 450, state: null }; },
+    // turn to face a side (radians around the vertical axis); used by the booking case's travelling phone
+    lean(y, x) { base.y = y; if (x !== undefined) base.x = x; idle = 2; },
   };
   host._phone = ctl; host.dispatchEvent(new CustomEvent('phone-ready'));
   const resize = () => { const r = host.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const fit = Math.max(1, 1.9 / (r.width / r.height)); camera.position.z = 4.4 * Math.min(fit, 1.6) * (+(host.dataset.zoom || 1)); };
@@ -137,9 +139,10 @@ export function mountPhone(host) {
     if (!dragging && !spin) {
       ry += vy; rx += vx; vy *= .94; vx *= .94; idle += 1 / 60;
       if (idle > 1.6) { // drift back toward a flattering angle and sway
-        rx += ((base.x + Math.sin(t * .6) * .05) - rx) * .02;
+        const ease = host.dataset.follow ? .06 : .02;
+        rx += ((base.x + Math.sin(t * .6) * .05) - rx) * ease;
         const target = base.y + Math.sin(t * .45) * .18, turns = Math.round((ry - target) / (Math.PI * 2)) * Math.PI * 2;
-        ry += (target + turns - ry) * .02;
+        ry += (target + turns - ry) * (host.dataset.follow ? .06 : .02);
       }
     }
     rx = Math.max(-1.1, Math.min(1.1, rx));

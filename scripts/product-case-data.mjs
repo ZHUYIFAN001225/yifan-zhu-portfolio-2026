@@ -3,6 +3,14 @@
 const p=(en,zh)=>[en,zh];
 export const productCases=[{
   id:'beauty',slug:'beauty-marketplace',file:'project-beauty-marketplace.html',pdf:'LOOK',
+  // full-screen type between the main parts of the case; every line comes from the content of the part it opens
+  acts:{
+    overview:{style:'gather',kicker:p('Next: the problem','接下来：问题'),lines:[p('I love it.','我喜欢它。'),p('Who made it?','是谁做的？')],cap:p('Every search starts with a picture, not a service name.','每一次寻找，都从一张图开始，而不是一个服务名称。')},
+    system:{style:'split',kicker:p('Next: how the system works','接下来：系统如何运转'),lines:[p('One picture.','一张图，'),p('Two people.','两种人。')],cap:p('Inspiration for the user. A portfolio piece for the Creator.','对用户是灵感，对 Creator 是作品。'),pic:'w1'},
+    explode:{style:'pass',kicker:p('Next: the product, taken apart','接下来：把产品拆开看'),lines:[p('Picture','图片'),p('Person','人'),p('A booking','一次预约')],arrows:true,cap:p('The whole journey, in three words.','整段旅程，就这三个词。'),screen:'discover'},
+    build:{style:'hollow',kicker:p('Next: how it was built, and what is still unproven','接下来：怎么做出来的，还有什么没被证明'),lines:[p('Built.','做出来了。'),p('Not yet proven.','还没被证明。')],cap:p('A working prototype. Real people come next.','原型已经能用，下一步是真实的人。')},
+    end:{style:'meet',kicker:p('Two sides, one connection','两端，一次连接'),lines:[p('See the work.','先看作品，'),p('Book the person','再预约'),p('who made it.','做出它的人。')],cap:p('Thanks for reading.','谢谢你看到这里。')}
+  },
   title:p('LOOK — Beauty Marketplace','LOOK 见己 · 美容服务平台'),
   subtitle:p('See the work first. Book the person who made it.','先看作品，再预约做出它的人。'),
   intro:p('A Pinterest-like, image-led platform where every picture is real work by a real, local Creator. For users, it is a way to find a look and the person who can actually do it. For Creators, it is a living portfolio that turns their work into new customers.','一个像 Pinterest 一样由图片引导的平台，但每一张图都是真实 Creator 完成的真实作品。对用户，它帮你找到喜欢的造型，以及真正能做出来的人；对 Creator，它是一个能把作品变成新客户的个人作品集。'),

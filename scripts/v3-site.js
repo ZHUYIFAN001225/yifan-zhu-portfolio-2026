@@ -841,7 +841,7 @@ window.addEventListener('pagereveal',event=>{
   };
   const pokes = [['Snip snip!', '咔嚓咔嚓！'], ['Fresh cut ✂', '刚剪好 ✂'], ['Book me?', '约我吗？'], ['Hey, that tickles.', '哎，好痒。'], ['I only cut real work.', '我只剪真实作品。']];
   // the beauty tools now live inside the section titles (look-tools.mjs); the old travelling scissors below are kept as reference
-  { import('./look-tools.mjs').then(m => m.mount({ lines })).catch(() => {}); return; }
+  return; // replaced by the two lines in look-tools.mjs (loaded below)
   const secs = [...document.querySelectorAll('.ux-case .v3-product-section.ux-section')].filter(s => lines[s.id]);
   if (!secs.length) return;
   const b = document.createElement('button'); b.type = 'button'; b.className = 'snip'; b.setAttribute('aria-label', 'Scissors'); b.dataset.cursor = 'snip';
@@ -933,10 +933,14 @@ window.addEventListener('pagereveal',event=>{
   const zones = [...root.querySelectorAll('.v3-product-section.ux-section')];
   zones.forEach((z, k) => z.dataset.lkBg = cols[k % cols.length]);
   let q = false;
-  const run = () => { q = false; const mid = innerHeight * .55; let c = null;
-    for (const z of zones) { const r = z.getBoundingClientRect(); if (r.top < mid && r.bottom > mid) { c = z.dataset.lkBg; break; } }
-    const xp = document.querySelector('[data-explode]'), xr = xp?.getBoundingClientRect(); if (xr && xr.top < mid && xr.bottom > mid) c = null;
-    const first = zones[0]?.getBoundingClientRect(); if (first && first.top > mid) c = null;
+  // the backdrop takes the colour of the section that fills most of the screen; acts and the anatomy paint their own dark,
+  // so they never turn the coloured sections around them grey
+  const run = () => { q = false; const vh = innerHeight; let c = null, best = 0;
+    for (const z of zones) { const r = z.getBoundingClientRect(); const v = Math.min(vh, r.bottom) - Math.max(0, r.top); if (v > best) { best = v; c = z.dataset.lkBg; } }
+    if (best < vh * .08) c = null;
     document.body.classList.toggle('lk-light', !!c); if (c) bg.style.backgroundColor = c; };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
 })();
+
+// LOOK case below the film: act transitions, the two lines (user / Creator), the turning loop and the colour blocks.
+if (document.querySelector('[data-product-case=beauty] .lk-act')) import('./look-tools.mjs').then(m => m.mount()).catch(() => {});

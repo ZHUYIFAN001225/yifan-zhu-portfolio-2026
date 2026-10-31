@@ -112,7 +112,8 @@ function mountThreads(root, acts) {
   const shU = mk('path', 'lk-rope-sh'), shC = mk('path', 'lk-rope-sh'), shJ = mk('path', 'lk-rope-sh');
   const pathU = mk('path', 'lk-th lk-th--u'), pathC = mk('path', 'lk-th lk-th--c'), pathJ = mk('path', 'lk-th lk-th--j');
   const twU = mk('path', 'lk-rope-tw'), twC = mk('path', 'lk-rope-tw'), twJ = mk('path', 'lk-rope-tw');
-  const knotSh = mk('path', 'lk-rope-sh lk-knot-sh'), knot = mk('path', 'lk-th-knot');
+  // the knot: the pink rope and the lilac rope wrap round each other in a tight overhand knot, then carry on as one cord
+  const knotSh = mk('path', 'lk-rope-sh lk-knot-sh'), knotC = mk('path', 'lk-knot lk-knot--c'), knotU = mk('path', 'lk-knot lk-knot--u'), knotUt = mk('path', 'lk-rope-tw'), knotCt = mk('path', 'lk-knot lk-knot--c lk-knot--over'), knot = knotU;
   const dotU = mk('circle', 'lk-dot lk-dot--u'), dotC = mk('circle', 'lk-dot lk-dot--c'); [dotU, dotC].forEach(d => d.setAttribute('r', 5));
   // behind everything on the page, just above the coloured backdrop
   const bg = document.querySelector('.lk-bg'); bg ? bg.after(svg) : document.body.prepend(svg);
@@ -183,7 +184,7 @@ function mountThreads(root, acts) {
       if (y <= yk) {
         const u = b.u + spring.u.a * g + wave('u', y, now), c = b.c + spring.c.a * g + wave('c', y, now);
         dU += (dU ? 'L' : 'M') + u.toFixed(1) + ' ' + y.toFixed(1); dC += (dC ? 'L' : 'M') + c.toFixed(1) + ' ' + y.toFixed(1);
-      } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 30, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
+      } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 22, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
     }
     if (sayAt) { const y = sayAt.docY - sy, b = base(sayAt.docY), g = Math.exp(-Math.pow((y - my) / 110, 2)), side = sayAt.side, x = b[side] + spring[side].a * g + wave(side, y, now);
       say.style.left = (side === 'u' ? x + 16 : x - 16).toFixed(1) + 'px'; say.style.top = y.toFixed(1) + 'px'; }
@@ -200,9 +201,16 @@ function mountThreads(root, acts) {
     // the knot where they meet
     const kx = innerWidth / 2, kv = yk > -30 && yk < vh + 30;
     // a real knot: two loops crossing, with the two colours twisting into one
-    if (kv) { const d = `M${kx - 30} ${yk - 34}C${kx - 4} ${yk - 20} ${kx + 22} ${yk - 4} ${kx + 12} ${yk + 10}S${kx - 20} ${yk + 8} ${kx - 12} ${yk - 6}S${kx + 26} ${yk - 22} ${kx + 30} ${yk - 34}M${kx - 2} ${yk + 8}L${kx} ${yk + 30}`; knot.setAttribute('d', d); knotSh.setAttribute('d', d); }
-    knot.style.opacity = knotSh.style.opacity = kv ? 1 : 0;
-    knotSay.style.transform = `translate3d(${kx}px,${(yk + 44).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
+    if (kv) {
+      const x = kx, y = yk, k = 1.7, P = (a, b) => `${(x + a * k).toFixed(1)} ${(y + b * k).toFixed(1)}`;
+      // overhand knot woven from both ropes: lilac loop underneath, pink loop crossing over it, then lilac crosses back on top
+      const dc = `M${P(3, -1)}C${P(13, -2)} ${P(12, 10)} ${P(3, 11)}C${P(-6, 12)} ${P(-9, 3)} ${P(-3, -3)}C${P(1, -7)} ${P(4, -3)} ${P(2, 3)}L${P(1, 14)}`;
+      const du = `M${P(-3, -1)}C${P(-13, -2)} ${P(-12, 10)} ${P(-3, 11)}C${P(6, 12)} ${P(9, 3)} ${P(3, -3)}C${P(-1, -7)} ${P(-4, -3)} ${P(-2, 3)}L${P(-1, 14)}`;
+      const over = `M${P(-6, 9)}C${P(-2, 12)} ${P(4, 12)} ${P(7, 8)}`; // the lilac strand passing over the pink at the front
+      knotC.setAttribute('d', dc); knotU.setAttribute('d', du); knotCt.setAttribute('d', over); knotUt.setAttribute('d', ''); knotSh.setAttribute('d', dc + du);
+    }
+    [knotC, knotCt, knotU, knotUt, knotSh].forEach(e => e.style.opacity = kv ? 1 : 0);
+    knotSay.style.transform = `translate3d(${kx + 34}px,${(yk + 30).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
   };
   raf = requestAnimationFrame(frame);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(frame); });

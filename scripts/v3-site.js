@@ -901,10 +901,12 @@ window.addEventListener('pagereveal',event=>{
 // Parallax rhythm for the case content below the film: cards in a row drift at different speeds.
 (() => {
   if (!document.querySelector('[data-film]') || matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(max-width: 760px)').matches) return;
-  const els = [...document.querySelectorAll('.ux-decisions article, .ux-details figure, .ux-principles>div, .ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*')];
-  els.forEach((e, k) => { e.classList.add('v3-par'); e.style.setProperty('--sp', [0.6, -0.35, 1, -0.6, 0.3][k % 5]); });
+  const beauty = !!document.querySelector('[data-product-case=beauty]');
+  const els = [...document.querySelectorAll(beauty ? '.ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*' : '.ux-decisions article, .ux-details figure, .ux-principles>div, .ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*')];
+  // LOOK: stronger depth — each card in a group sits on its own layer (near cards move more, far ones less and are a touch smaller)
+  els.forEach((e, k) => { e.classList.add('v3-par'); const d = [1, .35, .75, .15, .55][k % 5]; e.style.setProperty('--sp', beauty ? (d * 2.4 - .6).toFixed(2) : [0.6, -0.35, 1, -0.6, 0.3][k % 5]); if (beauty) { e.style.setProperty('--depth', d); } });
   let q = false;
-  const run = () => { q = false; const vh = innerHeight; els.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return; const p = (r.top + r.height / 2 - vh / 2) / vh; e.style.setProperty('--py', (p * -60 * +e.style.getPropertyValue('--sp')).toFixed(1) + 'px'); }); };
+  const run = () => { q = false; const vh = innerHeight; els.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return; const p = (r.top + r.height / 2 - vh / 2) / vh; e.style.setProperty('--py', (p * (beauty ? -80 : -60) * +e.style.getPropertyValue('--sp')).toFixed(1) + 'px'); if (beauty) e.style.setProperty('--pr', (p * 3 * (+e.style.getPropertyValue('--sp') - .6)).toFixed(2) + 'deg'); }); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
 })();
 
@@ -946,3 +948,12 @@ window.addEventListener('pagereveal',event=>{
 
 // LOOK case below the film: act transitions, the two lines (user / Creator), the turning loop and the colour blocks.
 if (document.querySelector('[data-product-case=beauty] .lk-act')) import('./look-tools.mjs').then(m => m.mount()).catch(() => {});
+
+// LOOK decisions: the cards stack as you scroll — each slides up over the last, which shrinks back and dims.
+(() => {
+  const list = document.querySelector('[data-product-case=beauty] .ux-decisions'); if (!list || matchMedia('(max-width: 760px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cards = [...list.children]; list.classList.add('lk-stack'); cards.forEach((c, i) => c.style.setProperty('--i', i));
+  let q = false;
+  const run = () => { q = false; cards.forEach((c, i) => { const next = cards[i + 1]; if (!next) { c.style.setProperty('--cover', 0); return; } const r = next.getBoundingClientRect(), top = c.getBoundingClientRect().top; const cover = Math.min(1, Math.max(0, 1 - (r.top - top - 60) / (innerHeight * .55))); c.style.setProperty('--cover', cover.toFixed(3)); }); };
+  addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
+})();

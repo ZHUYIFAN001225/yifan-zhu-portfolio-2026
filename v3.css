@@ -2131,3 +2131,8 @@ body.lk-th-on .lk-chip{opacity:1;translate:0 0;pointer-events:auto}
 .lk-ico2 svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 [data-product-case=beauty] .ux-research-plan .lk-fold::after{top:22px;right:18px}
 @media (max-width:760px){[data-product-case=beauty] .ux-research-plan{grid-template-columns:1fr}[data-product-case=beauty] .ux-research-plan>div{margin-top:0!important}}
+/* the film sinks back while "Which look?" rises over it */
+.fm .fm-stage{transform-origin:50% 30%;transform:scale(calc(1 - var(--rise,0) * .08)) translateY(calc(var(--rise,0) * -3vh));filter:brightness(calc(1 - var(--rise,0) * .55)) blur(calc(var(--rise,0) * 3px))}
+.fm-find{border-radius:calc(44px + (1 - var(--rise,0)) * 40px) calc(44px + (1 - var(--rise,0)) * 40px) 0 0;box-shadow:0 -40px 80px -30px rgba(0,0,0,.5)}
+.fm-find-in{transform:translateY(calc((1 - var(--rise,0)) * 18vh));opacity:calc(var(--rise,0) * 1.6 - .35)}
+@media (prefers-reduced-motion:reduce){.fm .fm-stage,.fm-find-in{transform:none;filter:none;opacity:1}}

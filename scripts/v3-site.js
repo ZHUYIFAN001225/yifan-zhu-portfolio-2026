@@ -728,7 +728,7 @@ window.addEventListener('pagereveal',event=>{
     const now = performance.now(); if (now < lockUntil) return true;
     const m = cur < 0 ? nearest() : cur, to = m + dir;
     if (to < 0) return false;
-    if (to >= M) { const r = track.getBoundingClientRect(); const end = scrollY + r.bottom - innerHeight + 4; if (end - scrollY < 40) return false; lockUntil = now + 560; glideTo(end, 520); return true; } // one more tick leaves the film at once
+    if (to >= M) { const r = track.getBoundingClientRect(); const end = scrollY + r.bottom - innerHeight + 4; if (end - scrollY < 40) return false; lockUntil = now + 1500; glideTo(end + innerHeight * .9, 1500); return true; } // one more tick leaves the film at once
     const same = moms[to].t === 'step' && moms[cur]?.t === 'step' && moms[to].i === moms[cur].i; lockUntil = now + 560; show(to); glideTo(yOf(to), 520); return true;
   };
   let acc = 0, accT = 0;
@@ -955,5 +955,13 @@ if (document.querySelector('[data-product-case=beauty] .lk-act')) import('./look
   const cards = [...list.children]; list.classList.add('lk-stack'); cards.forEach((c, i) => c.style.setProperty('--i', i));
   let q = false;
   const run = () => { q = false; cards.forEach((c, i) => { const next = cards[i + 1]; if (!next) { c.style.setProperty('--cover', 0); return; } const r = next.getBoundingClientRect(), top = c.getBoundingClientRect().top; const cover = Math.min(1, Math.max(0, 1 - (r.top - top - 60) / (innerHeight * .55))); c.style.setProperty('--cover', cover.toFixed(3)); }); };
+  addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
+})();
+
+// LOOK: as the "Which look?" panel rises over the film, the film sinks back and the panel's content floats in after it.
+(() => {
+  const find = document.querySelector('[data-find]'), fm = document.querySelector('[data-film]'); if (!find || !fm || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let q = false;
+  const run = () => { q = false; const r = find.getBoundingClientRect(), p = Math.min(1, Math.max(0, 1 - r.top / innerHeight)); fm.style.setProperty('--rise', p.toFixed(3)); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
 })();

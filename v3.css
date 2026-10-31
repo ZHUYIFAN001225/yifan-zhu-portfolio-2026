@@ -2006,3 +2006,7 @@ body.lk-th-on .lk-chip{opacity:1;translate:0 0;pointer-events:auto}
 .lk-chip.is-done b{transform:scaleX(.08)}
 .lk-chip span{margin-left:4px;font-variant-numeric:tabular-nums}
 @media (max-width:760px),(prefers-reduced-motion:reduce){.lk-chip,.lk-th-note{display:none}}
+/* slower rise, so the words are still moving when you arrive */
+.lk-act-words,.lk-act-arrow{transition:transform 1.7s cubic-bezier(.19,1,.22,1) calc(.15s + var(--li) * .28s)!important}
+.lk-act-kicker,.lk-act-cap{transition:opacity 1s ease .9s,transform 1.4s cubic-bezier(.19,1,.22,1) .9s!important}
+.lk-act-kicker{transition-delay:0s,0s!important}

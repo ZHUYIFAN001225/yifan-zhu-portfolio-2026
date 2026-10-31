@@ -80,7 +80,7 @@ function mountActs(root, calm) {
   tone();
   // the words rise once, as soon as the act comes into view, and stay; scrolling back does not replay them
   if (calm || !('IntersectionObserver' in window)) acts.forEach(a => a.el.classList.add('is-in'));
-  else { const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { threshold: .3 }); acts.forEach(a => io.observe(a.el)); }
+  else { const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { threshold: 0, rootMargin: '0px 0px -38% 0px' }); acts.forEach(a => io.observe(a.el)); } // starts only once the words are well into view
   // scroll progress through each act, used only by the two lines
   let q = false;
   const run = () => { q = false; const vh = innerHeight; acts.forEach(a => { const r = a.el.getBoundingClientRect(); a.p = clamp((vh - r.top) / (r.height + vh)); }); };

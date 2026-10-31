@@ -966,3 +966,6 @@ if (document.querySelector('[data-product-case=beauty] .lk-act')) import('./look
   const run = () => { q = false; const r = find.getBoundingClientRect(), p = Math.min(1, Math.max(0, 1 - r.top / innerHeight)); fm.style.setProperty('--rise', p.toFixed(3)); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
 })();
+
+// Booking case: a day in the salon (clock moments, diary timeline, appointment slips).
+if (document.querySelector('.bk-day')) import('./booking-day.mjs').then(m => m.mount()).catch(() => {});

@@ -234,6 +234,14 @@ export const productCases=[{
   sourceDocs:['look-demo/README.md','look-demo/格拉斯哥逻辑与商业复审.md','look-demo/design-qa.md']
 },{
   id:'booking',slug:'glasgow-booking',file:'project-glasgow-booking.html',pdf:'Glasgow-Booking',
+  // "A day in the salon": the lower half of the case reads as the shop's diary. Each main part opens at a time of day.
+  day:{
+    overview:{time:'08:30',kicker:p('08:30 · Before opening','08:30 · 开门前'),line:p('“Is anyone booked on Friday?”','“周五有人约吗？”'),cap:p('Every booking lived in one person: WeChat, a paper diary and memory.','所有预约都在一个人身上：微信、纸质本和记忆。')},
+    system:{time:'10:00',kicker:p('10:00 · The shop opens','10:00 · 开门'),line:p('One diary. Two views.','一本预约本，两种视角。'),cap:p('Customers see the times that fit. The owner sees her day.','顾客看到放得下的时间，店主看到她的一天。')},
+    explode:{time:'12:10',kicker:p('12:10 · Lunch break','12:10 · 午休'),line:p('Choose. Check. Confirm.','选择。核对。确认。'),cap:p('A customer books on her lunch break, in three steps.','顾客在午休时，三步约好。')},
+    build:{time:'17:40',kicker:p('17:40 · End of the day','17:40 · 快收工了'),line:p('Live in the shop.','已经在店里用上了。'),cap:p('Real customers book here now. Real use will show what to fix next.','真实顾客已经在这里预约，真实使用会告诉我下一步改什么。')},
+    end:{time:'18:30',kicker:p('18:30 · Closed','18:30 · 打烊'),line:p('The routine runs itself.','日常，自己运转。'),cap:p('She only steps in for the exceptions. Thanks for reading.','她只在例外时出手。谢谢你看到这里。')}
+  },
   title:p('Glasgow Salon Booking','格拉斯哥理发店预约系统'),
   subtitle:p('One shared diary. Two clear experiences.','一本共享预约本，两端清晰体验。'),
   intro:p('A customer and shop booking system for a small Glasgow salon run by an older owner, who currently manages every appointment through WeChat, a paper diary and memory.','为格拉斯哥一家小理发店设计的顾客与店铺双端预约系统。店主年纪较大，目前所有预约都靠微信、纸质本和记忆管理。'),

@@ -2176,3 +2176,73 @@ html[lang^=zh] [data-product-case=beauty] .ux-section .ux-research-plan>div>span
 [data-product-case=beauty] .ux-decisions{display:grid!important;gap:clamp(30px,6vh,70px)}
 [data-product-case=beauty] .ux-decisions article{width:min(820px,80%)!important}
 .lk-act :is(h2,h3,h4,p,li,span,a,strong,b,em,small){text-shadow:none!important}
+/* ======== Glasgow Salon Booking: a day in the salon ======== */
+body:has(.bk-day){--bk-ink:#17362b;--bk-ink2:#4d6157;--bk-mint:#1f9e6c;--bk-mint-l:#3fe2a0;--bk-paper-c:#f3eee3;--bk-line:rgba(23,54,43,.07);background-color:color-mix(in srgb,var(--bk-paper-c) calc(var(--bk-paper,0) * 100%),#141518);transition:none}
+body.bk-on-paper:has(.bk-day){background-image:repeating-linear-gradient(180deg,transparent 0 35px,var(--bk-line) 35px 36px);background-attachment:fixed}
+body.bk-on-paper:has(.bk-day) .site-header.v3-header{background:color-mix(in srgb,var(--bk-paper-c) 90%,transparent);backdrop-filter:blur(12px)}
+body.bk-on-paper:has(.bk-day) .site-header.v3-header :is(a,button,span,strong){color:var(--bk-ink)}
+body.bk-on-paper .bk-day .ux-case-index{background:color-mix(in srgb,var(--bk-paper-c) 90%,transparent)!important;box-shadow:0 0 0 100vmax color-mix(in srgb,var(--bk-paper-c) 90%,transparent)!important;clip-path:inset(0 -100vmax);backdrop-filter:blur(12px)}
+body.bk-on-paper .bk-day .ux-case-index a{color:var(--bk-ink)!important}
+/* sections read as diary pages: dark green ink, a red margin rule like a paper appointment book */
+.bk-day .v3-product-section.ux-section{position:relative;color:var(--bk-ink);border-top:0;padding-top:clamp(50px,8vh,90px)}
+.bk-day .v3-product-section.ux-section::before{content:'';position:absolute;left:-28px;top:0;bottom:0;width:1px;background:rgba(200,80,70,.28)}
+.bk-day .ux-section :is(h2,h3,h4,strong,b){color:var(--bk-ink)!important}
+.bk-day .ux-section :is(p,li,dd,dt,span,small,td,th){color:var(--bk-ink2)}
+.bk-day .v3-product-section.ux-section>h2{font-size:clamp(14px,1vw,15px);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--bk-mint)!important}
+.bk-day .ux-section :is(.ux-question,.ux-subhead){font-size:clamp(26px,2.6vw,40px);line-height:1.15;letter-spacing:-.03em}
+.bk-day .ux-section .ux-chips li,.bk-day .ux-section .ux-research-status{background:#fff!important;border:1px solid rgba(23,54,43,.12)!important;color:var(--bk-ink)!important}
+/* the phone story and the anatomy stay as dark inserts in the diary, like a phone laid on the page */
+.bk-day :is(.st,.xp){background:#141518;border-radius:34px;padding:clamp(20px,3vw,40px);margin:60px 0;box-shadow:0 40px 80px -40px rgba(23,54,43,.6)}
+/* moments: a clock that rolls to the time of day */
+.bk-moment{min-height:78vh;display:grid;place-items:center;padding:14vh 0 6vh;text-align:center}
+.bk-moment-kicker{margin:0 0 2vh;font:600 12px/1 Inter,system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--bk-mint)}
+.bk-clock{display:flex;justify-content:center;margin:0;font:600 clamp(90px,15vw,260px)/1 Inter,system-ui,sans-serif;letter-spacing:-.06em;font-variant-numeric:tabular-nums;color:var(--bk-ink)}
+.bk-digit{display:inline-block;height:1em;overflow:hidden}
+.bk-reel{display:flex;flex-direction:column;transform:translateY(calc(var(--n,0) * -1em));transition:transform 2.4s cubic-bezier(.16,1,.3,1)}
+.bk-digit:nth-child(2) .bk-reel{transition-delay:.12s}.bk-digit:nth-child(4) .bk-reel{transition-delay:.24s}.bk-digit:nth-child(5) .bk-reel{transition-delay:.36s}
+.bk-reel i{display:block;height:1em;font-style:normal}
+.bk-colon{display:inline-block;color:var(--bk-mint);animation:bk-blink 1.6s steps(1) infinite}
+@keyframes bk-blink{50%{opacity:.25}}
+.bk-moment-line{margin:3vh 0 0;font:600 clamp(24px,2.6vw,42px)/1.15 Inter,system-ui,sans-serif;letter-spacing:-.03em;color:var(--bk-ink)}
+.bk-moment-cap{margin:1.6vh auto 0;max-width:40ch;font-size:clamp(15px,1.2vw,18px);line-height:1.5;color:var(--bk-ink2)}
+.bk-moment :is(.bk-moment-kicker,.bk-moment-line,.bk-moment-cap){opacity:0;transform:translateY(16px);transition:opacity 1.2s ease,transform 1.6s cubic-bezier(.16,1,.3,1)}
+.bk-moment .bk-moment-line{transition-delay:1.1s}.bk-moment .bk-moment-cap{transition-delay:1.5s}
+.bk-moment.is-in :is(.bk-moment-kicker,.bk-moment-line,.bk-moment-cap){opacity:1;transform:none}
+.bk-moment[data-moment=overview]{color:var(--bk-ink)}
+/* appointment slips */
+.bk-day .bk-slip{position:relative;background:#fff!important;border:1px solid rgba(23,54,43,.1)!important;border-radius:6px 16px 16px 6px!important;padding:16px 18px 16px 24px!important;box-shadow:0 14px 30px -20px rgba(23,54,43,.45)!important;opacity:0;transform:translateX(-40px);transition:opacity .9s ease var(--d),transform 1.2s cubic-bezier(.16,1,.3,1) var(--d),box-shadow .4s}
+.bk-day .bk-slip.is-in{opacity:1;transform:none}
+.bk-day .bk-slip::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:6px 0 0 6px;background:var(--bk-mint);transform-origin:50% 0;transform:scaleY(.45);transition:transform .7s cubic-bezier(.16,1,.3,1)}
+.bk-day .bk-slip:is(:hover,:focus-within,.is-open)::before{transform:scaleY(1)}
+.bk-day .bk-slip:is(:hover,.is-open){box-shadow:0 24px 40px -22px rgba(23,54,43,.55)!important}
+.bk-day .bk-has-more{cursor:pointer}
+.bk-day .bk-has-more .bk-more{max-height:0;opacity:0;overflow:hidden;margin:0!important;transition:max-height .6s cubic-bezier(.16,1,.3,1),opacity .35s,margin .4s}
+.bk-day .bk-has-more:is(:hover,:focus-within,.is-open) .bk-more{max-height:260px;opacity:1;margin-top:8px!important}
+.bk-day .bk-has-more::after{content:'';position:absolute;right:14px;top:16px;width:8px;height:8px;border-right:1.5px solid var(--bk-ink2);border-bottom:1.5px solid var(--bk-ink2);transform:rotate(45deg);transition:transform .4s}
+.bk-day .bk-has-more:is(:hover,.is-open)::after{transform:rotate(225deg) translate(-3px,-3px)}
+/* the margin timeline */
+.bk-rail{position:fixed;left:clamp(14px,2.4vw,40px);top:120px;bottom:60px;width:40px;z-index:30;opacity:0;pointer-events:none;transition:opacity .5s}
+body.bk-rail-on .bk-rail{opacity:1}
+.bk-rail-track{position:relative;height:100%;border-left:1.5px solid rgba(23,54,43,.18)}
+.bk-rail-track i{position:absolute;left:-1px;top:calc(var(--y) * 100%);width:8px;border-top:1.5px solid rgba(23,54,43,.3)}
+.bk-rail-track i b{position:absolute;left:12px;top:-7px;font:500 10px/1 Inter,system-ui,sans-serif;color:rgba(23,54,43,.45)}
+.bk-rail-fill{position:absolute;left:-2px;top:0;width:3px;height:calc(var(--p,0) * 100%);border-radius:3px;background:var(--bk-mint)}
+.bk-now{position:absolute;left:-6px;top:calc(var(--p,0) * 100%);width:11px;height:11px;margin-top:-5.5px;border-radius:50%;background:var(--bk-mint);box-shadow:0 0 0 5px rgba(31,158,108,.18)}
+.bk-now em{position:absolute;left:18px;top:50%;transform:translateY(-50%);padding:4px 8px;border-radius:8px;background:var(--bk-ink);color:#fff;font:600 11px/1 Inter,system-ui,sans-serif;font-style:normal;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (max-width:899px){.bk-day .v3-product-section.ux-section::before{display:none}}
+@media (prefers-reduced-motion:reduce){.bk-reel{transition:none}.bk-colon{animation:none}.bk-day .bk-slip{opacity:1;transform:none}}
+/* every panel inside the diary pages becomes paper-white with ink text */
+.bk-day .ux-section :is(.ux-persona,.ux-lanes>div,.ux-evidence-note,.ux-bp-row>span,.ux-principles>div,.ux-process>li,.ux-before-after>p,.ux-smap-tabs,.ux-smap-l1,.ux-success>li,ol>li){background:#fff!important;border:1px solid rgba(23,54,43,.1)!important;box-shadow:0 10px 24px -18px rgba(23,54,43,.4)}
+.bk-day .ux-section :is(.ux-persona,.ux-lanes>div,.ux-evidence-note,.ux-bp-row>span,.ux-principles>div,.ux-process>li,.ux-before-after>p,.ux-smap-tabs,.ux-smap-l1,.ux-success>li,ol>li) *{color:var(--bk-ink2)}
+.bk-day .ux-section :is(.ux-persona,.ux-principles>div,.ux-lanes>div) :is(h3,h4,strong,b){color:var(--bk-ink)!important}
+.bk-day .ux-section .ux-bp-row>span.ux-bp-lane{background:var(--bk-ink)!important}.bk-day .ux-section .ux-bp-row>span.ux-bp-lane *,.bk-day .ux-section .ux-bp-row>span.ux-bp-lane{color:#fff!important}
+.bk-day .ux-section .ux-bp-row>span.is-planned{background:transparent!important;border-style:dashed!important}
+.bk-day .ux-section .ux-level{background:var(--bk-mint)!important;color:#fff!important;border:0!important}
+.bk-day .ux-section .ux-smap-tabs [aria-selected=true]{background:var(--bk-ink)!important;color:#fff!important}
+/* the timeline sits on the diary's margin rule, with the hours written on its left like a paper appointment book */
+.bk-rail{left:var(--rail-x,40px);width:1px}
+.bk-rail-track{border-left-color:rgba(200,80,70,.35)}
+.bk-rail-track i{left:-8px}
+.bk-rail-track i b{left:auto;right:12px}
+.bk-now em{left:auto;right:18px}
+.bk-day .ux-section :is(.ux-principles>div,.ux-persona,.ux-evidence-note,.ux-lanes>div,.ux-success>li) :is(p,span,li){color:var(--bk-ink2)!important;opacity:1!important}

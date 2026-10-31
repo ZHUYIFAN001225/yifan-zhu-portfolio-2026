@@ -317,8 +317,10 @@ export function mountStage(root) {
       if (tagTxt.textContent !== lab) { tagTxt.textContent = lab; tag.dataset.who = fgK === 'o' ? 'owner' : 'customer'; }
       tag.classList.toggle('is-on', !hv);
     } else tag.classList.remove('is-on');
+    dbg = { y, kind: st.kind, hold, fg: st.fg, spot: st.spot, t, amt: [P.c.amt, P.o.amt], rect: [P.c.rect, P.o.rect], img: [!!P.c.img, !!P.o.img], file: [P.c.file, P.o.file], hover: !!hv };
     renderer.render(scene, cam);
   }
+  let dbg = null; window.__bkStage = () => dbg;
   requestAnimationFrame(frame);
   return true;
 }

@@ -61,8 +61,16 @@ function fold(root) {
     ['.ux-build>li', 'p'],
     ['.ux-research-plan>div', 'p'],
     ['.ux-evidence-note', 'p'],
-    ['.ux-audience>div', 'p']
+    ['.ux-audience>div', 'p'],
+    ['.ux-pains>div', 'p'],
+    ['.ux-phases>li', 'p'],
+    ['.ux-journey>li', 'p']
   ];
+  // the journey becomes a row of polaroids, each showing the real screen of that step
+  const SHOT = ['discover', 'detail', 'matches', 'availability', 'c-portfolio'];
+  root.querySelectorAll('.ux-journey>li').forEach((li, i) => { if (li.querySelector('.lk-pol')) return; const f = document.createElement('span'); f.className = 'lk-pol'; f.innerHTML = `<img src="assets/v3/screens/look/${zh() ? 'zh/' : ''}${SHOT[i % SHOT.length]}.webp" alt="" loading="lazy" decoding="async">`; li.prepend(f); li.style.setProperty('--tilt', [-5, 4, -2, 5, -4][i % 5] + 'deg'); });
+  root.querySelector('.ux-journey')?.classList.add('lk-polaroids');
+  document.addEventListener('portfolio:language', () => root.querySelectorAll('.lk-pol img').forEach((im, i) => { im.src = `assets/v3/screens/look/${zh() ? 'zh/' : ''}${SHOT[i % SHOT.length]}.webp`; }));
   sets.forEach(([sel, body]) => root.querySelectorAll(sel).forEach(card => {
     const parts = [...card.querySelectorAll(':scope ' + body + ', :scope > div > ' + body)]; if (!parts.length) return;
     card.classList.add('lk-fold'); parts.forEach(x => x.classList.add('lk-fold-body'));
@@ -234,7 +242,7 @@ export function mountLoop() {
   const wrap = document.createElement('div'); wrap.className = 'lk-loop'; wrap.style.setProperty('--n', N);
   wrap.innerHTML = `<svg class="lk-loop-ring" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lkArc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0457f"/><stop offset="1" stop-color="#8a5fd6"/></linearGradient><filter id="lkGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.1"/></filter></defs>
       <g class="lk-loop-ticks">${ticks}</g><circle cx="50" cy="50" r="40" class="lk-loop-track"/><circle cx="50" cy="50" r="40" class="lk-loop-arc" pathLength="100"/><circle r="1.6" class="lk-loop-head-glow" filter="url(#lkGlow)"/><circle r=".9" class="lk-loop-head"/></svg>
-    <div class="lk-loop-phone" aria-hidden="true"><div class="lk-phone3d">${Array.from({ length: 9 }, (_, k) => `<i class="lk-ph-side" style="--z:${k + 1}"></i>`).join('')}<div class="lk-ph-front"><span class="lk-ph-screen">${items.map((_, k) => `<img src="assets/v3/screens/look/${SHOTS[k % SHOTS.length]}.webp" alt="" loading="lazy" decoding="async"${k ? '' : ' class="is-on"'}/>`).join('')}</span><i class="lk-ph-island"></i><i class="lk-ph-glare"></i></div></div><i class="lk-ph-shadow"></i></div>
+    <div class="lk-loop-phone" aria-hidden="true"><span class="dev lk-phone3d">${Array.from({ length: 7 }, (_, k) => `<i class="dev-side" style="--k:${7 - k}"></i>`).join('')}<span class="dev-screen"><span class="dev-view lk-ph-screen">${items.map((_, k) => `<img src="assets/v3/screens/look/${SHOTS[k % SHOTS.length]}.webp" alt="" loading="lazy" decoding="async"${k ? '' : ' class="is-on"'}/>`).join('')}</span></span><i class="dev-shine"></i></span><i class="lk-ph-shadow"></i></div>
     <ol class="lk-loop-nodes"></ol>`;
   const list = wrap.querySelector('.lk-loop-nodes');
   items.forEach((li, k) => {
@@ -262,8 +270,8 @@ export function mountLoop() {
     const k = ((Math.round(-th / step) % N) + N) % N;
     if (k !== cur) { if (cur >= 0) swing = 1; cur = k; items.forEach((li, j) => li.classList.toggle('is-on', j === k)); imgs.forEach((im, j) => im.classList.toggle('is-on', j === k)); }
     const t = (now || performance.now()) / 1000;
-    ph.style.transform = `rotateX(${(8 + rx + Math.sin(t * .8) * 2).toFixed(2)}deg) rotateY(${(-14 + ry + Math.sin(t * .6) * 3 + swing * 18).toFixed(2)}deg) rotateZ(${(-3 + swing * -4).toFixed(2)}deg)`;
-    ph.style.setProperty('--gl', ((ry + 15) / 30 * 100).toFixed(1) + '%');
+    ph.style.transform = `rotateX(${(44 + rx + Math.sin(t * .8) * 2).toFixed(2)}deg) rotateZ(${(-26 + Math.sin(t * .6) * 2 + swing * -5).toFixed(2)}deg) rotateY(${(ry * .8 + swing * 14).toFixed(2)}deg)`;
+    ph.style.setProperty('--mrx2', (ry / 15).toFixed(3));
     raf = requestAnimationFrame(tick);
   };
   const go = () => { calc(); if (!raf) raf = requestAnimationFrame(tick); };

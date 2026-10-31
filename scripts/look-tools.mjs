@@ -124,7 +124,9 @@ function mountThreads(root, acts) {
   const SAY = { u: [['“I love it, but I don’t know what it’s called.”', '“我觉得好看，但不知道它叫什么。”'], ['“Pinterest shows me looks, not who can do them.”', '“Pinterest 给我看造型，却不告诉我谁能做。”'], ['“I have to pick a salon before I see the work.”', '“我得先选店，才能看到作品。”']],
     c: [['“Instagram gives me likes, not bookings.”', '“Instagram 给我点赞，不给我预约。”'], ['“I post real work every day, but few new customers find me.”', '“我每天发真实作品，却很少带来新客户。”'], ['“My work should be my shop window.”', '“我的作品，就该是我的橱窗。”']] };
   const sayK = { u: 0, c: 0 }; let sayT = 0, touching = '';
-  const speak = (side, x, y) => { const l = SAY[side][sayK[side]++ % SAY[side].length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; say.style.transform = `translate3d(${Math.min(innerWidth - 300, Math.max(16, x + (side === 'u' ? 22 : -282))).toFixed(0)}px,${Math.max(70, y - 30).toFixed(0)}px,0)`; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => say.classList.remove('is-on'), 3200); };
+  // the bubble grows out of the point that was plucked, points back at it, and rides along with the rope
+  let sayAt = null;
+  const speak = (side, docY) => { const l = SAY[side][sayK[side]++ % SAY[side].length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; sayAt = { side, docY }; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => { say.classList.remove('is-on'); setTimeout(() => { if (!say.classList.contains('is-on')) sayAt = null; }, 400); }, 3400); };
   const words = () => {
     labU.innerHTML = zh() ? '<strong>用户</strong>想找到做这个造型的人' : '<strong>User</strong>looking for who made a look';
     labC.innerHTML = zh() ? '<strong>Creator</strong>想让作品带来客人' : '<strong>Creator</strong>wants their work to bring customers';
@@ -172,9 +174,7 @@ function mountThreads(root, acts) {
     const at = base(sy + my);
     const now = performance.now();
     for (const k of ['u', 'c']) { const s = spring[k], d = mx - at[k], T = Math.abs(d) < 190 && my > 0 ? -Math.sign(d) * (190 - Math.abs(d)) * .55 : 0; s.v += (T - s.a) * .14; s.v *= .78; s.a += s.v;
-      if (pmx > -1e3 && Math.sign(pmx - at[k]) !== Math.sign(mx - at[k]) && Math.abs(mx - pmx) > 3) { ripples.push({ side: k, y: my, t: now, amp: Math.min(30, 6 + Math.abs(mx - pmx) * 1.2) }); s.v += Math.sign(mx - pmx) * 6; } }
-    // speak when the pointer first touches a rope
-    { const near = Math.abs(mx - at.u) < 26 ? 'u' : Math.abs(mx - at.c) < 26 ? 'c' : ''; if (near && near !== touching && my > startY - sy && my < knotDoc - sy) speak(near, mx, my); touching = near; }
+      if (pmx > -1e3 && Math.sign(pmx - at[k]) !== Math.sign(mx - at[k]) && Math.abs(mx - pmx) > 3) { ripples.push({ side: k, y: my, t: now, amp: Math.min(30, 6 + Math.abs(mx - pmx) * 1.2) }); s.v += Math.sign(mx - pmx) * 6; if (my > startY - sy && my < knotDoc - sy && (!sayAt || now - (sayAt.t || 0) > 700)) { speak(k, sy + my); sayAt.t = now; } } }
     pmx = mx; while (ripples.length && now - ripples[0].t > 2600) ripples.shift();
     const y0 = Math.max(0, startY - sy), y1 = Math.min(vh, endY - sy), yk = knotDoc - sy;
     let dU = '', dC = '', dJ = '';
@@ -185,6 +185,8 @@ function mountThreads(root, acts) {
         dU += (dU ? 'L' : 'M') + u.toFixed(1) + ' ' + y.toFixed(1); dC += (dC ? 'L' : 'M') + c.toFixed(1) + ' ' + y.toFixed(1);
       } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 30, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
     }
+    if (sayAt) { const y = sayAt.docY - sy, b = base(sayAt.docY), g = Math.exp(-Math.pow((y - my) / 110, 2)), side = sayAt.side, x = b[side] + spring[side].a * g + wave(side, y, now);
+      say.style.left = (side === 'u' ? x + 16 : x - 16).toFixed(1) + 'px'; say.style.top = y.toFixed(1) + 'px'; }
     [[pathU, shU, twU, dU], [pathC, shC, twC, dC], [pathJ, shJ, twJ, dJ]].forEach(([a, b, c, d]) => { a.setAttribute('d', d); b.setAttribute('d', d); c.setAttribute('d', d); });
     // a dot rides each line in the middle of the screen
     const mid = vh * .5, bm = base(sy + mid), gm = Math.exp(-Math.pow((mid - my) / 110, 2));

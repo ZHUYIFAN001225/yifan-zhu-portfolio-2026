@@ -2044,3 +2044,12 @@ body.lk-th-on .lk-chip{opacity:1;translate:0 0;pointer-events:auto}
 @media (prefers-reduced-motion:reduce){.lk-flip-card{animation:none}}
 @media (max-width:760px){.lk-flip-wire{display:none}}
 .lk-flip-who em{font:600 11px/1 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important}
+/* the bubble comes out of the rope */
+.lk-rope-say{transform:none!important;width:250px;translate:0 -50%;border:2px solid var(--rc);transform-origin:0 50%}
+.lk-rope-say[data-side=u]{--rc:#d9487f}.lk-rope-say[data-side=c]{--rc:#8259cf;translate:-100% -50%;transform-origin:100% 50%}
+.lk-rope-say{scale:.2;transition:opacity .25s ease,scale .55s cubic-bezier(.34,1.56,.64,1)}
+.lk-rope-say.is-on{scale:1}
+.lk-rope-say::before{content:'';position:absolute;top:50%;width:12px;height:12px;background:#fff;border:2px solid var(--rc);transform:translateY(-50%) rotate(45deg)}
+.lk-rope-say[data-side=u]::before{left:-8px;border-top:0;border-right:0}.lk-rope-say[data-side=c]::before{right:-8px;border-bottom:0;border-left:0}
+.lk-rope-say::after{content:'';position:absolute;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--rc);box-shadow:0 0 0 4px color-mix(in srgb,var(--rc) 25%,transparent)}
+.lk-rope-say[data-side=u]::after{left:-21px}.lk-rope-say[data-side=c]::after{right:-21px}

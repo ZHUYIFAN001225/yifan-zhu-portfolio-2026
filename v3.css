@@ -2136,3 +2136,4 @@ body.lk-th-on .lk-chip{opacity:1;translate:0 0;pointer-events:auto}
 .fm-find{border-radius:calc(44px + (1 - var(--rise,0)) * 40px) calc(44px + (1 - var(--rise,0)) * 40px) 0 0;box-shadow:0 -40px 80px -30px rgba(0,0,0,.5)}
 .fm-find-in{transform:translateY(calc((1 - var(--rise,0)) * 18vh));opacity:calc(var(--rise,0) * 1.6 - .35)}
 @media (prefers-reduced-motion:reduce){.fm .fm-stage,.fm-find-in{transform:none;filter:none;opacity:1}}
+.lk-loop-phone,.lk-loop-phone .dev{--dw:calc(var(--size) * .23)!important}

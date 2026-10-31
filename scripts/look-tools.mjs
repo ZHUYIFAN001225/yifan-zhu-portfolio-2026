@@ -172,12 +172,24 @@ function mountThreads(root, acts) {
   const note = mkLabel('lk-th-note');
   // touch a rope and it says what that side is going through
   const say = document.createElement('div'); say.className = 'lk-rope-say'; say.setAttribute('aria-live', 'polite'); document.body.append(say);
-  const SAY = { u: [['“I love it, but I don’t know what it’s called.”', '“我觉得好看，但不知道它叫什么。”'], ['“Pinterest shows me looks, not who can do them.”', '“Pinterest 给我看造型，却不告诉我谁能做。”'], ['“I have to pick a salon before I see the work.”', '“我得先选店，才能看到作品。”']],
-    c: [['“Instagram gives me likes, not bookings.”', '“Instagram 给我点赞，不给我预约。”'], ['“I post real work every day, but few new customers find me.”', '“我每天发真实作品，却很少带来新客户。”'], ['“My work should be my shop window.”', '“我的作品，就该是我的橱窗。”']] };
-  const sayK = { u: 0, c: 0 }; let sayT = 0, touching = '';
+  // what each side says depends on where on the rope you pluck: pains at the top, finding each other in the middle,
+  // and near the knot what it is like once they are connected — the rope is also a timeline
+  const SAY = {
+    u: [
+      [['“I love it, but I don’t know what it’s called.”', '“我觉得好看，但不知道它叫什么。”'], ['“Pinterest shows me looks, not who can do them.”', '“Pinterest 给我看造型，却不告诉我谁能做。”'], ['“I have to pick a salon before I see the work.”', '“我得先选店，才能看到作品。”']],
+      [['“I saved the picture, and it showed me who made it.”', '“我收藏了这张图，它告诉了我是谁做的。”'], ['“Three people nearby can do this look.”', '“附近有三个人能做这个造型。”'], ['“Her own work looks just like my picture.”', '“她自己的作品和我那张图几乎一样。”']],
+      [['“Found her. Booked for Wednesday, 2pm.”', '“找到她了，约在周三下午两点。”'], ['“She already had my picture when I sat down.”', '“我一坐下，她已经看过我的参考图了。”'], ['“It came out exactly like the photo.”', '“做出来和照片一模一样。”']]
+    ],
+    c: [
+      [['“Instagram gives me likes, not bookings.”', '“Instagram 给我点赞，不给我预约。”'], ['“I post real work every day, but few new customers find me.”', '“我每天发真实作品，却很少带来新客户。”'], ['“My work should be my shop window.”', '“我的作品，就该是我的橱窗。”']],
+      [['“My work is tagged by style now.”', '“我的作品按风格被标好了。”'], ['“Someone nearby asked: can you do this?”', '“附近有人问我：这个你能做吗？”'], ['“I answered with my own picture, not a promise.”', '“我用自己的作品回答，而不是一句保证。”']],
+      [['“A new customer, from one picture.”', '“一张图，带来一位新客人。”'], ['“The booking came with her reference attached.”', '“预约里直接附上了她的参考图。”'], ['“Her result is now in my portfolio too.”', '“她的成品也进了我的作品集。”']]
+    ]
+  };
+  const sayK = { u: [0, 0, 0], c: [0, 0, 0] }; let sayT = 0, touching = '';
   // the bubble grows out of the point that was plucked, points back at it, and rides along with the rope
   let sayAt = null;
-  const speak = (side, docY) => { const l = SAY[side][sayK[side]++ % SAY[side].length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; sayAt = { side, docY }; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => { say.classList.remove('is-on'); setTimeout(() => { if (!say.classList.contains('is-on')) sayAt = null; }, 400); }, 3400); };
+  const speak = (side, docY) => { const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), stg = P < .38 ? 0 : P < .72 ? 1 : 2, list = SAY[side][stg], l = list[sayK[side][stg]++ % list.length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; sayAt = { side, docY }; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => { say.classList.remove('is-on'); setTimeout(() => { if (!say.classList.contains('is-on')) sayAt = null; }, 400); }, 3400); };
   const words = () => {
     labU.innerHTML = zh() ? '<strong>用户</strong>想找到做这个造型的人' : '<strong>User</strong>looking for who made a look';
     labC.innerHTML = zh() ? '<strong>Creator</strong>想让作品带来客人' : '<strong>Creator</strong>wants their work to bring customers';

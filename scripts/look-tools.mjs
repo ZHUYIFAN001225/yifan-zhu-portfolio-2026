@@ -320,7 +320,7 @@ export function mountLoop() {
     if (k !== cur) { if (cur >= 0) swing = 1; cur = k; items.forEach((li, j) => li.classList.toggle('is-on', j === k)); imgs.forEach((im, j) => im.classList.toggle('is-on', j === k)); }
     const t = (now || performance.now()) / 1000;
     // stands almost upright so the screen reads; leans a little towards the pointer, just enough to show the metal edge
-    ph.style.transform = `rotateX(${(5 + rx * .6 + Math.sin(t * .8) * 1).toFixed(2)}deg) rotateY(${(-9 + ry * .7 + Math.sin(t * .6) * 1.5 + swing * 10).toFixed(2)}deg) rotateZ(${(-2 + swing * -2).toFixed(2)}deg)`;
+    ph.style.transform = `rotateX(${(2 + rx * 1.3 + Math.sin(t * .8) * 1).toFixed(2)}deg) rotateY(${(ry * 1.7 + Math.sin(t * .6) * 1.5 + swing * 10).toFixed(2)}deg)`; // symmetric: straight on at rest, leans the same amount either way
     ph.style.setProperty('--mrx2', (ry / 15).toFixed(3));
     raf = requestAnimationFrame(tick);
   };

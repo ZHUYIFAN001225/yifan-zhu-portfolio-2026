@@ -2175,3 +2175,9 @@ html[lang^=zh] [data-product-case=beauty] .ux-section .ux-research-plan>div>span
 /* decisions: staggered cards with depth parallax, like the other groups */
 [data-product-case=beauty] .ux-decisions{display:grid!important;gap:clamp(30px,6vh,70px)}
 [data-product-case=beauty] .ux-decisions article{width:min(820px,80%)!important}
+/* pointer light in the background, tinted by whatever colour the page is */
+.lk-glow{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;filter:blur(18px);mix-blend-mode:soft-light;opacity:1}
+body.lk-dark .lk-glow{mix-blend-mode:screen;opacity:.35}
+.lk-glow{mix-blend-mode:overlay;filter:blur(16px) saturate(1)}
+body.lk-dark .lk-glow{mix-blend-mode:screen;opacity:.22}
+.lk-act :is(h2,h3,h4,p,li,span,a,strong,b,em,small){text-shadow:none!important}

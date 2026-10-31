@@ -50,6 +50,7 @@ export function mount() {
     if (!loopOn) { try { mountLoop(); loopOn = true; } catch (e) { console.error(e); } }
     if (!ropesOn && !calm) { try { mountThreads(root, acts); ropesOn = true; } catch (e) { console.error(e); } }
   };
+  try { glowTrail(); } catch (e) { console.error(e); }
   up(); wide.addEventListener('change', up); addEventListener('resize', up); addEventListener('load', up);
 }
 
@@ -133,6 +134,32 @@ function rail(root) {
   tags.forEach((t, i) => t.addEventListener('pointerenter', e => { const dt = Math.max(16, performance.now() - lt), vx = (e.clientX - lx) / dt; const f = Math.max(-1.1, Math.min(1.1, vx * .6 || (e.clientX < t.getBoundingClientRect().left + t.offsetWidth / 2 ? .6 : -.6))); kick(i, f); if (st[i - 1]) kick(i - 1, f * .3); if (st[i + 1]) kick(i + 1, f * .3); }));
 }
 
+// The pointer leaves a soft light in the background, tinted by the page colour, like a hand moving through water:
+// faster moves make bigger, brighter swells that spread out and fade.
+function glowTrail() {
+  if (document.querySelector('.lk-glow') || !matchMedia('(hover:hover) and (pointer:fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.createElement('canvas'); cv.className = 'lk-glow'; cv.setAttribute('aria-hidden', 'true');
+  const bg = document.querySelector('.lk-bg'); bg ? bg.after(cv) : document.body.prepend(cv);
+  const ctx = cv.getContext('2d'), S = .25; let W = 0, H = 0;
+  const size = () => { W = cv.width = Math.ceil(innerWidth * S); H = cv.height = Math.ceil(innerHeight * S); }; size(); addEventListener('resize', size);
+  const blobs = []; let lx = null, ly = null, lt = 0, raf = 0, idle = 0;
+  addEventListener('pointermove', e => {
+    const now = performance.now(), x = e.clientX, y = e.clientY;
+    if (lx !== null) { const dt = Math.max(8, now - lt), d = Math.hypot(x - lx, y - ly), v = Math.min(3, d / dt);
+      const n = Math.max(1, Math.round(d / 30));
+      for (let k = 1; k <= n; k++) blobs.push({ x: (lx + (x - lx) * k / n) * S, y: (ly + (y - ly) * k / n) * S, r: (26 + v * 55) * S, a: .1 + v * .14, g: 1 + v * .6 }); }
+    lx = x; ly = y; lt = now; idle = 0; if (blobs.length > 160) blobs.splice(0, blobs.length - 160); if (!raf) raf = requestAnimationFrame(tick);
+  }, { passive: true });
+  const tick = () => {
+    raf = 0; ctx.clearRect(0, 0, W, H);
+    for (const b of blobs) { b.r += b.g * S * 2.2; b.a *= .955;
+      const gr = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r); gr.addColorStop(0, `rgba(255,255,255,${b.a})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 6.283); ctx.fill(); }
+    for (let i = blobs.length - 1; i >= 0; i--) if (blobs[i].a < .004) blobs.splice(i, 1);
+    if (blobs.length) raf = requestAnimationFrame(tick);
+  };
+}
+
 // ---------- acts ----------
 function mountActs(root, calm) {
   const acts = [...root.querySelectorAll('.lk-act')].map(el => ({ el, style: el.dataset.act, p: 0 }));
@@ -170,7 +197,7 @@ function mountThreads(root, acts) {
   const knotSh = mk('path', 'lk-rope-sh lk-knot-sh'), knotC = mk('path', 'lk-knot lk-knot--c'), knotU = mk('path', 'lk-knot lk-knot--u'), knotUt = mk('path', 'lk-rope-tw'), knotCt = mk('path', 'lk-knot lk-knot--c lk-knot--over'), knot = knotU;
   const dotU = mk('circle', 'lk-dot lk-dot--u'), dotC = mk('circle', 'lk-dot lk-dot--c'); [dotU, dotC].forEach(d => d.setAttribute('r', 5));
   // behind everything on the page, just above the coloured backdrop
-  const bg = document.querySelector('.lk-bg'); bg ? bg.after(svg) : document.body.prepend(svg);
+  const bg = document.querySelector('.lk-glow') || document.querySelector('.lk-bg'); bg ? bg.after(svg) : document.body.prepend(svg);
   const mkLabel = cls => { const p = document.createElement('p'); p.className = 'lk-th-label ' + cls; p.setAttribute('aria-hidden', 'true'); document.body.append(p); return p; };
   const labU = mkLabel('lk-th-label--u'), labC = mkLabel('lk-th-label--c'), knotSay = mkLabel('lk-knot-say');
   const note = mkLabel('lk-th-note');

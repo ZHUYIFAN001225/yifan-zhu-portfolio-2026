@@ -26,19 +26,19 @@ const OWNER = new Set(['schedule', 'today', 'time-off-hours', 'services', 'add',
 // the 12:10 story — one booking, step by step. Poses: [x, y, size, rx, ry, rz, depth]; x/y are screen fractions, size is phone height / screen height
 export const STEPS = [
   { c: 'book', o: 'schedule', kicker: ['12:10 · Lunch break', '12:10 · 午休'], title: ['One booking, from both sides.', '一笔预约，两端同时发生。'], body: ['Keep scrolling: follow a single booking from the customer’s phone into the owner’s diary.', '往下滚：跟着一笔预约，从顾客的手机走进店主的日程。'],
-    d: { c: [.58, .52, .62, .05, .42, 0, 0], o: [.82, .55, .62, .05, -.42, 0, 0] }, m: { c: [.3, .3, .38, .05, .4, 0, 0], o: [.7, .31, .38, .05, -.4, 0, 0] } },
+    d: { c: [.58, .52, .62, .05, .42, 0, 0], o: [.82, .55, .62, .05, -.42, 0, 0] }, m: { c: [0.3, 0.34, 0.38, 0.05, 0.4, 0, 0], o: [0.7, 0.35, 0.38, 0.05, -0.4, 0, 0] } },
   { c: 'book', o: 'schedule', fg: 'c', spot: SPOT.book, spin: { c: 1 }, kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'],
-    d: { c: [.64, .52, .78, .03, .14, 0, 0], o: [.9, .3, .36, .12, -.9, .12, -2.2] }, m: { c: [.5, .31, .5, .02, .1, 0, 0], o: [.88, .14, .26, .1, -.9, .1, -2] } },
+    d: { c: [.64, .52, .78, .03, .14, 0, 0], o: [.9, .3, .36, .12, -.9, .12, -2.2] }, m: { c: [0.5, 0.35, 0.46, 0.02, 0.1, 0, 0], o: [0.84, 0.2, 0.22, 0.1, -0.9, 0.1, -2] } },
   { c: 'day', o: 'schedule', fg: 'c', spot: SPOT.day, kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'],
-    d: { c: [.62, .52, .78, .02, -.14, 0, 0], o: [.9, .32, .36, .12, -.9, .12, -2.2] }, m: { c: [.5, .31, .5, .02, -.1, 0, 0], o: [.88, .15, .26, .1, -.9, .1, -2] } },
+    d: { c: [.62, .52, .78, .02, -.14, 0, 0], o: [.9, .32, .36, .12, -.9, .12, -2.2] }, m: { c: [0.5, 0.35, 0.46, 0.02, -0.1, 0, 0], o: [0.84, 0.2, 0.22, 0.1, -0.9, 0.1, -2] } },
   { c: 'confirm', o: 'schedule', fg: 'c', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling and watch it leave her phone.', '日期、时间、时长都在一张卡里。继续滚，看它离开她的手机。'],
-    d: { c: [.57, .52, .74, .03, .22, 0, 0], o: [.84, .55, .6, .05, -.36, 0, -.4] }, m: { c: [.36, .31, .44, .03, .18, 0, 0], o: [.76, .33, .36, .05, -.3, 0, -.4] } },
+    d: { c: [.57, .52, .74, .03, .22, 0, 0], o: [.84, .55, .6, .05, -.36, 0, -.4] }, m: { c: [0.36, 0.35, 0.44, 0.03, 0.18, 0, 0], o: [0.76, 0.37, 0.36, 0.05, -0.3, 0, -0.4] } },
   { c: 'booked', o: 'schedule', fg: 'o', spot: SPOT.schedule, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'],
-    d: { o: [.7, .52, .78, .03, -.14, 0, 0], c: [.47, .3, .36, .12, .9, -.1, -2.4] }, m: { o: [.5, .31, .5, .02, -.1, 0, 0], c: [.13, .15, .26, .1, .9, -.1, -2] } },
+    d: { o: [.7, .52, .78, .03, -.14, 0, 0], c: [.47, .3, .36, .12, .9, -.1, -2.4] }, m: { o: [0.5, 0.35, 0.46, 0.02, -0.1, 0, 0], c: [0.16, 0.2, 0.22, 0.1, 0.9, -0.1, -2] } },
   { c: 'kept', o: 'time-off-hours', fg: 'o', spot: SPOT['time-off-hours'], spin: { o: -1 }, kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'],
-    d: { o: [.68, .52, .78, .03, .14, 0, 0], c: [.47, .32, .36, .12, .9, -.1, -2.4] }, m: { o: [.5, .31, .5, .02, .1, 0, 0], c: [.13, .15, .26, .1, .9, -.1, -2] } },
+    d: { o: [.68, .52, .78, .03, .14, 0, 0], c: [.47, .32, .36, .12, .9, -.1, -2.4] }, m: { o: [0.5, 0.35, 0.46, 0.02, 0.1, 0, 0], c: [0.16, 0.2, 0.22, 0.1, 0.9, -0.1, -2] } },
   { c: 'kept', o: 'today', spin: { c: 1, o: -1 }, kicker: ['18:30 · Closed', '18:30 · 打烊'], title: ['The routine runs itself.', '日常，自己运转。'], body: ['Next: the screens, the rules and how it was built.', '接下来是界面、规则，以及它是怎么做出来的。'],
-    d: { c: [.58, .52, .6, .05, .42, 0, 0], o: [.82, .55, .6, .05, -.42, 0, 0] }, m: { c: [.3, .3, .38, .05, .4, 0, 0], o: [.7, .31, .38, .05, -.4, 0, 0] } }
+    d: { c: [.58, .52, .6, .05, .42, 0, 0], o: [.82, .55, .6, .05, -.42, 0, 0] }, m: { c: [0.3, 0.34, 0.38, 0.05, 0.4, 0, 0], o: [0.7, 0.35, 0.38, 0.05, -0.4, 0, 0] } }
 ];
 
 // one beat per piece of the long page: which element, which screen, and who is holding the phone

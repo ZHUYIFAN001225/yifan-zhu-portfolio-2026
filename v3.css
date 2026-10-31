@@ -2161,3 +2161,9 @@ body.lk-th-on .lk-chip{opacity:1;translate:0 0;pointer-events:auto}
 [data-product-case=beauty] .ux-section .ux-research-plan>div>span::before{content:'STEP ';}
 html[lang^=zh] [data-product-case=beauty] .ux-section .ux-research-plan>div>span::before{content:'第 '}
 html[lang^=zh] [data-product-case=beauty] .ux-section .ux-research-plan>div>span::after{content:' 步'}
+/* rail without the dryer: brackets at both ends */
+[data-product-case=beauty] .ux-principles--4.lk-rail{grid-template-columns:repeat(4,minmax(0,1fr));padding:40px 30px 10px}
+[data-product-case=beauty] .lk-rail::before{left:0!important}
+[data-product-case=beauty] .lk-rail>.lk-tag:first-of-type::before{content:''}
+[data-product-case=beauty] .lk-rail{background-image:linear-gradient(90deg,#c9b8a8,#8e7b6f);background-size:16px 40px;background-position:-6px 6px;background-repeat:no-repeat}
+.lk-dryer{display:none!important}

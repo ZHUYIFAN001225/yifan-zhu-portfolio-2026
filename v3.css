@@ -2359,3 +2359,6 @@ body.bk-rail-on .bk-rail{opacity:1}
 .bk-screen{border-radius:calc(min(250px,17vw) * .125)}
 .bk-island{top:calc(min(250px,17vw) * .055);height:calc(min(250px,17vw) * .085)}
 .bk-lift.is-on{transform:translateZ(55px) scale(1.06)}
+.bk-lift.is-on{transform:translateZ(48px) scale(1.12)}
+.bk-dev{transition:none}
+.bk-phone.is-pointing{z-index:45}

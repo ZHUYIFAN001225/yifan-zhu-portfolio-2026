@@ -265,7 +265,7 @@ function cssPhone(host, files, calm) {
   const imgs = {};
   const img = f => { if (!imgs[f]) { const i = document.createElement('img'); i.alt = ''; i.decoding = 'async'; i.src = src(f); shots.append(i); imgs[f] = i; } return imgs[f]; };
   document.addEventListener('portfolio:language', () => Object.entries(imgs).forEach(([f, i]) => { i.src = src(f); }));
-  let curF = null, face = .38, lifted = 0, liftT = 0, rx = 16, ry = -18, rz = -6, mx = 0, my = 0, dragX = 0, dragY = 0, drag = null;
+  let curF = null, face = .38, lifted = 0, liftT = 0, zoom = 1, oy = 50, spotCy = 50, rx = 16, ry = -18, rz = -6, mx = 0, my = 0, dragX = 0, dragY = 0, drag = null;
   const show = i => { const f = files[i]; if (!f || f === curF) return; curF = f; const n = img(f); Object.values(imgs).forEach(x => x.classList.toggle('is-on', x === n)); if (lift.classList.contains('is-on')) limg.style.backgroundImage = `url("${src(f)}")`; };
   const spot = r => {
     if (!r) { lift.classList.remove('is-on'); host.classList.remove('is-lifted'); liftT = 0; return; }
@@ -273,7 +273,7 @@ function cssPhone(host, files, calm) {
     lift.style.cssText = `left:${x}%;top:${y}%;width:${w}%;height:${h}%`;
     limg.style.backgroundImage = `url("${src(curF)}")`; limg.style.backgroundSize = `${(1e4 / w).toFixed(2)}% ${(1e4 / h).toFixed(2)}%`;
     limg.style.backgroundPosition = `${w >= 100 ? 0 : (x / (100 - w) * 100).toFixed(2)}% ${h >= 100 ? 0 : (y / (100 - h) * 100).toFixed(2)}%`;
-    lift.classList.remove('is-on'); void lift.offsetWidth; lift.classList.add('is-on'); host.classList.add('is-lifted'); liftT = 1;
+    spotCy = y + h / 2; lift.classList.remove('is-on'); void lift.offsetWidth; lift.classList.add('is-on'); host.classList.add('is-lifted'); liftT = 1;
   };
   addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; if (drag) { dragY += (e.clientX - drag.x) * .35; dragX -= (e.clientY - drag.y) * .25; drag = { x: e.clientX, y: e.clientY }; } }, { passive: true });
   host.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; host.setPointerCapture?.(e.pointerId); });
@@ -284,9 +284,12 @@ function cssPhone(host, files, calm) {
     lifted += (liftT - lifted) * .08;
     // facing the text it stands beside; when something is lifted, the camera swings round to show the depth
     const side = Math.sign(face) || 1, swing = Math.max(-1.2, Math.min(1.2, face - .38 * side));
-    const tY = -side * (18 + lifted * 10) + swing * -40 + mx * 10 + dragY, tX = 14 + lifted * 16 + my * -8 + dragX, tZ = -side * (5 + lifted * 9);
+    // readable angles (like LOOK's anatomy): a gentle turn towards the text; when a part lifts, the camera moves in on it and straightens
+    const tY = -side * (14 - lifted * 7) + swing * -40 + mx * 8 + dragY, tX = 8 + lifted * 6 + my * -6 + dragX, tZ = -side * (3 - lifted * 2);
     const k = calm ? 1 : .07; ry += (tY - ry) * k; rx += (tX - rx) * k; rz += (tZ - rz) * k;
-    dev.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
+    zoom += ((liftT ? 1.55 : 1) - zoom) * k; oy += (spotCy - oy) * k;
+    dev.style.transformOrigin = `50% ${oy.toFixed(1)}%`;
+    dev.style.transform = `translateY(${((50 - oy) * (zoom - 1) * .9).toFixed(1)}%) scale(${zoom.toFixed(3)}) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
     dev.style.setProperty('--gl', (50 + ry * 1.5).toFixed(1) + '%');
   };
   requestAnimationFrame(tick);

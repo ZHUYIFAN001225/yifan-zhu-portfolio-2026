@@ -488,16 +488,17 @@ window.addEventListener('pagereveal',event=>{
   const items = [...xp.querySelectorAll('[data-xp-item]')], layers = [...xp.querySelectorAll('[data-xp-layer]')], scene = xp.querySelector('.xp-scene');
   // camera poses: each layer gets its own angle and framing, like a product film cutting between shots
   const phoneEl = xp.querySelector('.xp-phone');
+  // angles stay modest so the screen is always readable: tilt up to ~44deg, turn up to ~30deg
   const poses = [
-    { cx: '-10%', cy: '12%', crx: '30deg', crz: '-8deg', cry: '-22deg', cs: .94 },
-    { cx: '-12%', cy: '14%', crx: '60deg', crz: '-60deg', cry: '-14deg', cs: 1.04 },
-    { cx: '12%', cy: '13%', crx: '38deg', crz: '26deg', cry: '24deg', cs: .86 },
-    { cx: '-6%', cy: '12%', crx: '64deg', crz: '-14deg', cry: '30deg', cs: 1.08 },
-    { cx: '-6%', cy: '6%', crx: '36deg', crz: '-70deg', cry: '-28deg', cs: 1.04 }
+    { cx: '-8%', cy: '14%', crx: '28deg', crz: '-14deg', cry: '-12deg', cs: 0.9 },
+    { cx: '6%', cy: '10%', crx: '36deg', crz: '-26deg', cry: '10deg', cs: 0.85 },
+    { cx: '-4%', cy: '6%', crx: '22deg', crz: '12deg', cry: '14deg', cs: 0.8 },
+    { cx: '4%', cy: '11%', crx: '42deg', crz: '-30deg', cry: '-10deg', cs: 0.8 },
+    { cx: '0%', cy: '0%', crx: '34deg', crz: '-18deg', cry: '16deg', cs: 0.85 }
   ];
-  const rest = { cx: '0%', cy: '2%', crx: '54deg', crz: '-34deg', cry: '0deg', cs: 1.06 };
-  // when nobody points at anything, the camera keeps moving around the phone like a product film
-  const orbit = [rest, { cx: '-8%', cy: '6%', crx: '40deg', crz: '-58deg', cry: '-18deg', cs: 1.12 }, { cx: '8%', cy: '4%', crx: '30deg', crz: '18deg', cry: '24deg', cs: .96 }, { cx: '0%', cy: '-3%', crx: '62deg', crz: '-10deg', cry: '12deg', cs: 1.02 }];
+  const rest = { cx: '0%', cy: '6%', crx: '40deg', crz: '-22deg', cry: '0deg', cs: 0.83 };
+  // when nobody points at anything, the camera drifts gently around the phone
+  const orbit = [rest, { cx: '-6%', cy: '8%', crx: '32deg', crz: '-28deg', cry: '-12deg', cs: 0.83 }, { cx: '6%', cy: '6%', crx: '26deg', crz: '14deg', cry: '14deg', cs: 0.8 }, { cx: '0%', cy: '4%', crx: '44deg', crz: '-10deg', cry: '8deg', cs: 0.82 }];
   let orbitK = 0, orbitT = 0, focused = -1, xpVis = false;
   const pose = p => Object.entries(p).forEach(([k, v]) => phoneEl.style.setProperty('--' + k, v));
   const idle = () => { clearTimeout(orbitT); if (focused >= 0 || !xpVis || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(min-width: 761px)').matches) return; orbitT = setTimeout(() => { orbitK = (orbitK + 1) % orbit.length; if (focused < 0) pose(orbit[orbitK]); idle(); }, 2400); };
@@ -841,8 +842,8 @@ window.addEventListener('pagereveal',event=>{
     release: ['Where it goes from here.', '接下来往哪走。']
   };
   const pokes = [['Snip snip!', '咔嚓咔嚓！'], ['Fresh cut ✂', '刚剪好 ✂'], ['Book me?', '约我吗？'], ['Hey, that tickles.', '哎，好痒。'], ['I only cut real work.', '我只剪真实作品。']];
-  // the 3D beauty tools take over from here (WebGL); the flat scissors below stay as the fallback
-  if (window.WebGLRenderingContext) { import('./look-tools.mjs').then(m => m.mount({ lines })).catch(() => {}); return; }
+  // the beauty tools now live inside the section titles (look-tools.mjs); the old travelling scissors below are kept as reference
+  { import('./look-tools.mjs').then(m => m.mount({ lines })).catch(() => {}); return; }
   const secs = [...document.querySelectorAll('.ux-case .v3-product-section.ux-section')].filter(s => lines[s.id]);
   if (!secs.length) return;
   const b = document.createElement('button'); b.type = 'button'; b.className = 'snip'; b.setAttribute('aria-label', 'Scissors'); b.dataset.cursor = 'snip';

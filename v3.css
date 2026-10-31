@@ -1943,3 +1943,66 @@ body.lk-th-on .lk-threads{opacity:.9}
 @media (max-width:760px),(prefers-reduced-motion:reduce){.lk-th-label,.lk-knot-say{display:none}}
 [data-product-case=beauty] :is(.ux-pains>div,.ux-principles>div,.ux-challenge-grid>*,.ux-build>li,.ux-phases>li,.ux-journey>li,.ux-decisions article,.ux-world,.ux-evidence-note,.ux-research-plan>div){background:rgba(255,255,255,.86)!important}
 [data-product-case=beauty] .ux-section .ux-world--real{background:#fde8f0!important}
+/* ======== LOOK: bars and panels follow the colour of the page instead of sitting on it as black blocks ======== */
+body:has([data-product-case=beauty]){--lk-ink:#2a1d30;--lk-ink-2:#5d4a63}
+body.lk-dark:has([data-product-case=beauty]){--lk-ink:#f6eef6;--lk-ink-2:#b9a9bd}
+body:has([data-product-case=beauty]) .site-header.v3-header{background:color-mix(in srgb,var(--lk-page,#120d13) 86%,transparent)!important;box-shadow:none!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background-color .6s ease,color .6s ease}
+body:has([data-product-case=beauty]) .site-header.v3-header :is(a,button,span,strong,b){color:var(--lk-ink)}
+body:has([data-product-case=beauty]) .site-header.v3-header :is(button,a)[class*=theme],body:has([data-product-case=beauty]) .site-header.v3-header .lang-toggle{border-color:color-mix(in srgb,var(--lk-ink) 25%,transparent)}
+[data-product-case=beauty] .ux-case-index{background:color-mix(in srgb,var(--lk-page,#120d13) 86%,transparent)!important;box-shadow:0 0 0 100vmax color-mix(in srgb,var(--lk-page,#120d13) 86%,transparent)!important;clip-path:inset(0 -100vmax);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background-color .6s ease,box-shadow .6s ease}
+[data-product-case=beauty] .ux-case-index a{color:var(--lk-ink)!important;opacity:.62;text-decoration:none}
+[data-product-case=beauty] .ux-case-index a:is(:hover,[aria-current],.is-active){opacity:1}
+[data-product-case=beauty] .ux-roles{background:color-mix(in srgb,#fff 55%,transparent)!important;border:1px solid color-mix(in srgb,var(--lk-ink) 12%,transparent)!important;color:var(--lk-ink)}
+[data-product-case=beauty] .ux-roles :is(p,strong,a){color:var(--lk-ink)!important}
+[data-product-case=beauty] .ux-roles a{opacity:.72}[data-product-case=beauty] .ux-roles a:hover{opacity:1}
+body.lk-dark [data-product-case=beauty] .ux-roles{background:color-mix(in srgb,#fff 6%,transparent)!important}
+[data-product-case=beauty] .ux-core{color:var(--lk-ink)!important;transition:color .6s ease}
+[data-product-case=beauty] .v3-product-head :is(p,.v3-product-intro){color:var(--lk-ink-2)}
+/* ======== LOOK: the growth dial, refined ======== */
+.lk-loop{--size:min(700px,74vw);--r:calc(var(--size) * .4)}
+.lk-loop-ring{transform:none}
+.lk-loop-ticks line{stroke:color-mix(in srgb,var(--lk-ink,#2a1d30) 22%,transparent);stroke-width:.18}
+.lk-loop-track{fill:none;stroke:color-mix(in srgb,var(--lk-ink,#2a1d30) 10%,transparent);stroke-width:.35;stroke-dasharray:none}
+.lk-loop-arc{fill:none;stroke:url(#lkArc);stroke-width:.75;stroke-linecap:round;stroke-dasharray:100;transform-origin:50px 50px;transform-box:view-box}
+.lk-loop-head{fill:#fff;stroke:#c2457a;stroke-width:.35}.lk-loop-head-glow{fill:#e0457f;opacity:.55}
+[data-product-case=beauty] .lk-loop-nodes>li.lk-node{width:auto;opacity:1;scale:1;transform:translate(-50%,-50%) rotate(var(--ang)) translateX(var(--r)) rotate(calc(-1 * var(--ang)))}
+[data-product-case=beauty] .lk-loop-nodes>li.lk-node span{width:26px;height:26px;line-height:26px;margin:0;font:600 10.5px/26px Inter,system-ui,sans-serif;background:var(--lk-page,#f2e6d5)!important;color:color-mix(in srgb,var(--lk-ink,#2a1d30) 55%,transparent)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--lk-ink,#2a1d30) 22%,transparent);transition:background .4s,color .4s,transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .4s}
+[data-product-case=beauty] .lk-loop-nodes>li.lk-node.is-on span{background:linear-gradient(135deg,#e0457f,#8a5fd6)!important;color:#fff!important;transform:scale(1.25);box-shadow:0 0 0 6px color-mix(in srgb,#e0457f 18%,transparent),0 8px 20px rgba(138,95,214,.35)}
+.lk-node-label{position:absolute;left:50%;top:50%;width:150px;font:500 13.5px/1.3 Inter,system-ui,sans-serif;text-align:center;color:color-mix(in srgb,var(--lk-ink,#2a1d30) 50%,transparent);transform:translate(-50%,-50%) translate(calc(cos(var(--ang)) * 96px),calc(sin(var(--ang)) * 46px));transition:color .4s ease,font-size .4s ease}
+[data-product-case=beauty] .lk-node.is-on .lk-node-label{color:var(--lk-ink,#2a1d30);font-weight:600;font-size:15px}
+/* a phone with real thickness, a metal rim and a glare that follows the pointer */
+.lk-loop-phone{width:calc(var(--size) * .3);aspect-ratio:9/19.5;padding:0;border-radius:0;background:none;box-shadow:none;perspective:1400px;transform:translate(-50%,-50%)!important}
+.lk-phone3d{position:relative;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
+.lk-ph-side{position:absolute;inset:0;border-radius:calc(var(--size) * .05);background:linear-gradient(100deg,#8b8692,#3a3540 30%,#1b171e 60%,#6e6875);transform:translateZ(calc(var(--z) * -1.1px))}
+.lk-ph-front{position:absolute;inset:0;border-radius:calc(var(--size) * .05);padding:calc(var(--size) * .011);background:#0d0a0f;box-shadow:inset 0 0 0 1.5px #5c5662,inset 0 0 0 3px #17131a;transform:translateZ(0)}
+.lk-ph-screen{position:relative;display:block;width:100%;height:100%;overflow:hidden;border-radius:calc(var(--size) * .04);background:#000}
+.lk-ph-screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transform:scale(1.04);transition:opacity .45s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+.lk-ph-screen img.is-on{opacity:1;transform:none}
+.lk-ph-island{position:absolute;left:50%;top:calc(var(--size) * .022);width:28%;height:calc(var(--size) * .022);border-radius:999px;background:#000;transform:translateX(-50%)}
+.lk-ph-glare{position:absolute;inset:0;border-radius:calc(var(--size) * .05);background:linear-gradient(115deg,transparent calc(var(--gl,50%) - 30%),rgba(255,255,255,.16) var(--gl,50%),transparent calc(var(--gl,50%) + 22%));pointer-events:none;mix-blend-mode:screen}
+.lk-ph-shadow{position:absolute;left:8%;right:8%;bottom:-9%;height:9%;border-radius:50%;background:radial-gradient(closest-side,rgba(60,25,60,.35),transparent);filter:blur(6px)}
+/* ======== LOOK: folded detail ======== */
+[data-product-case=beauty] .lk-fold{position:relative;cursor:pointer;outline:none}
+[data-product-case=beauty] .lk-fold::after{content:'+';position:absolute;right:16px;top:14px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:500 16px/1 Inter,system-ui,sans-serif;color:var(--lk-ink,#2a1d30);background:color-mix(in srgb,var(--lk-ink,#2a1d30) 7%,transparent);transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .3s}
+[data-product-case=beauty] .lk-fold:is(:hover,:focus-visible,.is-open)::after{transform:rotate(45deg);background:color-mix(in srgb,#e0457f 18%,transparent)}
+[data-product-case=beauty] .lk-fold:focus-visible{box-shadow:0 0 0 2px #e0457f!important}
+[data-product-case=beauty] .lk-fold .lk-fold-body{max-height:0;opacity:0;overflow:hidden;margin-top:0!important;margin-bottom:0!important;transition:max-height .55s cubic-bezier(.16,1,.3,1),opacity .35s ease,margin .4s}
+[data-product-case=beauty] .lk-fold:is(:hover,:focus-within,.is-open) .lk-fold-body{max-height:420px;opacity:1;margin-top:10px!important}
+[data-product-case=beauty] .lk-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+[data-product-case=beauty] .lk-clamp:is(:hover,:focus,.is-open){-webkit-line-clamp:unset;display:block}
+@media (hover:none),(max-width:760px){[data-product-case=beauty] .lk-fold .lk-fold-body{max-height:none;opacity:1;margin-top:8px!important}[data-product-case=beauty] .lk-fold::after{display:none}[data-product-case=beauty] .lk-clamp{-webkit-line-clamp:unset;display:block}}
+@media print{[data-product-case=beauty] .lk-fold .lk-fold-body{max-height:none;opacity:1}[data-product-case=beauty] .lk-clamp{display:block}}
+/* ======== the two lines: what they mean ======== */
+.lk-th-label{font:500 13px/1.35 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;max-width:200px;color:var(--lk-ink-2,#5d4a63)!important}
+.lk-th-label strong{display:block;margin-bottom:3px;font:600 11px/1 Inter,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.lk-th-label--u strong{color:#e0457f}.lk-th-label--c strong{color:#8a5fd6}
+.lk-th-label--c{text-align:right}
+.lk-th-note{translate:-50% 0;max-width:none!important;font-weight:600!important;color:var(--lk-ink,#2a1d30)!important;white-space:nowrap}
+.lk-knot-say{text-transform:none!important;letter-spacing:0!important;font-size:15px!important}
+.lk-chip{position:fixed;left:18px;bottom:18px;z-index:45;display:flex;align-items:center;gap:6px;padding:8px 12px 8px 10px;border:1px solid color-mix(in srgb,var(--lk-ink,#2a1d30) 14%,transparent);border-radius:999px;background:color-mix(in srgb,var(--lk-page,#f2e6d5) 80%,white);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--lk-ink,#2a1d30);font:600 12px/1 Inter,system-ui,sans-serif;cursor:pointer;opacity:0;translate:0 12px;pointer-events:none;transition:opacity .4s,translate .5s cubic-bezier(.16,1,.3,1),background .6s}
+body.lk-th-on .lk-chip{opacity:1;translate:0 0;pointer-events:auto}
+.lk-chip i{width:8px;height:8px;border-radius:50%}.lk-chip i.u{background:#e0457f}.lk-chip i.c{background:#8a5fd6}
+.lk-chip b{position:relative;display:block;width:46px;height:2px;border-radius:2px;background:linear-gradient(90deg,#e0457f,#8a5fd6);transform-origin:50% 50%;transform:scaleX(max(.08,var(--gap,1)));transition:transform .3s ease}
+.lk-chip.is-done b{transform:scaleX(.08)}
+.lk-chip span{margin-left:4px;font-variant-numeric:tabular-nums}
+@media (max-width:760px),(prefers-reduced-motion:reduce){.lk-chip,.lk-th-note{display:none}}

@@ -938,7 +938,9 @@ window.addEventListener('pagereveal',event=>{
   const run = () => { q = false; const vh = innerHeight; let c = null, best = 0;
     for (const z of root.querySelectorAll('[data-lk-bg]')) { const r = z.getBoundingClientRect(); const v = Math.min(vh, r.bottom) - Math.max(0, r.top); if (v > best) { best = v; c = z.dataset.lkBg; } }
     if (best < vh * .08) c = null;
-    document.body.classList.toggle('lk-light', !!c); if (c) bg.style.backgroundColor = c; };
+    const page = c || '#120d13', dark = page.toLowerCase() === '#120d13';
+    document.body.classList.toggle('lk-light', !!c); if (c) bg.style.backgroundColor = c;
+    document.documentElement.style.setProperty('--lk-page', page); document.body.classList.toggle('lk-dark', dark); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
 })();
 

@@ -2025,3 +2025,22 @@ body.lk-th-on .lk-chip{opacity:1;translate:0 0;pointer-events:auto}
 .lk-rope-say[data-side=u] b{color:#d9487f}.lk-rope-say[data-side=c] b{color:#8259cf}
 .lk-rope-say.is-on{opacity:1;scale:1}
 @media (max-width:760px),(prefers-reduced-motion:reduce){.lk-rope-say{display:none}}
+/* ======== "Real work": one picture, two meanings ======== */
+[data-product-case=beauty] .ux-bridge-link.has-flip>:not(.lk-flip){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+[data-product-case=beauty] .ux-bridge-link.has-flip{position:relative;display:grid;place-items:center;min-width:170px;background:none!important;box-shadow:none!important}
+.lk-flip{position:relative;width:150px;perspective:900px}
+.lk-flip-card{position:relative;width:150px;aspect-ratio:3/4;transform-style:preserve-3d;animation:lk-flip 7s cubic-bezier(.65,0,.35,1) infinite}
+.lk-flip:hover .lk-flip-card{animation-play-state:paused}
+@keyframes lk-flip{0%,38%{transform:rotateY(-14deg) rotateX(4deg)}50%,88%{transform:rotateY(166deg) rotateX(4deg)}100%{transform:rotateY(346deg) rotateX(4deg)}}
+.lk-flip-face{position:absolute;inset:0;border-radius:16px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 26px 40px -18px rgba(60,20,60,.55),0 0 0 1px rgba(255,255,255,.4) inset}
+.lk-flip-face img{width:100%;height:100%;object-fit:cover;display:block}
+.lk-flip-c{transform:rotateY(180deg)}
+.lk-flip-face b{position:absolute;left:8px;right:8px;bottom:8px;padding:6px 9px;border-radius:10px;background:rgba(255,255,255,.92);font:600 11.5px/1.25 Inter,system-ui,"PingFang SC",sans-serif;color:#2a1d30;text-align:center}
+.lk-flip-u b{box-shadow:inset 3px 0 0 #d9487f}.lk-flip-c b{box-shadow:inset 3px 0 0 #8259cf}
+.lk-flip-who{position:absolute;left:8px;top:8px;display:flex;align-items:center;gap:6px;padding:4px 9px 4px 4px;border-radius:999px;background:rgba(255,255,255,.92);font:600 11px/1 Inter,system-ui,sans-serif}
+.lk-flip-who i{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d8c6ff,#8259cf)}.lk-flip-who em{font-style:normal;color:#2a1d30}
+.lk-flip-wire{position:absolute;top:50%;width:46px;border-top:2px dashed;opacity:.55}
+.lk-flip-wire--l{right:100%;margin-right:6px;border-color:#d9487f}.lk-flip-wire--r{left:100%;margin-left:6px;border-color:#8259cf}
+@media (prefers-reduced-motion:reduce){.lk-flip-card{animation:none}}
+@media (max-width:760px){.lk-flip-wire{display:none}}
+.lk-flip-who em{font:600 11px/1 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important}

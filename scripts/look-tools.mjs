@@ -40,6 +40,7 @@ export function mount() {
   applyInk(); document.addEventListener('portfolio:language', () => setTimeout(applyInk, 60));
   if (desktop) { try { mountLoop(); } catch {} }
   fold(root);
+  bridge(root);
   const acts = mountActs(root, calm);
   if (desktop && !calm) mountThreads(root, acts);
 }
@@ -65,6 +66,17 @@ function fold(root) {
   }));
   // long paragraphs at the top of a section: two lines, then "more"
   root.querySelectorAll('#release .ux-section-body>p:first-child, #research .ux-section-body>p:not([class]), #build .ux-section-body>p:first-child').forEach(pp => { pp.classList.add('lk-clamp'); pp.tabIndex = 0; pp.addEventListener('click', () => pp.classList.toggle('is-open')); pp.addEventListener('keydown', e => { if (e.key === 'Enter') pp.classList.toggle('is-open'); }); });
+}
+
+// "Real work" between the two sides: one real picture that flips — inspiration for the user, portfolio for the Creator.
+function bridge(root) {
+  const link = root.querySelector('.ux-bridge-link'); if (!link || link.querySelector('.lk-flip')) return;
+  const src = 'assets/v3/look-film/w1.webp';
+  const el = document.createElement('div'); el.className = 'lk-flip'; el.setAttribute('aria-hidden', 'true');
+  el.innerHTML = `<i class="lk-flip-wire lk-flip-wire--l"></i><div class="lk-flip-card"><div class="lk-flip-face lk-flip-u"><img src="${src}" alt="" loading="lazy" decoding="async"><b></b></div><div class="lk-flip-face lk-flip-c"><img src="${src}" alt="" loading="lazy" decoding="async"><span class="lk-flip-who"><i></i><em>Amy</em></span><b></b></div></div><i class="lk-flip-wire lk-flip-wire--r"></i>`;
+  link.append(el); link.classList.add('has-flip');
+  const words = () => { el.querySelector('.lk-flip-u b').textContent = zh() ? '对用户：灵感' : 'For the user: inspiration'; el.querySelector('.lk-flip-c b').textContent = zh() ? '对 Creator：作品集' : 'For the Creator: portfolio'; };
+  words(); document.addEventListener('portfolio:language', words);
 }
 
 // ---------- acts ----------

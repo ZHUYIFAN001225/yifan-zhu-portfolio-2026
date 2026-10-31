@@ -2167,3 +2167,11 @@ html[lang^=zh] [data-product-case=beauty] .ux-section .ux-research-plan>div>span
 [data-product-case=beauty] .lk-rail>.lk-tag:first-of-type::before{content:''}
 [data-product-case=beauty] .lk-rail{background-image:linear-gradient(90deg,#c9b8a8,#8e7b6f);background-size:16px 40px;background-position:-6px 6px;background-repeat:no-repeat}
 .lk-dryer{display:none!important}
+/* the ropes run behind the words: every line of text gets a thin halo in the page colour, so a rope passing behind is cut away around the letters */
+[data-product-case=beauty] :is(.ux-section,.xp-copy,.lk-act,.ux-core) :is(h2,h3,h4,p,li,dt,dd,span,a,strong,b,em,small):not(.lk-ch){text-shadow:0 0 2px var(--lk-page,#120d13),0 0 4px var(--lk-page,#120d13),0 0 6px var(--lk-page,#120d13),0 0 10px var(--lk-page,#120d13)}
+/* inside cards the halo uses the card colour instead */
+[data-product-case=beauty] :is(.ux-pains>div,.ux-principles>div,.ux-challenge-grid>*,.ux-build>li,.ux-phases>li,.ux-journey>li,.ux-decisions article,.ux-world,.ux-research-plan>div,.ux-evidence-note,.ux-chips li,.ux-roles,.lk-tag) *{text-shadow:none!important}
+.xp-copy{position:relative;z-index:2}
+/* decisions: staggered cards with depth parallax, like the other groups */
+[data-product-case=beauty] .ux-decisions{display:grid!important;gap:clamp(30px,6vh,70px)}
+[data-product-case=beauty] .ux-decisions article{width:min(820px,80%)!important}

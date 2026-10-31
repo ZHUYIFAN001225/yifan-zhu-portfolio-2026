@@ -902,7 +902,7 @@ window.addEventListener('pagereveal',event=>{
 (() => {
   if (!document.querySelector('[data-film]') || matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(max-width: 760px)').matches) return;
   const beauty = !!document.querySelector('[data-product-case=beauty]');
-  const els = [...document.querySelectorAll(beauty ? '.ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*, .ux-research-plan>div' : '.ux-decisions article, .ux-details figure, .ux-principles>div, .ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*')];
+  const els = [...document.querySelectorAll(beauty ? '.ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*, .ux-research-plan>div, .ux-decisions article' : '.ux-decisions article, .ux-details figure, .ux-principles>div, .ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*')];
   // LOOK: stronger depth — each card in a group sits on its own layer (near cards move more, far ones less and are a touch smaller)
   els.forEach((e, k) => { e.classList.add('v3-par'); const d = [1, .35, .75, .15, .55][k % 5]; e.style.setProperty('--sp', beauty ? (d * 2.4 - .6).toFixed(2) : [0.6, -0.35, 1, -0.6, 0.3][k % 5]); if (beauty) { e.style.setProperty('--depth', d); } });
   let q = false;
@@ -951,7 +951,8 @@ if (document.querySelector('[data-product-case=beauty] .lk-act')) import('./look
 
 // LOOK decisions: the cards stack as you scroll — each slides up over the last, which shrinks back and dims.
 (() => {
-  const list = document.querySelector('[data-product-case=beauty] .ux-decisions'); if (!list || matchMedia('(max-width: 760px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const list = null; if (!list ||  // stacking replaced by the same depth parallax as the other cards
+ matchMedia('(max-width: 760px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const cards = [...list.children]; list.classList.add('lk-stack'); cards.forEach((c, i) => c.style.setProperty('--i', i));
   let q = false;
   const run = () => { q = false; cards.forEach((c, i) => { const next = cards[i + 1]; if (!next) { c.style.setProperty('--cover', 0); return; } const r = next.getBoundingClientRect(), top = c.getBoundingClientRect().top; const cover = Math.min(1, Math.max(0, 1 - (r.top - top - 60) / (innerHeight * .55))); c.style.setProperty('--cover', cover.toFixed(3)); }); };

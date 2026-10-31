@@ -2246,3 +2246,45 @@ body.bk-rail-on .bk-rail{opacity:1}
 .bk-rail-track i b{left:auto;right:12px}
 .bk-now em{left:auto;right:18px}
 .bk-day .ux-section :is(.ux-principles>div,.ux-persona,.ux-evidence-note,.ux-lanes>div,.ux-success>li) :is(p,span,li){color:var(--bk-ink2)!important;opacity:1!important}
+/* the story line under each section label, written like a diary note */
+.bk-day .ux-section .bk-note{margin:0 0 28px;max-width:30ch;font:500 clamp(24px,2.4vw,36px)/1.2 Inter,system-ui,sans-serif;letter-spacing:-.025em;color:var(--bk-ink)!important}
+.bk-day .ux-section .bk-note::before{content:'';display:block;width:34px;height:3px;margin-bottom:16px;border-radius:2px;background:var(--bk-mint)}
+/* ======== booking: diary spreads ======== */
+.bk-day .bk-spread{display:grid!important;grid-template-columns:minmax(220px,30%) minmax(0,1fr);gap:clamp(30px,5vw,80px);align-items:start}
+.bk-day .bk-left{align-self:stretch}
+.bk-day .bk-left-in{position:sticky;top:130px}
+.bk-day .bk-spread>.ux-section-body{max-width:none!important;margin:0!important}
+.bk-day .bk-note{position:relative;display:inline;background:linear-gradient(transparent 62%,rgba(255,226,92,.75) 62%) no-repeat 0 0/0% 100%;transition:background-size 1.4s cubic-bezier(.65,0,.25,1) .3s}
+.bk-day .bk-note.is-in{background-size:100% 100%}
+.bk-day .bk-left .bk-note{display:block;margin-top:18px;font-size:clamp(22px,2vw,32px)!important}
+.bk-day .bk-left .bk-note::before{display:none}
+.bk-day .bk-left .bk-note{background:none}
+.bk-day .bk-left .bk-note span,.bk-day .bk-left .bk-note{box-decoration-break:clone}
+@media (max-width:899px){.bk-day .bk-spread{display:block!important}.bk-day .bk-left-in{position:static}}
+/* sticky notes */
+.bk-day .ux-pains{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 26px;padding:10px 6px}
+.bk-day .ux-pains>div.bk-sticky{position:relative;min-height:170px;padding:30px 22px 20px!important;border:0!important;border-radius:2px 2px 18px 2px!important;background:var(--c)!important;transform:rotate(var(--r));box-shadow:0 18px 26px -18px rgba(60,50,20,.5),0 2px 0 rgba(0,0,0,.03)!important;transition:transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .4s;opacity:1}
+.bk-day .ux-pains>div.bk-sticky::before{content:'';position:absolute;left:50%;top:-11px;width:84px;height:22px;margin-left:-42px;background:rgba(255,255,255,.55);border:1px solid rgba(23,54,43,.06);transform:rotate(calc(var(--r) * -1.4));backdrop-filter:blur(2px)}
+.bk-day .ux-pains>div.bk-sticky::after{display:none}
+.bk-day .ux-pains>div.bk-sticky:hover{transform:rotate(0) translateY(-8px) scale(1.03);box-shadow:0 30px 40px -22px rgba(60,50,20,.55)!important}
+.bk-day .ux-pains>div.bk-sticky h4{font-size:19px;line-height:1.25;margin:0 0 12px}
+.bk-day .ux-pains>div.bk-sticky p.bk-more{max-height:none!important;opacity:1!important;margin-top:8px!important}
+/* the rules on a timetable */
+.bk-day .ux-principles.bk-table{display:grid!important;grid-template-columns:1fr 1fr;grid-auto-rows:34px;gap:6px 18px;padding-left:64px;position:relative;background:repeating-linear-gradient(180deg,transparent 0 39px,rgba(23,54,43,.08) 39px 40px)}
+.bk-day .bk-table>.bk-appt{grid-row:span var(--rows);position:relative;margin:0!important;padding:12px 16px 12px 18px!important;border-radius:8px 14px 14px 8px!important;background:#e3f4ea!important;border:0!important;border-left:5px solid var(--bk-mint)!important;box-shadow:none!important;overflow:hidden;transition:transform .4s cubic-bezier(.16,1,.3,1),background .3s}
+.bk-day .bk-table>.bk-appt:nth-child(4n+2),.bk-day .bk-table>.bk-appt:nth-child(4n+3){background:#fff!important}
+.bk-day .bk-table>.bk-appt:hover{transform:scale(1.03);background:#d2eedd!important;z-index:2}
+.bk-day .bk-table .bk-appt-time{display:block;margin-bottom:4px;font:600 11px/1 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--bk-mint)}
+.bk-day .bk-table>.bk-appt>span{display:none}
+.bk-day .bk-table h4{font-size:15px;margin:0 0 4px}
+.bk-day .bk-table p{font-size:13px;line-height:1.4;margin:0}
+/* checklist */
+.bk-day .ux-success.bk-check{display:grid;gap:12px;list-style:none;padding:0}
+.bk-day .ux-success.bk-check>li{display:flex;align-items:center;gap:14px;padding:14px 18px!important;font-size:16px}
+.bk-day .ux-success.bk-check>li::before{display:none}
+.bk-box{flex:0 0 24px;width:24px;height:24px;border:2px solid var(--bk-ink);border-radius:6px;display:grid;place-items:center}
+.bk-box svg{width:18px;height:18px;fill:none;stroke:var(--bk-mint);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .6s cubic-bezier(.65,0,.35,1) var(--d)}
+.bk-check.is-in .bk-box svg{stroke-dashoffset:0}
+@media (max-width:760px){.bk-day .ux-pains{grid-template-columns:1fr}.bk-day .ux-principles.bk-table{grid-template-columns:1fr;padding-left:0}}
+@media (min-width:900px){.bk-day .v3-product-section.ux-section{padding-left:78px}.bk-day .v3-product-section.ux-section::before{left:18px}}
+.bk-day .ux-pains>div.bk-sticky p{color:#4b4a3a!important;opacity:1!important;max-height:none!important;border-top:1px dashed rgba(23,54,43,.18)!important;padding-top:10px!important}

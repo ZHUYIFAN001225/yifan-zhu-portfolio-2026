@@ -14,6 +14,10 @@ export function mount() {
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const moments = [...root.querySelectorAll('.bk-moment')];
   clocks(moments, calm);
+  spread(root);
+  notes(root, calm);
+  timetable(root);
+  checklist(root, calm);
   slips(root, calm);
   if (matchMedia('(min-width: 900px)').matches && !calm) timeline(root, moments);
   paper(root);
@@ -31,7 +35,7 @@ function clocks(moments, calm) {
 
 // cards become appointment slips written into the diary
 function slips(root, calm) {
-  const cards = [...root.querySelectorAll('.ux-pains>div, .ux-challenge-grid>div, .ux-build>li, .ux-research-plan>div, .ux-journey>li, .ux-audience>div')];
+  const cards = [...root.querySelectorAll('.ux-challenge-grid>div, .ux-build>li, .ux-research-plan>div, .ux-journey>li, .ux-audience>div')];
   cards.forEach((c, i) => {
     c.classList.add('bk-slip'); c.style.setProperty('--d', (i % 4) * 90 + 'ms');
     // keep the first line, open the rest on hover / focus / tap
@@ -52,7 +56,7 @@ function timeline(root, moments) {
   document.body.append(rail);
   const fill = rail.querySelector('.bk-rail-fill'), now = rail.querySelector('.bk-now'), lab = now.querySelector('em');
   const stops = () => moments.map(m => ({ y: m.getBoundingClientRect().top + scrollY + m.offsetHeight * .5, t: mins(m.dataset.time) }));
-  const place = () => { const sec = root.querySelector('.v3-product-section.ux-section'); if (sec) rail.style.setProperty('--rail-x', Math.max(74, sec.getBoundingClientRect().left - 28) + 'px'); }; place(); addEventListener('resize', place);
+  const place = () => { const sec = root.querySelector('.v3-product-section.ux-section'); if (sec) rail.style.setProperty('--rail-x', Math.max(30, sec.getBoundingClientRect().left + 18) + 'px'); }; place(); addEventListener('resize', place);
   let S = stops(); addEventListener('resize', () => { S = stops(); }); setInterval(() => { S = stops(); }, 1200);
   let q = false;
   const run = () => {
@@ -74,4 +78,45 @@ function paper(root) {
   let q = false;
   const run = () => { q = false; const r = first.getBoundingClientRect(); const p = clamp(1 - (r.top - innerHeight * .2) / (innerHeight * .6)); document.body.style.setProperty('--bk-paper', p.toFixed(3)); const mix = (a, b2) => Math.round(a + (b2 - a) * p); document.body.style.setProperty('background-color', `rgb(${mix(20, 243)},${mix(21, 238)},${mix(24, 227)})`, 'important'); document.body.classList.toggle('bk-on-paper', p > .5); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
+}
+
+// each section is a diary spread: the left page holds the section label and its story line (it stays while you read),
+// the right page holds the content
+function spread(root) {
+  root.querySelectorAll('.v3-product-section.ux-section').forEach(sec => {
+    if (sec.querySelector('.bk-left')) return;
+    const h = sec.querySelector(':scope>h2'), body = sec.querySelector(':scope>.ux-section-body'), note = body?.querySelector(':scope>.bk-note');
+    if (!h || !body) return;
+    const left = document.createElement('div'); left.className = 'bk-left'; const inner = document.createElement('div'); inner.className = 'bk-left-in';
+    inner.append(h); if (note) inner.append(note); left.append(inner); sec.prepend(left); sec.classList.add('bk-spread');
+  });
+  // the story line gets a highlighter stroke when it arrives
+  if (!('IntersectionObserver' in window)) return root.querySelectorAll('.bk-note').forEach(n => n.classList.add('is-in'));
+  const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -30% 0px' });
+  root.querySelectorAll('.bk-note').forEach(n => io.observe(n));
+}
+
+// the problems are sticky notes stuck on the page
+function notes(root) {
+  root.querySelectorAll('.ux-pains>div').forEach((n, i) => { n.classList.add('bk-sticky'); n.style.setProperty('--r', [-2.5, 1.8, -1.2, 2.6][i % 4] + 'deg'); n.style.setProperty('--c', ['#fff4b8', '#d8f3e4', '#ffe1d6', '#e6ecff'][i % 4]); });
+}
+
+// the booking rules sit on a day timetable: each rule is an appointment of its own length
+function timetable(root) {
+  const box = root.querySelector('.ux-principles'); if (!box || box.classList.contains('bk-table')) return;
+  box.classList.add('bk-table');
+  const len = [2, 3, 2, 2, 3, 2, 3, 2]; let start = 9 * 60;
+  [...box.children].forEach((r, i) => {
+    const d = len[i % len.length] * 30, t0 = start, t1 = start + d; start = t1;
+    r.classList.add('bk-appt'); r.style.setProperty('--rows', len[i % len.length]);
+    const tm = document.createElement('time'); tm.className = 'bk-appt-time'; tm.textContent = `${fmt(t0)}–${fmt(t1)}`; r.prepend(tm);
+  });
+}
+
+// how success is measured: a checklist that ticks itself off as you reach it
+function checklist(root, calm) {
+  const list = root.querySelector('.ux-success'); if (!list) return; list.classList.add('bk-check');
+  const items = [...list.children]; items.forEach((li, i) => { li.style.setProperty('--d', (i * 380) + 'ms'); const b = document.createElement('i'); b.className = 'bk-box'; b.innerHTML = '<svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9"/></svg>'; li.prepend(b); });
+  if (calm || !('IntersectionObserver' in window)) return list.classList.add('is-in');
+  const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { list.classList.add('is-in'); io.disconnect(); } }, { rootMargin: '0px 0px -30% 0px' }); io.observe(list);
 }

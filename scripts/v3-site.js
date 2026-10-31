@@ -540,7 +540,7 @@ window.addEventListener('pagereveal',event=>{
         zoom.style.setProperty('--sx', x + '%'); zoom.style.setProperty('--sy', y + '%'); zoom.style.setProperty('--sw', w + '%'); zoom.style.setProperty('--sh', h + '%');
         zoom.style.setProperty('--ox', cx + '%'); zoom.style.setProperty('--oy', cy + '%'); zoom.style.setProperty('--z', '1');
         wrap.classList.add('has-spot');
-        later(() => zoom.style.setProperty('--z', z.toFixed(2)), 500);
+        // no zoom: the whole screen stays visible and sharp; the spotlight alone shows the part that matters
         const vr = wrap.querySelector('.dev-view').getBoundingClientRect(), wr = wrap.getBoundingClientRect();
         callout.style.setProperty('--cy', (vr.top - wr.top + vr.height * cy / 100) + 'px');
         callout.style.left = (vr.right - wr.left + 18) + 'px';

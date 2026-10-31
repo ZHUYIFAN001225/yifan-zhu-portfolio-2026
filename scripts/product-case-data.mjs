@@ -235,12 +235,25 @@ export const productCases=[{
 },{
   id:'booking',slug:'glasgow-booking',file:'project-glasgow-booking.html',pdf:'Glasgow-Booking',
   // "A day in the salon": the lower half of the case reads as the shop's diary. Each main part opens at a time of day.
+  dayNotes:{
+    overview:p('Where it started: one person carrying the whole shop’s diary.','故事从这里开始：一个人，扛着整家店的预约本。'),
+    system:p('The idea: routine bookings run themselves, and the owner stays in charge of the exceptions.','想法是：日常预约自己运转，店主只管例外。'),
+    strategy:p('Before drawing a single screen, I wrote down the rules that protect her day.','画任何界面之前，我先把保护她这一天的规则写了下来。'),
+    iteration:p('How the work moved, step by step.','这件事是怎么一步步推进的。'),
+    structure:p('Two small apps sharing one diary: here is every screen.','两个小应用，共用一本预约本：所有页面都在这里。'),
+    flow:p('One booking, from the customer’s first tap to the owner’s diary.','一笔预约，从顾客点下第一下，到出现在店主的日程里。'),
+    interfaces:p('Close-ups of the moments that carry her day.','放大看，撑起她这一天的那些细节。'),
+    build:p('From written rules to a site real customers use.','从写下的规则，到真实顾客在用的网站。'),
+    challenges:p('What is still hard, honestly.','说实话，还有哪些难点。'),
+    research:p('What I still need to learn from the owner and her customers.','我还需要从店主和顾客那里了解什么。'),
+    release:p('Where the shop’s diary goes from here.','这本预约本，接下来往哪走。')
+  },
   day:{
-    overview:{time:'08:30',kicker:p('08:30 · Before opening','08:30 · 开门前'),line:p('“Is anyone booked on Friday?”','“周五有人约吗？”'),cap:p('Every booking lived in one person: WeChat, a paper diary and memory.','所有预约都在一个人身上：微信、纸质本和记忆。')},
-    system:{time:'10:00',kicker:p('10:00 · The shop opens','10:00 · 开门'),line:p('One diary. Two views.','一本预约本，两种视角。'),cap:p('Customers see the times that fit. The owner sees her day.','顾客看到放得下的时间，店主看到她的一天。')},
-    explode:{time:'12:10',kicker:p('12:10 · Lunch break','12:10 · 午休'),line:p('Choose. Check. Confirm.','选择。核对。确认。'),cap:p('A customer books on her lunch break, in three steps.','顾客在午休时，三步约好。')},
-    build:{time:'17:40',kicker:p('17:40 · End of the day','17:40 · 快收工了'),line:p('Live in the shop.','已经在店里用上了。'),cap:p('Real customers book here now. Real use will show what to fix next.','真实顾客已经在这里预约，真实使用会告诉我下一步改什么。')},
-    end:{time:'18:30',kicker:p('18:30 · Closed','18:30 · 打烊'),line:p('The routine runs itself.','日常，自己运转。'),cap:p('She only steps in for the exceptions. Thanks for reading.','她只在例外时出手。谢谢你看到这里。')}
+    overview:{time:'08:30',kicker:p('08:30 · Before opening','08:30 · 开门前'),line:p('Every morning began with the same question.','每天早上，都从同一个问题开始。'),cap:p('“Is anyone booked on Friday? Who do I need to tell?” She runs the salon alone, and every booking lived in WeChat, a paper diary and her memory.','“周五有人约吗？我要通知谁？”她一个人经营这家店，所有预约都在微信、纸质本和她的记忆里。')},
+    system:{time:'10:00',kicker:p('10:00 · The shop opens','10:00 · 开门'),line:p('So the shop got one shared diary.','所以，这家店有了一本共享的预约本。'),cap:p('Customers only see the times that fit. The owner sees her whole day. Nothing has to be passed on by message.','顾客只看到放得下的时间，店主看到她的一整天，不用再靠消息来回转达。')},
+    explode:{time:'12:10',kicker:p('12:10 · Lunch break','12:10 · 午休'),line:p('A customer books on her lunch break.','一位顾客，在午休时约好了。'),cap:p('Follow one ordinary day: she picks a service, only times that fit are offered, and the booking lands in the owner’s diary on its own.','跟着这普通的一天往下看：她选好服务，系统只给放得下的时间，预约自己出现在店主的日程里。')},
+    build:{time:'18:05',kicker:p('18:05 · After hours','18:05 · 打烊后'),line:p('Behind the screens: one set of rules.','屏幕背后，是同一套规则。'),cap:p('The rules were written first, then built and tested, so both sides of the shop always agree.','先把规则写清楚，再做出来、测试，让店的两端永远对得上。')},
+    end:{time:'18:30',kicker:p('18:30 · Closed','18:30 · 打烊'),line:p('Nothing to chase tonight.','今晚，没有要追着问的事了。'),cap:p('Since October 2026 real customers book here. The owner only steps in for the exceptions. Thanks for reading.','2026 年 10 月起，真实顾客已经在这里预约，店主只在例外时出手。谢谢你看到这里。')}
   },
   title:p('Glasgow Salon Booking','格拉斯哥理发店预约系统'),
   subtitle:p('One shared diary. Two clear experiences.','一本共享预约本，两端清晰体验。'),

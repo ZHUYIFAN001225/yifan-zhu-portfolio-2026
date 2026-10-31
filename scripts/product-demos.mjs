@@ -8,7 +8,7 @@ export function renderProductDemos(t,document){
   // Only sections with content are shown; their numbers follow the order on the page.
   const present=Object.keys(caseLabels).filter(id=>({system:!!c.system,strategy:!!(c.strategy||c.principles),iteration:!!c.iteration,logic:c.decisions.length>0,build:!!c.build,challenges:!!c.challenges,structure:!c.film,interfaces:!c.film})[id]??true); // LOOK's film already walks through these screens, so the close-ups would repeat it
   const label=id=>{const v=(caseLabelOverrides[c.id]||{})[id]||caseLabels[id],n=String(present.indexOf(id)+1).padStart(2,'0');return [`${n} / ${v[0]}`,`${n} / ${v[1]}`];};
-  const section=(id,body)=>present.includes(id)?`<section class="v3-product-section ux-section" id="${id}"><h2>${pair(label(id))}</h2><div class="ux-section-body">${body}</div></section>`:'';
+  const section=(id,body)=>present.includes(id)?`<section class="v3-product-section ux-section" id="${id}"><h2>${pair(label(id))}</h2><div class="ux-section-body">${c.dayNotes?.[id]?`<p class="bk-note">${pair(c.dayNotes[id])}</p>`:''}${body}</div></section>`:'';
   const chips=items=>`<ul class="ux-chips">${items.map(v=>`<li>${pair(v)}</li>`).join('')}</ul>`;
   const overviewExtras=()=>[
     c.persona?`<div class="ux-persona"><div class="ux-persona-id"><span aria-hidden="true">✂</span><h4>${pair(c.persona.name)}</h4></div>${chips(c.persona.traits)}<p class="ux-persona-quote">${pair(c.persona.quote)}</p></div>`:'',

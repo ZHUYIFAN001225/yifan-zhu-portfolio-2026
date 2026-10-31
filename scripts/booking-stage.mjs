@@ -160,7 +160,7 @@ export function mountStage(root) {
     heroEnd = op ? docY(op) + op.offsetHeight : 0;
     if (!m && heroEl && op) {
       const r = heroEl.getBoundingClientRect(), hy = r.top + scrollY, x0 = (r.left + r.width / 2) / innerWidth, y0 = (hy + r.height / 2 - scrollY * 0) / vh;
-      const s0 = Math.min(.95, r.height * .78 / vh), opH = op.offsetHeight;
+      const s0 = Math.min(.95, r.height * .69 / vh), opH = op.offsetHeight;
       const first = (heroEl.dataset.screens || '').split(',')[0].match(/([\w-]+)\.webp/); if (first) cf = first[1];
       push(vh * .5, { kind: 'hero', c: P7([x0, y0, s0, -.06, -.45, 0, 0]), o: P7([x0 + .04, y0 + 1.1, s0 * .8, .2, -.8, 0, -2]), cf, of, fg: 'c', front: true });
       push(vh * .5 + opH * .5, { kind: 'hero', c: P7([x0, y0 - opH * .5 / vh * .55, s0 * .96, -.02, -.3, 0, 0]), o: P7([x0 + .04, y0 + 1.1, s0 * .8, .2, -.8, 0, -2]), cf, of, fg: 'c', front: true });
@@ -208,7 +208,7 @@ export function mountStage(root) {
     const K = [];
     S.forEach((st, i) => {
       const nx = S[i + 1]; K.push({ at: st.at, st });
-      if (nx) { const T = Math.min(vh * (m ? .55 : .8), (nx.at - st.at) * .62); K.push({ at: nx.at - T, st }); }
+      if (nx) { const T = Math.min(vh * (m ? .55 : .8), (nx.at - st.at) * .55); K.push({ at: nx.at - T, st }); }
     });
     keys = K;
   }
@@ -254,7 +254,7 @@ export function mountStage(root) {
     let a = keys[0], b = keys[0], t = 0;
     if (y >= keys[keys.length - 1].at) a = b = keys[keys.length - 1];
     else if (y > keys[0].at) for (let i = 0; i < keys.length - 1; i++) if (y < keys[i + 1].at) { a = keys[i]; b = keys[i + 1]; t = (y - a.at) / Math.max(1, b.at - a.at); break; }
-    const e = a.st === b.st ? 0 : ease(t), hold = a.st === b.st, st = e < .5 ? a.st : b.st;
+    const e = a.st === b.st ? 0 : ease(t), st = e < .5 ? a.st : b.st, hold = e < .04 || e > .96; // "hold": the phone is (nearly) at rest
     const time = (now - t0) / 1000;
     // the screens follow the station; the change happens mid-flight (behind the spin when there is one)
     const m = isMobile();
@@ -270,7 +270,7 @@ export function mountStage(root) {
       show(p, file);
       if (p.fade < 1) { p.fade = Math.min(1, p.fade + dt / .35); draw(p); }
       setSpot(p, rect);
-      const liftWant = rect && p.rect && !(a.st.travel && !hold && k === 'c') ? 1 : 0;
+      const liftWant = rect && p.rect && !(a.st.travel && a.st !== b.st && e > .001 && k === 'c') ? 1 : 0;
       p.amt += (liftWant - p.amt) * E(liftWant ? 4.5 : 8);
       p.focus += ((hv && isFg ? 1 : 0) - p.focus) * E(5);
       // pose: station → station, plus hover focus, float and a lean from scroll speed
@@ -289,7 +289,7 @@ export function mountStage(root) {
       }
     }
     // the booking card flies from her phone into the owner's diary (story step "one check" → "lands in her diary")
-    const flying = a.st.travel && !hold && P.c.tex;
+    const flying = a.st.travel && a.st !== b.st && e > .001 && e < .999 && P.c.tex;
     fly.visible = !!flying;
     if (flying) {
       const k = e, c = P.c, o = P.o;

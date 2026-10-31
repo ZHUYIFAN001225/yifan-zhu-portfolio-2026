@@ -71,6 +71,15 @@ function fold(root) {
   root.querySelectorAll('.ux-journey>li').forEach((li, i) => { if (li.querySelector('.lk-pol')) return; const f = document.createElement('span'); f.className = 'lk-pol'; f.innerHTML = `<img src="assets/v3/screens/look/${zh() ? 'zh/' : ''}${SHOT[i % SHOT.length]}.webp" alt="" loading="lazy" decoding="async">`; li.prepend(f); li.style.setProperty('--tilt', [-5, 4, -2, 5, -4][i % 5] + 'deg'); });
   root.querySelector('.ux-journey')?.classList.add('lk-polaroids');
   document.addEventListener('portfolio:language', () => root.querySelectorAll('.lk-pol img').forEach((im, i) => { im.src = `assets/v3/screens/look/${zh() ? 'zh/' : ''}${SHOT[i % SHOT.length]}.webp`; }));
+  // every small card leans towards the pointer, like a card picked up off the table
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches) root.querySelectorAll('.ux-pains>div, .ux-build>li, .ux-phases>li, .ux-challenge-grid>div, .ux-research-plan>div, .ux-decisions article').forEach(c => {
+    c.classList.add('lk-tilt');
+    c.addEventListener('pointermove', e => { const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; c.style.setProperty('--tx', (-y).toFixed(3)); c.style.setProperty('--ty', x.toFixed(3)); c.style.setProperty('--ta', (Math.hypot(x, y) * 14).toFixed(2) + 'deg'); c.style.setProperty('--gx', ((x + .5) * 100).toFixed(1) + '%'); c.style.setProperty('--gy', ((y + .5) * 100).toFixed(1) + '%'); });
+    c.addEventListener('pointerleave', () => c.style.setProperty('--ta', '0deg'));
+  });
+  // the research plan: each step gets a little symbol of what happens in it
+  const ICON = ['<svg viewBox="0 0 24 24"><path d="M4 5h16v10H9l-5 4z"/></svg>', '<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>', '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="m8 12 3 3 5-6"/></svg>'];
+  root.querySelectorAll('.ux-research-plan>div').forEach((d, i) => { if (d.querySelector('.lk-ico2')) return; const s = document.createElement('i'); s.className = 'lk-ico2'; s.innerHTML = ICON[i % 3]; d.prepend(s); });
   sets.forEach(([sel, body]) => root.querySelectorAll(sel).forEach(card => {
     const parts = [...card.querySelectorAll(':scope ' + body + ', :scope > div > ' + body)]; if (!parts.length) return;
     card.classList.add('lk-fold'); parts.forEach(x => x.classList.add('lk-fold-body'));
@@ -190,14 +199,16 @@ function mountThreads(root, acts) {
     const at = base(sy + my);
     const now = performance.now();
     for (const k of ['u', 'c']) { const s = spring[k], d = mx - at[k], T = Math.abs(d) < 190 && my > 0 ? -Math.sign(d) * (190 - Math.abs(d)) * .55 : 0; s.v += (T - s.a) * .14; s.v *= .78; s.a += s.v;
-      if (pmx > -1e3 && Math.sign(pmx - at[k]) !== Math.sign(mx - at[k]) && Math.abs(mx - pmx) > 3) { ripples.push({ side: k, y: my, t: now, amp: Math.min(30, 6 + Math.abs(mx - pmx) * 1.2) }); s.v += Math.sign(mx - pmx) * 6; if (my > startY - sy && my < knotDoc - sy && (!sayAt || now - (sayAt.t || 0) > 700)) { speak(k, sy + my); sayAt.t = now; } } }
+      if (pmx > -1e3 && Math.sign(pmx - at[k]) !== Math.sign(mx - at[k]) && Math.abs(mx - pmx) > 3) { ripples.push({ side: k, y: my, t: now, amp: Math.min(30, 6 + Math.abs(mx - pmx) * 1.2) }); s.v += Math.sign(mx - pmx) * 6; if (my > startY - sy && my < knotDoc - sy - 140 && (!sayAt || now - (sayAt.t || 0) > 700)) { speak(k, sy + my); sayAt.t = now; } } }
     pmx = mx; while (ripples.length && now - ripples[0].t > 2600) ripples.shift();
     const y0 = Math.max(0, startY - sy), y1 = Math.min(vh, endY - sy), yk = knotDoc - sy;
     let dU = '', dC = '', dJ = '';
     for (let vy = y0, i = 0; vy <= y1 + 1; vy += 10, i++) {
       const y = Math.min(vy, y1), b = base(sy + y), g = Math.exp(-Math.pow((y - my) / 110, 2));
       if (y <= yk) {
-        const u = b.u + spring.u.a * g + wave('u', y, now), c = b.c + spring.c.a * g + wave('c', y, now);
+        // the knot holds the ropes: the closer to it, the less they can swing
+        const hold = clamp((yk - y) / 160), gh = g * hold;
+        const u = b.u + (spring.u.a * gh + wave('u', y, now) * hold), c = b.c + (spring.c.a * gh + wave('c', y, now) * hold);
         dU += (dU ? 'L' : 'M') + u.toFixed(1) + ' ' + y.toFixed(1); dC += (dC ? 'L' : 'M') + c.toFixed(1) + ' ' + y.toFixed(1);
       } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 22, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
     }

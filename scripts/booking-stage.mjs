@@ -200,7 +200,7 @@ export function mountStage(root) {
         if (who === 'c') cf = b.file; else of = b.file;
         const R = side === 'right', X = R ? .84 : .16;
         const fg = P7([X, .53, .62, .04, R ? -.3 : .3, 0, 0]);
-        const bg = P7([R ? .93 : .07, .27, .34, .12, R ? -.95 : .95, R ? .14 : -.14, -2.2]);
+        const bg = P7([R ? .9 : .1, .26, .3, .12, R ? -.95 : .95, R ? .14 : -.14, -2.2]);
         const at = j === 0 ? top + vh * .1 : Math.max(docY(b.el) - vh * .05, top + vh * .1);
         push(at, { kind: 'section', c: who === 'c' ? fg : bg, o: who === 'c' ? bg : fg, cf, of, fg: who, spot: SPOT[b.file] || [2, 20, 96, 30], label: b.label });
       });

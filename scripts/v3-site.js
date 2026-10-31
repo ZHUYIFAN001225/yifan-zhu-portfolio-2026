@@ -936,7 +936,7 @@ window.addEventListener('pagereveal',event=>{
   // the backdrop takes the colour of the section that fills most of the screen; acts and the anatomy paint their own dark,
   // so they never turn the coloured sections around them grey
   const run = () => { q = false; const vh = innerHeight; let c = null, best = 0;
-    for (const z of zones) { const r = z.getBoundingClientRect(); const v = Math.min(vh, r.bottom) - Math.max(0, r.top); if (v > best) { best = v; c = z.dataset.lkBg; } }
+    for (const z of root.querySelectorAll('[data-lk-bg]')) { const r = z.getBoundingClientRect(); const v = Math.min(vh, r.bottom) - Math.max(0, r.top); if (v > best) { best = v; c = z.dataset.lkBg; } }
     if (best < vh * .08) c = null;
     document.body.classList.toggle('lk-light', !!c); if (c) bg.style.backgroundColor = c; };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();

@@ -46,136 +46,94 @@ export function mount() {
 // ---------- acts ----------
 function mountActs(root, calm) {
   const acts = [...root.querySelectorAll('.lk-act')].map(el => ({ el, style: el.dataset.act, p: 0 }));
-  // the scattered letters are a visual copy of each line; the real text stays in place (hidden) so translation keeps working
-  const gatherSetup = a => {
-    a.el.querySelectorAll('.lk-act-words').forEach(src => {
-      src.classList.add('lk-src'); src.nextElementSibling?.classList.contains('lk-vis') && src.nextElementSibling.remove();
-      const vis = document.createElement('span'); vis.className = 'lk-vis'; vis.setAttribute('aria-hidden', 'true');
-      [...src.textContent].forEach(ch => { const c = document.createElement('span'); c.className = 'lk-ch'; c.textContent = ch; if (ch.trim()) { c.style.setProperty('--dx', ((Math.random() - .5) * 900).toFixed(0)); c.style.setProperty('--dy', ((Math.random() - .5) * 600).toFixed(0)); c.style.setProperty('--dr', ((Math.random() - .5) * 120).toFixed(0)); } vis.append(c); });
-      src.after(vis);
-    });
-  };
-  acts.filter(a => a.style === 'gather').forEach(gatherSetup);
-  document.addEventListener('portfolio:language', () => setTimeout(() => acts.filter(a => a.style === 'gather').forEach(gatherSetup), 60));
-  if (calm) { acts.forEach(a => a.el.style.setProperty('--p', .5)); return acts; }
+  // each act takes the colour of the block it opens, so the big words and what follows read as one page
+  const tone = () => acts.forEach(a => {
+    let n = a.el.nextElementSibling; while (n && !(n.matches('.ux-section, .xp'))) n = n.nextElementSibling;
+    if (n?.matches('.xp')) { a.el.dataset.tone = 'dark'; a.el.dataset.lkBg = '#120d13'; n.dataset.lkBg = '#120d13'; }
+    else if (n) { a.el.dataset.lkBg = n.dataset.lkBg || '#e4d6ec'; a.el.style.setProperty('--act-accent', n.dataset.lkInk || '#c2457a'); }
+    else { a.el.dataset.tone = 'dark'; a.el.dataset.lkBg = '#120d13'; } // the closing act sits on the footer's dark
+  });
+  tone();
+  // the words rise once, as soon as the act comes into view, and stay; scrolling back does not replay them
+  if (calm || !('IntersectionObserver' in window)) acts.forEach(a => a.el.classList.add('is-in'));
+  else { const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { threshold: .3 }); acts.forEach(a => io.observe(a.el)); }
+  // scroll progress through each act, used only by the two lines
   let q = false;
-  const run = () => {
-    q = false; const vh = innerHeight;
-    acts.forEach(a => {
-      const r = a.el.getBoundingClientRect();
-      // 0 when the act's top enters at the bottom of the screen, 1 when its bottom leaves at the top
-      a.p = clamp((vh - r.top) / (r.height + vh)); a.top = r.top; a.h = r.height;
-      a.el.style.setProperty('--p', a.p.toFixed(4));
-    });
-  };
+  const run = () => { q = false; const vh = innerHeight; acts.forEach(a => { const r = a.el.getBoundingClientRect(); a.p = clamp((vh - r.top) / (r.height + vh)); }); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
   return acts;
 }
 
 // ---------- the two lines ----------
+// Two quiet lines behind the content: the user (pink) starts at the left edge, the Creator (lilac) at the right.
+// The further you read, the closer they come; under the closing words they meet and tie a knot.
+// Bring the pointer near a line and it gives way like a string, then springs back.
 function mountThreads(root, acts) {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'lk-threads'); svg.setAttribute('aria-hidden', 'true');
   const mk = (tag, cls) => { const e = document.createElementNS(NS, tag); e.setAttribute('class', cls); svg.append(e); return e; };
-  const bridge = mk('path', 'lk-th-bridge'), pathU = mk('path', 'lk-th lk-th--u'), pathC = mk('path', 'lk-th lk-th--c'), knot = mk('path', 'lk-th-knot');
-  document.body.append(svg);
-  const tip = (side, label) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'lk-tip lk-tip--' + side; b.dataset.cursor = 'pluck'; b.innerHTML = `<i></i><span>${label()}</span>`; document.body.append(b); return b; };
-  const lab = { u: () => zh() ? '用户' : 'User', c: () => 'Creator' };
-  const tipU = tip('u', lab.u), tipC = tip('c', lab.c);
-  document.addEventListener('portfolio:language', () => { tipU.querySelector('span').textContent = lab.u(); tipC.querySelector('span').textContent = lab.c(); tipU.setAttribute('aria-label', zh() ? '用户这条线：拨一下' : 'The user line: pluck it'); tipC.setAttribute('aria-label', zh() ? 'Creator 这条线：拨一下' : 'The Creator line: pluck it'); });
-  tipU.setAttribute('aria-label', zh() ? '用户这条线：拨一下' : 'The user line: pluck it'); tipC.setAttribute('aria-label', zh() ? 'Creator 这条线：拨一下' : 'The Creator line: pluck it');
+  const pathU = mk('path', 'lk-th lk-th--u'), pathC = mk('path', 'lk-th lk-th--c'), pathJ = mk('path', 'lk-th lk-th--j'), knot = mk('path', 'lk-th-knot');
+  const dotU = mk('circle', 'lk-dot lk-dot--u'), dotC = mk('circle', 'lk-dot lk-dot--c'); [dotU, dotC].forEach(d => d.setAttribute('r', 5));
+  // behind everything on the page, just above the coloured backdrop
+  const bg = document.querySelector('.lk-bg'); bg ? bg.after(svg) : document.body.prepend(svg);
+  const mkLabel = cls => { const p = document.createElement('p'); p.className = 'lk-th-label ' + cls; p.setAttribute('aria-hidden', 'true'); document.body.append(p); return p; };
+  const labU = mkLabel('lk-th-label--u'), labC = mkLabel('lk-th-label--c'), knotSay = mkLabel('lk-knot-say');
+  const words = () => { labU.textContent = zh() ? '用户' : 'User'; labC.textContent = 'Creator'; knotSay.textContent = zh() ? '用户和 Creator，连上了。' : 'User and Creator, connected.'; };
+  words(); document.addEventListener('portfolio:language', words);
 
-  // where the lines live: the margin beside the text
-  let gutL = 40, gutR = innerWidth - 40, startY = 0, endY = 1e9;
+  let startY = 0, knotDoc = 1e9, endY = 1e9;
   const measure = () => {
-    const body = root.querySelector('.ux-section .ux-section-body') || root;
-    const r = body.getBoundingClientRect(), h = root.querySelector('.ux-section>h2')?.getBoundingClientRect();
-    const left = Math.min(r.left, h?.left ?? r.left), right = Math.max(r.right, h?.right ?? r.right);
-    gutL = Math.max(14, left / 2); gutR = innerWidth - Math.max(14, (innerWidth - right) / 2);
-    const first = acts[0]?.el.getBoundingClientRect(); startY = first ? first.top + scrollY : 0;
-    const last = acts[acts.length - 1]?.el.getBoundingClientRect(); endY = last ? last.bottom + scrollY : 1e9;
+    const first = acts[0]?.el, last = acts[acts.length - 1]?.el; if (!first || !last) return;
+    startY = first.getBoundingClientRect().top + scrollY + innerHeight * .1;
+    knotDoc = last.querySelector('.lk-act-cap').getBoundingClientRect().bottom + scrollY + 46;
+    endY = last.getBoundingClientRect().bottom + scrollY;
   };
-  measure(); addEventListener('resize', measure); setInterval(measure, 1000);
+  measure(); addEventListener('resize', measure); addEventListener('load', measure); setInterval(measure, 1000);
 
-  // what each act does to the lines: where they lean to, how wide the bend is
-  const W = () => innerWidth;
-  const shape = {
-    gather: a => ({ u: 10, c: W() - 10, amp: Math.sin(Math.PI * a.p) }),            // as far apart as they can be
-    split: a => ({ u: W() / 2 - 3, c: W() / 2 + 3, amp: Math.pow(Math.sin(Math.PI * a.p), 2), touch: true }), // they touch once, at the picture
-    pass: a => ({ u: W() * .4, c: W() * .6, amp: Math.sin(Math.PI * a.p) }),         // closer
-    hollow: a => ({ u: W() / 2 - 16, c: W() / 2 + 16, amp: Math.sin(Math.PI * a.p), gap: true }), // side by side, not yet joined
-    meet: a => ({ u: W() / 2, c: W() / 2, amp: ss(.18, .5, a.p), knot: true })      // tied together
+  // where each line is at a point of the page: apart at the start, together at the knot
+  const ease = t => t * t * (3 - 2 * t);
+  const base = docY => {
+    const W = innerWidth, P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.15));
+    const wave = Math.sin(docY / 520) * W * .022 * (1 - e);
+    return { u: W * .045 + (W * .5 - W * .045) * e + wave, c: W * .955 - (W * .955 - W * .5) * e - Math.sin(docY / 520 + 1.3) * W * .022 * (1 - e) };
   };
-  let pluckU = 0, pluckC = 0, pluckT = 0;
-  let boxes = [];
-  const xAt = (vy, now) => {
-    // which act covers this screen height?
-    let u = gutL, c = gutR, gap = 0, knotAmp = 0;
-    for (const { a, top, h } of boxes) {
-      if (vy < top || vy > top + h) continue;
-      const s = shape[a.style](a);
-      // the bend is centred on the middle of the screen while the act is pinned, and fades out above and below the act
-      // only inside the act's own dark area, so the lines never cross the text of the sections around it
-      const inAct = ss(top, top + innerHeight * .3, vy) * (a.style === 'meet' ? 1 : 1 - ss(top + h - innerHeight * .3, top + h, vy));
-      // once they meet at the end they stay together below the knot
-      // the meeting point sits under the closing words, and moves up with them once the act scrolls away
-      const cy = a.style === 'meet' ? Math.min(innerHeight * .84, top + h - innerHeight * .16) : innerHeight * .5;
-      const g = a.style === 'meet' ? (vy >= cy ? 1 : Math.exp(-Math.pow((vy - cy) / (innerHeight * .12), 2))) : Math.exp(-Math.pow((vy - cy) / (innerHeight * .32), 2));
-      const f = s.amp * g * inAct;
-      u += (s.u - u) * f; c += (s.c - c) * f;
-      if (s.gap) gap = Math.max(gap, f); if (s.knot) knotAmp = Math.max(knotAmp, s.amp * inAct);
-    }
-    const t = (now - pluckT) / 1000;
-    if (t < 1.4) { const w = Math.sin(vy / 26 - t * 30) * 14 * Math.exp(-t * 3); u += w * pluckU; c -= w * pluckC; }
-    return { u, c, gap, knotAmp };
-  };
-  const pluck = side => {
-    pluckT = performance.now(); pluckU = side === 'u' ? 1 : .25; pluckC = side === 'c' ? 1 : .25;
-    const b = side === 'u' ? tipU : tipC; b.classList.remove('is-pluck'); void b.offsetWidth; b.classList.add('is-pluck');
-    // the words near the line shake
-    const x = side === 'u' ? gutL : gutR, y = innerHeight * .45;
-    document.querySelectorAll('.ux-section h2, .ux-section h3, .ux-section h4, .ux-section p, .ux-section li, .lk-act-line').forEach(el => {
-      const r = el.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight || !r.width) return;
-      const d = Math.hypot((side === 'u' ? r.left : r.right) - x, (r.top + r.height / 2) - y); if (d > 520) return;
-      el.style.setProperty('--gd', side === 'u' ? 1 : -1); el.style.setProperty('--gk', (1 - d / 520).toFixed(2)); el.style.animationDelay = Math.round(d / 3) + 'ms';
-      el.classList.remove('lk-twang'); void el.offsetWidth; el.classList.add('lk-twang'); setTimeout(() => el.classList.remove('lk-twang'), 1200 + d / 3);
-    });
-  };
-  tipU.addEventListener('click', () => pluck('u')); tipC.addEventListener('click', () => pluck('c'));
-  // at the end, the knot: click it and the colour of the two lines floods the page
-  knot.addEventListener('click', () => {
-    const r = knot.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, R = Math.hypot(innerWidth, innerHeight) * 1.2;
-    const sp = document.createElement('i'); sp.className = 'lk-splash lk-splash--front'; sp.style.left = x + 'px'; sp.style.top = y + 'px'; sp.style.width = sp.style.height = R * 2 + 'px'; document.body.append(sp);
-    sp.animate([{ transform: 'translate(-50%,-50%) scale(0)', opacity: .9 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: .9 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }], { duration: 1400, easing: 'cubic-bezier(.3,0,.2,1)' }).onfinish = () => sp.remove();
-  });
+  // the pointer pushes a line aside like a string
+  let mx = -1e4, my = -1e4; const spring = { u: { a: 0, v: 0 }, c: { a: 0, v: 0 } };
+  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+  document.addEventListener('pointerleave', () => { mx = my = -1e4; });
 
   let raf = 0;
-  const frame = now => {
+  const frame = () => {
     raf = requestAnimationFrame(frame);
     const vh = innerHeight, sy = scrollY;
-    boxes = acts.map(a => ({ a, top: a.el.getBoundingClientRect().top, h: a.el.offsetHeight }));
-    const on = sy + vh > startY + vh * .3 && sy < endY;
+    const on = sy + vh > startY && sy < endY;
     document.body.classList.toggle('lk-th-on', on); if (!on) return;
-    // draw only the part of the page that is on screen, from where the lines start to where they end
-    const y0 = Math.max(0, startY - sy), y1 = Math.min(vh, endY - sy);
-    let dU = '', dC = '', dB = '', knotAmp = 0, kx = 0;
-    for (let vy = y0, i = 0; vy <= y1 + 1; vy += 12, i++) {
-      const p = xAt(Math.min(vy, y1), now);
-      dU += (i ? 'L' : 'M') + p.u.toFixed(1) + ' ' + Math.min(vy, y1).toFixed(1);
-      dC += (i ? 'L' : 'M') + p.c.toFixed(1) + ' ' + Math.min(vy, y1).toFixed(1);
-      if (p.gap > .4 && i % 3 === 0) dB += `M${(p.u + 4).toFixed(1)} ${vy.toFixed(1)}L${(p.c - 4).toFixed(1)} ${vy.toFixed(1)}`;
-      if (p.knotAmp > knotAmp) { knotAmp = p.knotAmp; kx = (p.u + p.c) / 2; }
+    // springs
+    const at = base(sy + my);
+    for (const k of ['u', 'c']) { const s = spring[k], d = mx - at[k], T = Math.abs(d) < 150 && my > 0 ? -Math.sign(d) * (150 - Math.abs(d)) * .4 : 0; s.v += (T - s.a) * .12; s.v *= .8; s.a += s.v; }
+    const y0 = Math.max(0, startY - sy), y1 = Math.min(vh, endY - sy), yk = knotDoc - sy;
+    let dU = '', dC = '', dJ = '';
+    for (let vy = y0, i = 0; vy <= y1 + 1; vy += 10, i++) {
+      const y = Math.min(vy, y1), b = base(sy + y), g = Math.exp(-Math.pow((y - my) / 110, 2));
+      if (y <= yk) {
+        const u = b.u + spring.u.a * g, c = b.c + spring.c.a * g;
+        dU += (dU ? 'L' : 'M') + u.toFixed(1) + ' ' + y.toFixed(1); dC += (dC ? 'L' : 'M') + c.toFixed(1) + ' ' + y.toFixed(1);
+      } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
     }
-    pathU.setAttribute('d', dU); pathC.setAttribute('d', dC); bridge.setAttribute('d', dB);
-    // the knot sits where the lines meet, in the middle of the screen
-    const mb = boxes.find(b => b.a.style === 'meet'), ky = mb ? Math.min(vh * .84, mb.top + mb.h - vh * .16) : vh * .84;
-    { const pk = xAt(ky, now); knotAmp = (ky >= 0 && ky <= y1) ? pk.knotAmp : 0; kx = (pk.u + pk.c) / 2; }
-    if (knotAmp > .55) { const k = ky, r = 16 * knotAmp; knot.setAttribute('d', `M${kx - r} ${k}c0-${r * 1.2} ${r * 2}-${r * 1.2} ${r * 2} 0s-${r * 2} ${r * 1.2}-${r * 2} 0z`); knot.style.opacity = ss(.55, .9, knotAmp); }
-    else knot.style.opacity = 0;
-    // tips ride the lines at 45% of the screen
-    const ty = vh * .45; document.body.classList.toggle('lk-in-act', boxes.some(b => b.top <= ty && b.top + b.h >= ty));
-    if (ty >= y0 && ty <= y1) { const p = xAt(ty, now); tipU.style.transform = `translate3d(${p.u.toFixed(1)}px,${ty}px,0)`; tipC.style.transform = `translate3d(${p.c.toFixed(1)}px,${ty}px,0)`; tipU.classList.add('is-on'); tipC.classList.add('is-on'); tipU.classList.toggle('is-meet', Math.abs(p.c - p.u) < 20); tipU.classList.toggle('is-side', p.u < gutL + 30); tipC.classList.toggle('is-side', p.c > gutR - 30); }
-    else { tipU.classList.remove('is-on'); tipC.classList.remove('is-on'); }
+    pathU.setAttribute('d', dU); pathC.setAttribute('d', dC); pathJ.setAttribute('d', dJ);
+    // a dot rides each line in the middle of the screen
+    const mid = vh * .5, bm = base(sy + mid), gm = Math.exp(-Math.pow((mid - my) / 110, 2));
+    const showDots = mid >= y0 && mid <= Math.min(y1, yk);
+    [[dotU, bm.u + spring.u.a * gm], [dotC, bm.c + spring.c.a * gm]].forEach(([d, x]) => { d.setAttribute('cx', x.toFixed(1)); d.setAttribute('cy', mid); d.style.opacity = showDots ? 1 : 0; });
+    // labels once, where the lines begin
+    const ls = startY - sy + 34, bl = base(startY + 34);
+    labU.style.transform = `translate3d(${(bl.u + 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`; labC.style.transform = `translate3d(${(bl.c - 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`;
+    const lv = ls > 40 && ls < vh - 40; labU.classList.toggle('is-on', lv); labC.classList.toggle('is-on', lv);
+    // the knot where they meet
+    const kx = innerWidth / 2, kv = yk > -30 && yk < vh + 30;
+    if (kv) { const r = 13; knot.setAttribute('d', `M${kx - r} ${yk}c0-${r * 1.2} ${r * 2}-${r * 1.2} ${r * 2} 0s-${r * 2} ${r * 1.2}-${r * 2} 0z`); }
+    knot.style.opacity = kv ? 1 : 0;
+    knotSay.style.transform = `translate3d(${kx}px,${(yk + 24).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
   };
   raf = requestAnimationFrame(frame);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(frame); });

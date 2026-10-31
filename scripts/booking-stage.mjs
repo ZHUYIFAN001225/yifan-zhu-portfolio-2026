@@ -232,6 +232,8 @@ export function mountStage(root) {
     else b.addEventListener('click', () => { peek = { file: b.dataset.screen, rect: null, who: OWNER.has(b.dataset.screen) ? 'o' : 'c', y: .32, sy: scrollY, t: performance.now() }; });
   });
 
+  // a tap anywhere else closes the preview
+  if (!canHover) document.addEventListener('click', e => { if (peek && !e.target.closest('.bk-points, #structure [data-screen]')) peek = null; });
   // ---------- the loop ----------
   let vw = 0, vh = 0, mx = 0, my = 0, sy = scrollY, last = performance.now(), t0 = last;
   const resize = () => { vw = innerWidth; vh = innerHeight; renderer.setPixelRatio(Math.min(vw < 1000 ? 1.5 : 2, devicePixelRatio || 1)); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix(); build(); };
@@ -279,7 +281,7 @@ export function mountStage(root) {
       // pose: station → station, plus hover focus, float and a lean from scroll speed
       let q = mix(a.st[k], b.st[k], e);
       if (p.focus > .001) q = { ...q, s: q.s * (1 + .14 * p.focus), ry: q.ry - (q.ry - Math.round(q.ry / TAU) * TAU) * .75 * p.focus, rx: q.rx * (1 - .7 * p.focus), z: q.z + .5 * p.focus };
-      if (peekAmt > .001 && pk && pk.who === k) q = mix(q, { x: .5, y: peekY, s: .46, rx: .02, ry: Math.round(q.ry / TAU) * TAU, rz: 0, z: .3 }, ease(peekAmt));
+      if (peekAmt > .001 && pk && pk.who === k) q = mix(q, { x: .5, y: peekY, s: .42, rx: .02, ry: Math.round(q.ry / TAU) * TAU, rz: 0, z: .3 }, ease(peekAmt));
       const ph = k === 'c' ? 0 : 1.7, calm = 1 - p.focus * .7;
       q = { ...q, y: q.y + Math.sin(time * 1.05 + ph) * .006 * calm, rx: q.rx + Math.sin(time * .7 + ph) * .035 * calm + vel * .5, ry: q.ry + Math.sin(time * .5 + ph) * .05 * calm, rz: q.rz + Math.sin(time * .43 + ph) * .02 * calm - vel * (k === 'c' ? .35 : -.35) };
       place(p, q);
@@ -317,10 +319,8 @@ export function mountStage(root) {
       if (tagTxt.textContent !== lab) { tagTxt.textContent = lab; tag.dataset.who = fgK === 'o' ? 'owner' : 'customer'; }
       tag.classList.toggle('is-on', !hv);
     } else tag.classList.remove('is-on');
-    dbg = { y, kind: st.kind, hold, fg: st.fg, spot: st.spot, t, amt: [P.c.amt, P.o.amt], rect: [P.c.rect, P.o.rect], img: [!!P.c.img, !!P.o.img], file: [P.c.file, P.o.file], hover: !!hv };
     renderer.render(scene, cam);
   }
-  let dbg = null; window.__bkStage = () => dbg;
   requestAnimationFrame(frame);
   return true;
 }

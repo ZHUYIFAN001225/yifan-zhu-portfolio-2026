@@ -32,17 +32,24 @@ function split(el) {
 
 export function mount() {
   const root = document.querySelector('[data-product-case=beauty]'); if (!root) return;
-  const desktop = matchMedia('(min-width: 761px)').matches, calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // section colours
   const secs = [...root.querySelectorAll('.v3-product-section.ux-section')].filter(s => s.querySelector(':scope>h2'));
   secs.forEach((s, k) => { const [bg, ink] = BASE[TOOLS[k % 4]]; s.dataset.lkBg = bg; s.dataset.lkInk = ink; });
   const applyInk = () => secs.forEach(s => { s.querySelector(':scope>h2').style.color = s.dataset.lkInk; });
   applyInk(); document.addEventListener('portfolio:language', () => setTimeout(applyInk, 60));
-  if (desktop) { try { mountLoop(); } catch {} }
   fold(root);
   bridge(root);
   const acts = mountActs(root, calm);
-  if (desktop && !calm) mountThreads(root, acts);
+  // the dial and the ropes need a wide window; if the page opened narrow (a new tab or window still sizing up), add them as soon as it is wide
+  let loopOn = false, ropesOn = false;
+  const wide = matchMedia('(min-width: 761px)');
+  const up = () => {
+    if (!wide.matches) return;
+    if (!loopOn) { try { mountLoop(); loopOn = true; } catch (e) { console.error(e); } }
+    if (!ropesOn && !calm) { try { mountThreads(root, acts); ropesOn = true; } catch (e) { console.error(e); } }
+  };
+  up(); wide.addEventListener('change', up); addEventListener('resize', up); addEventListener('load', up);
 }
 
 

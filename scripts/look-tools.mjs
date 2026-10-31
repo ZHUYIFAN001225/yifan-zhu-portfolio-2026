@@ -35,6 +35,7 @@ function split(el) {
 export function mount() {
   const secs = [...document.querySelectorAll('.ux-case .v3-product-section.ux-section')].filter(s => s.querySelector(':scope>h2'));
   if (!secs.length) return;
+  try { mountLoop(); } catch {}
   const toolOf = k => TOOLS[k % TOOLS.length];
   secs.forEach((s, k) => { const [bg, ink] = BASE[toolOf(k)]; s.dataset.lkBg = bg; s.dataset.lkInk = ink; s.dataset.lkTool = toolOf(k); });
   const applyInk = () => secs.forEach(s => { s.querySelector(':scope>h2').style.color = s.dataset.lkInk; });
@@ -109,4 +110,34 @@ export function mount() {
     h.addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; if (!raf) raf = requestAnimationFrame(run); });
     h.addEventListener('pointerleave', () => { h._lk?.chars.forEach(c => { if (t === 'dryer' || t === 'comb') c.style.transform = ''; }); later(h, 2800); });
   });
+}
+
+// "The loop that makes it grow": the ring turns as you scroll past it. The step at the top lights up and the phone in the
+// middle shows that step's real screen, so the loop reads as the product actually moving, not eight circles on a page.
+export function mountLoop() {
+  const ol = document.querySelector('[data-product-case=beauty] .ux-flywheel'); if (!ol || ol.closest('.lk-loop') || matchMedia('(max-width: 760px)').matches) return;
+  const SHOTS = ['c-upload', 'discover', 'saved', 'detail', 'availability', 'booked', 'c-portfolio', 'similar'];
+  const items = [...ol.children]; const N = items.length; if (N < 3) return;
+  const wrap = document.createElement('div'); wrap.className = 'lk-loop';
+  wrap.innerHTML = `<svg class="lk-loop-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="40" class="lk-loop-track"/><circle cx="50" cy="50" r="40" class="lk-loop-arc" pathLength="100"/></svg>
+    <div class="lk-loop-phone" aria-hidden="true"><span class="lk-loop-screen">${items.map((_, k) => `<img data-i18n-img src="assets/v3/screens/look/${SHOTS[k % SHOTS.length]}.webp" alt="" loading="lazy" decoding="async"${k ? '' : ' class="is-on"'}/>`).join('')}</span></div>
+    <ol class="lk-loop-nodes"></ol>`;
+  const list = wrap.querySelector('.lk-loop-nodes');
+  items.forEach((li, k) => { li.style.setProperty('--k', k); li.classList.add('lk-node'); list.append(li); });
+  ol.replaceWith(wrap); wrap.append(ol); ol.hidden = true; // keep the empty original for print styles
+  // swap in the right language for the new images now
+  document.dispatchEvent(new CustomEvent('portfolio:language-images'));
+  if (document.documentElement.lang.startsWith('zh')) wrap.querySelectorAll('img').forEach(i => { i.dataset.enSrc = i.getAttribute('src'); i.src = i.getAttribute('src').replace(/\/([^/]+)$/, '/zh/$1'); });
+  const imgs = [...wrap.querySelectorAll('.lk-loop-screen img')], arc = wrap.querySelector('.lk-loop-arc');
+  const step = 360 / N; let th = 0, target = 0, cur = -1, raf = 0;
+  const calc = () => { const r = wrap.getBoundingClientRect(), vh = innerHeight; const p = Math.min(1, Math.max(0, (vh * .75 - r.top) / (r.height + vh * .2))); target = -p * step * (N - 1); };
+  const tick = () => {
+    raf = 0; th += (target - th) * .12; wrap.style.setProperty('--th', th.toFixed(2));
+    const a = Math.round(-th / step); const k = ((a % N) + N) % N;
+    arc.style.strokeDashoffset = (100 - (-th / (step * (N - 1))) * 100).toFixed(2);
+    if (k !== cur) { cur = k; items.forEach((li, j) => li.classList.toggle('is-on', j === k)); imgs.forEach((im, j) => im.classList.toggle('is-on', j === k)); }
+    if (Math.abs(target - th) > .05) raf = requestAnimationFrame(tick);
+  };
+  const go = () => { calc(); if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', go, { passive: true }); addEventListener('resize', go); go();
 }

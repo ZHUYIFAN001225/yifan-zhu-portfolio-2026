@@ -488,22 +488,19 @@ window.addEventListener('pagereveal',event=>{
   const items = [...xp.querySelectorAll('[data-xp-item]')], layers = [...xp.querySelectorAll('[data-xp-layer]')], scene = xp.querySelector('.xp-scene');
   // camera poses: each layer gets its own angle and framing, like a product film cutting between shots
   const phoneEl = xp.querySelector('.xp-phone');
-  // angles stay modest so the screen is always readable: tilt up to ~44deg, turn up to ~30deg
-  const poses = [
-    { cx: '-8%', cy: '14%', crx: '28deg', crz: '-14deg', cry: '-12deg', cs: 0.9 },
-    { cx: '6%', cy: '10%', crx: '36deg', crz: '-26deg', cry: '10deg', cs: 0.85 },
-    { cx: '-4%', cy: '6%', crx: '22deg', crz: '12deg', cry: '14deg', cs: 0.8 },
-    { cx: '4%', cy: '11%', crx: '42deg', crz: '-30deg', cry: '-10deg', cs: 0.8 },
-    { cx: '0%', cy: '0%', crx: '34deg', crz: '-18deg', cry: '16deg', cs: 0.85 }
-  ];
+  // the camera: pointing at a layer moves in close on that part, from a slightly different gentle angle each time;
+  // otherwise it drifts between random gentle angles with the whole phone in view. Angles stay small so the screen reads.
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const bandOf = k => { const l = layers[k]; const ft = parseFloat(l?.style.getPropertyValue('--ft')) || 0, fh = parseFloat(l?.style.getPropertyValue('--fh')) || 20; return ft + fh / 2; };
+  const close = k => { const cs = rnd(1.32, 1.48), c = bandOf(k); return { cx: rnd(-5, 5).toFixed(1) + '%', cy: ((50 - c) * cs * .82).toFixed(1) + '%', crx: rnd(14, 28).toFixed(1) + 'deg', crz: (Math.random() < .5 ? rnd(-20, -6) : rnd(4, 12)).toFixed(1) + 'deg', cry: rnd(-12, 12).toFixed(1) + 'deg', cs: cs.toFixed(3) }; };
+  const wide = () => ({ cx: rnd(-6, 6).toFixed(1) + '%', cy: rnd(4, 9).toFixed(1) + '%', crx: rnd(24, 42).toFixed(1) + 'deg', crz: (Math.random() < .7 ? rnd(-28, -10) : rnd(6, 14)).toFixed(1) + 'deg', cry: rnd(-14, 14).toFixed(1) + 'deg', cs: rnd(.8, .86).toFixed(3) });
   const rest = { cx: '0%', cy: '6%', crx: '40deg', crz: '-22deg', cry: '0deg', cs: 0.83 };
-  // when nobody points at anything, the camera drifts gently around the phone
-  const orbit = [rest, { cx: '-6%', cy: '8%', crx: '32deg', crz: '-28deg', cry: '-12deg', cs: 0.83 }, { cx: '6%', cy: '6%', crx: '26deg', crz: '14deg', cry: '14deg', cs: 0.8 }, { cx: '0%', cy: '4%', crx: '44deg', crz: '-10deg', cry: '8deg', cs: 0.82 }];
-  let orbitK = 0, orbitT = 0, focused = -1, xpVis = false;
+  const poses = { length: 1 }, orbit = { length: 4 };
+  let orbitK = 0, orbitT = 0, focused = -1, xpVis = false, lastFocus = -2;
   const pose = p => Object.entries(p).forEach(([k, v]) => phoneEl.style.setProperty('--' + k, v));
-  const idle = () => { clearTimeout(orbitT); if (focused >= 0 || !xpVis || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(min-width: 761px)').matches) return; orbitT = setTimeout(() => { orbitK = (orbitK + 1) % orbit.length; if (focused < 0) pose(orbit[orbitK]); idle(); }, 2400); };
+  const idle = () => { clearTimeout(orbitT); if (focused >= 0 || !xpVis || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(min-width: 761px)').matches) return; orbitT = setTimeout(() => { if (focused < 0) pose(wide()); idle(); }, 2800); };
   new IntersectionObserver(es => { xpVis = es[0].isIntersecting; idle(); }, { threshold: .2 }).observe(xp);
-  const focus = i => { focused = i; idle(); xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); pose(i >= 0 && matchMedia('(min-width: 761px)').matches ? poses[i % poses.length] : orbit[orbitK]); };
+  const focus = i => { focused = i; idle(); xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); if (i !== lastFocus) { lastFocus = i; pose(i >= 0 && matchMedia('(min-width: 761px)').matches ? close(i) : rest); } };
   items.forEach((li, k) => { li.addEventListener('pointerenter', () => focus(k)); li.addEventListener('focus', () => focus(k)); li.addEventListener('click', () => focus(k)); });
   layers.forEach((l, k) => l.addEventListener('pointerenter', () => focus(k)));
   xp.querySelector('.xp-list').addEventListener('pointerleave', () => focus(-1));
@@ -703,6 +700,7 @@ window.addEventListener('pagereveal',event=>{
   };
   const show = m => {
     if (m === cur) return; const prevM = cur; cur = m; const mo = moms[m], i = mo.t === 'step' ? mo.i : -1;
+    { const P = [[0, 0, 0, 1], [6, -12, -2, 1.02], [-4, 10, 2, 1], [8, 8, -3, 1.03], [-3, -10, 3, 1.01], [5, 12, 1, 1.02], [-6, -6, -2, 1]], q = mo.t === 'open' ? P[0] : mo.t === 'duo' ? [4, -14, 0, .98] : P[1 + (i % (P.length - 1))]; const fl = fm.querySelector('.fm-float'); if (fl) { fl.style.setProperty('--pvx', q[0] + 'deg'); fl.style.setProperty('--pvy', q[1] + 'deg'); fl.style.setProperty('--pvz', q[2] + 'deg'); fl.style.setProperty('--pvs', q[3]); } }
     const di = moms.findIndex(x => x.t === 'duo');
     fm.classList.toggle('is-story', m >= 1);
     fm.classList.toggle('is-duo', mo.t === 'duo');

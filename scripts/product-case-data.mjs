@@ -61,11 +61,11 @@ export const productCases=[{
     title:p('The feed, taken apart.','把信息流拆开看。'),
     lead:p('The home feed of the prototype, layer by layer. Each layer has one job in getting from a picture to a person.','原型的首页信息流，一层一层拆开。每一层只负责一件事：让人从一张图走到一个人。'),
     layers:[
-      {band:'0,11.5',file:'header',title:p('Where am I?','我在哪？'),body:p('Just the brand and notifications. Nothing competes with the pictures.','只有品牌和通知，没有任何东西和图片抢注意力。')},
-      {band:'11.5,5.7',file:'chips',title:p('What kind of look?','想要哪类造型？'),body:p('Hair, nails, makeup, outfit. One tap narrows the feed without typing a single word.','发型、美甲、妆容、穿搭。点一下就能缩小范围，不用打字。')},
-      {band:'17.2,32.8',file:'row1',title:p('Is this real?','这是真的吗？'),body:p('Every picture is real work by a local Creator, marked with a small Creator tag.','每张图都是本地 Creator 的真实作品，并标有 Creator 小标签。')},
-      {band:'50,30',file:'row2',title:p('More like this?','还有类似的吗？'),body:p('The feed keeps going, and saving a picture teaches it your taste.','信息流继续往下，收藏一张图就能让它更懂你的口味。')},
-      {band:'80,13',file:'nav',title:p('Where do I go next?','下一步去哪？'),body:p('Discover, search, build a look, messages and profile. The plus in the middle builds a whole look.','发现、搜索、组合造型、消息、个人。中间的加号用来组合一整套造型。')}
+      {band:'0,12.8',file:'header',title:p('Where am I?','我在哪？'),body:p('Just the brand and notifications. Nothing competes with the pictures.','只有品牌和通知，没有任何东西和图片抢注意力。')},
+      {band:'13.7,5.5',file:'chips',title:p('What kind of look?','想要哪类造型？'),body:p('Hair, nails, makeup, outfit. One tap narrows the feed without typing a single word.','发型、美甲、妆容、穿搭。点一下就能缩小范围，不用打字。')},
+      {band:'19.8,34',file:'row1',title:p('Is this real?','这是真的吗？'),body:p('Every picture is real work by a local Creator, marked with a small Creator tag.','每张图都是本地 Creator 的真实作品，并标有 Creator 小标签。')},
+      {band:'53.8,33.3',file:'row2',title:p('More like this?','还有类似的吗？'),body:p('The feed keeps going, and saving a picture teaches it your taste.','信息流继续往下，收藏一张图就能让它更懂你的口味。')},
+      {band:'88.8,7.45',file:'nav',title:p('Where do I go next?','下一步去哪？'),body:p('Discover, search, build a look, messages and profile. The plus in the middle builds a whole look.','发现、搜索、组合造型、消息、个人。中间的加号用来组合一整套造型。')}
     ]
   },
   film:{

@@ -1851,3 +1851,23 @@ body.lk-tool-on .lk-say.is-on{opacity:1;translate:0 0}
 [data-product-case=beauty] .v3-product-section.ux-section>h2{overflow:visible!important;clip-path:none!important;contain:none!important}
 [data-product-case=beauty] .v3-product-section.ux-section>h2 span:not(.lk-ico *){color:inherit!important}
 [data-product-case=beauty] .v3-product-section.ux-section>h2 .lk-ch.is-wet{color:var(--wet)!important}
+/* film phone: each step has its own gentle camera angle (kept small so the screen stays readable) */
+.fm-float{transform:rotateX(calc(var(--pvx,0deg) + var(--mry,0) * -14deg)) rotateY(calc(var(--pvy,0deg) + var(--mrx,0) * 18deg)) rotateZ(var(--pvz,0deg)) translate3d(calc(var(--mrx,0) * 12px),calc(var(--mry,0) * 10px),0) scale(var(--pvs,1));transition:transform 1.1s cubic-bezier(.22,1,.36,1)}
+/* ---- LOOK: the growth loop turns with the scroll ---- */
+.lk-loop{--size:min(680px,72vw);--r:calc(var(--size) * .4);position:relative;width:var(--size);aspect-ratio:1;margin:clamp(30px,6vh,70px) auto clamp(50px,8vh,90px);overflow:visible}
+.lk-loop-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.lk-loop-track{fill:none;stroke:rgba(42,29,48,.14);stroke-width:.35;stroke-dasharray:.8 1.4}
+.lk-loop-arc{fill:none;stroke:#c2457a;stroke-width:.7;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100}
+.lk-loop-phone{position:absolute;left:50%;top:50%;width:calc(var(--size) * .3);aspect-ratio:9/19.5;transform:translate(-50%,-50%) rotate(-4deg);border-radius:calc(var(--size) * .045);padding:calc(var(--size) * .009);background:#17111a;box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 40px 70px -20px rgba(60,20,60,.45);transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.lk-loop:hover .lk-loop-phone{transform:translate(-50%,-50%) rotate(0deg) scale(1.03)}
+.lk-loop-screen{position:relative;display:block;width:100%;height:100%;overflow:hidden;border-radius:calc(var(--size) * .037);background:#000}
+.lk-loop-screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transform:scale(1.04);transition:opacity .45s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+.lk-loop-screen img.is-on{opacity:1;transform:none}
+.lk-loop-nodes{position:absolute;inset:0;margin:0;padding:0;list-style:none}
+[data-product-case=beauty] .lk-loop-nodes>li.lk-node{--ang:calc(var(--k) * 360deg / 8 + var(--th, 0) * 1deg - 90deg);position:absolute;left:50%;top:50%;width:150px;margin:0;padding:0;border:0;background:none;box-shadow:none;backdrop-filter:none;text-align:center;font-size:14px;line-height:1.3;font-weight:500;transform:translate(-50%,-50%) rotate(var(--ang)) translateX(var(--r)) rotate(calc(-1 * var(--ang))) scale(.86);opacity:.5;transition:opacity .4s ease,scale .4s ease}
+[data-product-case=beauty] .lk-loop-nodes>li.lk-node span{display:block;width:30px;height:30px;margin:0 auto 6px;line-height:30px;border-radius:50%;background:#2a1d30!important;color:#f6d2df!important;font-size:11px;transition:background .4s,transform .5s cubic-bezier(.34,1.56,.64,1)}
+[data-product-case=beauty] .lk-loop-nodes>li.lk-node.is-on{opacity:1;scale:1.22;color:#2a1d30!important}
+[data-product-case=beauty] .lk-loop-nodes>li.lk-node.is-on span{background:#c2457a!important;color:#fff!important;transform:scale(1.15)}
+@media (prefers-reduced-motion:reduce){.lk-loop-screen img{transition:none}}
+/* LOOK anatomy: the nav layer is only the floating tab bar, so its outline hugs the pill */
+.xp-phone--dark .xp-layer[data-xp-layer="4"].is-on::after{left:3.2%;right:3.1%;border-radius:999px}

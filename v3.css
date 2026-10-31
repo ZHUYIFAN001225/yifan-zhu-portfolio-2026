@@ -2335,3 +2335,27 @@ body.bk-rail-on .bk-rail{opacity:1}
 .bk-day .bk-points.is-pointed{outline-color:#3fe2a0}
 .bk-phone.is-pointing .bk-phone-label{opacity:0}
 .bk-phone-hint{display:none!important}
+/* ======== booking: the CSS-3D travelling phone ======== */
+.bk-phone{width:min(330px,23vw)!important;height:auto!important}
+.bk-phone-3d{position:relative;inset:auto;perspective:1400px;cursor:grab}
+.bk-dev{position:relative;transform-style:preserve-3d;border-radius:calc(min(330px,23vw) * .16);will-change:transform}
+.bk-side{position:absolute;inset:0;border-radius:inherit;transform:translateZ(calc(var(--k) * -2.2px));background:linear-gradient(110deg,#25272c,#6d7078 30%,#d9dbe0 40%,#5c5f66 50%,#1d1e22)}
+.bk-front{position:relative;transform-style:preserve-3d;padding:calc(min(330px,23vw) * .035);border-radius:inherit;background:linear-gradient(150deg,#45474d,#18191b 30%,#0b0c0d 65%,#2c2e33);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 60px 90px -30px rgba(10,30,20,.55),0 18px 30px -10px rgba(10,30,20,.3)}
+.bk-screen{position:relative;transform-style:preserve-3d;aspect-ratio:540/1171;border-radius:calc(min(330px,23vw) * .125);background:#fbfafc}
+.bk-shots{position:absolute;inset:0;border-radius:inherit;overflow:hidden}
+.bk-shots img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease}
+.bk-shots img.is-on{opacity:1}
+.bk-dim{position:absolute;inset:0;border-radius:inherit;background:rgba(40,40,46,.45);opacity:0;transition:opacity .6s ease;pointer-events:none}
+.bk-phone-3d.is-lifted .bk-dim{opacity:1}
+.bk-lift{position:absolute;transform-style:preserve-3d;pointer-events:none;opacity:0;transform:translateZ(0);transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .35s ease}
+.bk-lift.is-on{opacity:1;transform:translateZ(70px) scale(1.06)}
+.bk-lift-img{position:absolute;inset:-1px;border-radius:12px;background-repeat:no-repeat;background-color:#fff;box-shadow:0 0 0 2.5px #f59ab8,0 0 22px rgba(245,154,184,.6),0 30px 40px -12px rgba(0,0,0,.45)}
+.bk-island{position:absolute;left:50%;top:calc(min(330px,23vw) * .055);width:30%;height:calc(min(330px,23vw) * .085);border-radius:999px;background:#050506;transform:translateX(-50%) translateZ(1px)}
+.bk-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent calc(var(--gl,50%) - 25%),rgba(255,255,255,.14) var(--gl,50%),transparent calc(var(--gl,50%) + 20%));transform:translateZ(2px)}
+.bk-phone-label{bottom:-34px!important}
+.bk-phone{width:min(250px,17vw)!important}
+.bk-dev{border-radius:calc(min(250px,17vw) * .16)}
+.bk-front{padding:calc(min(250px,17vw) * .035)}
+.bk-screen{border-radius:calc(min(250px,17vw) * .125)}
+.bk-island{top:calc(min(250px,17vw) * .055);height:calc(min(250px,17vw) * .085)}
+.bk-lift.is-on{transform:translateZ(55px) scale(1.06)}

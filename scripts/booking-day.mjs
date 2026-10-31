@@ -156,16 +156,16 @@ function traveller(root, calm) {
   const hoverScreens = [...root.querySelectorAll('#structure [data-screen]')].map(b => b.dataset.screen);
   const files = [...new Set([...beats.map(b => b.file), ...hoverScreens])];
   const wrap = document.createElement('div'); wrap.className = 'bk-phone'; wrap.setAttribute('aria-hidden', 'true');
-  wrap.innerHTML = `<div class="bk-phone-3d" data-phone3d data-mode="manual" data-follow="1" data-status="1" data-zoom=".62" data-tilt-y="0" data-screens="${files.map(f => B + f + '.webp').join(',')}"></div><p class="bk-phone-label"><i></i><span></span></p><p class="bk-phone-hint"></p>`;
+  wrap.innerHTML = `<div class="bk-phone-3d" data-screens=""><div class="bk-dev">${Array.from({ length: 8 }, (_, k) => `<i class="bk-side" style="--k:${k + 1}"></i>`).join('')}<div class="bk-front"><div class="bk-screen"><div class="bk-shots"></div><i class="bk-dim"></i><div class="bk-lift"><i class="bk-lift-img"></i></div></div><i class="bk-island"></i><i class="bk-glare"></i></div></div></div><p class="bk-phone-label"><i></i><span></span></p><p class="bk-phone-hint"></p>`;
   document.body.append(wrap);
-  const host = wrap.querySelector('[data-phone3d]'), lab = wrap.querySelector('.bk-phone-label span'), hint = wrap.querySelector('.bk-phone-hint');
+  const host = wrap.querySelector('.bk-phone-3d'), lab = wrap.querySelector('.bk-phone-label span'), hint = wrap.querySelector('.bk-phone-hint');
   hint.textContent = zh() ? '拖动它试试' : 'Drag to turn it';
   // chapters (between clock moments) keep the phone on one side; it crosses during the clock moments
   const CH = { overview: 'right', system: 'left', strategy: 'left', iteration: 'left', structure: 'right', flow: 'right', interfaces: 'right', build: 'left', challenges: 'left', research: 'left', release: 'left' };
   const secs = [...root.querySelectorAll('.v3-product-section.ux-section')].filter(x => CH[x.id]);
   secs.forEach(sec => { sec.classList.add('bk-with-phone'); sec.dataset.phone = CH[sec.id]; });
   document.body.classList.add('bk-has-phone');
-  const XS = { right: .85, left: .15 };
+  const XS = { right: .84, left: .16 };
   // keyframes along the page: where the phone is (x across the screen, y in the screen, size, visibility) at each point
   let keys = [];
   const docY = e => e.getBoundingClientRect().top + scrollY;
@@ -175,7 +175,7 @@ function traveller(root, calm) {
     if (heroEl) {
       // it IS the opening phone: starts exactly where that one stands, then drifts up slower than the page (parallax)
       const hr = heroEl.getBoundingClientRect(), hy = hr.top + scrollY, op = document.querySelector('[data-opening]'), opH = op ? op.offsetHeight : vh;
-      const s0 = Math.max(.6, Math.min(1.6, hr.height * .82 / (wrap.offsetHeight || 600)));
+      const s0 = Math.max(.6, Math.min(1.1, hr.height * .8 / (wrap.offsetHeight || 540)));
       const x0 = (hr.left + hr.width / 2) / innerWidth, y0 = (hy + hr.height / 2) / vh;
       K.push({ at: vh * .5, x: x0, y: y0, s: s0, o: 1 });
       K.push({ at: vh * .5 + opH, x: x0, y: y0 - opH * .45 / vh, s: s0 * .92, o: 1 });
@@ -238,7 +238,7 @@ function traveller(root, calm) {
     const mid = vh * .55; let b = -1; beats.forEach((bt, i) => { if (bt.el.getBoundingClientRect().top < mid) b = i; });
     if (b >= 0 && b !== cur) { cur = b; host._phone?.show(files.indexOf(beats[b].file)); lab.textContent = beats[b].label[zh() ? 1 : 0]; wrap.dataset.who = /Owner|店主/.test(lab.textContent) ? 'owner' : 'customer'; wrap.classList.remove('is-swap'); void wrap.offsetWidth; wrap.classList.add('is-swap'); }
   };
-  import('./phone3d.mjs').then(m => m.mountPhone(host)).catch(() => {});
+  host._phone = cssPhone(host, files, calm);
   host.addEventListener('pointerdown', () => wrap.classList.add('was-dragged'), { once: true });
   document.addEventListener('portfolio:language', () => { cur = -1; hint.textContent = zh() ? '拖动它试试' : 'Drag to turn it'; });
   requestAnimationFrame(tick);
@@ -248,11 +248,48 @@ function traveller(root, calm) {
 function parallax(root, calm) {
   if (calm) return;
   const type = document.querySelector('[data-opening] .op-type');
-  const items = [...root.querySelectorAll('.bk-sticky, .bk-appt, .bk-slip, .bk-moment-line, .bk-moment-cap, .ux-persona, .ux-blueprint, .bk-check')];
+  const items = [...root.querySelectorAll('.bk-moment-line, .bk-moment-cap, .ux-persona, .ux-blueprint, .bk-check')];
   items.forEach((e, i) => e.style.setProperty('--ps', [.12, -.08, .18, -.05, .1][i % 5]));
   let q = false;
   const run = () => { q = false; const vh = innerHeight;
     if (type) type.style.transform = `translate3d(0,${(scrollY * .38).toFixed(1)}px,0)`;
     items.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -100 || r.top > vh + 100) return; const p = (r.top + r.height / 2 - vh / 2); e.style.translate = `0 ${(p * -+e.style.getPropertyValue('--ps')).toFixed(1)}px`; }); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
+}
+
+// A phone built in CSS 3D (like the anatomy view): a screen you can see, and the part being talked about physically
+// lifts out of it towards you with a pink glow while the rest dims. Pose and lift are eased every frame, never snapped.
+function cssPhone(host, files, calm) {
+  const dev = host.querySelector('.bk-dev'), shots = host.querySelector('.bk-shots'), lift = host.querySelector('.bk-lift'), limg = host.querySelector('.bk-lift-img');
+  const src = f => B + (zh() ? 'zh/' : '') + f + '.webp';
+  const imgs = {};
+  const img = f => { if (!imgs[f]) { const i = document.createElement('img'); i.alt = ''; i.decoding = 'async'; i.src = src(f); shots.append(i); imgs[f] = i; } return imgs[f]; };
+  document.addEventListener('portfolio:language', () => Object.entries(imgs).forEach(([f, i]) => { i.src = src(f); }));
+  let curF = null, face = .38, lifted = 0, liftT = 0, rx = 16, ry = -18, rz = -6, mx = 0, my = 0, dragX = 0, dragY = 0, drag = null;
+  const show = i => { const f = files[i]; if (!f || f === curF) return; curF = f; const n = img(f); Object.values(imgs).forEach(x => x.classList.toggle('is-on', x === n)); if (lift.classList.contains('is-on')) limg.style.backgroundImage = `url("${src(f)}")`; };
+  const spot = r => {
+    if (!r) { lift.classList.remove('is-on'); host.classList.remove('is-lifted'); liftT = 0; return; }
+    const [x, y, w, h] = [r.x, r.y, r.w, r.h];
+    lift.style.cssText = `left:${x}%;top:${y}%;width:${w}%;height:${h}%`;
+    limg.style.backgroundImage = `url("${src(curF)}")`; limg.style.backgroundSize = `${(1e4 / w).toFixed(2)}% ${(1e4 / h).toFixed(2)}%`;
+    limg.style.backgroundPosition = `${w >= 100 ? 0 : (x / (100 - w) * 100).toFixed(2)}% ${h >= 100 ? 0 : (y / (100 - h) * 100).toFixed(2)}%`;
+    lift.classList.remove('is-on'); void lift.offsetWidth; lift.classList.add('is-on'); host.classList.add('is-lifted'); liftT = 1;
+  };
+  addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; if (drag) { dragY += (e.clientX - drag.x) * .35; dragX -= (e.clientY - drag.y) * .25; drag = { x: e.clientX, y: e.clientY }; } }, { passive: true });
+  host.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; host.setPointerCapture?.(e.pointerId); });
+  addEventListener('pointerup', () => { drag = null; });
+  const tick = () => {
+    requestAnimationFrame(tick);
+    if (!drag) { dragX *= .92; dragY *= .92; }
+    lifted += (liftT - lifted) * .08;
+    // facing the text it stands beside; when something is lifted, the camera swings round to show the depth
+    const side = Math.sign(face) || 1, swing = Math.max(-1.2, Math.min(1.2, face - .38 * side));
+    const tY = -side * (18 + lifted * 10) + swing * -40 + mx * 10 + dragY, tX = 14 + lifted * 16 + my * -8 + dragX, tZ = -side * (5 + lifted * 9);
+    const k = calm ? 1 : .07; ry += (tY - ry) * k; rx += (tX - rx) * k; rz += (tZ - rz) * k;
+    dev.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
+    dev.style.setProperty('--gl', (50 + ry * 1.5).toFixed(1) + '%');
+  };
+  requestAnimationFrame(tick);
+  show(0);
+  return { show, spot, lean: y => { face = y; } };
 }

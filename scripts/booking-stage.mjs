@@ -254,7 +254,7 @@ export function mountStage(root) {
       });
     });
     const end = els.length ? docY(els[els.length - 1]) + els[els.length - 1].offsetHeight : document.documentElement.scrollHeight;
-    if (!m) push(end + vh * .2, { kind: 'off', q: off(-1), f });
+    if (!m) push(end + vh * .2, { kind: 'off', q: P6([1.35, .5, .5, .1, -1.2, 0]), f }); // leaves to the side, never across the last words
     // keys: hold each station, then fly to the next one within the last part of the gap
     const K = [];
     S.forEach((st, i) => { const nx = S[i + 1]; K.push({ at: st.at, st }); if (nx) K.push({ at: nx.at - Math.min(vh * (m ? .9 : 1.3), (nx.at - st.at) * .78), st }); });

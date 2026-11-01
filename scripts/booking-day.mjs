@@ -139,34 +139,35 @@ function parallax(root, calm) {
 
 // One 3D stage for the whole case (see booking-stage.mjs). The 12:10 story becomes scroll steps the phones act out.
 function stage(root, calm) {
-  const st = root.querySelector('.st'), wide = matchMedia('(min-width: 1000px)').matches;
-  const undo = [];
-  if (wide) {
-    // the interface close-ups and the screen map become text: the phone shows the screens
-    const DETAIL = ['book', 'today', 'time-off-hours', 'kept'];
-    root.querySelectorAll('#interfaces .ux-details figure').forEach((f, i) => { f.classList.add('bk-textonly'); f.dataset.screen = DETAIL[i % DETAIL.length]; undo.push(() => f.classList.remove('bk-textonly')); });
-    root.querySelectorAll('#structure .ux-shot').forEach(b => { const src = b.dataset.shot || b.querySelector('img')?.getAttribute('src') || ''; const m = src.match(/booking\/(?:zh\/)?([\w-]+)\.webp/); if (m) { b.dataset.screen = m[1]; b.classList.add('bk-textonly'); undo.push(() => b.classList.remove('bk-textonly')); } });
-    const map = root.querySelector('#structure'); map?.classList.add('bk-map-text'); undo.push(() => map?.classList.remove('bk-map-text'));
-  }
-  if (calm) { undo.forEach(f => f()); return; }
-  import('./booking-stage.mjs').then(S => {
-    if (wide) {
-      root.querySelectorAll('.v3-product-section.ux-section').forEach(sec => { const side = S.SIDE[sec.id]; if (side) { sec.classList.add('bk-with-phone'); sec.dataset.phone = side; undo.push(() => sec.classList.remove('bk-with-phone')); } });
-      document.body.classList.add('bk-has-phone'); undo.push(() => document.body.classList.remove('bk-has-phone'));
-    }
+  const st = root.querySelector('.st'), mq = matchMedia('(min-width: 1000px)');
+  // on wide screens the phone shows the screens, so close-ups become text and each chapter leaves room on its phone
+  // side. This follows the window size live (a window can be opened narrow and widened later).
+  let S = null;
+  const DETAIL = ['book', 'today', 'time-off-hours', 'kept'];
+  const layout = on => {
+    root.querySelectorAll('#interfaces .ux-details figure').forEach((f, i) => { f.dataset.screen = DETAIL[i % DETAIL.length]; f.classList.toggle('bk-textonly', on); });
+    root.querySelectorAll('#structure .ux-shot').forEach(b => { const src = b.dataset.shot || b.querySelector('img')?.getAttribute('src') || ''; const m = src.match(/booking\/(?:zh\/)?([\w-]+)\.webp/); if (m) { b.dataset.screen = m[1]; b.classList.toggle('bk-textonly', on); } });
+    root.querySelector('#structure')?.classList.toggle('bk-map-text', on);
+    if (S) root.querySelectorAll('.v3-product-section.ux-section').forEach(sec => { const side = S.SIDE[sec.id]; if (side) { sec.dataset.phone = side; sec.classList.toggle('bk-with-phone', on); } });
+    document.body.classList.toggle('bk-has-phone', on && !!S);
+  };
+  const undo = [() => { S = null; layout(false); }];
+  if (calm) return;
+  import('./booking-stage.mjs').then(mod => {
+    S = mod; layout(mq.matches); mq.addEventListener('change', e => { if (S) layout(e.matches); });
     let story = null;
     if (st) {
       story = document.createElement('section'); story.className = 'bk-story';
-      const N = S.STEPS.length, pad = n => String(n).padStart(2, '0');
-      story.innerHTML = S.STEPS.map((s, i) => `<div class="bk-step" data-i="${i}"><div class="bk-step-card"><p class="bk-step-n">${pad(i + 1)} / ${pad(N)}</p><p class="bk-step-k"></p><h3 class="bk-step-t"></h3><p class="bk-step-b"></p></div></div>`).join('');
-      const text = () => { const l = zh() ? 1 : 0; story.setAttribute('aria-label', zh() ? '一笔预约，一步一步' : 'One booking, step by step'); story.querySelectorAll('.bk-step').forEach((el, i) => { const s = S.STEPS[i]; el.querySelector('.bk-step-k').textContent = s.kicker[l]; el.querySelector('.bk-step-t').textContent = s.title[l]; el.querySelector('.bk-step-b').textContent = s.body[l]; }); };
+      const N = mod.STEPS.length, pad = n => String(n).padStart(2, '0');
+      story.innerHTML = mod.STEPS.map((s, i) => `<div class="bk-step" data-i="${i}"><div class="bk-step-card"><p class="bk-step-n">${pad(i + 1)} / ${pad(N)}</p><p class="bk-step-k"></p><h3 class="bk-step-t"></h3><p class="bk-step-b"></p></div></div>`).join('');
+      const text = () => { const l = zh() ? 1 : 0; story.setAttribute('aria-label', zh() ? '一笔预约，一步一步' : 'One booking, step by step'); story.querySelectorAll('.bk-step').forEach((el, i) => { const s = mod.STEPS[i]; el.querySelector('.bk-step-k').textContent = s.kicker[l]; el.querySelector('.bk-step-t').textContent = s.title[l]; el.querySelector('.bk-step-b').textContent = s.body[l]; }); };
       text(); document.addEventListener('portfolio:language', text);
       st.before(story); st.classList.add('bk-st-hidden');
       // each step card rises in as it arrives
       const io = new IntersectionObserver(es => es.forEach(en => en.target.classList.toggle('is-in', en.isIntersecting)), { rootMargin: '-18% 0px -18% 0px' });
       story.querySelectorAll('.bk-step').forEach(s => io.observe(s));
     }
-    if (!S.mountStage(root)) throw new Error('WebGL unavailable');
+    if (!mod.mountStage(root)) throw new Error('WebGL unavailable');
     document.body.classList.add('bk-staged');
   }).catch(e => { console.error(e); root.querySelector('.bk-story')?.remove(); st?.classList.remove('bk-st-hidden'); undo.forEach(f => f()); });
 }

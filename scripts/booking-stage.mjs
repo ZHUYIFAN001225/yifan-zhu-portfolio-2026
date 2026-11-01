@@ -10,14 +10,15 @@
 //  • Hovering text (desktop) or tapping it (phone) brings the phone closer and lifts the matching part.
 import * as THREE from '../assets/v3/lib/three/three.module.min.js';
 import { RoomEnvironment } from '../assets/v3/lib/three/RoomEnvironment.js';
-import { buildPhone, paint, load, roundedRect, planeUV } from './phone3d.mjs';
+import { buildPhone, paint, load, roundedRect, planeUV, SCREEN } from './phone3d.mjs';
 
 const zh = () => document.documentElement.lang.startsWith('zh');
 const B = 'assets/v3/screens/booking/';
 const src = f => B + (zh() ? 'zh/' : '') + f + '.webp';
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, t) => a + (b - a) * t;
-const ease = t => t < .5 ? 8 * t ** 4 : 1 - (-2 * t + 2) ** 4 / 2; // power4.inOut, like Silencio
+const ease = t => t < .5 ? 8 * t ** 4 : 1 - (-2 * t + 2) ** 4 / 2; // power4.inOut (lifts)
+const glide = t => (1 - Math.cos(Math.PI * t)) / 2; // the phone's journeys: unhurried, no stop-and-snap
 const TAU = Math.PI * 2;
 
 // which part of each screen lifts out (x, y, w, h in % of the screen image)
@@ -89,7 +90,7 @@ export function mountStage(root) {
   const cam = new THREE.PerspectiveCamera(FOV, 1, .1, 60); cam.position.set(0, 0, D);
 
   // ---------- the phone and its screen ----------
-  const SW = .698, SH = 1.558, TF = 92 / 1741; // screen size in phone units; the status bar takes the top TF of it
+  const SW = SCREEN.w, SH = SCREEN.h, CH = Math.round(780 * SH / SW), TF = Math.round(780 * .118) / CH; // screen size in phone units; the status bar takes the top TF of it
   const imgs = {}, frosts = new Map();
   const getImg = f => { const k = (zh() ? 'zh/' : '') + f; if (!imgs[k]) imgs[k] = load(src(f)); return imgs[k]; };
   // frosted glass version of a screen: softened, paler, a little blurred (like the translucent layers in LOOK's anatomy)
@@ -100,7 +101,7 @@ export function mountStage(root) {
     x.fillStyle = 'rgba(232,233,238,.62)'; x.fillRect(0, 0, c.width, c.height);
     frosts.set(im, c); return c;
   };
-  const sc = document.createElement('canvas'); sc.width = 780; sc.height = 1741;
+  const sc = document.createElement('canvas'); sc.width = 780; sc.height = CH;
   const tex = new THREE.CanvasTexture(sc); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const phone = buildPhone(tex); scene.add(phone);
   const P = { g: phone, ctx: sc.getContext('2d'), file: '', img: null, prev: null, fade: 1, drawnAmt: -1, spotKey: '', rect: null, amt: 0, focus: 0, pw: 0, ph: 0 };
@@ -138,7 +139,7 @@ export function mountStage(root) {
     const L = { g, shadow, card, glow, w: 0, h: 0,
       set(crop, w, h) {
         L.w = w; L.h = h;
-        card.geometry.dispose(); card.geometry = planeUV(new THREE.ShapeGeometry(roundedRect(w, h, .03), 12));
+        card.geometry.dispose(); card.geometry = planeUV(new THREE.ShapeGeometry(roundedRect(w, h, .028), 12));
         card.material.map?.dispose(); const t = new THREE.CanvasTexture(crop); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; card.material.map = t; card.material.needsUpdate = true;
         const gl = glowTex(w, h); glow.material.map?.dispose(); glow.material.map = gl.t; glow.material.needsUpdate = true; L.gw = gl.w; L.gh = gl.h;
         const sh = shadowTex(w, h); shadow.material.map?.dispose(); shadow.material.map = sh.t; shadow.material.needsUpdate = true; shadow.scale.set(sh.w, sh.h, 1);
@@ -199,7 +200,7 @@ export function mountStage(root) {
         // it straightens, sizes itself to the prototype's screen and follows it exactly; then it fades and the real,
         // clickable prototype is what you see
         const d = dev.getBoundingClientRect(), track = { mid: d.top + scrollY + d.height / 2 };
-        const q = P6([(d.left + d.width / 2) / innerWidth, .5, d.height * 1.62 / 1.558 / vh, 0, 0, 0]);
+        const q = P6([(d.left + d.width / 2) / innerWidth, .5, d.height * 1.62 / SH / vh, 0, 0, 0]);
         push(track.mid, { kind: 'dock', track, q, f: 'book' }); push(track.mid + vh * .25, { kind: 'dock', track, q, f: 'book' });
         const m1 = root.querySelector('.bk-moment'); if (m1) push(docY(m1) - vh * .55, { kind: 'off', q: off(1, .85), f: 'book' });
       }
@@ -244,7 +245,7 @@ export function mountStage(root) {
     if (!m) push(end + vh * .2, { kind: 'off', q: off(-1), f });
     // keys: hold each station, then fly to the next one within the last part of the gap
     const K = [];
-    S.forEach((st, i) => { const nx = S[i + 1]; K.push({ at: st.at, st }); if (nx) K.push({ at: nx.at - Math.min(vh * (m ? .55 : .8), (nx.at - st.at) * .55), st }); });
+    S.forEach((st, i) => { const nx = S[i + 1]; K.push({ at: st.at, st }); if (nx) K.push({ at: nx.at - Math.min(vh * (m ? .9 : 1.3), (nx.at - st.at) * .78), st }); });
     keys = K;
   }
   const last0 = S => S.length ? S[S.length - 1].q.x : .5;
@@ -283,12 +284,12 @@ export function mountStage(root) {
     if (document.hidden || !keys.length) return;
     const dt = Math.min(.08, (now - last) / 1000); last = now; const E = r => 1 - Math.exp(-dt * r);
     // follow the scroll with a short smoothing (frame-rate independent); jump when far away (links, reloads)
-    if (Math.abs(scrollY - sy) > vh * 2.5) sy = scrollY; sy += (scrollY - sy) * E(7.5);
+    if (Math.abs(scrollY - sy) > vh * 2.5) sy = scrollY; sy += (scrollY - sy) * E(4.2); // a little inertia, like a camera on a dolly
     const y = sy + vh * .5, vel = clamp((scrollY - sy) / vh, -.6, .6);
     let a = keys[0], b = keys[0], t = 0;
     if (y >= keys[keys.length - 1].at) a = b = keys[keys.length - 1];
     else if (y > keys[0].at) for (let i = 0; i < keys.length - 1; i++) if (y < keys[i + 1].at) { a = keys[i]; b = keys[i + 1]; t = (y - a.at) / Math.max(1, b.at - a.at); break; }
-    const moving = a.st !== b.st, e = moving ? ease(t) : 0, st = e < .5 ? a.st : b.st, hold = e < .04 || e > .96;
+    const moving = a.st !== b.st, e = moving ? glide(t) : 0, st = e < .5 ? a.st : b.st, same = moving && a.st.q.x === b.st.q.x && a.st.q.y === b.st.q.y && a.st.q.ry === b.st.q.ry && a.st.q.s === b.st.q.s, hold = same ? Math.abs(e - .5) > .1 : (e < .05 || e > .95);
     const time = (now - t0) / 1000, m = isMobile();
     if (peek && (Math.abs(scrollY - peek.sy) > 160 || now - peek.t > 6000)) peek = null;
     const pk = peek && m ? peek : null; peekAmt += ((pk ? 1 : 0) - peekAmt) * E(pk ? 5 : 7); if (pk) peekY = pk.y;

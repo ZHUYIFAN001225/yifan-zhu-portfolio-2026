@@ -22,22 +22,35 @@ export function planeUV(geo) {
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); return geo;
 }
 
+// a thin bezel, like a current phone; the screen fills almost the whole front
+const PW = .76, PH = 1.62, INSET = .034;
+export const SCREEN = { w: PW - INSET, h: PH - INSET };
+// a soft diagonal reflection that slides across the glass as the phone turns
+let streak = null;
+const streakTex = () => {
+  if (streak) return streak;
+  const c = document.createElement('canvas'); c.width = 256; c.height = 512; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 256, 512);
+  g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.34, 'rgba(255,255,255,0)'); g.addColorStop(.42, 'rgba(255,255,255,.55)'); g.addColorStop(.5, 'rgba(255,255,255,.12)'); g.addColorStop(.62, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 256, 512);
+  streak = new THREE.CanvasTexture(c); streak.colorSpace = THREE.SRGBColorSpace; return streak;
+};
 export function buildPhone(screenTex) {
-  const W = .76, H = 1.62, D = .07, R = .13, bevel = .016;
+  const W = PW, H = PH, D = .07, R = .12, bevel = .018;
   const g = new THREE.Group();
-  const metal = new THREE.MeshPhysicalMaterial({ color: 0x5b5e66, metalness: 1, roughness: .28, clearcoat: .4, clearcoatRoughness: .25 });
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0x1e2026, metalness: .1, roughness: .38, clearcoat: 1, clearcoatRoughness: .15 });
+  const metal = new THREE.MeshPhysicalMaterial({ color: 0x9a9da4, metalness: 1, roughness: .2, clearcoat: .6, clearcoatRoughness: .12 }); // brushed titanium
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0x2a2d33, metalness: .15, roughness: .3, clearcoat: 1, clearcoatRoughness: .08 });
   const body = new THREE.ExtrudeGeometry(roundedRect(W - bevel * 2, H - bevel * 2, R - bevel), { depth: D, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 8, curveSegments: 24 });
   body.translate(0, 0, -D / 2);
   g.add(new THREE.Mesh(body, [glass, metal]));
   const front = D / 2 + bevel;
-  const bezel = new THREE.Mesh(new THREE.ShapeGeometry(roundedRect(W - .022, H - .022, R - .012), 24), new THREE.MeshBasicMaterial({ color: 0x050506 }));
+  const bezel = new THREE.Mesh(new THREE.ShapeGeometry(roundedRect(W - .014, H - .014, R - .008), 24), new THREE.MeshBasicMaterial({ color: 0x050506 }));
   bezel.position.z = front + .0006; g.add(bezel);
-  const sw = W - .062, sh = H - .062;
-  const screen = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(sw, sh, R - .035), 24)), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
+  const sw = SCREEN.w, sh = SCREEN.h;
+  const screen = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(sw, sh, R - .02), 24)), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
   screen.position.z = front + .0012; g.add(screen);
   // a faint reflection layer so the glass catches the light as it turns
-  const sheen = new THREE.Mesh(new THREE.ShapeGeometry(roundedRect(sw, sh, R - .035), 24), new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: .06, roughness: .05, metalness: 0, clearcoat: 1 }));
+  const sheen = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(sw, sh, R - .02), 24)), new THREE.MeshBasicMaterial({ map: streakTex(), transparent: true, opacity: .22, depthWrite: false, toneMapped: false }));
   sheen.position.z = front + .0018; g.add(sheen);
   // camera plateau and lenses on the back
   const back = -D / 2 - bevel;
@@ -103,7 +116,7 @@ export function mountPhone(host) {
   scene.environment = pm.fromScene(new RoomEnvironment(), .04).texture;
   const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(2, 3, 4); scene.add(key);
   const camera = new THREE.PerspectiveCamera(28, 1, .1, 50); camera.position.set(0, 0, 4.4);
-  const canvas = document.createElement('canvas'); canvas.width = 780; canvas.height = Math.round(780 * ((1.62 - .062) / (.76 - .062)));
+  const canvas = document.createElement('canvas'); canvas.width = 780; canvas.height = Math.round(780 * SCREEN.h / SCREEN.w);
   const ctx = canvas.getContext('2d'), tex = new THREE.CanvasTexture(canvas); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const phone = buildPhone(tex); scene.add(phone);
   const base = { x: +(host.dataset.tiltX || -.08), y: +(host.dataset.tiltY || -.42) };

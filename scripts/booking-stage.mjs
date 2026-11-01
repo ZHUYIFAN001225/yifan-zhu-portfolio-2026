@@ -82,7 +82,7 @@ export function mountStage(root) {
   const tagTxt = tag.querySelector('span');
   const NS = 'http://www.w3.org/2000/svg', ink = document.createElementNS(NS, 'svg'); ink.setAttribute('class', 'bk-link'); ink.setAttribute('aria-hidden', 'true');
   ink.innerHTML = '<path class="bk-link-line"/><path class="bk-link-head"/><path class="bk-link-ring"/><circle class="bk-link-tap" r="10"/><circle class="bk-link-tap is-2" r="10"/>';
-  document.body.append(ink);
+  cv.after(ink); // above the phone, below the text: the line passes behind cards instead of over words
   const [lLine, lHead, lRing] = ink.querySelectorAll('path'), lTaps = ink.querySelectorAll('circle');
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;

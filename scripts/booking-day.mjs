@@ -22,6 +22,7 @@ export function mount() {
   // (the margin time line is gone: the clock chapters already carry the time of day, and it ran over wide content)
   Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs')]).then(([h, d, c]) => { h.mountHand(root, d.CHARS() + c.CHARS()); d.mountDomino(root); c.mountChair(root); }).catch(e => console.error(e));
   stage(root, calm);
+  regionTags(root);
   paper(root);
   parallax(root, calm);
 }
@@ -43,7 +44,7 @@ function slips(root, calm) {
     c.classList.add('bk-slip'); c.style.setProperty('--d', (i % 4) * 90 + 'ms');
     // keep the first line, open the rest on hover / focus / tap
     const extra = [...c.children].filter((x, k) => k > 0 && !x.matches('span:first-child'));
-    const body = [...c.querySelectorAll(':scope > p')]; if (body.length) { c.classList.add('bk-has-more'); body.forEach(b => b.classList.add('bk-more')); c.tabIndex = 0; c.addEventListener('click', () => c.classList.toggle('is-open')); }
+    // (cards show their full text: hiding it behind a click only made readers guess)
   });
   if (calm || !('IntersectionObserver' in window)) { cards.forEach(c => c.classList.add('is-in')); return; }
   const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -12% 0px' });
@@ -145,12 +146,10 @@ function stage(root, calm) {
   // side. This follows the window size live (a window can be opened narrow and widened later).
   let S = null;
   const DETAIL = ['book', 'today', 'time-off-hours', 'kept'];
+  // the phone no longer stands beside the chapters, so screens stay screens (no text-only close-ups) and nothing makes room
   const layout = on => {
-    root.querySelectorAll('#interfaces .ux-details figure').forEach((f, i) => { f.dataset.screen = DETAIL[i % DETAIL.length]; f.classList.toggle('bk-textonly', on); });
-    root.querySelectorAll('#structure .ux-shot').forEach(b => { const src = b.dataset.shot || b.querySelector('img')?.getAttribute('src') || ''; const m = src.match(/booking\/(?:zh\/)?([\w-]+)\.webp/); if (m) { b.dataset.screen = m[1]; b.classList.toggle('bk-textonly', on); } });
-    root.querySelector('#structure')?.classList.toggle('bk-map-text', on);
     if (S) root.querySelectorAll('.v3-product-section.ux-section').forEach(sec => { const side = S.SIDE[sec.id]; if (side) { sec.dataset.phone = side; sec.classList.toggle('bk-with-phone', on); } });
-    document.body.classList.toggle('bk-has-phone', on && !!S);
+    document.body.classList.toggle('bk-has-phone', on && !!S && Object.keys(S.SIDE).length > 0);
   };
   const undo = [() => { S = null; layout(false); }];
   if (calm) return;
@@ -163,4 +162,33 @@ function stage(root, calm) {
     if (!mod.mountStage(root)) throw new Error('WebGL unavailable');
     document.body.classList.add('bk-staged');
   }).catch(e => { console.error(e); root.querySelector('.bk-story')?.remove(); st?.classList.remove('bk-st-hidden'); undo.forEach(f => f()); });
+}
+
+// Like LOOK: pointing at a part of the page shows a small tag that says what kind of thing it is
+// (a hard part, an opportunity, a rule…), so a reader knows where they are without reading the headings.
+function regionTags(root) {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const pill = document.createElement('div'); pill.className = 'bk-pill'; pill.setAttribute('aria-hidden', 'true'); document.body.append(pill);
+  const W = [
+    ['.ux-hard>*', 'Still hard', '还难的地方', 'hard'],
+    ['.ux-notdone li, .ux-gaps li', 'Not done yet', '还没做完', 'todo'],
+    ['.ux-opps>*', 'Opportunity', '机会', 'opp'],
+    ['.ux-success li', 'How we’d measure it', '怎么衡量', 'measure'],
+    ['.ux-principles>div', 'A design rule', '一条设计规则', 'rule'],
+    ['#strategy .ux-chips li', 'Left out on purpose', '刻意不做', 'out'],
+    ['.ux-blueprint', 'Who does what', '谁做什么', 'map'],
+    ['.ux-iterations article', 'Before → after', '改之前 → 改之后', 'iter'],
+    ['.ux-build>li', 'How it was built', '怎么做出来的', 'build'],
+    ['.ux-research-plan>div', 'Still to validate', '还要验证', 'todo'],
+    ['.bk-results-card:not(.is-next)', 'Proven', '已经证实', 'real'],
+    ['.bk-results-card.is-next', 'Not proven yet', '尚未证实', 'todo'],
+    ['.bk-ask', 'Two sides, one diary', '两端，一本日程', 'map'],
+    ['.ux-roadmap li', 'What’s next', '接下来', 'opp']
+  ];
+  let cur = null;
+  addEventListener('pointermove', e => {
+    const w = e.target.closest ? W.find(([sel]) => e.target.closest(sel) && root.contains(e.target)) : null;
+    if (w !== cur) { cur = w; pill.classList.toggle('is-on', !!w); if (w) { pill.textContent = document.documentElement.lang.startsWith('zh') ? w[2] : w[1]; pill.dataset.kind = w[3]; } }
+    if (w) { pill.style.left = e.clientX + 'px'; pill.style.top = e.clientY + 'px'; }
+  }, { passive: true });
 }

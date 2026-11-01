@@ -23,6 +23,7 @@ const PHASES = [
     { sel: '#iteration', t: null, s: ['before → after', '改之前 → 改之后'] }
   ] },
   { n: '04', t: ['Deliver & validate', '上线与验证'], d: ['What is live, what is not proven yet', '上线了什么，还有什么没证实'], items: [
+    { sel: '.bk-dom[data-mode="new"]', id: 'day-after', t: ['The same day, with the diary', '同一天，有了预约本'], s: ['before vs after · the calls you saw', '前后对比 · 你刚才看到的消息'] },
     { sel: '.bk-results', id: 'launch', t: ['Launch record', '上线记录'], s: ['live since Oct 2026', '2026 年 10 月上线'] },
     { sel: '#challenges', t: null, s: ['hard parts · gaps · opportunities', '难点 · 不足 · 机会'] },
     { sel: '#research', t: null, s: ['what still needs real users', '还需要真实用户验证的'] },

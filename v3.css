@@ -2733,3 +2733,9 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
   .bk-day .bk-flow .bk-flow-note{font-size:18px}
 }
 @media (prefers-reduced-motion:reduce){.bk-flow-card{opacity:1;transform:none}}
+.bk-flow-board{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:clamp(24px,4vw,64px);row-gap:16px;max-width:1080px;margin:0 auto}
+.bk-flow-shot{max-width:210px;border-width:4px;border-radius:22px}
+.bk-flow-card figcaption{max-width:230px}
+.bk-flow-lane.is-o{margin-top:56px}
+.bk-day .bk-flow .bk-flow-idle{grid-column:1/3;font-size:22px}
+@media(max-width:699px){.bk-flow-shot{max-width:none}.bk-flow-lane.is-o{margin-top:0}}

@@ -19,7 +19,7 @@ export function mount() {
   timetable(root);
   checklist(root, calm);
   slips(root, calm);
-  if (matchMedia('(min-width: 900px)').matches && !calm) timeline(root, moments);
+  // (the margin time line is gone: the clock chapters already carry the time of day, and it ran over wide content)
   Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs')]).then(([h, d, c]) => { h.mountHand(root, d.CHARS() + c.CHARS()); d.mountDomino(root); c.mountChair(root); }).catch(e => console.error(e));
   stage(root, calm);
   paper(root);

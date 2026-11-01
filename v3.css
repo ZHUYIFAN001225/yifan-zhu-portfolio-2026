@@ -2985,3 +2985,113 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
 .bk-ch2 .bk-hand-head{transition:filter .3s,opacity .3s}
 @media (prefers-reduced-motion:reduce){.bk-ch2.is-ring .bk-ch2-pin,.bk-ch2.is-ring *{animation:none!important}}
 .bk-ch2{height:300vh}
+
+/* ---- booking: her phone rings while you read (replaces the chair scene) ---- */
+.bk-ch2{display:none}
+.bk-shk{display:inline-block;animation:bk-shk .09s linear infinite alternate;animation-delay:var(--d)}
+@keyframes bk-shk{0%{transform:translate(var(--x),var(--y)) rotate(var(--r))}100%{transform:translate(calc(var(--x) * -1),calc(var(--y) * -.6)) rotate(calc(var(--r) * -1))}}
+.bk-settle .bk-shk{animation:none;transform:none;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.bk-calls{position:fixed;right:24px;top:96px;z-index:70;width:min(340px,calc(100vw - 32px));display:grid;gap:8px;pointer-events:none;font-family:Inter,system-ui,sans-serif}
+.bk-calls>*{pointer-events:auto}
+.bk-calls [hidden]{display:none!important}
+.bk-call-n{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:rgba(250,250,248,.86);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);box-shadow:0 18px 44px -18px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.05);color:#111;opacity:0;transform:translateY(-16px) scale(.98);transition:opacity .3s,transform .5s cubic-bezier(.2,1.1,.3,1)}
+.bk-calls.is-in .bk-call-n{opacity:1;transform:none}
+body.bk-ringing .bk-calls.is-in .bk-call-n{animation:bk-ch2-buzz .08s linear infinite alternate}
+@keyframes bk-ch2-buzz{from{transform:translateX(-2px) rotate(-.4deg)}to{transform:translateX(2px) rotate(.4deg)}}
+.bk-call-app{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;font:600 16px/1 Inter,system-ui,sans-serif;font-style:normal;color:#fff;background:#07c160}
+.bk-call-n[data-kind="call"] .bk-call-app{border-radius:50%;background:#8a9690}
+.bk-call-n>div{display:grid;gap:1px;min-width:0;flex:1}
+.bk-call-what{font:500 12px/1.2 Inter,system-ui,sans-serif;color:#6b6b6b}
+.bk-call-who{font:600 15px/1.25 Inter,system-ui,sans-serif}
+.bk-call-msg{font:400 14px/1.35 Inter,system-ui,sans-serif;color:#222}.bk-call-msg:empty{display:none}
+.bk-call-ring{width:32px;height:32px;border-radius:50%;flex:none;background:#34c759;position:relative}
+.bk-call-ring::after{content:"";position:absolute;inset:0;border-radius:50%;animation:bk-call-pulse 1.1s infinite}
+@keyframes bk-call-pulse{from{box-shadow:0 0 0 0 rgba(52,199,89,.5)}to{box-shadow:0 0 0 12px rgba(52,199,89,0)}}
+.bk-call-n[data-kind="msg"] .bk-call-ring{display:none}
+.bk-calls.is-busy .bk-call-ring{background:#d0453b}.bk-calls.is-busy .bk-call-ring::after{animation:none}
+.bk-call-sim{position:absolute;right:12px;bottom:-9px;padding:2px 7px;border-radius:6px;background:#fffdf7;border:1px solid rgba(39,64,143,.35);font:600 9px/1.2 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;font-style:normal;color:#27408f}
+.bk-call-busy{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 10px;padding:10px 14px;border-radius:14px;background:#d0453b;color:#fff;font:500 13px/1.3 Inter,system-ui,sans-serif;opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s}
+.bk-calls.is-busy .bk-call-busy{opacity:1;transform:none}
+.bk-call-busy>i{width:8px;height:8px;border-radius:50%;background:#fff;animation:bk-call-blink 1s infinite}
+@keyframes bk-call-blink{50%{opacity:.2}}
+.bk-call-busy b{font-variant-numeric:tabular-nums}
+.bk-call-she{grid-column:1/-1;margin:0;font:italic 500 13px/1.4 Inter,system-ui,sans-serif;opacity:.9}
+.bk-call-tally{justify-self:end;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-radius:999px;background:#fffdf7;border:1px solid rgba(23,54,43,.12);box-shadow:0 8px 20px -14px rgba(23,54,43,.4);font:600 12px/1 Inter,system-ui,sans-serif;color:#17362b}
+.bk-call-tally.is-bump{animation:bk-call-bump .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bk-call-bump{40%{transform:scale(1.08)}}
+.bk-call-dot{width:7px;height:7px;border-radius:50%;background:#d0453b}
+.bk-call-count{font-variant-numeric:tabular-nums}
+.bk-call-mute{border:0;border-radius:999px;padding:5px 10px;background:rgba(23,54,43,.07);color:#4d6157;font:600 11px/1 Inter,system-ui,sans-serif;cursor:pointer}
+.bk-call-mute:hover{background:rgba(23,54,43,.14);color:#17362b}
+.bk-call-sum{position:relative;padding:18px 20px 18px;border-radius:18px;background:#fffdf7;border:1px solid rgba(23,54,43,.1);box-shadow:0 24px 50px -24px rgba(23,54,43,.45);color:#17362b;opacity:0;transform:translateY(-10px);transition:opacity .4s,transform .5s cubic-bezier(.16,1,.3,1)}
+.bk-calls.is-sum .bk-call-sum{opacity:1;transform:none}
+.bk-call-sum p{margin:0}
+.bk-call-sum-k{font:600 10px/1.2 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:#1f9e6c}
+.bk-call-sum-a{margin-top:6px!important;font:500 15px/1.35 Inter,system-ui,sans-serif}
+.bk-call-sum-a b{color:#d0453b;font-size:20px}
+.bk-call-sum-b{margin-top:6px!important;font:500 13px/1.45 Inter,system-ui,sans-serif;color:#4d6157}
+.bk-call-sum-b b{display:block;font:600 40px/1.1 Inter,system-ui,sans-serif;letter-spacing:-.03em;color:#d0453b}
+.bk-call-sum-c{margin-top:10px!important;padding-top:10px;border-top:1px dashed rgba(23,54,43,.2);font:500 14px/1.45 Inter,system-ui,sans-serif}
+.bk-call-x{position:absolute;right:8px;top:8px;width:28px;height:28px;border:0;border-radius:50%;background:transparent;color:#5d6f66;font:400 20px/1 Inter,system-ui,sans-serif;cursor:pointer}
+.bk-call-x:hover{background:rgba(23,54,43,.07)}
+@media (max-width:699px){.bk-calls{right:16px;left:16px;width:auto;top:72px}.bk-call-tally{justify-self:end}}
+
+/* booking: iterations as readable rows — what changed, before → after, why — instead of narrow 3-up boxes */
+.bk-day .ux-iterations{grid-template-columns:1fr;gap:0;margin:20px 0 32px;border-top:1px solid rgba(23,54,43,.14)}
+.bk-day .ux-iterations article{display:grid;grid-template-columns:minmax(150px,.8fr) minmax(0,2.4fr);gap:8px 28px;padding:22px 0;border:0;border-bottom:1px solid rgba(23,54,43,.14);border-radius:0;background:none;box-shadow:none!important;transform:none!important}
+.bk-day .ux-iterations h4{grid-row:1/3;margin:0;font:600 16px/1.35 Inter,system-ui,sans-serif;color:#17362b}
+.bk-day .ux-iterations .ux-before-after{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);align-items:stretch;gap:0}
+.bk-day .ux-iterations .ux-before-after p{margin:0;padding:12px 14px;border-radius:12px;font:500 14px/1.5 Inter,system-ui,sans-serif;box-shadow:none}
+.bk-day .ux-iterations .ux-before-after p:first-child{background:rgba(23,54,43,.05);color:#5d6f66}
+.bk-day .ux-iterations .ux-before-after p:last-child{background:#e6f3ec;color:#17362b}
+.bk-day .ux-iterations .ux-before-after small{display:block;margin-bottom:4px;font:600 10px/1.2 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:#7d8c84}
+.bk-day .ux-iterations .ux-before-after p:last-child small{color:#1f9e6c}
+.bk-day .ux-iterations .ux-before-after>span{display:grid;place-items:center;color:#1f9e6c;font-size:16px}
+.bk-day .ux-iterations .ux-iteration-note{grid-column:2;margin:0;font:500 13px/1.5 Inter,system-ui,sans-serif;color:#4d6157}
+@media (max-width:899px){
+  .bk-day .ux-iterations article{grid-template-columns:1fr}
+  .bk-day .ux-iterations h4{grid-row:auto}
+  .bk-day .ux-iterations .ux-iteration-note{grid-column:1}
+  .bk-day .ux-iterations .ux-before-after{grid-template-columns:1fr;gap:6px}
+  .bk-day .ux-iterations .ux-before-after>span{transform:rotate(90deg);height:18px}
+}
+
+/* booking: the left page as a script — time + chapter, then the beats of this chapter on a timeline */
+.bk-day .bk-script-k{margin:0 0 10px;font:600 11px/1.2 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.14em;color:#1f9e6c}
+.bk-day .bk-script{--fill:0;position:relative;list-style:none;margin:28px 0 0;padding:0 0 0 22px;display:grid;gap:4px;max-width:30ch}
+.bk-day .bk-script::before,.bk-day .bk-script::after{content:"";position:absolute;left:5px;top:10px;bottom:10px;width:2px;border-radius:2px;background:rgba(23,54,43,.12)}
+.bk-day .bk-script::after{background:#1f9e6c;bottom:auto;height:calc((100% - 20px) * var(--fill));transition:height .25s linear}
+.bk-day .bk-script li{position:relative}
+.bk-day .bk-script li::before{content:"";position:absolute;left:-21px;top:9px;width:10px;height:10px;border-radius:50%;background:#f3eee3;border:2px solid rgba(23,54,43,.25);z-index:1;transition:all .3s}
+.bk-day .bk-script li.is-past::before{background:#1f9e6c;border-color:#1f9e6c}
+.bk-day .bk-script li.is-on::before{background:#fff;border-color:#1f9e6c;box-shadow:0 0 0 4px rgba(31,158,108,.18)}
+.bk-day .bk-script a{display:grid;grid-template-columns:24px 1fr;gap:6px;padding:4px 8px;margin-left:-8px;border-radius:8px;text-decoration:none;color:#7d8c84;transition:color .3s,background .3s}
+.bk-day .bk-script a span{font:600 11px/1.6 "IBM Plex Mono",ui-monospace,monospace}
+.bk-day .bk-script a b{font:500 14px/1.45 Inter,system-ui,sans-serif}
+.bk-day .bk-script li.is-past a{color:#4d6157}
+.bk-day .bk-script li.is-on a{color:#17362b;background:rgba(31,158,108,.08)}
+.bk-day .bk-script li.is-on a b{font-weight:600}
+.bk-day .bk-script a:hover{color:#17362b}
+@media (max-width:899px){.bk-day .bk-script{display:none}}
+
+/* ======== booking: frosted glass material ========
+   A few soft colour pools sit far behind the paper so the glass has something to frost; every card becomes a pane
+   of milky glass with a bright top edge, instead of a flat white block. */
+body.bk-on-paper::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background:radial-gradient(38% 32% at 12% 22%,rgba(122,214,170,.28),transparent 70%),radial-gradient(34% 30% at 88% 30%,rgba(255,206,140,.26),transparent 70%),radial-gradient(40% 36% at 60% 92%,rgba(150,176,255,.18),transparent 70%);
+  filter:blur(20px)}
+.bk-day{--glass:rgba(255,253,248,.52);--glass-hi:rgba(255,255,255,.75);--glass-edge:rgba(255,255,255,.65);--glass-line:rgba(23,54,43,.08)}
+.bk-day :is(.bk-dom-card,.bk-receipt,.bk-owner,.bk-ask,.bk-entry>li,.bk-results-card,.bk-ch2-card,.ux-blueprint,.ux-scenario>li),
+.bk-day .ux-section :is(.ux-persona,.ux-lanes>div,.ux-evidence-note,.ux-principles>div,.ux-process>li,.ux-decisions article,.ux-details figure,.ux-research-plan>div,.ux-hard>*,.ux-opps>*,.ux-build>li,.ux-roadmap li,.ux-taps,.ux-bp-row>span,.ux-success>li,.ux-smap-tabs,ol:not(.bk-script)>li),
+.bk-day .bk-slip,.bk-day .ux-section .ux-chips li{
+  background:linear-gradient(160deg,var(--glass-hi),var(--glass) 42%)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);
+  border:1px solid var(--glass-line)!important;
+  box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 0 0 1px rgba(255,255,255,.25),0 18px 40px -26px rgba(23,54,43,.35)!important}
+.bk-dom-slip{background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 10px 18px -14px rgba(23,54,43,.5)}
+.bk-day .ux-iterations .ux-before-after p:first-child{background:rgba(255,255,255,.45)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)!important}
+.bk-day .ux-iterations .ux-before-after p:last-child{background:rgba(214,240,226,.6)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)!important}
+.bk-call-tally,.bk-call-sum{background:rgba(255,253,248,.62);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);border-color:rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 24px 50px -24px rgba(23,54,43,.45)}
+.bk-day .bk-script li.is-on a{background:rgba(255,255,255,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+
+.bk-shkw{display:inline-block;white-space:nowrap}

@@ -95,10 +95,48 @@ function spread(root) {
     const left = document.createElement('div'); left.className = 'bk-left'; const inner = document.createElement('div'); inner.className = 'bk-left-in';
     inner.append(h); if (note) inner.append(note); left.append(inner); sec.prepend(left); sec.classList.add('bk-spread');
   });
+  script(root);
   // the story line gets a highlighter stroke when it arrives
   if (!('IntersectionObserver' in window)) return root.querySelectorAll('.bk-note').forEach(n => n.classList.add('is-in'));
   const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -30% 0px' });
   root.querySelectorAll('.bk-note').forEach(n => io.observe(n));
+}
+
+// the left page reads like a film script: the time of day and the chapter's place in the day, then the beats of this
+// chapter in order. The beat being shown on the right is lit and a line fills down the timeline, so the left side
+// always says what the right side is showing.
+function script(root) {
+  const secs = [...root.querySelectorAll('.bk-spread')], all = [];
+  secs.forEach((sec, si) => {
+    const inner = sec.querySelector('.bk-left-in'), body = sec.querySelector(':scope>.ux-section-body'); if (!inner || !body || inner.querySelector('.bk-script')) return;
+    let prev = sec.previousElementSibling; while (prev && !prev.matches('.bk-moment, .v3-product-section')) prev = prev.previousElementSibling;
+    const time = prev?.matches('.bk-moment') ? prev.dataset.time : '';
+    const k = document.createElement('p'); k.className = 'bk-script-k'; k.textContent = `${time ? time + ' · ' : ''}${String(si + 1).padStart(2, '0')} / ${String(secs.length).padStart(2, '0')}`;
+    inner.prepend(k);
+    const heads = [...body.querySelectorAll('h3')].filter(h => !h.closest('.bk-left, [hidden], .ux-iterations, .ux-decisions article') && h.textContent.trim());
+    if (heads.length < 2) return;
+    const ol = document.createElement('ol'); ol.className = 'bk-script';
+    heads.forEach((h, i) => {
+      const li = document.createElement('li'); const a = document.createElement('a'); a.href = '#'; a.innerHTML = `<span>${String(i + 1).padStart(2, '0')}</span><b></b>`;
+      const sync = () => { a.querySelector('b').textContent = h.textContent.trim(); }; sync(); document.addEventListener('portfolio:language', () => setTimeout(sync, 40));
+      a.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: h.getBoundingClientRect().top + scrollY - innerHeight * .25, behavior: 'smooth' }); });
+      li.append(a); ol.append(li);
+    });
+    inner.append(ol); all.push({ sec, ol, heads });
+  });
+  if (!all.length) return;
+  let q = false;
+  const run = () => {
+    q = false; const line = innerHeight * .45;
+    all.forEach(({ sec, ol, heads }) => {
+      const r = sec.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+      let cur = -1; heads.forEach((h, i) => { if (h.getBoundingClientRect().top < line) cur = i; });
+      [...ol.children].forEach((li, i) => { li.classList.toggle('is-on', i === cur); li.classList.toggle('is-past', i < cur); });
+      const last = heads[heads.length - 1].getBoundingClientRect(), first = heads[0].getBoundingClientRect();
+      ol.style.setProperty('--fill', clamp((line - first.top) / Math.max(1, last.top - first.top)).toFixed(3));
+    });
+  };
+  addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
 }
 
 // the problems are sticky notes stuck on the page

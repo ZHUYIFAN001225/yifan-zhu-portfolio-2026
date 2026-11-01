@@ -1,161 +1,159 @@
-// Glasgow Salon Booking — "You're in the chair."
-// The reader is the customer. Scrolling is the haircut. At four points her phone goes off: a call or a message drops
-// over the page, the scene buzzes and blurs, and the haircut stops moving while you keep scrolling. Each interruption
-// adds a red slice to the time bar, the clock jumps, and the next customer's start slips. Light, on the paper —
-// the interruption is the event, not the frame.
+// Glasgow Salon Booking — "Her phone, while you read."
+// The reader stands in for the customer in the chair. While they read the problem half of the case, her phone
+// rings now and then: a notification drops into the corner and, like LOOK's hair dryer, every character on screen
+// shakes loose for a moment and settles back. A small counter keeps the tally. When the case reaches the shared
+// diary (10:00), the calls stop and a card shows how long the reading was interrupted — the booking site now
+// answers those questions. Nothing has to be clicked; scrolling is never held.
 const zh = () => document.documentElement.lang.startsWith('zh');
 const L = a => a[zh() ? 1 : 0];
-const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
-// at = scroll progress where it fires; mins = time she spends on it
+// where each call rings: element + how far into it (the read line is the middle of the screen)
 const HITS = [
-  { at: .18, kind: 'call', who: ['Emma', 'Emma'], what: ['WeChat voice call', '微信语音通话'], she: ['Hello? …OK, twenty minutes late, fine.', '喂？……好，晚二十分钟是吧。'], mins: 3 },
-  { at: .38, kind: 'msg', who: ['Mrs Li', '李阿姨'], what: ['Can I move to 3 o’clock?', '能改到三点吗？'], she: ['Three… let me check the book…', '三点……我翻翻本子……'], mins: 4 },
-  { at: .58, kind: 'call', who: ['Unknown number', '陌生号码'], what: ['Incoming call', '来电'], she: ['Sunday? I’ll let you know later.', '周日？我回头告诉你。'], mins: 3 },
-  { at: .78, kind: 'msg', who: ['Mr He', '何先生'], what: ['What time was I booked again?', '我约的是几点来着？'], she: ['You were… hold on…', '你是……等一下……'], mins: 4 }
+  { at: ['.bk-hand[data-act="1"]', .22], kind: 'call', who: ['Emma', 'Emma'], what: ['WeChat voice call', '微信语音通话'], she: ['“Hello? …twenty minutes late, fine.”', '“喂？……晚二十分钟是吧，好。”'], mins: 3 },
+  { at: ['.bk-hand[data-act="1"]', .7], kind: 'msg', who: ['Mrs Li', '李阿姨'], what: ['Can I move to 3 o’clock?', '能改到三点吗？'], she: ['“Three… let me check the book…”', '“三点……我翻翻本子……”'], mins: 4 },
+  { at: ['.bk-dom[data-mode="old"]', .45], kind: 'call', who: ['Unknown number', '陌生号码'], what: ['Incoming call', '来电'], she: ['“Sunday? I’ll let you know later.”', '“周日？我回头告诉你。”'], mins: 3 },
+  { at: ['#overview', .35], kind: 'msg', who: ['Mr He', '何先生'], what: ['What time was I booked again?', '我约的是几点来着？'], she: ['“You were… hold on…”', '“你是……等一下……”'], mins: 4 }
 ];
+const STOP = ['.bk-moment[data-moment="system"]', .3];
 const T = {
-  k: ['What the time line can’t show', '时间轴画不出来的'], t: ['You’re in the chair.', '现在，你坐在这把椅子上。'],
-  lead: ['Scroll to get your haircut. Her phone is on the counter.', '往下滚，开始剪头发。她的手机就放在台面上。'],
-  stamp: ['Illustrative · not a real customer', '示意 · 非真实顾客'],
-  you: ['You', '你'], svc: ['Haircut · booked 14:00–14:30', '剪发 · 预约 14:00–14:30'],
-  done: ['haircut done', '已剪完'], next: ['Next: Ella, booked 14:30', '下一位：Ella，约了 14:30'],
-  ontime: ['on time', '准时'], bookedEnd: ['booked end', '原定结束'],
   sorry: ['Sorry, one sec —', '不好意思，我接一下——'],
-  onPhone: ['She’s on the phone', '她在接电话'], replying: ['She’s typing a reply', '她在回消息'],
-  sum1: ['Your 30-minute haircut took', '你 30 分钟的剪发，坐了'],
-  sum2: ['on other people’s bookings', '花在别人的预约上'],
-  sum3: ['late start for Ella', 'Ella 晚开始'],
-  sum4: ['None of these were about your haircut. Every one was a booking question a shared calendar could answer.', '这些事没有一件是关于你的头发，每一件都是一本共享预约表就能回答的问题。'],
-  skip: ['Skip ↓', '跳过 ↓'], min: ['min', '分钟']
+  onPhone: ['She’s on the phone', '她在接电话'], replying: ['She’s replying', '她在回消息'],
+  sim: ['Illustrative', '示意'],
+  count: ['Interrupted', '被打断'], times: ['×', '次'], min: ['min', '分钟'], mute: ['Mute', '静音'], muted: ['Muted', '已静音'],
+  sumK: ['While you read this far', '你读到这里'],
+  sumA: ['her phone interrupted you', '她的手机打断了你'],
+  sumB: ['If you were the customer in her chair, you would have waited', '如果你是坐在她椅子上的顾客，你就多等了'],
+  sumC: ['From here on, customers scan a QR code and book themselves. The calls stop.', '从这里开始，顾客扫码自己预约。电话不再来。'],
+  close: ['Close', '关闭']
 };
-export const CHARS = () => [...Object.values(T).flat(), ...HITS.flatMap(h => [...h.who, ...h.what, ...h.she]), '0123456789:%…?!—+'].join('');
+export const CHARS = () => [...Object.values(T).flat(), ...HITS.flatMap(h => [...h.who, ...h.what, ...h.she]), '0123456789:×—'].join('');
 
 export function mountChair(root) {
-  const board = root.querySelector('.bk-dom[data-mode="old"]'); if (!board || root.querySelector('.bk-chair')) return;
-  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const sec = document.createElement('section'); sec.className = 'bk-chair bk-ch2';
-  sec.innerHTML = `<div class="bk-ch2-pin">
-    <div class="bk-hand-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p><p class="bk-ch2-lead"></p><span class="bk-stamp"></span></div>
-    <div class="bk-ch2-card">
-      <div class="bk-ch2-top">
-        <p class="bk-ch2-me"><i class="bk-ch2-av is-you" aria-hidden="true"></i><span><b class="bk-ch2-you"></b><small class="bk-ch2-svc"></small></span></p>
-        <p class="bk-ch2-clock"><b>14:00</b></p>
-      </div>
-      <div class="bk-ch2-bar" aria-hidden="true"><div class="bk-ch2-fill"></div><i class="bk-ch2-mark"><span class="bk-ch2-mark-l"></span></i></div>
-      <div class="bk-ch2-meta"><span><b class="bk-ch2-pct">0%</b> <span class="bk-ch2-done"></span></span><span class="bk-ch2-next"><span class="bk-ch2-next-t"></span> · <b class="bk-ch2-late"></b></span></div>
-      <div class="bk-ch2-owner"><i class="bk-ch2-av is-owner" aria-hidden="true"></i><p class="bk-ch2-say"></p></div>
-      <ol class="bk-ch2-log" aria-live="polite"></ol>
-      <div class="bk-ch2-sum"><p class="bk-ch2-sum-a"></p><p class="bk-ch2-sum-big"><b></b> <span></span></p>
-        <div class="bk-ch2-sum-row"><p><b class="r1"></b> <span></span></p><p><b class="r2"></b> <span></span></p></div><p class="bk-ch2-sum-t"></p></div>
-    </div>
-    <a class="bk-ch2-skip" href="#"></a>
-  </div>
-  <div class="bk-ch2-pop" aria-hidden="true" hidden>
-    <div class="bk-ch2-note"><i class="bk-ch2-app" aria-hidden="true"></i><div><small class="bk-ch2-what"></small><b class="bk-ch2-who"></b><span class="bk-ch2-msg"></span></div><span class="bk-ch2-ring" aria-hidden="true"></span></div>
-    <div class="bk-ch2-busy"><i></i><span class="bk-ch2-busy-t"></span><b class="bk-ch2-busy-m"></b></div>
-  </div>`;
-  board.after(sec);
+  if (document.querySelector('.bk-calls')) return;
   root.querySelector('.bk-story-board')?.remove();
-  const $ = s => sec.querySelector(s), pop = $('.bk-ch2-pop');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ui = document.createElement('div'); ui.className = 'bk-calls'; ui.setAttribute('aria-live', 'polite');
+  ui.innerHTML = `
+    <div class="bk-call-n" hidden><i class="bk-call-app" aria-hidden="true"></i><div><small class="bk-call-what"></small><b class="bk-call-who"></b><span class="bk-call-msg"></span></div><span class="bk-call-ring" aria-hidden="true"></span><em class="bk-call-sim"></em></div>
+    <div class="bk-call-busy" hidden><i></i><span class="bk-call-busy-t"></span><b class="bk-call-busy-m">0:00</b><p class="bk-call-she"></p></div>
+    <div class="bk-call-tally" hidden><span class="bk-call-dot" aria-hidden="true"></span><span class="bk-call-count"></span><button type="button" class="bk-call-mute"></button></div>
+    <div class="bk-call-sum" role="status" hidden><button type="button" class="bk-call-x" aria-label=""></button><p class="bk-call-sum-k"></p><p class="bk-call-sum-a"><b class="n"></b> <span></span></p><p class="bk-call-sum-b"><span></span> <b class="m"></b></p><p class="bk-call-sum-c"></p></div>`;
+  document.body.append(ui);
+  const $ = s => ui.querySelector(s);
+  const note = $('.bk-call-n'), busy = $('.bk-call-busy'), tally = $('.bk-call-tally'), sum = $('.bk-call-sum');
+  let n = 0, mins = 0, muted = false, done = false, pendingSum = false, cur = -1, busyUntil = 0;
+  const fired = new Set(), queue = [];
 
-  // scroll is time. Cutting windows move the haircut on; interruption windows freeze it while the red slice grows.
-  // Nothing has to be clicked: the page rings, shakes and blurs as you scroll through, then lets you go.
-  const W = [];
-  { let x = 0; const cut = .1, hit = .1; HITS.forEach((h, i) => { W.push({ cut: [x, x + cut], from: i ? HITS[i - 1].at : 0, to: h.at }); x += cut; W.push({ hit: i, w: [x, x + hit] }); x += hit; }); W.push({ cut: [x, .95], from: HITS[HITS.length - 1].at, to: 1 }); }
-  let p = calm ? 1 : 0, active = -1, logged = -1;
-  const total = HITS.reduce((a, h) => a + h.mins, 0);
-  const state = () => {
-    let cut = 0; const hk = HITS.map(() => 0); let act = -1, ak = 0;
-    W.forEach(w => {
-      if (w.cut) { const k = clamp((p - w.cut[0]) / (w.cut[1] - w.cut[0])); if (k > 0) cut = w.from + (w.to - w.from) * k; }
-      else { const k = clamp((p - w.w[0]) / (w.w[1] - w.w[0])); hk[w.hit] = k; if (k > 0 && k < 1) { act = w.hit; ak = k; } }
-    });
-    return { cut, hk, act, ak };
+  const text = () => {
+    $('.bk-call-sim').textContent = L(T.sim);
+    $('.bk-call-count').textContent = `${L(T.count)} ${n} ${L(T.times)} · ${mins} ${L(T.min)}`;
+    $('.bk-call-mute').textContent = muted ? L(T.muted) : L(T.mute);
+    $('.bk-call-sum-k').textContent = L(T.sumK);
+    if (zh()) { $('.bk-call-sum-a').innerHTML = `${L(T.sumA)} <b class="n">${n} 次</b>`; }
+    else { $('.bk-call-sum-a').innerHTML = `<span>${L(T.sumA)}</span> <b class="n">${n} times</b>`; }
+    $('.bk-call-sum-b span').textContent = L(T.sumB); $('.bk-call-sum-b .m').textContent = `${mins} ${L(T.min)}`;
+    $('.bk-call-sum-c').textContent = L(T.sumC); $('.bk-call-x').setAttribute('aria-label', L(T.close)); $('.bk-call-x').textContent = '×';
+    if (cur >= 0) fill(cur);
   };
-
   const fill = i => {
     const h = HITS[i];
-    pop.dataset.kind = h.kind;
-    $('.bk-ch2-what').textContent = h.kind === 'msg' ? 'WeChat' : L(h.what);
-    $('.bk-ch2-who').textContent = L(h.who);
-    $('.bk-ch2-msg').textContent = h.kind === 'msg' ? L(h.what) : '';
-    $('.bk-ch2-app').textContent = L(h.who).slice(0, 1);
-    $('.bk-ch2-busy-t').textContent = h.kind === 'msg' ? L(T.replying) : L(T.onPhone);
-  };
-  const text = () => {
-    $('.bk-hand-k').textContent = L(T.k); $('.bk-hand-t').textContent = L(T.t); $('.bk-ch2-lead').textContent = L(T.lead); $('.bk-stamp').textContent = L(T.stamp);
-    $('.bk-ch2-you').textContent = L(T.you); $('.bk-ch2-svc').textContent = L(T.svc); $('.bk-ch2-done').textContent = L(T.done);
-    $('.bk-ch2-next-t').textContent = L(T.next); $('.bk-ch2-mark-l').textContent = L(T.bookedEnd) + ' 14:30';
-    $('.bk-ch2-skip').textContent = L(T.skip);
-    $('.bk-ch2-sum-a').textContent = L(T.sum1); $('.bk-ch2-sum-big b').textContent = 30 + total; $('.bk-ch2-sum-big span').textContent = L(T.min);
-    $('.bk-ch2-sum-row .r1').textContent = total + ' ' + L(T.min); $('.bk-ch2-sum-row .r1 + span').textContent = L(T.sum2);
-    $('.bk-ch2-sum-row .r2').textContent = '+' + total + ' ' + L(T.min); $('.bk-ch2-sum-row .r2 + span').textContent = L(T.sum3);
-    $('.bk-ch2-sum-t').textContent = L(T.sum4);
-    if (active >= 0) fill(active);
-    logged = -1; active = -2; draw();
+    note.dataset.kind = h.kind;
+    $('.bk-call-what').textContent = h.kind === 'msg' ? 'WeChat' : L(h.what);
+    $('.bk-call-who').textContent = L(h.who);
+    $('.bk-call-msg').textContent = h.kind === 'msg' ? L(h.what) : '';
+    $('.bk-call-app').textContent = L(h.who).slice(0, 1);
+    $('.bk-call-busy-t').textContent = h.kind === 'msg' ? L(T.replying) : L(T.onPhone);
+    $('.bk-call-she').textContent = L(h.she);
   };
 
-  const logRow = i => {
-    const h = HITS[i], at = Math.floor(h.at * 30 + HITS.slice(0, i).reduce((a, x) => a + x.mins, 0));
-    return `<li class="is-${h.kind}"><time>14:${String(at).padStart(2, '0')}</time><span>${L(h.who)} · ${L(h.what)}</span><b>+${h.mins} ${L(T.min)}</b></li>`;
-  };
-
-  // the bar spans 48 minutes; cutting slices are green, interruptions red, in the order they happened
-  const SCALE = 48;
-  function draw() {
-    const S = state(), cutDone = S.cut * 30, segs = []; let prev = 0, extra = 0;
-    HITS.forEach((h, i) => {
-      if (S.hk[i] <= 0) return;
-      const c = h.at * 30; segs.push(['cut', Math.max(0, c - prev)]); prev = c;
-      const m = h.mins * clamp((S.hk[i] - .15) / .8); segs.push(['call', m]); extra += m;
+  // Like LOOK's hair dryer: the words on screen come apart letter by letter, shake, and settle back.
+  const SHAKE = 'h1,h2,h3,.bk-moment-line,.bk-moment-cap,.bk-hand-t,.bk-hand-k,.ux-question,.bk-note,p,li,dt,dd,figcaption';
+  function shake(ms) {
+    if (calm) return;
+    const vh = innerHeight, picked = [];
+    for (const el of root.querySelectorAll(SHAKE)) {
+      if (picked.length > 18) break;
+      if (el.closest('.bk-calls') || picked.some(p => p.contains(el) || el.contains(p))) continue;
+      const r = el.getBoundingClientRect(); if (r.bottom < 0 || r.top > vh || !r.width) continue;
+      const txt = el.textContent; if (!txt.trim() || txt.length > 260 || [...el.querySelectorAll('*')].some(c => !/^(B|STRONG|EM|I|SMALL|BR)$/.test(c.tagName) || c.className)) continue; // plain text only, so nothing a script holds is replaced
+      picked.push(el);
+    }
+    const saved = picked.map(el => [el, el.innerHTML]);
+    picked.forEach(el => {
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
+      nodes.forEach(t => {
+        const f = document.createDocumentFragment();
+        // words stay whole (so lines don't re-wrap mid-word); each letter inside shakes on its own
+        t.textContent.split(/(\s+)/).forEach(word => {
+          if (!word) return; if (!word.trim()) { f.append(word); return; }
+          const w = document.createElement('span'); w.className = /[\u3000-\u9fff\uff00-\uffef]/.test(word) ? 'bk-shkc' : 'bk-shkw';
+          [...word].forEach(ch => {
+            const s = document.createElement('span'); s.className = 'bk-shk'; s.textContent = ch;
+            s.style.cssText = `--x:${((Math.random() - .5) * 7).toFixed(1)}px;--y:${((Math.random() - .5) * 6).toFixed(1)}px;--r:${((Math.random() - .5) * 14).toFixed(0)}deg;--d:${(Math.random() * -.12).toFixed(2)}s`;
+            w.append(s);
+          });
+          f.append(w);
+        });
+        t.replaceWith(f);
+      });
+      el.classList.add('bk-shaking');
     });
-    segs.push(['cut', Math.max(0, cutDone - prev)]);
-    const f = $('.bk-ch2-fill');
-    if (f.children.length !== segs.length) f.innerHTML = segs.map(s => `<i class="is-${s[0]}"></i>`).join('');
-    segs.forEach((s, i) => { f.children[i].style.width = (s[1] / SCALE * 100) + '%'; });
-    const mm = Math.floor(cutDone + extra);
-    $('.bk-ch2-clock b').textContent = `${14 + Math.floor(mm / 60)}:${String(mm % 60).padStart(2, '0')}`;
-    $('.bk-ch2-pct').textContent = Math.round(S.cut * 100) + '%';
-    const late = Math.round(extra);
-    $('.bk-ch2-late').textContent = late ? `+${late} ${L(T.min)}` : L(T.ontime);
-    $('.bk-ch2-next').classList.toggle('is-late', late > 0);
-    $('.bk-ch2-mark').style.left = (30 / SCALE * 100) + '%';
-    // the interruption: rings (whole scene buzzes), then she's busy (blur, timer), then it slides away
-    const act = S.act, k = S.ak;
-    if (act !== active) {
-      active = act;
-      if (act >= 0) { fill(act); pop.hidden = false; void pop.offsetWidth; pop.classList.add('is-in'); $('.bk-ch2-say').textContent = L(T.sorry); }
-      else { pop.classList.remove('is-in', 'is-busy'); }
-      $('.bk-ch2-owner').classList.toggle('is-on', act >= 0);
-    }
-    const on = act >= 0 && k < .92;
-    pop.classList.toggle('is-in', on);
-    sec.classList.toggle('is-hit', on);
-    sec.classList.toggle('is-ring', act >= 0 && k < .3);
-    if (act >= 0) {
-      const busy = k >= .3; pop.classList.toggle('is-busy', busy);
-      if (busy) { $('.bk-ch2-say').textContent = '“' + L(HITS[act].she) + '”'; const s2 = Math.round(clamp((k - .3) / .62) * HITS[act].mins * 60); $('.bk-ch2-busy-m').textContent = `${Math.floor(s2 / 60)}:${String(s2 % 60).padStart(2, '0')}`; }
-      else $('.bk-ch2-say').textContent = L(T.sorry);
-    }
-    const done = S.hk.filter(v => v >= .92).length;
-    if (done !== logged) { logged = done; $('.bk-ch2-log').innerHTML = HITS.slice(0, done).map((_, i) => logRow(i)).join(''); }
-    sec.classList.toggle('is-end', p > .96);
+    document.body.classList.add('bk-ringing');
+    setTimeout(() => {
+      picked.forEach(el => el.classList.add('bk-settle'));
+      setTimeout(() => { saved.forEach(([el, html]) => { if (el.querySelector('.bk-shk')) el.innerHTML = html; el.classList.remove('bk-shaking', 'bk-settle'); }); document.body.classList.remove('bk-ringing'); }, 380);
+    }, ms);
   }
-  $('.bk-ch2-skip').addEventListener('click', e => { e.preventDefault(); scrollTo({ top: sec.getBoundingClientRect().bottom + scrollY - innerHeight * .2, behavior: 'smooth' }); });
 
-  text();
-  document.addEventListener('portfolio:language', text);
-  if (calm) { p = 1; draw(); return; }
+  function ring(i) {
+    cur = i; fill(i);
+    note.hidden = false; busy.hidden = true; void note.offsetWidth; ui.classList.add('is-in'); ui.classList.remove('is-busy');
+    shake(1500);
+    const h = HITS[i];
+    setTimeout(() => {
+      ui.classList.add('is-busy'); busy.hidden = false;
+      const t0 = performance.now(), dur = 2600;
+      const step = now => {
+        const k = Math.min(1, (now - t0) / dur), s = Math.round(k * h.mins * 60);
+        $('.bk-call-busy-m').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+        if (k < 1) requestAnimationFrame(step);
+        else {
+          n++; mins += h.mins; tally.hidden = false; text();
+          tally.classList.remove('is-bump'); void tally.offsetWidth; tally.classList.add('is-bump');
+          ui.classList.remove('is-in', 'is-busy');
+          setTimeout(() => { note.hidden = true; busy.hidden = true; cur = -1; if (queue.length) ring(queue.shift()); else maybeSum(); }, 450);
+        }
+      };
+      requestAnimationFrame(step);
+    }, 1500);
+  }
 
-  let last = performance.now();
-  const tick = now => {
-    requestAnimationFrame(tick);
-    const dt = Math.min(.08, (now - last) / 1000); last = now;
-    const r = sec.getBoundingClientRect(), vh = innerHeight; if (r.bottom < -vh || r.top > vh * 2) return;
-    const target = clamp(-r.top / Math.max(1, r.height - vh));
-    const np = p + (target - p) * (1 - Math.exp(-dt * 7));
-    if (Math.abs(np - p) > .0003) { p = np; draw(); }
+  const yOf = ([sel, f]) => { const el = document.querySelector(sel); if (!el) return Infinity; const r = el.getBoundingClientRect(); return r.top + scrollY + f * r.height; };
+  let lastLine = scrollY + innerHeight * .5;
+  const onScroll = () => {
+    const line = scrollY + innerHeight * .5, down = line > lastLine;
+    const jump = line - lastLine > innerHeight * 1.2;
+    if (down && !done) {
+      HITS.forEach((h, i) => {
+        if (fired.has(i)) return; const y = yOf(h.at);
+        if (y > lastLine && y <= line) { fired.add(i); if (muted || jump) return; if (cur >= 0) queue.push(i); else ring(i); }
+        else if (y <= lastLine) fired.add(i); // already past when the page loaded or after a jump: don't ring late
+      });
+      const ys = yOf(STOP);
+      if (ys > lastLine && ys <= line) { done = true; pendingSum = true; if (cur < 0) maybeSum(); }
+      else if (ys <= lastLine) done = true;
+    }
+    lastLine = line;
   };
-  requestAnimationFrame(tick);
+  function maybeSum() { if (pendingSum && n > 0) { pendingSum = false; setTimeout(showSum, 300); } }
+  function showSum() {
+    text(); tally.hidden = true; sum.hidden = false; void sum.offsetWidth; ui.classList.add('is-sum');
+    clearTimeout(showSum.t); showSum.t = setTimeout(hideSum, 12000);
+  }
+  function hideSum() { ui.classList.remove('is-sum'); setTimeout(() => { sum.hidden = true; }, 400); }
+  $('.bk-call-x').addEventListener('click', hideSum);
+  $('.bk-call-mute').addEventListener('click', () => { muted = !muted; queue.length = 0; text(); });
+  // first measurement: anything already above the read line counts as passed
+  requestAnimationFrame(() => { lastLine = scrollY + innerHeight * .5; onScroll(); addEventListener('scroll', onScroll, { passive: true }); });
+  text(); document.addEventListener('portfolio:language', text);
 }

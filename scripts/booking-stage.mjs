@@ -218,11 +218,16 @@ export function mountStage(root) {
         // act 3: the phone takes over from the paper diary
         phoneOn = true; f = 'schedule';
         if (m) { const sp = e.querySelector('.bk-hand-space') || e, t2 = docY(sp), h2 = sp.offsetHeight; push(t2 - vh * .45, { kind: 'off', q: off(1), f }); push(t2 + h2 * .5, { kind: 'hand', q: P6([.5, .5, .5, .03, -.2, 0]), f, spot: SPOT.schedule }); story = true; return; }
-        push(top + h * .55, { kind: 'section', q: P6([.78, .52, .64, .04, -.12, 0]), f, spot: null, label: ['Owner · the diary keeps itself', '店主 · 预约本自己记'], who: 'o' });
+        // it rises in from below on its own side with a small turn, settles, then stays put while the page reads
+        // (the pointer tilts it); when the page moves on it lifts away upward
+        const rest = P6([.78, .52, .64, .04, -.12, 0]), lab = ['Owner · the diary keeps itself', '店主 · 预约本自己记'];
+        push(top - vh * .35, { kind: 'off', q: P6([.8, 1.7, .6, -.5, -.7, .14]), f });
+        push(top + h * .18, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
+        push(top + h * .78, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
         return;
       }
       if (!phoneOn && !m) return;
-      if (!m && phoneOn && !S.some(x => x.gone)) { push(top - vh * .2, { kind: 'off', gone: true, q: P6([1.35, .5, .5, .1, -.6, 0]), f }); return; }
+      if (!m && phoneOn && !S.some(x => x.gone)) { push(top - vh * .05, { kind: 'off', gone: true, q: P6([.8, -.75, .6, .5, .5, -.12]), f }); return; }
       if (!m) return;
       if (e.matches('.bk-step')) {
         const s = STEPS[+e.dataset.i];
@@ -287,7 +292,7 @@ export function mountStage(root) {
   if (!canHover) document.addEventListener('click', e => { if (peek && !e.target.closest('.bk-points, #structure [data-screen]')) peek = null; });
 
   // ---------- the loop ----------
-  let sideVal = -1, vw = 0, vh = 0, mx = 0, my = 0, sy = scrollY, last = performance.now(), t0 = last, fadeAmt = 1;
+  let sideVal = -1, vw = 0, vh = 0, mx = 0, my = 0, pmx = 0, pmy = 0, sy = scrollY, last = performance.now(), t0 = last, fadeAmt = 1;
   const resize = () => { vw = innerWidth; vh = innerHeight; renderer.setPixelRatio(Math.min(vw < 1000 ? 1.5 : 2, devicePixelRatio || 1)); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix(); build(); };
   addEventListener('resize', resize); resize(); setInterval(build, 1600);
   addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
@@ -336,7 +341,12 @@ export function mountStage(root) {
     const front = Math.round(q.ry / TAU) * TAU;
     if (P.focus > .001) q = { ...q, s: q.s * (1 + .14 * P.focus), ry: lerp(q.ry, front, .75 * P.focus), rx: q.rx * (1 - .7 * P.focus) };
     if (peekAmt > .001) q = mix(q, { x: .5, y: peekY, s: .42, rx: .02, ry: front, rz: 0 }, ease(peekAmt));
-    const calm = (1 - P.focus * .7) * (a.st.kind === 'dock' || b.st.kind === 'dock' ? 0 : 1);
+    // mouse-follow: where the phone stands still, it turns a little toward the pointer and the light moves with it
+    pmx += (mx - pmx) * E(4); pmy += (my - pmy) * E(4);
+    const stillAmt = a.st.still && b.st.still ? 1 : a.st.still ? 1 - e : b.st.still ? e : 0;
+    if (!m && stillAmt > 0) q = { ...q, ry: q.ry + pmx * .55 * stillAmt, rx: q.rx + pmy * .32 * stillAmt };
+    key.position.set(2 + pmx * 10 * stillAmt, 4 - pmy * 8 * stillAmt, 5);
+    const calm = (1 - P.focus * .7) * (a.st.kind === 'dock' || b.st.kind === 'dock' ? 0 : 1) * (1 - stillAmt * .85);
     q = { ...q, y: q.y + Math.sin(time * 1.05) * .006 * calm, rx: q.rx + Math.sin(time * .7) * .035 * calm + vel * .5 * calm, ry: q.ry + Math.sin(time * .5) * .05 * calm, rz: q.rz + Math.sin(time * .43) * .02 * calm - vel * .35 * calm };
     place(q);
     // the booking card: it rises out of the customer's screen, hangs in the air facing you while the phone turns over,

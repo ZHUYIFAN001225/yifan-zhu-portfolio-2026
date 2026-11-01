@@ -11,7 +11,7 @@ const hm = m => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, 
 const dur = m => { m = Math.round(m); const h = Math.floor(m / 60), r = m % 60; return zh() ? (h ? `${h} 小时${r ? ` ${r} 分` : ''}` : `${r} 分钟`) : (h ? `${h} h${r ? ` ${r} min` : ''}` : `${r} min`); };
 const T0 = 570, T1 = 1170, CLOSE = 1110; // the track runs 9:30–19:30, the shop closes at 18:30
 
-const NAMES = { chen: ['Chen', '陈'], emma: ['Emma', 'Emma'], sun: ['Sun', '孙'], wang: ['Wang', '王阿姨'], li: ['Li', '李'], zhou: ['Zhou', '周'], gao: ['Gao', '高'], lin: ['Lin', '林'], he: ['He', '何'] };
+const NAMES = { chen: ['Chen', '陈'], mia: ['Mia', 'Mia'], emma: ['Emma', 'Emma'], sun: ['Sun', '孙'], wang: ['Wang', '王阿姨'], li: ['Li', '李'], zhou: ['Zhou', '周'], gao: ['Gao', '高'], lin: ['Lin', '林'], he: ['He', '何'] };
 const SV = { short: ['short cut', '短发'], long: ['long cut', '长发'], colour: ['colour + bleach', '染 + 漂'] };
 // the day as it was written in the paper diary (lengths are guesses)
 const OLD = [
@@ -26,14 +26,15 @@ const OLD_EVENTS = [
   { w: [.6, .76], fx: { wang: { len: 150 } }, t: ['12:25 · The colour really takes 2½ hours. Nobody wrote that down.', '12:25 · 染发其实要两个半小时，本子上没人写过。'] },
   { w: [.8, .92], fx: {}, t: ['18:30 · Closing time, and two customers are still waiting.', '18:30 · 该打烊了，店里还有客人在等。'] }
 ];
-// the same day, booked through the shared diary: real lengths, only times that fit, a protected break, reminders
+// the same day, booked through the shared diary: real lengths, only times that fit, a break closed in the diary,
+// cancelling in My bookings reopens the slot (no reminders: they are not released yet)
 const NEW = [
   { id: 'chen', sv: 'short', at: 600, len: 30 }, { id: 'emma', sv: 'long', at: 630, len: 60 }, { id: 'sun', sv: 'short', at: 690, len: 30 },
   { id: 'wang', sv: 'colour', at: 720, len: 150 }, { id: 'break', at: 870, len: 30, brk: true }, { id: 'li', sv: 'long', at: 900, len: 60 },
   { id: 'zhou', sv: 'short', at: 960, len: 30 }, { id: 'gao', sv: 'long', at: 990, len: 60 }, { id: 'lin', sv: 'short', at: 1050, len: 30 }
 ];
 const NEW_EVENTS = [
-  { w: [.08, .22], fx: { chen: { ok: 1 } }, t: ['Chen got a reminder last night. She comes.', '陈前一晚收到了提醒，她来了。'] },
+  { w: [.08, .22], fx: { chen: { re: 1 } }, t: ['Chen cancels in My bookings the night before. Her slot reopens, and Mia books it.', '陈前一晚在“我的预约”里取消了。时段空出来，Mia 约上了。'] },
   { w: [.26, .44], fx: { emma: { late: 20 } }, t: ['Emma is still 20 minutes late. Two people wait a little, then the break absorbs it.', 'Emma 还是晚了 20 分钟：后面两位稍等一下，到午休就消化掉了。'] },
   { w: [.48, .62], fx: {}, t: ['No calls in the middle of a cut: customers book and change on their own.', '剪发时不用接电话：顾客自己约、自己改。'] },
   { w: [.66, .8], fx: {}, t: ['The colour was booked at its real length, 2½ hours, from the start.', '染发一开始就按真实时长约好：两个半小时。'] },
@@ -46,7 +47,7 @@ const TEXT = {
   wait: ['Everyone waited', '大家一共多等了'], idle: ['Chair sat empty', '椅子空着'], end: ['Last customer done', '最后一位结束'],
   over: ['after closing', '超过打烊'], ontime: ['before closing', '打烊前'],
   hint: ['Red +′ = minutes a customer waited in the shop. Tap a slip: make them late, or not come at all.', '红色 +′ = 客人在店里干等的分钟。点一张纸条：让 TA 迟到，或者干脆不来。'], reset: ['Replay', '重放'],
-  closing: ['closing 18:30', '打烊 18:30'], brk: ['her break', '她的休息'], nsh: ['didn’t come', '没来'], tom: ['He · tomorrow 10:00, chosen by her', '何 · 改到明天 10:00（她自己选的）'],
+  closing: ['closing 18:30', '打烊 18:30'], brk: ['break, closed in the diary', '午休（已在日程里关掉）'], nsh: ['didn’t come', '没来'], reo: ['reopened → Mia', '空出来 → Mia'], tom: ['He · tomorrow 10:00, chosen by her', '何 · 改到明天 10:00（她自己选的）'],
   waitTag: ['wait', '等'], lateTag: ['late', '晚到']
 };
 const STORY = [
@@ -123,7 +124,7 @@ export function mountDomino(root) {
   // the events, applied as far as the scroll has got
   function stateAt(b, p) {
     const st = {};
-    b.events.forEach(ev => { const a = clamp((p - ev.w[0]) / (ev.w[1] - ev.w[0])); for (const [id, fx] of Object.entries(ev.fx)) { const x = st[id] = st[id] || {}; const base = b.plan.find(s => s.id === id); if (fx.ns) x.ns = a; if (fx.late) x.late = fx.late * a; if (fx.call) x.call = fx.call * a; if (fx.len) x.len = base.len + (fx.len - base.len) * a; if (fx.ok) x.ok = a; } });
+    b.events.forEach(ev => { const a = clamp((p - ev.w[0]) / (ev.w[1] - ev.w[0])); for (const [id, fx] of Object.entries(ev.fx)) { const x = st[id] = st[id] || {}; const base = b.plan.find(s => s.id === id); if (fx.ns) x.ns = a; if (fx.late) x.late = fx.late * a; if (fx.call) x.call = fx.call * a; if (fx.len) x.len = base.len + (fx.len - base.len) * a; if (fx.ok) x.ok = a; if (fx.re) x.re = a; } });
     return st;
   }
   function drawBoard(b, now, dt) {
@@ -142,12 +143,13 @@ export function mountDomino(root) {
       sl.el.style.setProperty('--s', sl.x.toFixed(4)); sl.el.style.setProperty('--l', sl.l.toFixed(4));
       const shift = Math.abs(sl.x - fr(sl.s.at)) * (T1 - T0);
       sl.ghost.style.opacity = sl.s.brk ? 0 : clamp(shift / 8);
-      sl.el.classList.toggle('is-ns', (x.ns || 0) >= .5); sl.el.classList.toggle('is-ok', (x.ok || 0) > .5);
+      sl.el.classList.toggle('is-ns', (x.ns || 0) >= .5); sl.el.classList.toggle('is-ok', (x.ok || 0) > .5 || (x.re || 0) > .5);
+      const nm = (x.re || 0) > .5 ? L(NAMES.mia) : sl.s.brk ? L(TEXT.brk) : L(NAMES[sl.s.id]); const ne = sl.el.querySelector('.bk-dom-name'); if (ne.textContent !== nm) ne.textContent = nm;
       sl.el.classList.toggle('is-over', o.end > CLOSE + 1 && !(x.ns >= .5));
       sl.el.classList.toggle('has-call', (x.call || 0) > 1);
       sl.el.style.setProperty('--ns', (x.ns || 0).toFixed(3));
       const tag = sl.el.querySelector('.bk-dom-tag');
-      const txt = (x.ns || 0) >= .5 ? L(TEXT.nsh) : (x.late || 0) >= 2 ? `${L(TEXT.lateTag)} ${Math.round(x.late)}′` : o.wait >= 2 ? `+${Math.round(o.wait)}′` : '';
+      const txt = (x.re || 0) > .5 ? L(TEXT.reo) : (x.ns || 0) >= .5 ? L(TEXT.nsh) : (x.late || 0) >= 2 ? `${L(TEXT.lateTag)} ${Math.round(x.late)}′` : o.wait >= 2 ? `+${Math.round(o.wait)}′` : '';
       sl.el.classList.toggle('is-low', sl.i % 2 === 1);
       if (tag.textContent !== txt) tag.textContent = txt;
     });

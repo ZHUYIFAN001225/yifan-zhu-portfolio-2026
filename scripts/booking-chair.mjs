@@ -22,6 +22,7 @@ const T = {
   sim: ['Illustrative', '示意'],
   k: ['Did you notice?', '你注意到了吗？'],
   a: ['While you read, her phone went off', '你读到这里，她的手机响了'],
+  a0: ['A normal morning on her phone:', '她手机上，一个普通的上午：'],
   times: [' times', ' 次'],
   b: ['Every one was someone asking about a time — and she reads them with scissors in her hand, mid-cut.', '每一条都是有人在问时间。而她看到它们的时候，手里正拿着剪刀，剪到一半。'],
   c: ['From here on, customers scan a QR code and book themselves. These stop.', '从这里开始，顾客扫码自己预约。这些消息就不会再来了。'],
@@ -33,11 +34,11 @@ export function mountChair(root) {
   if (document.querySelector('.bk-calls')) return;
   root.querySelector('.bk-story-board')?.remove();
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const ui = document.createElement('div'); ui.className = 'bk-calls';
-  ui.innerHTML = `<div class="bk-call-sum" role="status" hidden><button type="button" class="bk-call-x"></button>
-    <p class="bk-call-sum-k"></p><p class="bk-call-sum-a"></p><ol class="bk-call-sum-list"></ol><p class="bk-call-sum-b"></p><p class="bk-call-sum-c"></p></div>`;
-  document.body.append(ui);
-  const $ = s => ui.querySelector(s), sum = $('.bk-call-sum');
+  // the reveal is part of the page, right after 10:00 — it never floats over the text and needs no closing
+  const ui = document.createElement('section'); ui.className = 'bk-calls bk-reveal'; ui.setAttribute('aria-label', '');
+  ui.innerHTML = `<div class="bk-call-sum"><p class="bk-call-sum-k"></p><p class="bk-call-sum-a"></p><ol class="bk-call-sum-list"></ol><p class="bk-call-sum-b"></p><p class="bk-call-sum-c"></p></div>`;
+  const anchor = root.querySelector('.bk-moment[data-moment="system"]'); if (anchor) anchor.after(ui); else return;
+  const $ = s => ui.querySelector(s);
   const seen = [], fired = new Set(); let done = false, live = 0;
 
   const icon = h => h.kind === 'msg' ? `<i class="bk-n-app is-wx" aria-hidden="true"></i>` : `<i class="bk-n-app is-ph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg></i>`;
@@ -52,7 +53,7 @@ export function mountChair(root) {
     buzz(h.kind === 'call' ? 2 : 1);
     const stay = h.kind === 'call' ? 4200 : 3200;
     setTimeout(() => { el.classList.remove('is-in'); el.classList.add('is-out'); setTimeout(() => { el.remove(); live--; }, 500); }, stay);
-    seen.push(i);
+    seen.push(i); fillSum();
   }
   // the card (or paper) in the middle of the screen gives a short phone-on-the-counter buzz
   const CARDS = '.bk-sheet,.bk-dom-card,.bk-receipt,.bk-owner,.bk-ask,.ux-blueprint,.ux-section-body>*';
@@ -68,24 +69,17 @@ export function mountChair(root) {
     setTimeout(() => best.classList.remove('bk-buzz', 'bk-buzz2'), 1400);
   }
 
-  function showSum() {
-    if (seen.length < 2) return;
+  // filled in as the messages arrive; if the reader skipped them, it shows the day's messages instead
+  function fillSum() {
+    const list = seen.length >= 2 ? seen : HITS.map((_, i) => i);
     $('.bk-call-sum-k').textContent = L(T.k);
-    $('.bk-call-sum-a').innerHTML = `${L(T.a)} <b>${seen.length}${L(T.times)}</b>`;
-    $('.bk-call-sum-list').innerHTML = seen.map(i => { const h = HITS[i]; return `<li class="is-${h.kind}">${icon(h)}<b>${L(h.who)}</b><span>${L(h.what)}</span></li>`; }).join('');
+    $('.bk-call-sum-a').innerHTML = seen.length >= 2 ? `${L(T.a)} <b>${seen.length}${L(T.times)}</b>` : L(T.a0);
+    $('.bk-call-sum-list').innerHTML = list.map((i, k) => { const h = HITS[i]; return `<li class="is-${h.kind}" style="--k:${k}">${icon(h)}<b>${L(h.who)}</b><span>${L(h.what)}</span></li>`; }).join('');
     $('.bk-call-sum-b').textContent = L(T.b); $('.bk-call-sum-c').textContent = L(T.c);
-    $('.bk-call-x').textContent = '×'; $('.bk-call-x').setAttribute('aria-label', L(T.close));
-    sum.hidden = false; void sum.offsetWidth; ui.classList.add('is-sum');
-    // the list fills in one by one, so the reader recognises each message they half-noticed
-    [...$('.bk-call-sum-list').children].forEach((li, k) => li.style.setProperty('--k', k));
-    sumY = scrollY; sumAt = performance.now(); sumOn = true;
-    clearTimeout(showSum.t); showSum.t = setTimeout(hideSum, 16000);
   }
-  let sumOn = false, sumY = 0, sumAt = 0;
-  // it goes away by itself once the reader keeps scrolling (the × is only a shortcut)
-  addEventListener('scroll', () => { if (sumOn && performance.now() - sumAt > 1200 && Math.abs(scrollY - sumY) > innerHeight * .6) hideSum(); }, { passive: true });
-  function hideSum() { sumOn = false; ui.classList.remove('is-sum'); setTimeout(() => { sum.hidden = true; }, 450); }
-  $('.bk-call-x').addEventListener('click', hideSum);
+  function showSum() { fillSum(); ui.classList.add('is-sum'); }
+  fillSum(); document.addEventListener('portfolio:language', fillSum);
+  if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { showSum(); io.disconnect(); } }), { rootMargin: '0px 0px -25% 0px' }); io.observe(ui); } else showSum();
 
   const yOf = ([sel, f]) => { const el = document.querySelector(sel); if (!el) return Infinity; const r = el.getBoundingClientRect(); return r.top + scrollY + f * r.height; };
   // jumps from any in-page link (top nav, case map, skip) scroll smoothly through the triggers: don't ring on those
@@ -100,7 +94,7 @@ export function mountChair(root) {
         else if (y <= lastLine) fired.add(i); // already past (reload, jump): never ring late
       });
       const ys = yOf(STOP);
-      if (ys > lastLine && ys <= line) { done = true; if (!jump) setTimeout(showSum, 900); }
+      if (ys > lastLine && ys <= line) { done = true; fillSum(); }
       else if (ys <= lastLine) done = true;
     }
     lastLine = line;

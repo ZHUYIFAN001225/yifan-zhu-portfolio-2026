@@ -3233,3 +3233,13 @@ body.bk-on-paper::before{background:radial-gradient(36% 30% at 10% 20%,rgba(40,4
 .bk-map .bk-map-ph a{color:#f4f2ec}.bk-map .bk-map-ph a span{color:#a9b3ae}
 .bk-map .bk-map-ph a:hover{background:rgba(63,226,160,.12)}
 .bk-map .bk-map-ph::after{color:#5d6a64}
+/* the reveal now sits in the page after 10:00 (no overlay, no ×); the diary's own WeChat bubbles are gone — the real
+   notifications already carry that */
+.bk-day .bk-hand .bk-bubble,.bk-day .bk-hand .bk-wechat{display:none!important}
+.bk-reveal.bk-calls{position:relative;inset:auto;z-index:1;width:min(720px,calc(100% - 32px));margin:-4vh auto 10vh;display:block;pointer-events:auto}
+.bk-reveal .bk-call-sum{width:auto;padding:26px 28px;opacity:0;transform:translateY(16px);transition:opacity .6s,transform .7s cubic-bezier(.16,1,.3,1)}
+.bk-reveal.is-sum .bk-call-sum{opacity:1;transform:none}
+.bk-reveal.is-sum .bk-call-sum-list li{animation:bk-n-li .45s cubic-bezier(.16,1,.3,1) forwards;animation-delay:calc(.35s + var(--k) * .14s)}
+.bk-reveal .bk-call-sum-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+.bk-reveal .bk-call-sum-a{font-size:18px!important}
+@media (max-width:699px){.bk-reveal.bk-calls{left:auto;right:auto;bottom:auto;width:calc(100% - 32px)}.bk-reveal .bk-call-sum-list{grid-template-columns:1fr}.bk-reveal .bk-call-sum{padding:20px 18px}}

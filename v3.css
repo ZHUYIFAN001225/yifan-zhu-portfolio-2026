@@ -2536,3 +2536,7 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
 .bk-day .bk-story-board figcaption.bk-w{position:static;display:block;margin-top:12px;font-size:24px;line-height:1.1;white-space:normal}
 @media (max-width:899px){.bk-sb-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
 @media (max-width:520px){.bk-sb-row{grid-template-columns:1fr}.bk-day .bk-story-board figcaption.bk-w{font-size:22px}}
+.bk-dom-track{height:176px}
+.bk-day .bk-dom .bk-dom-slip.is-low .bk-dom-tag{bottom:auto;top:calc(100% + 2px)}
+.bk-dom-hours b{bottom:-2px}
+@media (max-width:699px){.bk-dom-track{height:min(46svh,400px)}.bk-day .bk-dom .bk-dom-slip.is-low .bk-dom-tag{top:auto}.bk-dom-slip{overflow:visible}}

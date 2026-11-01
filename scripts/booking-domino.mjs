@@ -45,7 +45,7 @@ const TEXT = {
   newK: ['The same day, with the diary', '同样的一天，换成共享预约本'], newT: ['Same people, same lateness. The day holds.', '同样的人，同样会迟到。这一天稳住了。'],
   wait: ['Everyone waited', '大家一共多等了'], idle: ['Chair sat empty', '椅子空着'], end: ['Last customer done', '最后一位结束'],
   over: ['after closing', '超过打烊'], ontime: ['before closing', '打烊前'],
-  hint: ['Tap a slip: make them late, or not come at all.', '点一张纸条：让 TA 迟到，或者干脆不来。'], reset: ['Replay', '重放'],
+  hint: ['Red +′ = minutes a customer waited in the shop. Tap a slip: make them late, or not come at all.', '红色 +′ = 客人在店里干等的分钟。点一张纸条：让 TA 迟到，或者干脆不来。'], reset: ['Replay', '重放'],
   closing: ['closing 18:30', '打烊 18:30'], brk: ['her break', '她的休息'], nsh: ['didn’t come', '没来'], tom: ['He · tomorrow 10:00, chosen by her', '何 · 改到明天 10:00（她自己选的）'],
   waitTag: ['wait', '等'], lateTag: ['late', '晚到']
 };
@@ -147,7 +147,8 @@ export function mountDomino(root) {
       sl.el.classList.toggle('has-call', (x.call || 0) > 1);
       sl.el.style.setProperty('--ns', (x.ns || 0).toFixed(3));
       const tag = sl.el.querySelector('.bk-dom-tag');
-      const txt = (x.ns || 0) >= .5 ? L(TEXT.nsh) : o.wait >= 2 ? `${L(TEXT.waitTag)} ${Math.round(o.wait)}′` : (x.late || 0) >= 2 ? `${L(TEXT.lateTag)} ${Math.round(x.late)}′` : '';
+      const txt = (x.ns || 0) >= .5 ? L(TEXT.nsh) : (x.late || 0) >= 2 ? `${L(TEXT.lateTag)} ${Math.round(x.late)}′` : o.wait >= 2 ? `+${Math.round(o.wait)}′` : '';
+      sl.el.classList.toggle('is-low', sl.i % 2 === 1);
       if (tag.textContent !== txt) tag.textContent = txt;
     });
     // counters

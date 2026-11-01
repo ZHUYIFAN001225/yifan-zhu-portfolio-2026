@@ -2619,3 +2619,11 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
 /* illustrative numbers must not look like real metrics */
 .bk-dom-stats b{font-weight:500;color:#5b6f8f!important;font-style:italic}
 .bk-dom-stats{border:1.5px dashed rgba(91,111,143,.4);border-radius:8px;padding:12px 14px}
+@media(max-width:900px){
+  .bk-day .op--3d .op-copy{left:16px;right:16px;max-width:none;bottom:18px;padding:14px 16px}
+  .bk-day .op--3d .op-kicker{display:none}
+  .bk-day .op--3d .op-sub{font-size:15px}
+  .bk-day .op-live{font-size:11px;flex-wrap:wrap}
+  .bk-day .op-url{font-size:12px;padding:6px 10px;margin-bottom:8px}
+  .bk-day .op-btn{padding:9px 13px;font-size:13px}
+}

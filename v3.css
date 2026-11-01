@@ -3335,3 +3335,40 @@ body.bk-on-paper::before{filter:none!important}
 .bk-day .v3-product-head.has-opening .v3-product-intro{font-size:15px!important;line-height:1.6!important;color:#a9b3ae!important}
 @media (max-width:999px){.bk-day .v3-product-head.has-opening>div:first-child{position:static;padding-top:0}}
 .op2-cap-m{display:none}@media (hover:none) and (pointer:coarse){.op2-cap-d{display:none}.op2-cap-m{display:inline}}
+
+/* ======== booking: try-it block — the prototype in the middle, a customer/shop switch, pencil notes ======== */
+.bk-day .v3-product-head.bk-try-head{display:block!important;margin:40px auto 90px!important;width:min(1180px,calc(100% - 48px))}
+.bk-try-head>div:not(.bk-try){display:none!important}
+.bk-try-head .ux-demo-stage,.bk-try-head .ux-hero-howto,.bk-try-head .ux-hero-print{display:none!important}
+.bk-try-top{display:grid;justify-items:center;text-align:center;margin-bottom:34px}
+.bk-try-k2{margin:0 0 12px;font:600 11.5px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#3fe2a0}
+.bk-try-h{margin:0;max-width:22ch;font:600 clamp(30px,3.6vw,52px)/1.1 Inter,system-ui,sans-serif;letter-spacing:-.035em;color:#f4f2ec}
+.bk-try-sub{margin:14px 0 26px;font:500 15px/1.5 Inter,system-ui,sans-serif;color:#9fb0a8}
+.bk-try-switch{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;padding:5px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.bk-try-switch button{position:relative;z-index:1;min-width:120px;padding:10px 22px;border:0;background:none;border-radius:999px;font:600 14px/1 Inter,system-ui,sans-serif;color:#c9d2cd;cursor:pointer;transition:color .3s}
+.bk-try-switch button[aria-selected="true"]{color:#0f1a15}
+.bk-try-switch>i{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);border-radius:999px;background:#3fe2a0;box-shadow:0 6px 20px -6px rgba(63,226,160,.6);transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.bk-try-switch[data-v="shop"]>i{transform:translateX(100%)}
+.bk-try-bench{position:relative;display:grid;justify-items:center}
+.bk-try-bench .ux-demo-device{position:relative;z-index:1;width:min(400px,100%)!important;padding:10px!important;border:0!important;border-radius:46px!important;background:#0b0c0e!important;overflow:visible!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.05),0 60px 120px -40px rgba(0,0,0,.9),0 0 120px -20px rgba(63,226,160,.14)!important;transition:opacity .25s,transform .4s cubic-bezier(.16,1,.3,1)}
+.bk-try-bench .ux-demo-device iframe{display:block;width:100%;height:min(780px,78vh)!important;border-radius:36px!important;background:#fff!important}
+.bk-try-bench .ux-demo-device.is-swap{opacity:.35;transform:scale(.985)}
+/* pencil notes beside the screen */
+.bk-try-notes{position:absolute;inset:0;pointer-events:none}
+.bk-try-note{position:absolute;top:calc(var(--y) * 100%);display:flex;align-items:center;gap:6px;margin:0;width:calc(50% - 230px);max-width:300px;color:#9fe8c6}
+.bk-try-note.is-l{right:calc(50% + 214px);justify-content:flex-end;text-align:right}
+.bk-try-note.is-r{left:calc(50% + 214px);flex-direction:row-reverse;justify-content:flex-end}
+.bk-try-note span{font:400 23px/1.15 Caveat,"Long Cang","Segoe Print","Bradley Hand",cursive;transform:rotate(-2deg)}
+.bk-try-note svg{flex:none;width:70px;height:24px;overflow:visible}
+.bk-try-note path{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:140;stroke-dashoffset:140;animation:bk-try-draw .9s ease .3s forwards}
+.bk-try-note span{opacity:0;animation:op2-in .7s ease .15s forwards}
+@keyframes bk-try-draw{to{stroke-dashoffset:0}}
+.bk-try-note.is-top{color:#ffd68a}
+.bk-try-links{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:26px 0 0}
+.bk-try-links a{padding:11px 20px;border-radius:999px;font:600 14px/1 Inter,system-ui,sans-serif;text-decoration:none!important;color:#f4f2ec;border:1px solid rgba(255,255,255,.18);background:none}
+.bk-try-links a:hover{background:rgba(255,255,255,.06)}
+@media (max-width:1060px){.bk-try-note{display:none}}
+@media (max-width:699px){.bk-try-switch button{min-width:0;padding:10px 18px}.bk-try-bench .ux-demo-device iframe{height:min(680px,76vh)!important}}
+.bk-try-note.is-top{top:-62px}.bk-try-note.is-top svg{transform:rotate(-28deg) translateY(-6px)}
+.bk-try-links a{display:inline-flex!important;align-items:center;height:46px;box-sizing:border-box;margin:0!important;padding:0 22px!important;color:#f4f2ec!important;border:1px solid rgba(255,255,255,.18)!important;background:none!important;font:600 14px/1 Inter,system-ui,sans-serif!important}

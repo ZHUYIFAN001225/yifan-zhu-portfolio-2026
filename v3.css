@@ -3400,3 +3400,14 @@ body.bk-on-paper::before{filter:none!important}
 }
 /* mobile: the reckoning after the board */
 .bk-ledger.is-after{width:calc(100% - 32px);margin:-10vh auto 8vh;padding:16px;box-sizing:border-box;border-radius:18px;background:#fffdf6;box-shadow:0 20px 40px -30px rgba(23,54,43,.45);position:relative;z-index:2}
+
+/* opening: bigger words that part as you scroll — GLASGOW left, BOOKING right, SALON grows in the middle */
+.bk-day ~ * .op-word,.op--3d .op-word{font-size:clamp(84px,15.5vw,270px)!important;line-height:.84!important}
+.op--3d .op-type{justify-content:center!important;padding-top:0!important}
+.op--3d .op-word:nth-child(1){text-align:left}
+.op--3d .op-word:nth-child(2){text-align:center!important;transform:scale(calc(1 + var(--sp,0) * .45))!important;transform-origin:50% 50%}
+.op--3d .op-word:nth-child(3){text-align:right}
+.op--3d .op-word:nth-child(1),.op--3d .op-word:nth-child(3){transform:translateX(calc(var(--sp,0) * var(--dx) * 60vw))!important}
+.op--3d .op-word{font-size:clamp(80px,14vw,250px)!important}
+:lang(zh) .op--3d .op-word{font-size:clamp(72px,13vw,230px)!important;line-height:1!important}
+@media (max-width:760px){.op--3d .op-word{font-size:clamp(64px,19vw,110px)!important}}

@@ -199,15 +199,8 @@ export function mountStage(root) {
       const first = (heroEl.dataset.screens || '').split(',')[0].match(/([\w-]+)\.webp/); if (first) f = first[1];
       push(vh * .5, { kind: 'hero', q: P6([x0, y0, s0, -.06, -.45, 0]), f });
       push(vh * .5 + opH * .5, { kind: 'hero', q: P6([x0, y0 - opH * .5 / vh * .55, s0 * .96, -.02, -.3, 0]), f });
-      const dev = document.querySelector('.ux-hero-demo .ux-demo-device, .ux-hero-demo iframe');
-      if (dev) {
-        // it straightens, sizes itself to the prototype's screen and follows it exactly; then it fades and the real,
-        // clickable prototype is what you see
-        const d = dev.getBoundingClientRect(), track = { mid: d.top + scrollY + d.height / 2 };
-        const q = P6([(d.left + d.width / 2) / innerWidth, .5, d.height * 1.62 / SH / vh, 0, 0, 0]);
-        push(track.mid, { kind: 'dock', track, q, f: 'book' }); push(track.mid + vh * .25, { kind: 'dock', track, q, f: 'book' });
-        const m1 = root.querySelector('.bk-moment'); if (m1) push(docY(m1) - vh * .55, { kind: 'off', q: off(1, .85), f: 'book' });
-      }
+      // the cover's phone rises up and away as the cover scrolls off (the try-it block has its own live prototype)
+      push(vh * .5 + opH * 1.05, { kind: 'off', q: P6([x0, -.7, s0 * .8, .35, -.1, .08]), f });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
     let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet

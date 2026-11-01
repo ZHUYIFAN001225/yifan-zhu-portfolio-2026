@@ -37,7 +37,7 @@ const NOTES = [
   ['#build .ux-section-body', ['rules written and tested before the UI', '先写规则、测规则，再做界面'], 'prepend'],
   ['#challenges .ux-challenge-grid', ['still to prove with the owner', '还要和店主一起验证']],
   ['#research .ux-research-plan', ['not validated yet: next, watch a real booking', '还没验证：下一步，看一次真实预约']],
-  ['#release .ux-section-body', ['one QR code, any customer', '一个二维码，谁都能约'], 'append']
+
 ];
 const ACTS = [
   // the old way and what goes wrong are one page: it is written, then it falls apart, while it stays on screen

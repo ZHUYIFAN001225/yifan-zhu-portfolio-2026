@@ -3372,3 +3372,31 @@ body.bk-on-paper::before{filter:none!important}
 @media (max-width:699px){.bk-try-switch button{min-width:0;padding:10px 18px}.bk-try-bench .ux-demo-device iframe{height:min(680px,76vh)!important}}
 .bk-try-note.is-top{top:-62px}.bk-try-note.is-top svg{transform:rotate(-28deg) translateY(-6px)}
 .bk-try-links a{display:inline-flex!important;align-items:center;height:46px;box-sizing:border-box;margin:0!important;padding:0 22px!important;color:#f4f2ec!important;border:1px solid rgba(255,255,255,.18)!important;background:none!important;font:600 14px/1 Inter,system-ui,sans-serif!important}
+
+/* ---- review fixes ---- */
+/* taps chart: readable on paper */
+.bk-day .ux-taps i{background:rgba(23,54,43,.07)!important}
+.bk-day .ux-taps i::before{background:#1f9e6c!important}
+.bk-day .ux-taps .is-over i::before{background:#d0453b!important}
+.bk-day .ux-taps b{color:#17362b!important;font-weight:600}
+.bk-day .ux-taps>div>span{color:#17362b}
+/* release: the PDF link is already at the top and in the closing card */
+.bk-day #release .ux-section-body>.v3-outline-button{display:none}
+/* the section index fits on one line (scrolls sideways if needed) */
+.bk-day .ux-case-index{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none}
+.bk-day .ux-case-index::-webkit-scrollbar{display:none}
+.bk-day .ux-case-index a{white-space:nowrap;flex:none}
+.bk-day .ux-case-index .ux-index-top{display:none}
+/* the case map pill steps aside while you scroll down */
+.bk-map-pill.is-on.is-away{opacity:0;transform:translateY(14px);pointer-events:none}
+/* mobile: "two sides" table header and rows */
+@media (max-width:699px){
+  .bk-ask p{grid-template-columns:1fr 18px 1fr}
+  .bk-ask-h{position:relative;padding:34px 12px 12px;font-size:10.5px}
+  .bk-ask-h b{position:absolute;left:50%;top:8px;transform:translateX(-50%);white-space:nowrap;font-size:10px;padding:4px 8px}
+  .bk-ask-h span:first-child{grid-column:1;padding-right:8px}.bk-ask-h span:last-child{grid-column:3;padding-left:8px}
+  .bk-ask-r{font-size:14px;padding:11px 12px}
+  .bk-ask-r span:first-child{padding-right:8px}.bk-ask-r span:last-child{padding-left:8px}
+}
+/* mobile: the reckoning after the board */
+.bk-ledger.is-after{width:calc(100% - 32px);margin:-10vh auto 8vh;padding:16px;box-sizing:border-box;border-radius:18px;background:#fffdf6;box-shadow:0 20px 40px -30px rgba(23,54,43,.45);position:relative;z-index:2}

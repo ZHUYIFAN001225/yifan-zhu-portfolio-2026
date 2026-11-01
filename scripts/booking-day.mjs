@@ -184,7 +184,7 @@ function checklist(root, calm) {
 function parallax(root, calm) {
   if (calm) return;
   const type = document.querySelector('[data-opening] .op-type');
-  const items = [...root.querySelectorAll('.bk-moment-line, .bk-moment-cap, .ux-persona, .ux-blueprint, .bk-check')];
+  const items = []; // content blocks no longer drift: they ran into their neighbours
   items.forEach((e, i) => e.style.setProperty('--ps', [.12, -.08, .18, -.05, .1][i % 5]));
   let q = false;
   const run = () => { q = false; const vh = innerHeight;

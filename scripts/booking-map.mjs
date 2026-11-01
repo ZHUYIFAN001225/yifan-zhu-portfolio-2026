@@ -100,6 +100,11 @@ export function mountMap(root) {
     pill.querySelectorAll('.bk-map-ph').forEach((ph, k) => ph.classList.toggle('is-here', k === pi));
     pill.querySelectorAll('.bk-map-grid a').forEach(a => a.classList.toggle('is-here', a.getAttribute('href') === '#' + key));
   }
-  let q = false; addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; mark(); }); } }, { passive: true });
+  let q = false, lastY = scrollY, idle = 0;
+  addEventListener('scroll', () => {
+    const y = scrollY; if (y > lastY + 4 && !pill.classList.contains('is-open')) pill.classList.add('is-away'); else if (y < lastY - 4) pill.classList.remove('is-away'); lastY = y;
+    clearTimeout(idle); idle = setTimeout(() => pill.classList.remove('is-away'), 700);
+    if (!q) { q = true; requestAnimationFrame(() => { q = false; mark(); }); }
+  }, { passive: true });
   render(); document.addEventListener('portfolio:language', () => setTimeout(() => { curKey = '-'; render(); }, 40));
 }

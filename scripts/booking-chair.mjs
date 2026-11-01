@@ -43,7 +43,9 @@ export function mountChair(root) {
   ui.innerHTML = `<div class="bk-ledger-before"><p class="bk-ledger-k"></p><p class="bk-ledger-t"></p><ol class="bk-ledger-list"></ol></div>
     <i class="bk-ledger-arrow" aria-hidden="true">→</i>
     <div class="bk-ledger-after"><p class="bk-ledger-k"></p><p class="bk-ledger-zero"><b>0</b><span></span></p><small></small></div>`;
-  if (board) board.querySelector('.bk-dom-stats')?.before(ui);
+  // on narrow screens the pinned card has no room for it: it follows the board instead
+  const place = () => { if (!board) return; if (matchMedia('(max-width: 899px)').matches) { ui.classList.add('is-after'); board.closest('.bk-dom').after(ui); } else { ui.classList.remove('is-after'); board.querySelector('.bk-dom-stats')?.before(ui); } };
+  place(); matchMedia('(max-width: 899px)').addEventListener('change', place);
   const $ = s => ui.querySelector(s);
   const seen = [], fired = new Set(); let done = false, live = 0;
 

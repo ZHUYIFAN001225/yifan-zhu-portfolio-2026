@@ -223,11 +223,11 @@ export function mountStage(root) {
         const rest = P6([.78, .52, .64, .04, -.12, 0]), lab = ['Owner · the diary keeps itself', '店主 · 预约本自己记'];
         push(top - vh * .35, { kind: 'off', q: P6([.8, 1.7, .6, -.5, -.7, .14]), f });
         push(top + h * .18, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
-        push(top + h * .78, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
+        push(top + h * .62, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
         return;
       }
       if (!phoneOn && !m) return;
-      if (!m && phoneOn && !S.some(x => x.gone)) { push(top - vh * .05, { kind: 'off', gone: true, q: P6([.8, -.75, .6, .5, .5, -.12]), f }); return; }
+      if (!m && phoneOn && !S.some(x => x.gone)) { push(top - vh * .38, { kind: 'off', gone: true, q: P6([.8, -.75, .6, .5, .5, -.12]), f }); return; }
       if (!m) return;
       if (e.matches('.bk-step')) {
         const s = STEPS[+e.dataset.i];

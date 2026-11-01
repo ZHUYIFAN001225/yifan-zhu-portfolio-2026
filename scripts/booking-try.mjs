@@ -39,6 +39,8 @@ export function mountTry(root) {
     <div class="bk-try-bench"><div class="bk-try-notes" aria-hidden="true"></div></div>
     <p class="bk-try-links"><a class="bk-try-full" target="_blank" rel="noopener" hidden></a></p>`;
   head.prepend(wrap);
+  // a reviewer reads the one-minute summary and the case map first, then tries it
+  const quick = root.querySelector('.bk-quick'); if (quick) head.before(quick);
   const bench = wrap.querySelector('.bk-try-bench');
   bench.prepend(device);
   if (pdf) { pdf.classList.add('bk-try-pdf'); wrap.querySelector('.bk-try-links').append(pdf); }

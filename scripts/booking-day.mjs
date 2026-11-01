@@ -154,20 +154,12 @@ function stage(root, calm) {
   };
   const undo = [() => { S = null; layout(false); }];
   if (calm) return;
-  import('./booking-stage.mjs').then(mod => {
+  import('./booking-stage.mjs').then(async mod => {
     S = mod; layout(mq.matches); mq.addEventListener('change', e => { if (S) layout(e.matches); });
+    // 12:10: the booking as a two-lane flow of the real screens (no scroll-jacking, no 3D here)
+    const flowMod = await import('./booking-flow.mjs');
     let story = null;
-    if (st) {
-      story = document.createElement('section'); story.className = 'bk-story';
-      const N = mod.STEPS.length, pad = n => String(n).padStart(2, '0');
-      story.innerHTML = mod.STEPS.map((s, i) => `<div class="bk-step" data-i="${i}"><div class="bk-step-card"><p class="bk-step-n">${pad(i + 1)} / ${pad(N)}</p><p class="bk-step-k"></p><h3 class="bk-step-t"></h3><p class="bk-step-b"></p></div></div>`).join('');
-      const text = () => { const l = zh() ? 1 : 0; story.setAttribute('aria-label', zh() ? '一笔预约，一步一步' : 'One booking, step by step'); story.querySelectorAll('.bk-step').forEach((el, i) => { const s = mod.STEPS[i]; el.querySelector('.bk-step-k').textContent = s.kicker[l]; el.querySelector('.bk-step-t').textContent = s.title[l]; el.querySelector('.bk-step-b').textContent = s.body[l]; }); };
-      text(); document.addEventListener('portfolio:language', text);
-      st.before(story); st.classList.add('bk-st-hidden');
-      // each step card rises in as it arrives
-      const io = new IntersectionObserver(es => es.forEach(en => en.target.classList.toggle('is-in', en.isIntersecting)), { rootMargin: '-18% 0px -18% 0px' });
-      story.querySelectorAll('.bk-step').forEach(s => io.observe(s));
-    }
+    if (st) { story = flowMod.mountFlow(root, st); st.classList.add('bk-st-hidden'); }
     if (!mod.mountStage(root)) throw new Error('WebGL unavailable');
     document.body.classList.add('bk-staged');
   }).catch(e => { console.error(e); root.querySelector('.bk-story')?.remove(); st?.classList.remove('bk-st-hidden'); undo.forEach(f => f()); });

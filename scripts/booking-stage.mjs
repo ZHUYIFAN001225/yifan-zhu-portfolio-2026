@@ -66,7 +66,9 @@ const HOVER = [
 ];
 // which side of the page each chapter keeps its phone on (desktop)
 // the phone always stands on the right and the text always reads on the left: it never has to cross the text
-export const SIDE = { system: 'right', strategy: 'right', iteration: 'right', structure: 'right', interfaces: 'right', build: 'right', challenges: 'right', research: 'right', release: 'right' };
+// the phone appears only where it carries the story (the opening, and when it takes over from the paper diary);
+// the long chapters get the full width and no phone
+export const SIDE = {};
 
 const P6 = a => ({ x: a[0], y: a[1], s: a[2], rx: a[3], ry: a[4], rz: a[5] });
 
@@ -216,10 +218,12 @@ export function mountStage(root) {
         // act 3: the phone takes over from the paper diary
         phoneOn = true; f = 'schedule';
         if (m) { const sp = e.querySelector('.bk-hand-space') || e, t2 = docY(sp), h2 = sp.offsetHeight; push(t2 - vh * .45, { kind: 'off', q: off(1), f }); push(t2 + h2 * .5, { kind: 'hand', q: P6([.5, .5, .5, .03, -.2, 0]), f, spot: SPOT.schedule }); story = true; return; }
-        push(top + h * .55, { kind: 'section', el: e.querySelector('.bk-sheet'), q: P6([.78, .52, .64, .04, -.3, 0]), f, spot: SPOT.schedule, label: ['Owner · the diary keeps itself', '店主 · 预约本自己记'], who: 'o' });
+        push(top + h * .55, { kind: 'section', q: P6([.78, .52, .64, .04, -.12, 0]), f, spot: null, label: ['Owner · the diary keeps itself', '店主 · 预约本自己记'], who: 'o' });
         return;
       }
       if (!phoneOn && !m) return;
+      if (!m && phoneOn && !S.some(x => x.gone)) { push(top - vh * .2, { kind: 'off', gone: true, q: P6([1.35, .5, .5, .1, -.6, 0]), f }); return; }
+      if (!m) return;
       if (e.matches('.bk-step')) {
         const s = STEPS[+e.dataset.i];
         if (!story && m) push(top - vh * .45, { kind: 'off', q: off(1), f });
@@ -269,14 +273,14 @@ export function mountStage(root) {
 
   // ---------- pointing at text ----------
   let hover = null, peek = null, peekAmt = 0, peekY = 0;
-  HOVER.forEach(([sel, list]) => root.querySelectorAll(sel).forEach((el, i) => {
+  [].forEach(([sel, list]) => root.querySelectorAll(sel).forEach((el, i) => {
     const file = list[i % list.length]; el.classList.add('bk-points');
     if (canHover) {
       el.addEventListener('pointerenter', () => { hover = { file, rect: SPOT[file] || [2, 20, 96, 30], el }; el.classList.add('is-pointed'); });
       el.addEventListener('pointerleave', () => { if (hover?.el === el) hover = null; el.classList.remove('is-pointed'); });
     } else el.addEventListener('click', () => { const r = el.getBoundingClientRect(); peek = { file, rect: SPOT[file] || [2, 20, 96, 30], y: (r.top + r.height / 2) > innerHeight * .5 ? .3 : .7, sy: scrollY, t: performance.now() }; });
   }));
-  root.querySelectorAll('#structure [data-screen]').forEach(b => {
+  [].forEach(b => {
     if (canHover) { b.addEventListener('pointerenter', () => { hover = { file: b.dataset.screen, rect: null, el: b }; }); b.addEventListener('pointerleave', () => { if (hover?.el === b) hover = null; }); }
     else b.addEventListener('click', () => { peek = { file: b.dataset.screen, rect: null, y: .32, sy: scrollY, t: performance.now() }; });
   });

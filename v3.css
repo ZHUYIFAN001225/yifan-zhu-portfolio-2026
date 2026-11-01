@@ -2973,3 +2973,15 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
   .bk-ch2-sum-big b{font-size:42px}
 }
 .bk-ch2.is-end .bk-ch2-owner{display:none}@media (max-width:699px){.bk-ch2.is-end .bk-ch2-log{display:none}.bk-ch2-pin{padding-top:96px}}
+/* chair v2: no clicking — the ring shakes the scene, then it blurs while she's busy */
+.bk-ch2-pop{pointer-events:none}
+.bk-ch2.is-ring .bk-ch2-pin{animation:bk-ch2-shake .11s linear infinite alternate}
+.bk-ch2.is-ring :is(.bk-hand-t,.bk-ch2-lead,.bk-ch2-clock b){animation:bk-ch2-jit .07s steps(2) infinite alternate}
+.bk-ch2.is-ring .bk-ch2-pop .bk-ch2-note{animation:bk-ch2-buzz .09s linear infinite alternate}
+@keyframes bk-ch2-shake{0%{transform:translate(-2px,1px) rotate(-.15deg)}100%{transform:translate(2px,-1px) rotate(.15deg)}}
+@keyframes bk-ch2-jit{0%{transform:translateX(-1.5px)}100%{transform:translateX(1.5px)}}
+.bk-ch2.is-hit .bk-ch2-card{filter:blur(2px) saturate(.6)}
+.bk-ch2.is-hit :is(.bk-hand-head){filter:blur(1px);opacity:.6;transition:filter .3s,opacity .3s}
+.bk-ch2 .bk-hand-head{transition:filter .3s,opacity .3s}
+@media (prefers-reduced-motion:reduce){.bk-ch2.is-ring .bk-ch2-pin,.bk-ch2.is-ring *{animation:none!important}}
+.bk-ch2{height:300vh}

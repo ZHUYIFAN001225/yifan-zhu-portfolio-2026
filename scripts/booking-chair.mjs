@@ -1,6 +1,6 @@
 // Glasgow Salon Booking — "You're in the chair."
 // The reader is the customer. Scrolling is the haircut. At four points her phone goes off: a call or a message drops
-// over the page, scrolling stops, and the reader can only carry on after letting her deal with it. Each interruption
+// over the page, the scene buzzes and blurs, and the haircut stops moving while you keep scrolling. Each interruption
 // adds a red slice to the time bar, the clock jumps, and the next customer's start slips. Light, on the paper —
 // the interruption is the event, not the frame.
 const zh = () => document.documentElement.lang.startsWith('zh');
@@ -22,7 +22,6 @@ const T = {
   done: ['haircut done', '已剪完'], next: ['Next: Ella, booked 14:30', '下一位：Ella，约了 14:30'],
   ontime: ['on time', '准时'], bookedEnd: ['booked end', '原定结束'],
   sorry: ['Sorry, one sec —', '不好意思，我接一下——'],
-  wait: ['Wait for her', '等她处理完'], waitHint: ['You can’t scroll on until she’s done.', '她处理完之前，你只能等着。'],
   onPhone: ['She’s on the phone', '她在接电话'], replying: ['She’s typing a reply', '她在回消息'],
   sum1: ['Your 30-minute haircut took', '你 30 分钟的剪发，坐了'],
   sum2: ['on other people’s bookings', '花在别人的预约上'],
@@ -52,19 +51,28 @@ export function mountChair(root) {
     </div>
     <a class="bk-ch2-skip" href="#"></a>
   </div>
-  <div class="bk-ch2-pop" role="alertdialog" hidden>
+  <div class="bk-ch2-pop" aria-hidden="true" hidden>
     <div class="bk-ch2-note"><i class="bk-ch2-app" aria-hidden="true"></i><div><small class="bk-ch2-what"></small><b class="bk-ch2-who"></b><span class="bk-ch2-msg"></span></div><span class="bk-ch2-ring" aria-hidden="true"></span></div>
-    <div class="bk-ch2-act"><p class="bk-ch2-hint"></p><button type="button" class="bk-ch2-btn"></button></div>
     <div class="bk-ch2-busy"><i></i><span class="bk-ch2-busy-t"></span><b class="bk-ch2-busy-m"></b></div>
   </div>`;
   board.after(sec);
   root.querySelector('.bk-story-board')?.remove();
   const $ = s => sec.querySelector(s), pop = $('.bk-ch2-pop');
 
-  let p = calm ? 1 : 0, active = -1, lockY = 0, skipped = calm, timer = 0, busyT = 0;
-  const fired = new Set(), resolved = new Set();
+  // scroll is time. Cutting windows move the haircut on; interruption windows freeze it while the red slice grows.
+  // Nothing has to be clicked: the page rings, shakes and blurs as you scroll through, then lets you go.
+  const W = [];
+  { let x = 0; const cut = .1, hit = .1; HITS.forEach((h, i) => { W.push({ cut: [x, x + cut], from: i ? HITS[i - 1].at : 0, to: h.at }); x += cut; W.push({ hit: i, w: [x, x + hit] }); x += hit; }); W.push({ cut: [x, .95], from: HITS[HITS.length - 1].at, to: 1 }); }
+  let p = calm ? 1 : 0, active = -1, logged = -1;
   const total = HITS.reduce((a, h) => a + h.mins, 0);
-  const lost = () => HITS.reduce((a, h, i) => a + (resolved.has(i) ? h.mins : 0), 0);
+  const state = () => {
+    let cut = 0; const hk = HITS.map(() => 0); let act = -1, ak = 0;
+    W.forEach(w => {
+      if (w.cut) { const k = clamp((p - w.cut[0]) / (w.cut[1] - w.cut[0])); if (k > 0) cut = w.from + (w.to - w.from) * k; }
+      else { const k = clamp((p - w.w[0]) / (w.w[1] - w.w[0])); hk[w.hit] = k; if (k > 0 && k < 1) { act = w.hit; ak = k; } }
+    });
+    return { cut, hk, act, ak };
+  };
 
   const fill = i => {
     const h = HITS[i];
@@ -79,113 +87,73 @@ export function mountChair(root) {
     $('.bk-hand-k').textContent = L(T.k); $('.bk-hand-t').textContent = L(T.t); $('.bk-ch2-lead').textContent = L(T.lead); $('.bk-stamp').textContent = L(T.stamp);
     $('.bk-ch2-you').textContent = L(T.you); $('.bk-ch2-svc').textContent = L(T.svc); $('.bk-ch2-done').textContent = L(T.done);
     $('.bk-ch2-next-t').textContent = L(T.next); $('.bk-ch2-mark-l').textContent = L(T.bookedEnd) + ' 14:30';
-    $('.bk-ch2-btn').textContent = L(T.wait); $('.bk-ch2-hint').textContent = L(T.waitHint); $('.bk-ch2-skip').textContent = L(T.skip);
+    $('.bk-ch2-skip').textContent = L(T.skip);
     $('.bk-ch2-sum-a').textContent = L(T.sum1); $('.bk-ch2-sum-big b').textContent = 30 + total; $('.bk-ch2-sum-big span').textContent = L(T.min);
     $('.bk-ch2-sum-row .r1').textContent = total + ' ' + L(T.min); $('.bk-ch2-sum-row .r1 + span').textContent = L(T.sum2);
     $('.bk-ch2-sum-row .r2').textContent = '+' + total + ' ' + L(T.min); $('.bk-ch2-sum-row .r2 + span').textContent = L(T.sum3);
     $('.bk-ch2-sum-t').textContent = L(T.sum4);
     if (active >= 0) fill(active);
-    draw();
+    logged = -1; active = -2; draw();
+  };
+
+  const logRow = i => {
+    const h = HITS[i], at = Math.floor(h.at * 30 + HITS.slice(0, i).reduce((a, x) => a + x.mins, 0));
+    return `<li class="is-${h.kind}"><time>14:${String(at).padStart(2, '0')}</time><span>${L(h.who)} · ${L(h.what)}</span><b>+${h.mins} ${L(T.min)}</b></li>`;
   };
 
   // the bar spans 48 minutes; cutting slices are green, interruptions red, in the order they happened
   const SCALE = 48;
   function draw() {
-    const cutDone = p * 30, segs = []; let prev = 0;
+    const S = state(), cutDone = S.cut * 30, segs = []; let prev = 0, extra = 0;
     HITS.forEach((h, i) => {
-      if (!fired.has(i)) return;
-      const c = h.at * 30; segs.push(['cut', Math.max(0, Math.min(cutDone, c) - prev)]); prev = Math.min(cutDone, c);
-      if (resolved.has(i)) segs.push(['call', h.mins]);
-      else if (i === active) segs.push(['call', h.mins * busyT]);
+      if (S.hk[i] <= 0) return;
+      const c = h.at * 30; segs.push(['cut', Math.max(0, c - prev)]); prev = c;
+      const m = h.mins * clamp((S.hk[i] - .15) / .8); segs.push(['call', m]); extra += m;
     });
     segs.push(['cut', Math.max(0, cutDone - prev)]);
     const f = $('.bk-ch2-fill');
     if (f.children.length !== segs.length) f.innerHTML = segs.map(s => `<i class="is-${s[0]}"></i>`).join('');
     segs.forEach((s, i) => { f.children[i].style.width = (s[1] / SCALE * 100) + '%'; });
-    const extra = lost() + (active >= 0 ? HITS[active].mins * busyT : 0), mm = Math.floor(cutDone + extra);
+    const mm = Math.floor(cutDone + extra);
     $('.bk-ch2-clock b').textContent = `${14 + Math.floor(mm / 60)}:${String(mm % 60).padStart(2, '0')}`;
-    $('.bk-ch2-pct').textContent = Math.round(p * 100) + '%';
+    $('.bk-ch2-pct').textContent = Math.round(S.cut * 100) + '%';
     const late = Math.round(extra);
     $('.bk-ch2-late').textContent = late ? `+${late} ${L(T.min)}` : L(T.ontime);
     $('.bk-ch2-next').classList.toggle('is-late', late > 0);
     $('.bk-ch2-mark').style.left = (30 / SCALE * 100) + '%';
-    sec.classList.toggle('is-end', p > .96 && active < 0);
+    // the interruption: rings (whole scene buzzes), then she's busy (blur, timer), then it slides away
+    const act = S.act, k = S.ak;
+    if (act !== active) {
+      active = act;
+      if (act >= 0) { fill(act); pop.hidden = false; void pop.offsetWidth; pop.classList.add('is-in'); $('.bk-ch2-say').textContent = L(T.sorry); }
+      else { pop.classList.remove('is-in', 'is-busy'); }
+      $('.bk-ch2-owner').classList.toggle('is-on', act >= 0);
+    }
+    const on = act >= 0 && k < .92;
+    pop.classList.toggle('is-in', on);
+    sec.classList.toggle('is-hit', on);
+    sec.classList.toggle('is-ring', act >= 0 && k < .3);
+    if (act >= 0) {
+      const busy = k >= .3; pop.classList.toggle('is-busy', busy);
+      if (busy) { $('.bk-ch2-say').textContent = '“' + L(HITS[act].she) + '”'; const s2 = Math.round(clamp((k - .3) / .62) * HITS[act].mins * 60); $('.bk-ch2-busy-m').textContent = `${Math.floor(s2 / 60)}:${String(s2 % 60).padStart(2, '0')}`; }
+      else $('.bk-ch2-say').textContent = L(T.sorry);
+    }
+    const done = S.hk.filter(v => v >= .92).length;
+    if (done !== logged) { logged = done; $('.bk-ch2-log').innerHTML = HITS.slice(0, done).map((_, i) => logRow(i)).join(''); }
+    sec.classList.toggle('is-end', p > .96);
   }
-
-  const logRow = i => {
-    const h = HITS[i], at = Math.floor(h.at * 30 + HITS.slice(0, i).reduce((a, x) => a + x.mins, 0));
-    const li = document.createElement('li'); li.className = 'is-' + h.kind;
-    li.innerHTML = `<time>14:${String(at).padStart(2, '0')}</time><span>${L(h.who)} · ${L(h.what)}</span><b>+${h.mins} ${L(T.min)}</b>`;
-    $('.bk-ch2-log').append(li);
-  };
-
-  // while she's busy the reader can't move on: forward scrolling is held at the interruption
-  const KEYS = ['ArrowDown', 'PageDown', ' ', 'Spacebar', 'End'];
-  const block = e => {
-    if (active < 0) return;
-    if (e.type === 'keydown') { if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); handle(); return; } if (!KEYS.includes(e.key)) return; }
-    if (e.type === 'wheel' && e.deltaY < 0) return;
-    e.preventDefault();
-  };
-  const hold = () => { if (active >= 0 && scrollY > lockY + 2) scrollTo(0, lockY); };
-  addEventListener('wheel', block, { passive: false }); addEventListener('touchmove', block, { passive: false });
-  addEventListener('keydown', block); addEventListener('scroll', hold, { passive: true });
-
-  const yAt = at => sec.getBoundingClientRect().top + scrollY + at * Math.max(1, sec.offsetHeight - innerHeight);
-  function fire(i) {
-    active = i; fired.add(i); fill(i); busyT = 0;
-    lockY = Math.round(yAt(HITS[i].at)); if (scrollY > lockY) scrollTo(0, lockY);
-    pop.hidden = false; pop.classList.remove('is-busy', 'is-in'); void pop.offsetWidth; pop.classList.add('is-in');
-    sec.classList.add('is-hit');
-    $('.bk-ch2-say').textContent = L(T.sorry); $('.bk-ch2-owner').classList.add('is-on');
-    clearTimeout(timer); timer = setTimeout(handle, 7000); // nobody gets stuck for good
-    draw();
-  }
-  function handle() {
-    if (active < 0 || pop.classList.contains('is-busy')) return;
-    clearTimeout(timer);
-    const i = active, h = HITS[i];
-    pop.classList.add('is-busy');
-    $('.bk-ch2-say').textContent = '“' + L(h.she) + '”';
-    const t0 = performance.now(), dur = 1800;
-    const step = now => {
-      busyT = clamp((now - t0) / dur);
-      const s = Math.round(busyT * h.mins * 60);
-      $('.bk-ch2-busy-m').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-      draw();
-      if (busyT < 1) requestAnimationFrame(step); else finish(i);
-    };
-    requestAnimationFrame(step);
-  }
-  function finish(i) {
-    resolved.add(i); busyT = 0; active = -1; logRow(i);
-    pop.classList.remove('is-in'); sec.classList.remove('is-hit'); $('.bk-ch2-owner').classList.remove('is-on');
-    setTimeout(() => { if (active < 0) pop.hidden = true; }, 400);
-    draw();
-  }
-  function skipAll() {
-    skipped = true; clearTimeout(timer);
-    HITS.forEach((_, i) => { if (!resolved.has(i)) { fired.add(i); resolved.add(i); logRow(i); } });
-    active = -1; busyT = 0; pop.hidden = true; pop.classList.remove('is-in', 'is-busy'); sec.classList.remove('is-hit'); $('.bk-ch2-owner').classList.remove('is-on');
-    p = 1; draw();
-  }
-  $('.bk-ch2-btn').addEventListener('click', handle);
-  $('.bk-ch2-skip').addEventListener('click', e => { e.preventDefault(); skipAll(); scrollTo({ top: sec.getBoundingClientRect().bottom + scrollY - innerHeight * .2, behavior: 'smooth' }); });
+  $('.bk-ch2-skip').addEventListener('click', e => { e.preventDefault(); scrollTo({ top: sec.getBoundingClientRect().bottom + scrollY - innerHeight * .2, behavior: 'smooth' }); });
 
   text();
-  document.addEventListener('portfolio:language', () => { $('.bk-ch2-log').innerHTML = ''; [...resolved].sort().forEach(logRow); text(); });
-  if (calm) { skipAll(); return; }
+  document.addEventListener('portfolio:language', text);
+  if (calm) { p = 1; draw(); return; }
 
   let last = performance.now();
   const tick = now => {
     requestAnimationFrame(tick);
     const dt = Math.min(.08, (now - last) / 1000); last = now;
     const r = sec.getBoundingClientRect(), vh = innerHeight; if (r.bottom < -vh || r.top > vh * 2) return;
-    let target = clamp(-r.top / Math.max(1, r.height - vh));
-    if (!skipped) {
-      if (active < 0) { const n = HITS.findIndex((h, i) => !fired.has(i) && target >= h.at); if (n >= 0) fire(n); }
-      const gate = HITS.findIndex((_, i) => !resolved.has(i)); if (gate >= 0) target = Math.min(target, HITS[gate].at);
-    }
+    const target = clamp(-r.top / Math.max(1, r.height - vh));
     const np = p + (target - p) * (1 - Math.exp(-dt * 7));
     if (Math.abs(np - p) > .0003) { p = np; draw(); }
   };

@@ -2541,3 +2541,5 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
 .bk-dom-hours b{bottom:-2px}
 @media (max-width:699px){.bk-dom-track{height:min(46svh,400px)}.bk-day .bk-dom .bk-dom-slip.is-low .bk-dom-tag{top:auto}.bk-dom-slip{overflow:visible}}
 @media (max-width:699px){.bk-day .bk-dom .bk-dom-slip .bk-dom-tag{top:50%!important;bottom:auto!important;transform:translateY(-50%)}}
+.bk-dom-call{width:auto!important;height:auto!important;border:0!important;font:600 13px/1 system-ui,sans-serif;font-style:normal;color:#d0453b}
+.bk-day .bk-dom .bk-dom-tom{position:static;display:block;margin:-4px 0 10px;text-align:right;white-space:normal}

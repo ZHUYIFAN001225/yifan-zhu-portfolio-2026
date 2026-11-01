@@ -94,7 +94,7 @@ export function mountDomino(root) {
     const slips = plan.map((s, i) => {
       const ghost = document.createElement('i'); ghost.className = 'bk-dom-ghost'; ghost.style.setProperty('--s', fr(s.at)); ghost.style.setProperty('--l', s.len / (T1 - T0));
       const el = document.createElement(s.brk ? 'div' : 'button'); el.className = 'bk-dom-slip' + (s.brk ? ' is-break' : ''); if (!s.brk) el.type = 'button';
-      el.innerHTML = `<span class="bk-dom-name"></span><span class="bk-dom-sv"></span><em class="bk-dom-tag bk-w"></em><i class="bk-dom-call" aria-hidden="true"></i>`;
+      el.innerHTML = `<span class="bk-dom-name"></span><span class="bk-dom-sv"></span><em class="bk-dom-tag bk-w"></em><i class="bk-dom-call" aria-hidden="true">☎</i>`;
       track.append(ghost, el);
       return { s, i, el, ghost, x: fr(s.at), l: s.len / (T1 - T0), tx: 0, tl: 0, moved: 0 };
     });

@@ -2610,3 +2610,7 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
 .bk-end{position:relative;max-width:1080px;margin:0 auto;padding:10vh var(--v3-gutter,24px) 6vh;text-align:center}
 .bk-end-t{margin:0 0 22px;font:600 clamp(28px,3.4vw,48px)/1.1 Inter,system-ui,sans-serif;letter-spacing:-.035em;color:#17362b}
 .bk-end-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.bk-day .bk-receipt-links a,.bk-day .bk-results-card a{color:#17362b!important}
+.bk-day .bk-minute-more{color:#eef3ee!important}
+.bk-day .op--3d .op-facts{display:none}
+.bk-day .op-btn{color:#eef3ee!important}.bk-day .op-btn--main{color:#0b1a12!important}.bk-day .op-url{color:#eef3ee!important}

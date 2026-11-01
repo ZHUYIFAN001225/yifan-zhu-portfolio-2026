@@ -226,7 +226,11 @@ export function mountStage(root) {
       if (story && m) push(top - vh * .2, { kind: 'off', q: off(-1), f });
       story = false;
       // the pinned day boards and the storyboard get the whole width: the phone steps out to the side
-      if (e.matches('.bk-dom, .bk-story-board, .bk-results, .bk-end')) { if (!phoneOn || m) return; const q = P6([1.35, .5, .5, .1, -1.2, 0]); push(top - vh * .3, { kind: 'off', q, f }); push(top + h - vh * .7, { kind: 'off', q, f }); return; }
+      if (e.matches('.bk-dom, .bk-story-board, .bk-results, .bk-end')) { if (!phoneOn || m) return;
+        // step out on the side the phone will come back on, so it never crosses the text on the way
+        let n = els[idx + 1]; while (n && !SIDE[n.id] && !n.matches('.bk-step')) n = els[els.indexOf(n) + 1];
+        const back = n ? (n.matches('.bk-step') || SIDE[n.id] === 'right' ? 1 : -1) : 1;
+        const q = P6([back > 0 ? 1.35 : -.35, .5, .5, .1, back > 0 ? -1.2 : 1.2, 0]); push(top - vh * .3, { kind: 'off', q, f }); push(top + h - vh * .7, { kind: 'off', q, f }); return; }
       if (m) return; // on phones the text gets the whole width: the 3D lives in the story steps (and in tapped previews)
       if (e.matches('.bk-moment')) {
         // beside the clock, on the side the next chapter will use

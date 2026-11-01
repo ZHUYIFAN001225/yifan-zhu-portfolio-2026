@@ -292,7 +292,7 @@ export function mountStage(root) {
   if (!canHover) document.addEventListener('click', e => { if (peek && !e.target.closest('.bk-points, #structure [data-screen]')) peek = null; });
 
   // ---------- the loop ----------
-  let sideVal = -1, vw = 0, vh = 0, mx = 0, my = 0, pmx = 0, pmy = 0, sy = scrollY, last = performance.now(), t0 = last, fadeAmt = 1;
+  let idleDrawn = false, sideVal = -1, vw = 0, vh = 0, mx = 0, my = 0, pmx = 0, pmy = 0, sy = scrollY, last = performance.now(), t0 = last, fadeAmt = 1;
   const resize = () => { vw = innerWidth; vh = innerHeight; renderer.setPixelRatio(Math.min(vw < 1000 ? 1.5 : 2, devicePixelRatio || 1)); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix(); build(); };
   addEventListener('resize', resize); resize(); setInterval(build, 1600);
   addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
@@ -315,6 +315,9 @@ export function mountStage(root) {
     let a = keys[0], b = keys[0], t = 0;
     if (y >= keys[keys.length - 1].at) a = b = keys[keys.length - 1];
     else if (y > keys[0].at) for (let i = 0; i < keys.length - 1; i++) if (y < keys[i + 1].at) { a = keys[i]; b = keys[i + 1]; t = (y - a.at) / Math.max(1, b.at - a.at); break; }
+    // nothing to draw while the phone is parked off screen: render one last frame, then sleep (keeps scrolling and
+    // the pointer smooth on long text stretches)
+    if (a.st.kind === 'off' && b.st.kind === 'off' && !peek) { if (idleDrawn) return; idleDrawn = true; } else idleDrawn = false;
     const moving = a.st !== b.st, e = moving ? glide(t) : 0, st = e < .5 ? a.st : b.st, same = moving && a.st.q.x === b.st.q.x && a.st.q.y === b.st.q.y && a.st.q.ry === b.st.q.ry && a.st.q.s === b.st.q.s, hold = same ? Math.abs(e - .5) > .1 : (e < .05 || e > .95);
     const time = (now - t0) / 1000, m = isMobile();
     if (peek && (Math.abs(scrollY - peek.sy) > 160 || now - peek.t > 6000)) peek = null;

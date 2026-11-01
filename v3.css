@@ -3272,3 +3272,10 @@ body.bk-on-paper::before{background:radial-gradient(36% 30% at 10% 20%,rgba(40,4
 .bk-ledger.is-in .bk-ledger-arrow{opacity:1}.bk-ledger.is-in .bk-ledger-after{opacity:1;transform:none}
 @media (max-width:899px){.bk-ledger{grid-template-columns:1fr;gap:8px}.bk-ledger-arrow{transform:rotate(90deg)}}
 @media (prefers-reduced-motion:reduce){.bk-ledger-list li{opacity:1;transform:none}.bk-ledger-after,.bk-ledger-arrow{opacity:1;transform:none}}
+
+/* performance: in-page cards keep the glass look without a live blur (the paper behind them is plain, so the blur
+   only cost repaints on every scroll and pointer move). Live blur stays on the few floating pieces. */
+.bk-day :is(.bk-dom-card,.bk-owner,.bk-ask,.bk-entry>li,.bk-results-card,.ux-blueprint,.ux-scenario>li,.bk-slip,.bk-dom-slip,.bk-map),
+.bk-day .ux-section :is(.ux-persona,.ux-lanes>div,.ux-evidence-note,.ux-principles>div,.ux-process>li,.ux-decisions article,.ux-details figure,.ux-research-plan>div,.ux-hard>*,.ux-opps>*,.ux-build>li,.ux-roadmap li,.ux-taps,.ux-bp-row>span,.ux-success>li,.ux-smap-tabs,ol>li,.ux-chips li,.ux-before-after>p),
+.bk-day .bk-script li a{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+body.bk-on-paper::before{filter:none!important}

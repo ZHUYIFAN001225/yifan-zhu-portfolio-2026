@@ -60,7 +60,7 @@ export function mountFlow(root, before) {
     // closing two hours (owner) → the customer is asked to pick again
     x1 = narrow ? c.cx + 50 : c.r + 6; y1 = narrow ? c.b + 8 : c.cy; x2 = narrow ? d.cx + 50 : d.r + 6; y2 = narrow ? d.t - 8 : d.cy; mx = narrow ? c.cx + 120 : c.r + 46; my = (y1 + y2) / 2;
     $('.bk-flow-a2').setAttribute('d', `M${P(x1, y1)} Q${P(mx, my)} ${P(x2, y2)}`); $('.bk-flow-a2h').setAttribute('d', head(x2, y2, mx, my));
-    const n2 = $('.n2'); n2.style.left = (narrow ? mx - 120 : mx - 10) + 'px'; n2.style.top = (my - 12) + 'px';
+    const n2 = $('.n2'); n2.style.left = (narrow ? mx - 120 : d.l - 190) + 'px'; n2.style.top = (narrow ? my - 12 : (d.b + c.t) / 2 - 14) + 'px';
     ink.querySelectorAll('path').forEach(p => { const len = p.getTotalLength(); p._L = len; p.style.strokeDasharray = `${len} ${len}`; });
     drawn = -1;
   }

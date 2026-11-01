@@ -171,7 +171,7 @@ function regionTags(root) {
   const pill = document.createElement('div'); pill.className = 'bk-pill'; pill.setAttribute('aria-hidden', 'true'); document.body.append(pill);
   const W = [
     ['.ux-hard>*', 'Still hard', '还难的地方', 'hard'],
-    ['.ux-notdone li, .ux-gaps li', 'Not done yet', '还没做完', 'todo'],
+    ['#challenges .ux-chips li', 'Not done yet', '还没做完', 'todo'],
     ['.ux-opps>*', 'Opportunity', '机会', 'opp'],
     ['.ux-success li', 'How we’d measure it', '怎么衡量', 'measure'],
     ['.ux-principles>div', 'A design rule', '一条设计规则', 'rule'],

@@ -48,6 +48,7 @@ const TEXT = {
   over: ['after closing', '超过打烊'], ontime: ['before closing', '打烊前'],
   hint: ['Red +′ = minutes a customer waited in the shop. Tap a slip: make them late, or not come at all.', '红色 +′ = 客人在店里干等的分钟。点一张纸条：让 TA 迟到，或者干脆不来。'], reset: ['Replay', '重放'],
   closing: ['closing 18:30', '打烊 18:30'], brk: ['break, closed in the diary', '午休（已在日程里关掉）'], nsh: ['didn’t come', '没来'], reo: ['reopened → Mia', '空出来 → Mia'], tom: ['He · tomorrow 10:00, chosen by her', '何 · 改到明天 10:00（她自己选的）'],
+  stampOld: ['Illustrative day', '示意 · 演示场景'], stampNew: ['Illustrative · follows the rules, not measured', '示意 · 按规则推演，非实测'], skip: ['Skip ↓', '跳过 ↓'],
   waitTag: ['wait', '等'], lateTag: ['late', '晚到']
 };
 const STORY = [
@@ -80,14 +81,16 @@ export function mountDomino(root) {
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const boards = [makeBoard('old', OLD, OLD_EVENTS), makeBoard('new', NEW, NEW_EVENTS)];
   const story = makeStory();
-  act2.after(boards[0].sec); boards[0].sec.after(story.sec); act3.after(boards[1].sec); story.init();
+  act2.after(boards[0].sec); boards[0].sec.after(story.sec);
+  // the replay belongs to the results: right after the 18:30 clock
+  (root.querySelector('.bk-moment[data-moment="end"]') || act3).after(boards[1].sec); story.init();
 
   function makeBoard(mode, plan, events) {
     const sec = document.createElement('section'); sec.className = 'bk-dom'; sec.dataset.mode = mode;
     sec.innerHTML = `<div class="bk-dom-pin"><div class="bk-dom-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p></div>
-      <div class="bk-dom-card"><p class="bk-dom-event bk-w"></p><div class="bk-dom-track"><div class="bk-dom-hours"></div><i class="bk-dom-close"><em></em></i><i class="bk-dom-over"></i></div>
+      <div class="bk-dom-card"><span class="bk-stamp"></span><p class="bk-dom-event bk-w"></p><div class="bk-dom-track"><div class="bk-dom-hours"></div><i class="bk-dom-close"><em></em></i><i class="bk-dom-over"></i></div>
       <div class="bk-dom-stats"><div><span class="bk-dom-sk"></span><b class="bk-dom-wait"></b></div><div><span class="bk-dom-sk"></span><b class="bk-dom-idle"></b></div><div><span class="bk-dom-sk"></span><b class="bk-dom-end"></b><small></small></div></div>
-      <p class="bk-dom-hint"><span></span><button type="button"></button></p>${mode === 'new' ? '<p class="bk-dom-tom bk-w is-green"></p>' : ''}</div></div>`;
+      <p class="bk-dom-hint"><span></span><button type="button"></button><a class="bk-skip" href="#"></a></p>${mode === 'new' ? '<p class="bk-dom-tom bk-w is-green"></p>' : ''}</div></div>`;
     const track = sec.querySelector('.bk-dom-track'), hours = sec.querySelector('.bk-dom-hours');
     for (let h = 10; h <= 19; h++) { const i = document.createElement('i'); i.style.setProperty('--s', ((h * 60 - T0) / (T1 - T0)).toFixed(4)); i.innerHTML = `<b>${h}:00</b>`; hours.append(i); }
     const fr = m => ((m - T0) / (T1 - T0));
@@ -108,12 +111,15 @@ export function mountDomino(root) {
       b.sec.classList.add('is-user');
     }); });
     sec.querySelector('.bk-dom-hint button').addEventListener('click', () => { b.user = null; b.sec.classList.remove('is-user'); });
+    // never trapped: one tap jumps past the pinned board
+    sec.querySelector('.bk-skip').addEventListener('click', e => { e.preventDefault(); scrollTo({ top: sec.getBoundingClientRect().bottom + scrollY - innerHeight * .1, behavior: 'smooth' }); });
     b.text = () => {
       const k = mode === 'old' ? [TEXT.oldK, TEXT.oldT] : [TEXT.newK, TEXT.newT];
       sec.querySelector('.bk-hand-k').textContent = L(k[0]); sec.querySelector('.bk-hand-t').textContent = L(k[1]);
       const sk = sec.querySelectorAll('.bk-dom-sk'); sk[0].textContent = L(TEXT.wait); sk[1].textContent = L(TEXT.idle); sk[2].textContent = L(TEXT.end);
       sec.querySelector('.bk-dom-hint span').textContent = L(TEXT.hint); sec.querySelector('.bk-dom-hint button').textContent = L(TEXT.reset);
       sec.querySelector('.bk-dom-close em').textContent = L(TEXT.closing);
+      sec.querySelector('.bk-stamp').textContent = L(mode === 'old' ? TEXT.stampOld : TEXT.stampNew); sec.querySelector('.bk-skip').textContent = L(TEXT.skip);
       const tom = sec.querySelector('.bk-dom-tom'); if (tom) tom.textContent = L(TEXT.tom);
       slips.forEach(sl => { const s = sl.s; sl.el.querySelector('.bk-dom-name').textContent = s.brk ? L(TEXT.brk) : L(NAMES[s.id]); sl.el.querySelector('.bk-dom-sv').textContent = s.brk ? '' : L(SV[s.sv]); sl.el.setAttribute('aria-label', s.brk ? L(TEXT.brk) : `${hm(s.at)} ${L(NAMES[s.id])}, ${L(SV[s.sv])}`); });
       b.last = null;
@@ -174,12 +180,12 @@ export function mountDomino(root) {
       // 4 · the next one at the door
       `<path d="M176 38 L236 38 L236 188 L176 188 Z M186 118 a3 3 0 1 0 .1 0"/><path class="is-red" d="M206 70 a11 11 0 1 0 .1 0 M206 82 L206 132 M206 96 L194 116 M206 96 L218 116 M206 132 L197 168 M206 132 L215 168"/><path d="M78 92 a18 18 0 1 0 .1 0 M64 100 Q68 84 78 86 Q88 86 92 96"/><path d="M56 128 Q78 114 100 128 L106 170 L50 170 Z"/><path d="M104 80 a5 5 0 1 0 .1 0 M104 92 a5 5 0 1 0 .1 0 M109 82 L130 70 M109 90 L130 76"/>`
     ];
-    sec.innerHTML = `<div class="bk-hand-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p></div><div class="bk-sb-row">${svgs.map((g, i) => `<figure class="bk-sb" data-i="${i}"><div class="bk-sb-pic"><svg viewBox="0 0 260 200" aria-hidden="true">${g}</svg>${i === 0 ? '<b class="bk-sb-pct">50%</b>' : ''}${i === 2 ? '<span class="bk-w bk-sb-say"></span><b class="bk-sb-timer"></b>' : ''}</div><figcaption class="bk-w"></figcaption></figure>`).join('')}</div>`;
+    sec.innerHTML = `<div class="bk-hand-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p><span class="bk-stamp"></span></div><div class="bk-sb-row">${svgs.map((g, i) => `<figure class="bk-sb" data-i="${i}"><div class="bk-sb-pic"><svg viewBox="0 0 260 200" aria-hidden="true">${g}</svg>${i === 0 ? '<b class="bk-sb-pct">50%</b>' : ''}${i === 2 ? '<span class="bk-w bk-sb-say"></span><b class="bk-sb-timer"></b>' : ''}</div><figcaption class="bk-w"></figcaption></figure>`).join('')}</div>`;
     const figs = [...sec.querySelectorAll('.bk-sb')].map(f => ({ f, paths: [...f.querySelectorAll('path')], cap: f.querySelector('figcaption') }));
     const s = { sec, figs, p: calm ? 1 : 0, drawn: -1 };
     // stroke lengths can only be measured once the drawings are on the page
     s.init = () => figs.forEach(g => g.paths.forEach(p => { const len = p.getTotalLength() || 300; p._L = len; p.style.strokeDasharray = `${len} ${len}`; p.style.strokeDashoffset = len; }));
-    s.text = () => { sec.querySelector('.bk-hand-k').textContent = L(STORY_HEAD.k); sec.querySelector('.bk-hand-t').textContent = L(STORY_HEAD.t); figs.forEach((g, i) => { g.cap.textContent = L(STORY[i].t); }); const say = sec.querySelector('.bk-sb-say'); say.textContent = L(STORY[2].say); s.drawn = -1; };
+    s.text = () => { sec.querySelector('.bk-stamp').textContent = L(TEXT.stampOld); sec.querySelector('.bk-hand-k').textContent = L(STORY_HEAD.k); sec.querySelector('.bk-hand-t').textContent = L(STORY_HEAD.t); figs.forEach((g, i) => { g.cap.textContent = L(STORY[i].t); }); const say = sec.querySelector('.bk-sb-say'); say.textContent = L(STORY[2].say); s.drawn = -1; };
     s.text();
     return s;
   }

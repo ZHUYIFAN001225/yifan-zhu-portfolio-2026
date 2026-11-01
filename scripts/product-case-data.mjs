@@ -253,7 +253,7 @@ export const productCases=[{
     system:{time:'10:00',kicker:p('10:00 · The shop opens','10:00 · 开门'),line:p('So the shop got one shared diary.','所以，这家店有了一本共享的预约本。'),cap:p('Customers only see the times that fit. The owner sees her whole day. Nothing has to be passed on by message.','顾客只看到放得下的时间，店主看到她的一整天，不用再靠消息来回转达。')},
     explode:{time:'12:10',kicker:p('12:10 · Lunch break','12:10 · 午休'),line:p('A customer books on her lunch break.','一位顾客，在午休时约好了。'),cap:p('Follow one ordinary day: she picks a service, only times that fit are offered, and the booking lands in the owner’s diary on its own.','跟着这普通的一天往下看：她选好服务，系统只给放得下的时间，预约自己出现在店主的日程里。')},
     build:{time:'18:05',kicker:p('18:05 · After hours','18:05 · 打烊后'),line:p('Behind the screens: one set of rules.','屏幕背后，是同一套规则。'),cap:p('The rules were written first, then built and tested, so both sides of the shop always agree.','先把规则写清楚，再做出来、测试，让店的两端永远对得上。')},
-    end:{time:'18:30',kicker:p('18:30 · Closed','18:30 · 打烊'),line:p('Nothing to chase tonight.','今晚，没有要追着问的事了。'),cap:p('Since October 2026 real customers book here. The owner only steps in for the exceptions. Thanks for reading.','2026 年 10 月起，真实顾客已经在这里预约，店主只在例外时出手。谢谢你看到这里。')}
+    end:{time:'18:30',kicker:p('18:30 · Closed','18:30 · 打烊'),line:p('Where it stands tonight.','今晚，它走到了哪一步。'),cap:p('Live with real customers since 21 October. What is proven, what is only illustrated, and what still needs the owner.','10 月 21 日起已有真实顾客在用。哪些已经证实、哪些只是示意、哪些还要店主来验证。')}
   },
   title:p('Glasgow Salon Booking','格拉斯哥理发店预约系统'),
   subtitle:p('One shared diary. Two clear experiences.','一本共享预约本，两端清晰体验。'),
@@ -261,6 +261,14 @@ export const productCases=[{
   core:p('The aim is not to put booking online. It is to let the routine run itself, so the owner only steps in for the exceptions — without learning a complicated tool.','目标不是「把预约搬到线上」，而是让日常预约自己运转，店主只在出现异常时介入，而且不需要学习复杂的工具。'),
   status:p('Live since October 2026 · web version in Chinese and English, with an owner admin','2026 年 10 月已上线 · 中英文网页版 + 店主管理端'),
   live:{url:'https://glasgow-booking-web.pages.dev/en/',urlZh:'https://glasgow-booking-web.pages.dev/',note:p('This is the shop’s real booking site, used by real customers. To try it freely, use the prototype here instead: it runs the same rules on sample data.','这是店里真实使用的预约网站，有真实顾客在约。想随便试的话，请用这里的原型：同一套规则，示例数据。')},
+  // the fast-read card at the top of the case (HR / first look). Add team, duration and relationship with the owner when confirmed.
+  glance:[
+    {label:p('Status','状态'),value:p('Live since 21 Oct 2026 · real customers book in Chinese and English','2026 年 10 月 21 日上线 · 真实顾客用中英文预约'),live:true},
+    {label:p('My part','我的工作'),value:p('Problem framing, service blueprint, booking rules, UI for both sides, AI-assisted build','问题定义、服务蓝图、预约规则、双端界面、AI 辅助开发')},
+    {label:p('Built with','技术'),value:p('TypeScript booking core · Cloudflare Pages + D1 · Google sign-in','TypeScript 预约核心 · Cloudflare Pages + D1 · Google 登录')},
+    {label:p('Proven so far','目前已证实'),value:p('End to end in production with real accounts: a booking, a reschedule and a cancellation showed up on every side.','用真实账号在线上完整走通：预约、改期、取消，各端同步。')},
+    {label:p('Not yet','尚未完成'),value:p('Usage data, an owner interview, reminders, the WeChat mini program.','使用数据、店主访谈、提醒功能、微信小程序。')}
+  ],
   role:p('Problem framing, service blueprint, booking rules, UI for both sides and AI-assisted prototyping','问题定义、服务蓝图、预约规则、双端界面与 AI 辅助原型'),
   scope:p('Customer booking + shop diary and availability','顾客预约 + 店铺排期与开放安排'),
   hero:['booking-customer','booking-admin'],

@@ -22,7 +22,7 @@ const ACT2 = [
   { id: 'n2', kind: 'write', row: 1, x: 372, red: true, t: ['didn’t come', '没来'] },
   { id: 's2', kind: 'strike', on: 'r2' },
   { id: 'c4', kind: 'circle', on: 'r4' },
-  { id: 'a45', kind: 'arrow', from: 'r4', to: 'r5', note: ['everyone after waits', '后面全被拖'] },
+  { id: 'a45', kind: 'arrow', src: 'r4', dst: 'r5', note: ['everyone after waits', '后面全被拖'] },
   { id: 'x5', kind: 'scribble', on: 'r5' },
   { id: 'n6', kind: 'write', row: 5, x: LEFT, red: true, t: ['→ Thu?? must tell her!', '→ 改周四？？要通知她！'] }
 ];
@@ -113,7 +113,7 @@ export function mountHand(root) {
         if (it.kind === 'scribble') it.paths = [path(a.svg, scribbleD(box(byId(it.on)), r), 'is-red')];
         if (it.kind === 'circle') { const e = byId(it.on), b = box(e); const w2 = b.w * .3; it.paths = [path(a.svg, circleD({ x: b.x + b.w - w2, y: b.y, w: w2, h: b.h }, r), 'is-red')]; }
         if (it.kind === 'arrow') {
-          const f = box(byId(it.from)), t = box(byId(it.to)); const [d1, d2] = arrowD(f.x + f.w + 22, f.y + f.h * .5, f.x + f.w + 30, t.y + t.h * .2, 34);
+          const f = box(byId(it.src)), t = box(byId(it.dst)); const [d1, d2] = arrowD(f.x + f.w + 22, f.y + f.h * .5, f.x + f.w + 30, t.y + t.h * .2, 34);
           it.paths = [path(a.svg, d1, 'is-red'), path(a.svg, d2, 'is-red')];
           if (!it.noteEl) { it.noteEl = document.createElement('span'); it.noteEl.className = 'bk-w is-red is-small'; a.sheet.append(it.noteEl); }
           it.noteEl.textContent = it.note[zh() ? 1 : 0]; it.noteEl.style.left = (f.x + f.w + 62) + 'px'; it.noteEl.style.top = (f.y + f.h * .9) + 'px';

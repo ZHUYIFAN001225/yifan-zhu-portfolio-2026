@@ -20,6 +20,7 @@ export function mount() {
   checklist(root, calm);
   slips(root, calm);
   // (the margin time line is gone: the clock chapters already carry the time of day, and it ran over wide content)
+  glassLight(root);
   Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs')]).then(([h, d, c]) => { h.mountHand(root, d.CHARS() + c.CHARS()); d.mountDomino(root); c.mountChair(root); }).catch(e => console.error(e));
   stage(root, calm);
   regionTags(root);
@@ -137,6 +138,22 @@ function script(root) {
     });
   };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
+}
+
+// glass light: the pane under the pointer catches a soft highlight where the pointer is, like light on frosted glass
+function glassLight(root) {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const SEL = '.bk-dom-card,.bk-receipt,.bk-owner,.bk-ask,.bk-entry>li,.bk-results-card,.ux-blueprint,.ux-scenario>li,.ux-persona,.ux-lanes>div,.ux-evidence-note,.ux-principles>div,.ux-process>li,.ux-decisions article,.ux-details figure,.ux-research-plan>div,.ux-hard>*,.ux-opps>*,.ux-build>li,.ux-roadmap li,.ux-taps,.ux-bp-row>span,.ux-success>li,.bk-slip,.ux-chips li,.ux-section ol:not(.bk-script)>li';
+  let cur = null, q = null;
+  const off = el => { el.style.removeProperty('--gx'); el.style.removeProperty('--gy'); };
+  root.addEventListener('pointermove', e => {
+    q = e; requestAnimationFrame(() => {
+      if (!q) return; const ev = q; q = null;
+      const el = ev.target.closest?.(SEL); if (cur && cur !== el) off(cur); cur = el && root.contains(el) ? el : null; if (!cur) return;
+      const r = cur.getBoundingClientRect(); cur.style.setProperty('--gx', (ev.clientX - r.left).toFixed(0) + 'px'); cur.style.setProperty('--gy', (ev.clientY - r.top).toFixed(0) + 'px');
+    });
+  }, { passive: true });
+  root.addEventListener('pointerleave', () => { if (cur) off(cur); cur = null; });
 }
 
 // the problems are sticky notes stuck on the page

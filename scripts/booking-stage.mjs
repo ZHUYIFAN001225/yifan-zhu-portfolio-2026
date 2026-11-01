@@ -333,6 +333,8 @@ export function mountStage(root) {
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
     cv.classList.toggle('is-front', (!m && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
     document.body.classList.toggle('bk-hero-handover', !m);
+    // the live prototype's frame waits empty until the phone has landed in it
+    document.body.classList.toggle('bk-awaiting-phone', !m && !gone && (a.st.kind === 'hero' || b.st.kind === 'dock'));
     // a small tag under the phone: whose phone this is right now
     const lab = st.label && !pk ? st.label[zh() ? 1 : 0] : '';
     if (!m && lab && hold) {

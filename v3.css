@@ -2406,3 +2406,5 @@ body.bk-rail-on .bk-rail{opacity:1}
   .bk-step-t{font-size:26px}
 }
 @media (prefers-reduced-motion:reduce){.bk-step-card{opacity:1;transform:none}}
+.bk-day .ux-hero-demo .ux-demo-device{transition:opacity .45s ease}
+body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transition:none}

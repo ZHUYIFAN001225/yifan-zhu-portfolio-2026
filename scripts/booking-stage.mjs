@@ -273,7 +273,7 @@ export function mountStage(root) {
   if (!canHover) document.addEventListener('click', e => { if (peek && !e.target.closest('.bk-points, #structure [data-screen]')) peek = null; });
 
   // ---------- the loop ----------
-  let vw = 0, vh = 0, mx = 0, my = 0, sy = scrollY, last = performance.now(), t0 = last, fadeAmt = 1;
+  let sideVal = -1, vw = 0, vh = 0, mx = 0, my = 0, sy = scrollY, last = performance.now(), t0 = last, fadeAmt = 1;
   const resize = () => { vw = innerWidth; vh = innerHeight; renderer.setPixelRatio(Math.min(vw < 1000 ? 1.5 : 2, devicePixelRatio || 1)); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix(); build(); };
   addEventListener('resize', resize); resize(); setInterval(build, 1600);
   addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
@@ -315,6 +315,10 @@ export function mountStage(root) {
     P.focus += ((hv ? 1 : 0) - P.focus) * E(5);
     // pose: station → station, plus hover focus, float and a lean from scroll speed
     let q = mix(poseOf(a.st), poseOf(b.st), e);
+    // crossing to the other side: it goes a little smaller and further away while it passes behind the text
+    if (moving && (poseOf(a.st).x - .5) * (poseOf(b.st).x - .5) < 0) q.s *= 1 - .3 * Math.sin(Math.PI * e);
+    // the text moves out of its way, in step with it
+    if (!m && st.kind !== 'off' && a.st.kind !== 'off' && b.st.kind !== 'off') { const side = clamp((.84 - q.x) / .68); if (Math.abs(side - sideVal) > .001) { sideVal = side; document.body.style.setProperty('--bk-side', side.toFixed(4)); } }
     const front = Math.round(q.ry / TAU) * TAU;
     if (P.focus > .001) q = { ...q, s: q.s * (1 + .14 * P.focus), ry: lerp(q.ry, front, .75 * P.focus), rx: q.rx * (1 - .7 * P.focus) };
     if (peekAmt > .001) q = mix(q, { x: .5, y: peekY, s: .42, rx: .02, ry: front, rz: 0 }, ease(peekAmt));

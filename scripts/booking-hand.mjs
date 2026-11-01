@@ -16,6 +16,7 @@ const ROWS = [
   { id: 'r4', row: 3, x: LEFT + 70, t: ['how long?? 3h?', '要多久？？3 小时？'] },
   { id: 'r5', row: 4, x: LEFT, t: ['16:00  Li (booked on WeChat)', '16:00  李（微信上约的）'] }
 ];
+const THINK = { id: 'think', row: -1, x: 300, grey: true, t: ['Friday… who was it?', '周五……是谁来着？'] };
 const BUBBLE1 = { id: 'b1', row: 5.4, t: ['Free at 2 on Friday?', '周五两点有空吗？'], note: ['reply later…', '晚点回…'] };
 // act 2: what goes wrong, in red pen
 const ACT2 = [
@@ -28,6 +29,14 @@ const ACT2 = [
 ];
 const BUBBLES2 = [{ id: 'b2', t: ['Can I move to 3?', '能改到三点吗？'] }, { id: 'b3', t: ['Are you open Sunday?', '周日开门吗？'] }];
 
+const NOTES = [
+  ['#overview .ux-question', ['…and she shouldn’t have to learn a new tool', '……而且她不该为此去学一个新工具']],
+  ['#overview .ux-pains', ['four pains, one root: no shared diary', '四个痛点，一个根：没有一本共享的本子']],
+  ['#strategy .ux-principles', ['rules first, screens second', '先定规则，再画界面']],
+  ['#flow .ux-journey', ['booked in three taps', '三步就约好']],
+  ['#challenges .ux-challenge-grid', ['still to prove with the owner', '还要和店主一起验证']],
+  ['#release .ux-section-body', ['next: a WeChat mini program?', '下一步：微信小程序？'], 'append']
+];
 const ACTS = [
   { n: 1, k: ['Act 1 · The old way', '第一幕 · 旧方式'], t: ['A paper diary, WeChat and her memory.', '一本纸质预约本、微信，和她的记忆。'] },
   { n: 2, k: ['Act 2 · Things change', '第二幕 · 计划总在变'], t: ['Every change is a crossing-out and another message.', '每一次变动，都是一道划线，和又一条消息。'] },
@@ -36,7 +45,7 @@ const ACTS = [
 
 // all the characters the handwriting fonts need (Google Fonts can send just these)
 const CHARS = () => {
-  const all = [...ROWS.flatMap(r => r.t), ...BUBBLE1.note, ...ACT2.flatMap(a => [...(a.t || []), ...(a.note || [])]), 'let the diary keep itself', '让预约本自己记', '0123456789:·?!→()'].join('');
+  const all = [...ROWS.flatMap(r => r.t), ...THINK.t, ...NOTES.flatMap(n => n[1]), ...BUBBLE1.note, ...ACT2.flatMap(a => [...(a.t || []), ...(a.note || [])]), 'let the diary keep itself', '让预约本自己记', '0123456789:·?!→()'].join('');
   return [...new Set(all)].join('');
 };
 function loadFonts() {
@@ -77,7 +86,7 @@ export function mountHand(root) {
       const add = (it, from, to, pre) => { a.items.push({ ...it, from, to, pre }); };
       // handwriting
       const write = (it, from, to, pre) => {
-        const s = document.createElement('span'); s.className = 'bk-w' + (it.big ? ' is-big' : '') + (it.red ? ' is-red' : ''); s.textContent = it.t[l];
+        const s = document.createElement('span'); s.className = 'bk-w' + (it.big ? ' is-big' : '') + (it.red ? ' is-red' : '') + (it.grey ? ' is-grey' : ''); s.textContent = it.t[l];
         s.style.left = it.x + 'px'; s.style.top = (rowY(it.row) - (it.big ? 34 : 30)) + 'px'; s.dataset.id = it.id; a.sheet.append(s);
         add({ kind: 'write', el: s, id: it.id }, from, to, pre);
       };
@@ -87,6 +96,9 @@ export function mountHand(root) {
         a.sheet.append(d); add({ kind: 'bubble', el: d }, from, to, pre);
       };
       const n = a.n;
+      // WeChat in the corner of the page: the unread count climbs through acts 1 and 2, and drops to zero in act 3
+      const wx = document.createElement('div'); wx.className = 'bk-wechat'; wx.innerHTML = '<i></i><b>0</b>'; a.sheet.append(wx); a.badge = wx;
+      write(THINK, .55, .66, n > 1);
       // rows: act 1 writes them one by one; later acts start with them on the page
       ROWS.forEach((r, i) => write(r, .02 + i * .1, .1 + i * .1, n > 1));
       bubble(BUBBLE1, 0, .66, .74, n > 1, BUBBLE1.note);
@@ -148,12 +160,14 @@ export function mountHand(root) {
       if (it.paths) { const n = it.paths.length; it.paths.forEach((pa, i) => { const kk = clamp(k * n - i); pa.style.strokeDashoffset = (pa._L * (1 - kk)).toFixed(2); }); }
       if (it.noteEl) it.noteEl.style.clipPath = k >= 1 ? 'none' : `inset(-30% ${(100 - clamp(k * 2 - 1) * 100).toFixed(2)}% -30% -4%)`;
     });
+    if (a.badge) { const [u0, u1, k0, k1] = a.n === 1 ? [0, 3, .6, .78] : a.n === 2 ? [3, 27, .1, .95] : [27, 0, .55, .9]; const k = clamp((p - k0) / (k1 - k0)); const u = Math.round(u0 + (u1 - u0) * k); const b = a.badge.querySelector('b'); if (b.textContent !== String(u)) { b.textContent = u; a.badge.classList.remove('is-bump'); void a.badge.offsetWidth; a.badge.classList.add('is-bump'); } a.badge.classList.toggle('is-zero', u === 0); }
     a.sec.classList.toggle('is-done', p > .98);
   };
   let last = performance.now();
   const tick = now => {
     requestAnimationFrame(tick);
     const dt = Math.min(.08, (now - last) / 1000); last = now; const vh = innerHeight;
+    noteTick(dt);
     acts.forEach(a => {
       const r = a.sheet.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) { if (a.drawn !== a.p) { apply(a); a.drawn = a.p; } return; }
       // starts when the page is low on the screen, finished once it is well up in view
@@ -162,7 +176,26 @@ export function mountHand(root) {
       if (Math.abs(a.p - a.drawn) > .0005) { apply(a); a.drawn = a.p; }
     });
   };
-  render(); fit(); addEventListener('resize', () => { fit(); geometry(); });
+  // margin notes: the designer's own pencil, written next to the chapter they comment on
+  const notes = NOTES.map(([sel, t, where]) => {
+    const target = root.querySelector(sel); if (!target) return null;
+    const d = document.createElement('div'); d.className = 'bk-margin'; d.setAttribute('aria-hidden', 'true');
+    d.innerHTML = '<span class="bk-w is-pencil"></span><svg class="bk-ink" aria-hidden="true"><path class="is-pencil"/><path class="is-pencil"/></svg>';
+    if (where === 'append') target.append(d); else target.before(d);
+    return { d, t, span: d.querySelector('span'), paths: [...d.querySelectorAll('path')], p: calm ? 1 : 0, drawn: -1 };
+  }).filter(Boolean);
+  const noteGeo = () => notes.forEach(n => {
+    n.span.textContent = n.t[zh() ? 1 : 0];
+    const w = n.d.clientWidth, sx = n.span.offsetLeft, sw = n.span.offsetWidth, y = n.span.offsetTop + n.span.offsetHeight * .6;
+    const [d1, d2] = arrowD(sx - 10, y, Math.max(20, sx - 70), n.d.clientHeight + 14, -18);
+    n.paths[0].setAttribute('d', d1); n.paths[1].setAttribute('d', d2);
+    n.paths.forEach(pa => { pa._L = pa.getTotalLength(); pa.style.strokeDasharray = `${pa._L} ${pa._L}`; });
+    n.drawn = -1;
+  });
+  const noteApply = n => { const k1 = clamp(n.p / .7), k2 = clamp((n.p - .6) / .4); n.span.style.clipPath = k1 >= 1 ? 'none' : `inset(-30% ${(100 - k1 * 100).toFixed(2)}% -30% -4%)`; n.paths.forEach((pa, i) => { const kk = clamp(k2 * 2 - i); pa.style.strokeDashoffset = ((pa._L || 0) * (1 - kk)).toFixed(2); }); };
+  const noteTick = dt => notes.forEach(n => { const r = n.d.getBoundingClientRect(); if (r.bottom < -100 || r.top > innerHeight + 100) return; const target = calm ? 1 : clamp((innerHeight * .9 - r.top) / (innerHeight * .4)); n.p += (target - n.p) * (1 - Math.exp(-dt * 3)); if (Math.abs(n.p - n.drawn) > .0005) { noteApply(n); n.drawn = n.p; } });
+  render(); fit(); noteGeo(); addEventListener('resize', () => { fit(); geometry(); noteGeo(); });
+  document.fonts?.ready.then(noteGeo); setTimeout(noteGeo, 1500); document.addEventListener('portfolio:language', () => setTimeout(noteGeo, 300));
   document.fonts?.ready.then(() => { geometry(); fit(); });
   setTimeout(() => { geometry(); fit(); }, 1500);
   document.addEventListener('portfolio:language', () => { render(); fit(); setTimeout(geometry, 300); });

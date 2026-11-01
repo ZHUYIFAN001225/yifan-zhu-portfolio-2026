@@ -3450,3 +3450,39 @@ body.bk-on-paper::before{filter:none!important}
 .op2-bg .o1{opacity:.62}
 .op2-glass{background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 1px,rgba(255,255,255,0) 1px 6px,rgba(0,0,0,.10) 6px 8px,rgba(255,255,255,.02) 8px 12px),linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.01) 50%,rgba(255,255,255,.08))}
 @media (max-width:899px){.op2-glass{right:-22vw;width:40vw;height:46vh;top:4%}.op2-title{font-size:clamp(48px,14vw,64px)!important}}
+
+/* ======== depth of field: objects behind the text, sharp in focus, blurred by depth ======== */
+.bk-dof{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bk-dof img{position:absolute;height:auto;translate:-50% -50%;rotate:var(--r);will-change:translate;user-select:none}
+.bk-dof.is-dark img.is-focus{filter:drop-shadow(0 40px 60px rgba(0,0,0,.55))!important}
+.bk-dof.is-paper img.is-focus{filter:drop-shadow(0 30px 40px rgba(23,54,43,.25))!important}
+/* cover: no glass over the title; light pools stay soft and far back */
+.op2-glass{display:none!important}
+.op2-bg .o1{left:58%;top:14%;opacity:.35!important}
+.op2-bg .o2{left:74%;top:52%;opacity:.35}
+.op2-in{position:relative;z-index:3}
+.op2-title{text-shadow:none!important}
+/* the sign is a frosted pane the ring passes behind (the ring blurs through it) */
+.op2-stand{z-index:4}
+.op2-card{-webkit-backdrop-filter:blur(18px) saturate(1.3)!important;backdrop-filter:blur(18px) saturate(1.3)!important;background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.04) 55%,rgba(255,255,255,.1))!important;transform:translateY(16%) rotateY(calc(-10deg + var(--mx,0) * 8deg)) rotateX(calc(3deg + var(--my,0) * -5deg))!important}
+.op2-card:hover{transform:translateY(14%) rotateY(calc(-4deg + var(--mx,0) * 6deg))!important}
+.op2-base{display:none}
+.op2-stand figcaption{transform:translateY(60%)}
+/* "try it" and the paper clocks: content above the objects */
+.bk-try{position:relative}.bk-try>*:not(.bk-dof){position:relative;z-index:1}
+.bk-day .bk-moment{position:relative;overflow:hidden}
+.bk-day .bk-moment>.bk-moment-in{position:relative;z-index:1}
+@media (max-width:899px){
+  .bk-dof.is-dark img{opacity:.55!important}
+  .op2-card{transform:none!important}.op2-stand figcaption{transform:none}
+  .bk-dof.is-paper img{opacity:.6!important}
+}
+.op2>.bk-dof{z-index:1}.op2-bg{z-index:0}
+/* milky frosted sign: the ring shows through it, text stays dark and readable */
+.op2-card{transform:rotateY(calc(-8deg + var(--mx,0) * 8deg)) rotateX(calc(3deg + var(--my,0) * -5deg))!important;background:linear-gradient(150deg,rgba(255,255,255,.62),rgba(236,242,239,.4) 60%,rgba(255,255,255,.5))!important;-webkit-backdrop-filter:blur(22px) saturate(1.2)!important;backdrop-filter:blur(22px) saturate(1.2)!important;border-color:rgba(255,255,255,.55)!important}
+.op2-card:hover{transform:rotateY(calc(-3deg + var(--mx,0) * 6deg)) translateY(-4px)!important}
+.op2-shop{color:#137a52!important}.op2-scan b{color:#10201a!important}.op2-scan i{color:#3d5047!important}.op2-lang{color:#10201a!important}.op2-url{color:#4d6157!important}
+.op2-stand figcaption{transform:none}
+.op2-stand{margin-top:8vh}
+@media (max-width:899px){.bk-dof.is-paper{display:none}.op2>.bk-dof img{opacity:.4!important}}
+@media (max-width:899px){.op2>.bk-dof img:not(.is-focus){display:none}}

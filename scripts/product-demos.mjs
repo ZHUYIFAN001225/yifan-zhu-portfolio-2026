@@ -88,7 +88,7 @@ export function renderProductDemos(t,document){
   // Opening (booking): no phone. Customers start by scanning a QR code on the shop counter, so the opening is that
   // counter sign — with a real QR code to the live site, so a reader can scan it and book like a customer would.
   const opening=()=>{const o=c.opening;const words=o.lines.map(pair);
-    return `<section class="op2" data-opening><div class="op2-bg" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div><div class="op2-glass" aria-hidden="true"><i></i></div><div class="op2-in">
+    return `<section class="op2" data-opening><div class="op2-bg" aria-hidden="true"><i class="o1"></i><i class="o2"></i></div><div class="op2-in">
       <div class="op2-copy"><p class="op2-kicker">${pair(o.kicker)}</p>
         <h1 class="op2-title" aria-label="${pair(c.title)}">${words.map((w,i)=>`<span style="--i:${i}">${w}${i===words.length-1?'<em>.</em>':''}</span>`).join('')}</h1>
         <p class="op2-sub">${pair(c.subtitle)}</p>

@@ -20,7 +20,7 @@ export function mount() {
   checklist(root, calm);
   slips(root, calm);
   // (the margin time line is gone: the clock chapters already carry the time of day, and it ran over wide content)
-  Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs'), import('./booking-map.mjs'), import('./booking-try.mjs')]).then(([h, d, c, mp, tr]) => { tr.mountTry(root); h.mountHand(root, d.CHARS() + c.CHARS() + mp.CHARS() + tr.CHARS()); d.mountDomino(root); c.mountChair(root); mp.mountMap(root); }).catch(e => console.error(e));
+  Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs'), import('./booking-map.mjs'), import('./booking-try.mjs'), import('./booking-dof.mjs')]).then(([h, d, c, mp, tr, df]) => { tr.mountTry(root); df.mountDof(root); h.mountHand(root, d.CHARS() + c.CHARS() + mp.CHARS() + tr.CHARS()); d.mountDomino(root); c.mountChair(root); mp.mountMap(root); }).catch(e => console.error(e));
   stage(root, calm);
   regionTags(root);
   paper(root);

@@ -9,7 +9,7 @@ export function renderProductDemos(t,document){
   const present0=Object.keys(caseLabels).filter(id=>({system:!!c.system,strategy:!!(c.strategy||c.principles),iteration:!!c.iteration,logic:c.decisions.length>0,build:!!c.build,challenges:!!c.challenges,structure:!c.film,interfaces:!c.film})[id]??true); // LOOK's film already walks through these screens, so the close-ups would repeat it
   const DAY=['overview','system','strategy','logic','structure','interfaces','build','iteration','challenges','research','release'];
   const present=c.day?DAY.filter(id=>present0.includes(id)):present0;
-  const label=id=>{const v=(caseLabelOverrides[c.id]||{})[id]||caseLabels[id],n=String(present.indexOf(id)+1).padStart(2,'0');return [`${n} / ${v[0]}`,`${n} / ${v[1]}`];};
+  const label=id=>{const v=(caseLabelOverrides[c.id]||{})[id]||caseLabels[id],n=String(present.indexOf(id)+1).padStart(2,'0');return c.day?[v[0],v[1]]:[`${n} / ${v[0]}`,`${n} / ${v[1]}`];}; // the booking case is numbered by the hours of the day instead
   const section=(id,body)=>present.includes(id)?`<section class="v3-product-section ux-section" id="${id}"><h2>${pair(label(id))}</h2><div class="ux-section-body">${c.dayNotes?.[id]?`<p class="bk-note">${pair(c.dayNotes[id])}</p>`:''}${body}</div></section>`:'';
   const chips=items=>`<ul class="ux-chips">${items.map(v=>`<li>${pair(v)}</li>`).join('')}</ul>`;
   const overviewExtras=()=>[
@@ -151,7 +151,7 @@ export function renderProductDemos(t,document){
     ${section('release',`<p>${pair(c.boundary)}</p><ol class="ux-roadmap">${c.roadmap.map((v,i)=>`<li${i===0?' class="is-current"':''}>${pair(v)}</li>`).join('')}</ol><p class="ux-flow-note">${c.live?t('Being live is not proof that it works well for the owner or her customers. That still needs real-use data and the owner interview.','上线不等于店主和顾客都觉得好用，这仍需要真实使用数据和店主访谈来验证。'):t('Local implementation checks do not establish usability or business impact. Release and a real pilot require further validation and explicit approval.','本地实现检查不等同于可用性验证或商业成效。真实试点与正式发布仍需后续验证及明确批准。')}</p><a class="v3-outline-button" data-case-pdf="${c.pdf}" href="assets/v3/case-pdfs/${c.pdf}-EN.pdf" download>${pdfLabel()}</a>`)}
     ${act('end')}${moment('end')}<a class="back-link" href="work.html?filter=digital-products-ux">${t('← Back to collection','← 返回作品分类')}</a>`;
   const bookingBody=()=>`
-    ${moment('overview')}${section('overview',`<h3 class="ux-question">${pair(c.question)}</h3>${c.pains?`<div class="ux-pains">${c.pains.map(pn=>`<div><h4>${pair(pn.quote)}</h4><p>${pair(pn.body)}</p></div>`).join('')}</div>`:`<p>${pair(c.context)}</p>`}${overviewExtras()}<aside class="ux-evidence-note"><strong>${t('Where this stands','项目现状')}</strong><p>${pair(c.evidence)}</p></aside><div class="ux-audience">${c.audience.map(a=>`<div><h3>${pair(a.title)}</h3><p>${pair(a.body)}</p></div>`).join('')}</div>`)}
+    ${moment('overview')}${section('overview',`<h3 class="ux-question">${pair(c.question)}</h3>${overviewExtras()}`)}
     ${moment('system')}${system()}
     ${strategy()}
     ${section('logic',`<div class="ux-decisions">${c.decisions.map((d,i)=>`<article><span class="ux-decision-number">0${i+1}</span><div><h3>${pair(d.title)}</h3><p>${pair(d.why)}</p><dl><dt>${t('Prototype response','原型中的应对')}</dt><dd>${pair(d.how)}</dd><dt>${t('What to validate next','下一步验证')}</dt><dd>${pair(d.test)}</dd></dl></div></article>`).join('')}</div>`)}

@@ -76,7 +76,7 @@ function simulate(plan, st) {
 }
 
 export function mountDomino(root) {
-  const act2 = root.querySelector('.bk-hand[data-act="2"]'), act3 = root.querySelector('.bk-hand[data-act="3"]');
+  const act2 = root.querySelector('.bk-hand[data-act="1"]'), act3 = root.querySelector('.bk-hand[data-act="3"]');
   if (!act2 || !act3) return;
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const boards = [makeBoard('old', OLD, OLD_EVENTS), makeBoard('new', NEW, NEW_EVENTS)];

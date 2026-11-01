@@ -275,7 +275,7 @@ export const productCases=[{
   question:p('How might every customer book easily — without adding work for the owner?','如何让每类顾客都能轻松预约，同时不给店主增加负担？'),
   persona:{name:p('The owner','店主「阿姨」'),traits:[p('Runs the salon alone','独自经营小店'),p('WeChat + paper diary','微信 + 纸质预约本'),p('Hours change with health and travel','营业时间随身体和出行变化'),p('Away for two weeks recently','最近离开过半个月'),p('Needs tools she can read at a glance','工具必须一眼看懂')],quote:p('“Is anyone booked on Friday? Who do I need to tell?”','「周五有人约吗？我要通知谁？」')},
   whoNeeds:{title:p('Same booking, different questions','同一个预约，双方关心的完全不同'),left:{title:p('Customer asks','顾客关心'),items:[p('What services?','有哪些服务？'),p('Which days are open?','哪天营业？'),p('Which times are free?','哪些时间有空？'),p('What did I book?','我约了什么？')]},center:p('One shared diary','一本共享预约本'),right:{title:p('Owner asks','店主关心'),items:[p('How many today?','今天几位？'),p('Who, when, what, how long?','谁、几点、做什么、多久？'),p('Where is free time?','哪里还有空？'),p('Who is affected if I close?','停业会影响谁？')]}},
-  flows:{title:p('Three users, three ways in','三类用户，三种入口'),lanes:[
+  flows:{title:p('Two sides, three ways in','两端，三种入口'),lanes:[
     {title:p('Chinese customers','中国顾客'),channel:p('Chinese website · live (mini program later)','中文网站 · 已上线（小程序之后）'),steps:[p('Open','打开'),p('Service','选服务'),p('Time','选时间'),p('Confirm','确认')]},
     {title:p('Non-WeChat customers','非微信顾客'),channel:p('English website · live; owner can still add them','英文网站 · 已上线；店主仍可代为补录'),steps:[p('Open the link','打开链接'),p('Service & time','选服务和时间'),p('Google sign-in','Google 登录'),p('Same diary','进入同一本日程')]},
     {title:p('Owner','店主'),channel:p('Shop view','店铺端'),steps:[p('Today','看今天'),p('Set hours once','设一次营业时间'),p('Handle exceptions','只处理异常')]}

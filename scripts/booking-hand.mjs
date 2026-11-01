@@ -31,7 +31,7 @@ const BUBBLES2 = [{ id: 'b2', t: ['Can I move to 3?', '能改到三点吗？'] }
 
 const NOTES = [
   ['#overview .ux-question', ['…and she shouldn’t have to learn a new tool', '……而且她不该为此去学一个新工具']],
-  ['#overview .ux-pains', ['four pains, one root: no shared diary', '四个痛点，一个根：没有一本共享的本子']],
+  ['#overview .ux-persona', ['she has to read it at a glance', '她得一眼就看懂']],
   ['#system .ux-blueprint', ['one diary, two views: nothing passed on by message', '一本日程，两种视图：不再靠消息传话']],
   ['#strategy .ux-principles', ['rules first, screens second', '先定规则，再画界面']],
   ['#structure .ux-section-body', ['every screen answers one question', '每个界面只回答一个问题']],
@@ -41,9 +41,9 @@ const NOTES = [
   ['#release .ux-section-body', ['next: a WeChat mini program?', '下一步：微信小程序？'], 'append']
 ];
 const ACTS = [
-  { n: 1, k: ['Act 1 · The old way', '第一幕 · 旧方式'], t: ['A paper diary, WeChat and her memory.', '一本纸质预约本、微信，和她的记忆。'] },
-  { n: 2, k: ['Act 2 · Things change', '第二幕 · 计划总在变'], t: ['Every change is a crossing-out and another message.', '每一次变动，都是一道划线，和又一条消息。'] },
-  { n: 3, k: ['Act 3 · The phone takes over', '第三幕 · 交给手机'], t: ['The same day, kept by one shared diary.', '同样的一天，交给一本共享的预约本。'] }
+  // the old way and what goes wrong are one page: it is written, then it falls apart, while it stays on screen
+  { n: 1, k: ['08:30 · The old way', '08:30 · 旧方式'], t: ['A paper diary, WeChat and her memory.', '一本纸质预约本、微信，和她的记忆。'], k2: ['Then plans change', '然后，计划变了'], t2: ['Every change is a crossing-out and another message.', '每一次变动，都是一道划线，和又一条消息。'] },
+  { n: 3, k: ['10:00 · The phone takes over', '10:00 · 交给手机'], t: ['The same day, kept by one shared diary.', '同样的一天，交给一本共享的预约本。'] }
 ];
 
 // all the characters the handwriting fonts need (Google Fonts can send just these)
@@ -74,10 +74,11 @@ export function mountHand(root, extra = '') {
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const acts = ACTS.map(a => {
     const sec = document.createElement('section'); sec.className = 'bk-hand'; sec.dataset.act = a.n;
-    sec.innerHTML = `<div class="bk-hand-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p><span class="bk-stamp"></span></div><div class="bk-hand-fit"><div class="bk-sheet"><i class="bk-tape"></i><svg class="bk-ink" aria-hidden="true"></svg></div></div>${a.n === 3 ? '<div class="bk-hand-space" aria-hidden="true"></div>' : ''}`;
+    sec.innerHTML = `<div class="bk-hand-pin"><div class="bk-hand-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p><span class="bk-stamp"></span></div><div class="bk-hand-fit"><div class="bk-sheet"><i class="bk-tape"></i><svg class="bk-ink" aria-hidden="true"></svg></div></div></div>${a.n === 3 ? '<div class="bk-hand-space" aria-hidden="true"></div>' : ''}`;
     return { ...a, sec, sheet: sec.querySelector('.bk-sheet'), svg: sec.querySelector('svg'), items: [], p: calm ? 1 : 0 };
   });
-  m1.after(acts[0].sec); if (ov) ov.after(acts[1].sec); else m2.before(acts[1].sec); m2.after(acts[2].sec);
+  m1.after(acts[0].sec); m2.after(acts[1].sec);
+  acts[0].sec.classList.add('is-pinned'); acts[0].merged = true;
 
   const rowY = row => TOP + row * ROW;
   // build each page: what is already on it from the earlier acts, and what this act writes
@@ -85,7 +86,7 @@ export function mountHand(root, extra = '') {
     const l = zh() ? 1 : 0;
     acts.forEach(a => {
       a.sec.querySelector('.bk-hand-k').textContent = a.k[l]; a.sec.querySelector('.bk-stamp').textContent = l ? '示意 · 根据我的笔记重构，并非她的真实本子' : 'Illustrative · reconstructed from my notes, not her real diary'; a.sec.querySelector('.bk-hand-t').textContent = a.t[l];
-      a.sheet.querySelectorAll('.bk-w, .bk-bubble').forEach(e => e.remove()); a.svg.innerHTML = ''; a.items = [];
+      a.half = 0; a.sheet.querySelectorAll('.bk-w, .bk-bubble').forEach(e => e.remove()); a.svg.innerHTML = ''; a.items = [];
       const add = (it, from, to, pre) => { a.items.push({ ...it, from, to, pre }); };
       // handwriting
       const write = (it, from, to, pre) => {
@@ -101,15 +102,15 @@ export function mountHand(root, extra = '') {
       const n = a.n;
       // WeChat in the corner of the page: the unread count climbs through acts 1 and 2, and drops to zero in act 3
       const wx = document.createElement('div'); wx.className = 'bk-wechat'; wx.innerHTML = '<i></i><b>0</b>'; a.sheet.append(wx); a.badge = wx;
-      write(THINK, .55, .66, n > 1);
-      // rows: act 1 writes them one by one; later acts start with them on the page
-      ROWS.forEach((r, i) => write(r, .02 + i * .1, .1 + i * .1, n > 1));
-      bubble(BUBBLE1, 0, .66, .74, n > 1, BUBBLE1.note);
-      if (n >= 2) {
-        const step = .6 / ACT2.length;
-        ACT2.forEach((it, i) => { if (it.kind === 'write') write(it, .05 + i * step, .05 + (i + 1) * step, n > 2); else add({ ...it }, .05 + i * step, .05 + (i + 1) * step, n > 2); });
-        BUBBLES2.forEach((b, i) => bubble(b, i + 1, .7 + i * .07, .76 + i * .07, n > 2));
-      }
+      // on the merged page the first half writes the day, the second half breaks it; on act 3 it is all already there
+      const A = (f, t) => a.merged ? [f * .46, t * .46] : [f, t], Bw = (f, t) => a.merged ? [.5 + f * .48, .5 + t * .48] : [f, t];
+      const pre = n > 1;
+      write(THINK, ...A(.55, .66), pre);
+      ROWS.forEach((r, i) => write(r, ...A(.02 + i * .1, .1 + i * .1), pre));
+      bubble(BUBBLE1, 0, ...A(.66, .74), pre, BUBBLE1.note);
+      const step = .6 / ACT2.length;
+      ACT2.forEach((it, i) => { const w = Bw(.05 + i * step, .05 + (i + 1) * step); if (it.kind === 'write') write(it, ...w, pre); else add({ ...it }, ...w, pre); });
+      BUBBLES2.forEach((b, i) => bubble(b, i + 1, ...Bw(.7 + i * .07, .76 + i * .07), pre));
       if (n === 3) { add({ kind: 'handoff' }, .1, .55, false); add({ kind: 'handnote' }, .45, .7, false); add({ kind: 'tick' }, .7, .85, false); }
     });
     requestAnimationFrame(geometry);
@@ -163,7 +164,9 @@ export function mountHand(root, extra = '') {
       if (it.paths) { const n = it.paths.length; it.paths.forEach((pa, i) => { const kk = clamp(k * n - i); pa.style.strokeDashoffset = (pa._L * (1 - kk)).toFixed(2); }); }
       if (it.noteEl) it.noteEl.style.clipPath = k >= 1 ? 'none' : `inset(-30% ${(100 - clamp(k * 2 - 1) * 100).toFixed(2)}% -30% -4%)`;
     });
-    if (a.badge) { const [u0, u1, k0, k1] = a.n === 1 ? [0, 3, .6, .78] : a.n === 2 ? [3, 27, .1, .95] : [27, 0, .55, .9]; const k = clamp((p - k0) / (k1 - k0)); const u = Math.round(u0 + (u1 - u0) * k); const b = a.badge.querySelector('b'); if (b.textContent !== String(u)) { b.textContent = u; a.badge.classList.remove('is-bump'); void a.badge.offsetWidth; a.badge.classList.add('is-bump'); } a.badge.classList.toggle('is-zero', u === 0); }
+    if (a.badge) { const u = a.merged ? (p < .5 ? Math.round(3 * clamp((p - .28) / .08)) : Math.round(3 + 24 * clamp((p - .52) / .44))) : Math.round(27 * (1 - clamp((p - .55) / .35))); const b = a.badge.querySelector('b'); if (b.textContent !== String(u)) { b.textContent = u; a.badge.classList.remove('is-bump'); void a.badge.offsetWidth; a.badge.classList.add('is-bump'); } a.badge.classList.toggle('is-zero', u === 0); }
+    // the merged page changes its title halfway, when things start to go wrong
+    if (a.merged) { const half = p > .49 ? 2 : 1; if (a.half !== half) { a.half = half; const l = zh() ? 1 : 0; a.sec.querySelector('.bk-hand-k').textContent = (half === 2 ? a.k2 : a.k)[l]; const tt = a.sec.querySelector('.bk-hand-t'); tt.textContent = (half === 2 ? a.t2 : a.t)[l]; tt.classList.remove('is-swap'); void tt.offsetWidth; tt.classList.add('is-swap'); } }
     a.sec.classList.toggle('is-done', p > .98);
   };
   let last = performance.now();
@@ -174,7 +177,7 @@ export function mountHand(root, extra = '') {
     acts.forEach(a => {
       const r = a.sheet.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) { if (a.drawn !== a.p) { apply(a); a.drawn = a.p; } return; }
       // starts when the page is low on the screen, finished once it is well up in view
-      const target = calm ? 1 : clamp((vh * .86 - r.top) / (vh * .62));
+      let target; if (calm) target = 1; else if (a.merged) { const sr = a.sec.getBoundingClientRect(); target = clamp(-sr.top / Math.max(1, sr.height - vh)); } else target = clamp((vh * .86 - r.top) / (vh * .62));
       a.p += (target - a.p) * (1 - Math.exp(-dt * 3.2)); // a hand, not a jump
       if (Math.abs(a.p - a.drawn) > .0005) { apply(a); a.drawn = a.p; }
     });

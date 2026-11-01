@@ -65,7 +65,8 @@ const HOVER = [
   ['#research .ux-research-plan>div', ['booked', 'services', 'time-off-hours']]
 ];
 // which side of the page each chapter keeps its phone on (desktop)
-export const SIDE = { system: 'left', strategy: 'left', iteration: 'left', structure: 'right', flow: 'right', interfaces: 'right', build: 'left', challenges: 'left', research: 'left', release: 'left' };
+// the phone always stands on the right and the text always reads on the left: it never has to cross the text
+export const SIDE = { system: 'right', strategy: 'right', iteration: 'right', structure: 'right', interfaces: 'right', build: 'right', challenges: 'right', research: 'right', release: 'right' };
 
 const P6 = a => ({ x: a[0], y: a[1], s: a[2], rx: a[3], ry: a[4], rz: a[5] });
 

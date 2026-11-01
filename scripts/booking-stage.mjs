@@ -21,7 +21,7 @@ const ease = t => t < .5 ? 8 * t ** 4 : 1 - (-2 * t + 2) ** 4 / 2; // power4.inO
 const TAU = Math.PI * 2;
 
 // which part of each screen lifts out (x, y, w, h in % of the screen image)
-export const SPOT = { today: [2, 22, 96, 28], book: [2, 19, 96, 13], day: [2, 31, 96, 28], confirm: [2, 27, 96, 24], schedule: [4, 52, 94, 34], 'time-off-hours': [2, 35, 96, 27], kept: [2, 33, 96, 28], add: [2, 24, 96, 30], mine: [2, 18, 96, 30], services: [2, 16, 96, 42], 'by-time': [2, 22, 96, 40], booked: [2, 14, 96, 34], reschedule: [2, 22, 96, 36], window: [2, 22, 96, 36] };
+export const SPOT = { today: [2, 21.3, 96, 30.6], book: [2, 19, 96, 15], day: [2, 30.9, 96, 29.1], confirm: [3, 28.5, 94, 15.6], schedule: [4, 52.3, 94, 33.2], 'time-off-hours': [2, 34.8, 96, 25.6], kept: [2, 33, 96, 30.8], add: [2, 21.5, 96, 32.5], mine: [2, 16.5, 96, 31.5], services: [2, 16, 96, 38.5], 'by-time': [2, 22.7, 96, 39.2], booked: [2, 13.9, 96, 34.1], reschedule: [2, 22.4, 96, 36.5], window: [2, 22, 96, 36] }; // edges sit in the gaps between elements, so nothing is cut
 
 // the 12:10 story, one booking step by step. Pose: [x, y, size, rx, ry, rz]; x/y are screen fractions, size is phone height / screen height
 export const STEPS = [

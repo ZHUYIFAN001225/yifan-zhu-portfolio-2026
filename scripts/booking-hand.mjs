@@ -26,7 +26,7 @@ const ACT2 = [
   { id: 'x5', kind: 'scribble', on: 'r5' },
   { id: 'n6', kind: 'write', row: 5, x: LEFT, red: true, t: ['→ Thu?? must tell her!', '→ 改周四？？要通知她！'] }
 ];
-const BUBBLES2 = [{ id: 'b2', t: ['Can I move to 3?', '能改到三点吗？'] }, { id: 'b3', t: ['Are you open Sunday?', '周日开门吗？'] }, { id: 'b4', t: ['Running late, sorry!', '晚到一会儿，抱歉！'] }];
+const BUBBLES2 = [{ id: 'b2', t: ['Can I move to 3?', '能改到三点吗？'] }, { id: 'b3', t: ['Are you open Sunday?', '周日开门吗？'] }];
 
 const ACTS = [
   { n: 1, k: ['Act 1 · The old way', '第一幕 · 旧方式'], t: ['A paper diary, WeChat and her memory.', '一本纸质预约本、微信，和她的记忆。'] },
@@ -113,10 +113,10 @@ export function mountHand(root) {
         if (it.kind === 'scribble') it.paths = [path(a.svg, scribbleD(box(byId(it.on)), r), 'is-red')];
         if (it.kind === 'circle') { const e = byId(it.on), b = box(e); const w2 = b.w * .3; it.paths = [path(a.svg, circleD({ x: b.x + b.w - w2, y: b.y, w: w2, h: b.h }, r), 'is-red')]; }
         if (it.kind === 'arrow') {
-          const f = box(byId(it.src)), t = box(byId(it.dst)); const [d1, d2] = arrowD(f.x + f.w + 22, f.y + f.h * .5, f.x + f.w + 30, t.y + t.h * .2, 34);
+          const f = box(byId(it.src)), t = box(byId(it.dst)); const [d1, d2] = arrowD(f.x + f.w + 16, f.y + f.h * .55, Math.max(f.x + f.w, t.x + t.w) + 12, t.y + t.h * .35, 26);
           it.paths = [path(a.svg, d1, 'is-red'), path(a.svg, d2, 'is-red')];
           if (!it.noteEl) { it.noteEl = document.createElement('span'); it.noteEl.className = 'bk-w is-red is-small'; a.sheet.append(it.noteEl); }
-          it.noteEl.textContent = it.note[zh() ? 1 : 0]; it.noteEl.style.left = (f.x + f.w + 62) + 'px'; it.noteEl.style.top = (f.y + f.h * .9) + 'px';
+          it.noteEl.textContent = it.note[zh() ? 1 : 0]; it.noteEl.style.left = (Math.max(f.x + f.w, t.x + t.w) + 24) + 'px'; it.noteEl.style.top = (t.y - 2) + 'px';
         }
         if (it.kind === 'handoff') {
           // from the right edge of the page towards where the phone stands

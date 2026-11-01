@@ -26,11 +26,11 @@ export const SPOT = { today: [2, 21.3, 96, 30.6], book: [2, 19, 96, 15], day: [2
 
 // the 12:10 story, one booking step by step. Pose: [x, y, size, rx, ry, rz]; x/y are screen fractions, size is phone height / screen height
 export const STEPS = [
-  { f: 'book', spot: SPOT.book, kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'], d: [.64, .52, .78, .03, .14, 0], m: [.5, .35, .46, .02, .1, 0] },
-  { f: 'day', spot: SPOT.day, kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'], d: [.62, .52, .78, .02, -.14, 0], m: [.5, .35, .46, .02, -.1, 0] },
-  { f: 'confirm', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling: the phone turns over to the owner’s side, and the card goes with it.', '日期、时间、时长都在一张卡里。继续滚：手机翻到店主那一面，这张卡也跟着过去。'], d: [.6, .52, .76, .03, .2, 0], m: [.5, .35, .46, .03, .14, 0] },
-  { f: 'schedule', spot: SPOT.schedule, spin: 1, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'], d: [.66, .52, .78, .03, -.14, 0], m: [.5, .35, .46, .02, -.1, 0] },
-  { f: 'time-off-hours', spot: SPOT['time-off-hours'], kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'], d: [.64, .52, .78, .03, .14, 0], m: [.5, .35, .46, .02, .1, 0] }
+  { f: 'book', spot: SPOT.book, tap: [22, 27], kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] },
+  { f: 'day', spot: SPOT.day, tap: [50, 45], kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'], d: [0.62, 0.52, 0.74, 0.02, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
+  { f: 'confirm', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling: the phone turns over to the owner’s side, and the card goes with it.', '日期、时间、时长都在一张卡里。继续滚：手机翻到店主那一面，这张卡也跟着过去。'], d: [0.6, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .03, .14, 0] },
+  { f: 'schedule', spot: SPOT.schedule, spin: 1, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'], d: [0.62, 0.52, 0.74, 0.03, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
+  { f: 'time-off-hours', spot: SPOT['time-off-hours'], tap: [62, 48], kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] }
 ];
 
 // one beat per piece of the long page: which element, which screen, and who is holding the phone
@@ -80,6 +80,10 @@ export function mountStage(root) {
   root.prepend(cv);
   const tag = document.createElement('p'); tag.className = 'bk-tag'; tag.setAttribute('aria-hidden', 'true'); tag.innerHTML = '<i></i><span></span>'; document.body.append(tag);
   const tagTxt = tag.querySelector('span');
+  const NS = 'http://www.w3.org/2000/svg', ink = document.createElementNS(NS, 'svg'); ink.setAttribute('class', 'bk-link'); ink.setAttribute('aria-hidden', 'true');
+  ink.innerHTML = '<path class="bk-link-line"/><path class="bk-link-head"/><path class="bk-link-ring"/><circle class="bk-link-tap" r="10"/><circle class="bk-link-tap is-2" r="10"/>';
+  document.body.append(ink);
+  const [lLine, lHead, lRing] = ink.querySelectorAll('path'), lTaps = ink.querySelectorAll('circle');
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
   const key = new THREE.DirectionalLight(0xffffff, 1.3); key.position.set(2, 4, 5); scene.add(key);
@@ -94,8 +98,8 @@ export function mountStage(root) {
   const frost = im => {
     if (frosts.has(im)) return frosts.get(im);
     const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d');
-    x.filter = 'blur(5px) saturate(.35)'; x.drawImage(im, 0, 0); x.filter = 'none';
-    x.fillStyle = 'rgba(232,233,238,.62)'; x.fillRect(0, 0, c.width, c.height);
+    x.filter = 'blur(2.5px) saturate(.5)'; x.drawImage(im, 0, 0); x.filter = 'none';
+    x.fillStyle = 'rgba(236,237,242,.5)'; x.fillRect(0, 0, c.width, c.height);
     frosts.set(im, c); return c;
   };
   const sc = document.createElement('canvas'); sc.width = 780; sc.height = CH;
@@ -145,7 +149,7 @@ export function mountStage(root) {
       pose(a) {
         g.visible = a > .004; if (!g.visible) return; const k = ease(clamp(a));
         card.position.z = .002 + k * .055; glow.position.z = card.position.z + .001; shadow.position.set(0, -k * .012, .001);
-        const sc = 1 + k * .035; card.scale.setScalar(sc); glow.scale.set(L.gw * sc, L.gh * sc, 1); card.material.opacity = clamp(a * 4); glow.material.opacity = clamp(a * 1.6); shadow.material.opacity = k * .55;
+        const sc = 1 + k * .035; card.scale.setScalar(sc); glow.scale.set(L.gw * sc, L.gh * sc, 1); card.material.opacity = clamp(a * 4); glow.material.opacity = clamp(a * 1.6) * .45; shadow.material.opacity = k * .55;
       }
     };
     return L;
@@ -211,7 +215,7 @@ export function mountStage(root) {
         // act 3: the phone takes over from the paper diary
         phoneOn = true; f = 'schedule';
         if (m) { const sp = e.querySelector('.bk-hand-space') || e, t2 = docY(sp), h2 = sp.offsetHeight; push(t2 - vh * .45, { kind: 'off', q: off(1), f }); push(t2 + h2 * .5, { kind: 'hand', q: P6([.5, .5, .5, .03, -.2, 0]), f, spot: SPOT.schedule }); story = true; return; }
-        push(top + h * .55, { kind: 'section', q: P6([.78, .52, .64, .04, -.3, 0]), f, spot: SPOT.schedule, label: ['Owner · the diary keeps itself', '店主 · 预约本自己记'], who: 'o' });
+        push(top + h * .55, { kind: 'section', el: e.querySelector('.bk-sheet'), q: P6([.78, .52, .64, .04, -.3, 0]), f, spot: SPOT.schedule, label: ['Owner · the diary keeps itself', '店主 · 预约本自己记'], who: 'o' });
         return;
       }
       if (!phoneOn && !m) return;
@@ -219,7 +223,7 @@ export function mountStage(root) {
         const s = STEPS[+e.dataset.i];
         if (!story && m) push(top - vh * .45, { kind: 'off', q: off(1), f });
         story = true; f = s.f;
-        push(top + h * .5, { kind: 'story', q: P6(m ? s.m : s.d), f, spot: s.spot || null, travel: s.travel, spin: s.spin });
+        push(top + h * .5, { kind: 'story', q: P6(m ? s.m : s.d), f, spot: s.spot || null, travel: s.travel, spin: s.spin, el: e.querySelector('.bk-step-card'), tap: s.tap });
         return;
       }
       if (story && m) push(top - vh * .2, { kind: 'off', q: off(-1), f });
@@ -250,7 +254,7 @@ export function mountStage(root) {
       beats.forEach((b, j) => {
         const R = side === 'right'; f = b.file;
         const at = j === 0 ? top + vh * .1 : Math.max(docY(b.el) - vh * .05, top + vh * .1);
-        push(at, { kind: 'section', q: P6([R ? .84 : .16, .53, .62, .04, R ? -.3 : .3, 0]), f, spot: SPOT[b.file] || [2, 20, 96, 30], label: b.label, who: b.label ? (/Owner|店主/.test(b.label[0]) ? 'o' : 'c') : null });
+        push(at, { kind: 'section', el: b.el, q: P6([R ? .84 : .16, .53, .62, .04, R ? -.3 : .3, 0]), f, spot: SPOT[b.file] || [2, 20, 96, 30], label: b.label, who: b.label ? (/Owner|店主/.test(b.label[0]) ? 'o' : 'c') : null });
       });
     });
     const end = els.length ? docY(els[els.length - 1]) + els[els.length - 1].offsetHeight : document.documentElement.scrollHeight;
@@ -360,7 +364,41 @@ export function mountStage(root) {
       if (tagTxt.textContent !== lab) { tagTxt.textContent = lab; tag.dataset.who = st.who === 'o' ? 'owner' : 'customer'; }
       tag.classList.toggle('is-on', !hv);
     } else tag.classList.remove('is-on');
+    link(st, hold, hv, now, m);
     renderer.render(scene, cam);
+  }
+  // ---------- the pen: words → the part of the screen they talk about ----------
+  let linkKey = '', linkT0 = 0;
+  const pv = new THREE.Vector3();
+  const toScreen = (x, y) => { pv.set(x, y, .07); phone.localToWorld(pv); pv.project(cam); return [(pv.x + 1) / 2 * vw, (1 - pv.y) / 2 * vh]; };
+  const wob = (k, a) => Math.sin(k * 12.9898 + a) * 2.2;
+  function link(st, hold, hv, now, m) {
+    const src = hv?.el || st.el, on = !m && hold && P.rect && P.amt > .6 && src && cv.style.opacity !== '0';
+    const key = on ? (P.spotKey + '|' + (hv ? 'h' : st.at)) : '';
+    if (key !== linkKey) { linkKey = key; linkT0 = now; }
+    ink.classList.toggle('is-on', !!on);
+    if (!on) return;
+    phone.updateMatrixWorld();
+    const r = P.rect, [w, h] = size(r), [cx, cy] = slot(r);
+    const pts = [[cx - w / 2, cy - h / 2], [cx + w / 2, cy - h / 2], [cx - w / 2, cy + h / 2], [cx + w / 2, cy + h / 2]].map(([x, y]) => toScreen(x, y));
+    const bx0 = Math.min(...pts.map(p => p[0])), bx1 = Math.max(...pts.map(p => p[0])), by0 = Math.min(...pts.map(p => p[1])), by1 = Math.max(...pts.map(p => p[1]));
+    const sr = src.getBoundingClientRect();
+    const tx = bx0 - 14, ty = (by0 + by1) / 2, sx = Math.min(sr.right + 16, tx - 60), sy = clamp(ty, Math.max(sr.top + 24, 90), Math.min(sr.bottom - 24, vh - 60));
+    if (sr.bottom < 60 || sr.top > vh - 60 || tx - sx < 40) { ink.classList.remove('is-on'); return; }
+    const mx = (sx + tx) / 2, my = Math.min(sy, ty) - 40 - Math.abs(tx - sx) * .08;
+    lLine.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)}`);
+    const ang = Math.atan2(ty - my, tx - mx), A = 13;
+    lHead.setAttribute('d', `M${(tx - Math.cos(ang - .45) * A).toFixed(1)} ${(ty - Math.sin(ang - .45) * A).toFixed(1)} L${tx.toFixed(1)} ${ty.toFixed(1)} L${(tx - Math.cos(ang + .45) * A).toFixed(1)} ${(ty - Math.sin(ang + .45) * A).toFixed(1)}`);
+    const ecx = (bx0 + bx1) / 2, ecy = (by0 + by1) / 2, erx = (bx1 - bx0) / 2 + 12, ery = (by1 - by0) / 2 + 10; let d = '';
+    for (let i = 0; i <= 40; i++) { const a = -2.6 + i / 40 * (Math.PI * 2 + .45), k = 1 + i / 40 * .05; d += (i ? ' L' : 'M') + (ecx + Math.cos(a) * erx * k + wob(i, 1)).toFixed(1) + ' ' + (ecy + Math.sin(a) * ery * k + wob(i, 2)).toFixed(1); }
+    lRing.setAttribute('d', d);
+    // draw it like a pen: the line first, then the ring
+    const k = clamp((now - linkT0) / 900);
+    [[lLine, 0, .45], [lHead, .45, .55], [lRing, .5, 1]].forEach(([el, a, b]) => { const L = el.getTotalLength() || 1, kk = clamp((k - a) / (b - a)); el.style.strokeDasharray = `${L} ${L}`; el.style.strokeDashoffset = (L * (1 - kk)).toFixed(1); });
+    // a finger tap where she acts
+    const tp = !hv && st.tap;
+    lTaps.forEach((c, i) => { c.style.display = tp && k >= 1 ? '' : 'none'; });
+    if (tp && k >= 1) { const [x, y] = tp, px = -SW / 2 + x / 100 * SW, py = SH / 2 - (TF + (1 - TF) * y / 100) * SH, [qx, qy] = toScreen(px, py); lTaps.forEach(c => { c.setAttribute('cx', qx.toFixed(1)); c.setAttribute('cy', qy.toFixed(1)); }); }
   }
   requestAnimationFrame(frame);
   return true;

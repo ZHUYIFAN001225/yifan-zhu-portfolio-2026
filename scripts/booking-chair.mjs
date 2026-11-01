@@ -78,9 +78,13 @@ export function mountChair(root) {
     sum.hidden = false; void sum.offsetWidth; ui.classList.add('is-sum');
     // the list fills in one by one, so the reader recognises each message they half-noticed
     [...$('.bk-call-sum-list').children].forEach((li, k) => li.style.setProperty('--k', k));
+    sumY = scrollY; sumAt = performance.now(); sumOn = true;
     clearTimeout(showSum.t); showSum.t = setTimeout(hideSum, 16000);
   }
-  function hideSum() { ui.classList.remove('is-sum'); setTimeout(() => { sum.hidden = true; }, 450); }
+  let sumOn = false, sumY = 0, sumAt = 0;
+  // it goes away by itself once the reader keeps scrolling (the × is only a shortcut)
+  addEventListener('scroll', () => { if (sumOn && performance.now() - sumAt > 1200 && Math.abs(scrollY - sumY) > innerHeight * .6) hideSum(); }, { passive: true });
+  function hideSum() { sumOn = false; ui.classList.remove('is-sum'); setTimeout(() => { sum.hidden = true; }, 450); }
   $('.bk-call-x').addEventListener('click', hideSum);
 
   const yOf = ([sel, f]) => { const el = document.querySelector(sel); if (!el) return Infinity; const r = el.getBoundingClientRect(); return r.top + scrollY + f * r.height; };

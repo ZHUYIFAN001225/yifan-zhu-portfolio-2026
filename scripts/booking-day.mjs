@@ -155,10 +155,6 @@ function stage(root, calm) {
   if (calm) return;
   import('./booking-stage.mjs').then(async mod => {
     S = mod; layout(mq.matches); mq.addEventListener('change', e => { if (S) layout(e.matches); });
-    // 12:10: the booking as a two-lane flow of the real screens (no scroll-jacking, no 3D here)
-    const flowMod = await import('./booking-flow.mjs');
-    let story = null;
-    if (st) { story = flowMod.mountFlow(root, st); st.classList.add('bk-st-hidden'); }
     if (!mod.mountStage(root)) throw new Error('WebGL unavailable');
     document.body.classList.add('bk-staged');
   }).catch(e => { console.error(e); root.querySelector('.bk-story')?.remove(); st?.classList.remove('bk-st-hidden'); undo.forEach(f => f()); });

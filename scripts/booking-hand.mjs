@@ -34,7 +34,6 @@ const NOTES = [
   ['#overview .bk-owner', ['she has to read it at a glance', '她得一眼就看懂']],
   ['#system .ux-blueprint', ['one diary, two views: nothing passed on by message', '一本日程，两种视图：不再靠消息传话']],
   ['#strategy .ux-principles', ['rules first, screens second', '先定规则，再画界面']],
-  ['#structure .ux-section-body', ['every screen answers one question', '每个界面只回答一个问题'], 'prepend'],
   ['#build .ux-section-body', ['rules written and tested before the UI', '先写规则、测规则，再做界面'], 'prepend'],
   ['#challenges .ux-challenge-grid', ['still to prove with the owner', '还要和店主一起验证']],
   ['#research .ux-research-plan', ['not validated yet: next, watch a real booking', '还没验证：下一步，看一次真实预约']],

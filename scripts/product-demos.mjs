@@ -7,7 +7,7 @@ export function renderProductDemos(t,document){
   return productCases.map(c=>{
   // Only sections with content are shown; their numbers follow the order on the page.
   const present0=Object.keys(caseLabels).filter(id=>({system:!!c.system,strategy:!!(c.strategy||c.principles),iteration:!!c.iteration,logic:c.decisions.length>0,build:!!c.build,challenges:!!c.challenges,structure:!c.film,interfaces:!c.film})[id]??true); // LOOK's film already walks through these screens, so the close-ups would repeat it
-  const DAY=['overview','system','strategy','logic','structure','interfaces','build','iteration','challenges','research','release'];
+  const DAY=['overview','system','strategy','logic','interfaces','build','iteration','challenges','research','release'];
   const present=c.day?DAY.filter(id=>present0.includes(id)):present0;
   const label=id=>{const v=(caseLabelOverrides[c.id]||{})[id]||caseLabels[id],n=String(present.indexOf(id)+1).padStart(2,'0');return c.day?[v[0],v[1]]:[`${n} / ${v[0]}`,`${n} / ${v[1]}`];}; // the booking case is numbered by the hours of the day instead
   const section=(id,body)=>present.includes(id)?`<section class="v3-product-section ux-section" id="${id}"><h2>${pair(label(id))}</h2><div class="ux-section-body">${c.dayNotes?.[id]?`<p class="bk-note">${pair(c.dayNotes[id])}</p>`:''}${body}</div></section>`:'';
@@ -155,8 +155,6 @@ export function renderProductDemos(t,document){
     ${moment('system')}${system()}
     ${strategy()}
     ${section('logic',`<div class="ux-decisions">${c.decisions.map((d,i)=>`<article><span class="ux-decision-number">0${i+1}</span><div><h3>${pair(d.title)}</h3><p>${pair(d.why)}</p><dl><dt>${t('Prototype response','原型中的应对')}</dt><dd>${pair(d.how)}</dd><dt>${t('What to validate next','下一步验证')}</dt><dd>${pair(d.test)}</dd></dl></div></article>`).join('')}</div>`)}
-    ${moment('explode')}${c.story?story():''}
-    ${c.film?'':c.screenMap?section('structure',screenMap()):section('structure',`<p>${pair(c.iaNote)}</p><div class="ux-architecture">${c.ia.map(a=>`<div><h3>${pair(a.title)}</h3><ol>${a.levels.map(v=>`<li>${pair(v)}</li>`).join('')}</ol></div>`).join('')}</div>`)}
     ${c.details?section('interfaces',details()):section('interfaces',`<p>${t('Actual screens from the existing running prototype. Read the sequence here, then follow the prototype steps below. Accounts, prices and appointments shown are demo fixtures.','以下为现有运行原型的真实界面截图。无需点开 Demo，也能按顺序了解产品。所示账号、价格与预约均为演示数据。')}</p><div class="ux-screens">${c.screens.map(s=>image(s)).join('')}</div>`)}
     ${moment('build')}${build()}
     ${iteration()}

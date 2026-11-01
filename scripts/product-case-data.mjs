@@ -242,7 +242,7 @@ export const productCases=[{
     iteration:p('How the work moved, step by step.','这件事是怎么一步步推进的。'),
     structure:p('Two small apps sharing one diary: here is every screen.','两个小应用，共用一本预约本：所有页面都在这里。'),
     flow:p('One booking, from the customer’s first tap to the owner’s diary.','一笔预约，从顾客点下第一下，到出现在店主的日程里。'),
-    interfaces:p('Close-ups of the moments that carry her day.','放大看，撑起她这一天的那些细节。'),
+    interfaces:p('Customers book by scanning a QR code; the owner sees the same booking in her day. These are the real screens.','顾客扫码在网站上预约，店主在自己的一天里看到同一笔预约。下面是真实界面。'),
     build:p('From written rules to a site real customers use.','从写下的规则，到真实顾客在用的网站。'),
     challenges:p('What is still hard, honestly.','说实话，还有哪些难点。'),
     research:p('What I still need to learn from the owner and her customers.','我还需要从店主和顾客那里了解什么。'),

@@ -31,14 +31,14 @@ const BUBBLES2 = [{ id: 'b2', t: ['Can I move to 3?', '能改到三点吗？'] }
 
 const NOTES = [
   ['#overview .ux-question', ['…and she shouldn’t have to learn a new tool', '……而且她不该为此去学一个新工具']],
-  ['#overview .ux-persona', ['she has to read it at a glance', '她得一眼就看懂']],
+  ['#overview .bk-owner', ['she has to read it at a glance', '她得一眼就看懂']],
   ['#system .ux-blueprint', ['one diary, two views: nothing passed on by message', '一本日程，两种视图：不再靠消息传话']],
   ['#strategy .ux-principles', ['rules first, screens second', '先定规则，再画界面']],
   ['#structure .ux-section-body', ['every screen answers one question', '每个界面只回答一个问题']],
   ['#build .ux-section-body', ['rules written and tested before the UI', '先写规则、测规则，再做界面']],
   ['#challenges .ux-challenge-grid', ['still to prove with the owner', '还要和店主一起验证']],
   ['#research .ux-research-plan', ['not validated yet: next, watch a real booking', '还没验证：下一步，看一次真实预约']],
-  ['#release .ux-section-body', ['next: a WeChat mini program?', '下一步：微信小程序？'], 'append']
+  ['#release .ux-section-body', ['one QR code, any customer', '一个二维码，谁都能约'], 'append']
 ];
 const ACTS = [
   // the old way and what goes wrong are one page: it is written, then it falls apart, while it stays on screen

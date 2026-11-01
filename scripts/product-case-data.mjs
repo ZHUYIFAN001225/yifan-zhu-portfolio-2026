@@ -267,7 +267,7 @@ export const productCases=[{
     {label:p('My part','我的工作'),value:p('Problem framing, service blueprint, booking rules, UI for both sides, AI-assisted build','问题定义、服务蓝图、预约规则、双端界面、AI 辅助开发')},
     {label:p('Built with','技术'),value:p('TypeScript booking core · Cloudflare Pages + D1 · Google sign-in','TypeScript 预约核心 · Cloudflare Pages + D1 · Google 登录')},
     {label:p('Proven so far','目前已证实'),value:p('End to end in production with real accounts: a booking, a reschedule and a cancellation showed up on every side.','用真实账号在线上完整走通：预约、改期、取消，各端同步。')},
-    {label:p('Not yet','尚未完成'),value:p('Usage data, an owner interview, reminders, the WeChat mini program.','使用数据、店主访谈、提醒功能、微信小程序。')}
+    {label:p('Not yet','尚未完成'),value:p('Usage data, an owner interview, reminders.','使用数据、店主访谈、提醒功能。')}
   ],
   role:p('Problem framing, service blueprint, booking rules, UI for both sides and AI-assisted prototyping','问题定义、服务蓝图、预约规则、双端界面与 AI 辅助原型'),
   scope:p('Customer booking + shop diary and availability','顾客预约 + 店铺排期与开放安排'),
@@ -276,7 +276,7 @@ export const productCases=[{
   persona:{name:p('The owner','店主「阿姨」'),traits:[p('Runs the salon alone','独自经营小店'),p('WeChat + paper diary','微信 + 纸质预约本'),p('Hours change with health and travel','营业时间随身体和出行变化'),p('Away for two weeks recently','最近离开过半个月'),p('Needs tools she can read at a glance','工具必须一眼看懂')],quote:p('“Is anyone booked on Friday? Who do I need to tell?”','「周五有人约吗？我要通知谁？」')},
   whoNeeds:{title:p('Same booking, different questions','同一个预约，双方关心的完全不同'),left:{title:p('Customer asks','顾客关心'),items:[p('What services?','有哪些服务？'),p('Which days are open?','哪天营业？'),p('Which times are free?','哪些时间有空？'),p('What did I book?','我约了什么？')]},center:p('One shared diary','一本共享预约本'),right:{title:p('Owner asks','店主关心'),items:[p('How many today?','今天几位？'),p('Who, when, what, how long?','谁、几点、做什么、多久？'),p('Where is free time?','哪里还有空？'),p('Who is affected if I close?','停业会影响谁？')]}},
   flows:{title:p('Two sides, three ways in','两端，三种入口'),lanes:[
-    {title:p('Chinese customers','中国顾客'),channel:p('Chinese website · live (mini program later)','中文网站 · 已上线（小程序之后）'),steps:[p('Open','打开'),p('Service','选服务'),p('Time','选时间'),p('Confirm','确认')]},
+    {title:p('Chinese customers','中国顾客'),channel:p('Scan the shop’s QR code · Chinese website','扫店里的二维码 · 中文网站'),steps:[p('Open','打开'),p('Service','选服务'),p('Time','选时间'),p('Confirm','确认')]},
     {title:p('Non-WeChat customers','非微信顾客'),channel:p('English website · live; owner can still add them','英文网站 · 已上线；店主仍可代为补录'),steps:[p('Open the link','打开链接'),p('Service & time','选服务和时间'),p('Google sign-in','Google 登录'),p('Same diary','进入同一本日程')]},
     {title:p('Owner','店主'),channel:p('Shop view','店铺端'),steps:[p('Today','看今天'),p('Set hours once','设一次营业时间'),p('Handle exceptions','只处理异常')]}
   ]},
@@ -344,8 +344,8 @@ export const productCases=[{
     steps:[
       {title:p('One booking core','一个预约核心'),body:p('Availability, booking, rescheduling, closures and admin actions live in one shared TypeScript core used by both sides.','可约时间、预约、改期、休息与店主操作都在同一个 TypeScript 核心中，双端共用。')},
       {title:p('Guardrails for AI','给 AI 的边界'),body:p('A written spec, folder rules and a list of what the AI may and may not change kept generated code inside the design.','书面规格、文件夹规则，以及 AI 可改与不可改的范围，让生成的代码不偏离设计。')},
-      {title:p('Two front ends','两个前端'),body:p('A customer flow and a shop diary, both phone-sized; the target is a WeChat mini program with a separate entry for non-WeChat customers.','顾客流程与店铺预约本，均为手机尺寸；目标形态是微信小程序，并为不用微信的顾客提供独立入口。')},
-      {title:p('Launched on the web','网页版上线'),body:p('The first release is a website, not yet the mini program: Chinese and English booking pages and an owner admin share one database, and every booking is re-checked on the server. Browsing is open; booking needs a Google sign-in.','第一次上线是网页版，而不是小程序：中文、英文预约页和店主管理端共用一个数据库，每笔预约都在服务器端复核。查看空位无需登录，预约需要 Google 登录。')},
+      {title:p('Two front ends','两个前端'),body:p('A customer flow and a shop diary, both phone-sized. We first planned a WeChat mini program, then chose a website instead: Chinese and non-Chinese customers alike book by scanning one QR code.','顾客流程与店铺预约本，均为手机尺寸。最初计划做微信小程序，后来改为网站：无论中国顾客还是外国顾客，扫一个二维码就能预约。')},
+      {title:p('Launched on the web','网页版上线'),body:p('The release is a website: Chinese and English booking pages and an owner admin share one database, and every booking is re-checked on the server. Browsing is open; booking needs a Google sign-in.','上线的是网站：中文、英文预约页和店主管理端共用一个数据库，每笔预约都在服务器端复核。查看空位无需登录，预约需要 Google 登录。')},
       {title:p('Public demo','公开演示版'),body:p('The live website’s own screens and booking rules run in the browser on sample data, in Chinese and English, so anyone can try both sides without touching real bookings.','线上网站的同一套界面和预约规则，在浏览器里用示例数据运行，中英文都有；任何人都能体验双端，而不会碰到真实预约。')}
     ],
     stats:[{value:107,label:p('automated tests, incl. 20 requests racing for one slot','项自动化测试，含 20 个请求同时抢同一时段')},{value:4,label:p('tabs for the owner','个店主标签页')},{value:3,label:p('steps for a customer to book','步完成顾客预约')}],
@@ -458,13 +458,13 @@ export const productCases=[{
   // Built, browser-only prototype served with the portfolio (demos/salon-booking); source stays in its own project.
   publicDemo:'demos/salon-booking/',
   publicAdmin:'demos/salon-booking/admin.html',
-  boundary:p('The live website serves real customers in Chinese and English, with an owner admin, on one shared database (Cloudflare Pages + D1) and Google sign-in. It was checked end to end in production with real accounts: a booking, a reschedule and a cancellation showed up on every side. The prototype on this page runs the same rules in the browser on sample data. The WeChat mini program and automatic reminders are not released yet.','线上网站以中英文为真实顾客服务，配有店主管理端，共用一个数据库（Cloudflare Pages + D1）并使用 Google 登录。上线时用真实账号在生产环境完整走过一遍：新增、改期和取消预约，各端都同步显示。本页原型在浏览器里用示例数据运行同一套规则。微信小程序和自动提醒尚未发布。'),
+  boundary:p('The live website serves real customers in Chinese and English, with an owner admin, on one shared database (Cloudflare Pages + D1) and Google sign-in. It was checked end to end in production with real accounts: a booking, a reschedule and a cancellation showed up on every side. The prototype on this page runs the same rules in the browser on sample data. Automatic reminders are not released yet.','线上网站以中英文为真实顾客服务，配有店主管理端，共用一个数据库（Cloudflare Pages + D1）并使用 Google 登录。上线时用真实账号在生产环境完整走过一遍：新增、改期和取消预约，各端都同步显示。本页原型在浏览器里用示例数据运行同一套规则。自动提醒尚未发布。'),
   research:[
     {title:p('Observe a real booking','观察真实预约'),body:p('With permission, map how a request moves from a conversation to the diary, including changes and interruptions. Record steps without retaining private customer details.','获得同意后，记录需求如何从对话进入预约本，以及中途变动与打断；不保留顾客隐私信息。')},
     {title:p('Validate the operating rules','验证实际经营规则'),body:p('Confirm service lengths, opening windows, same-day policy, buffers and preferred language with the owner. Demo fixtures are not final business rules.','与经营者核实服务时长、开放窗口、当天预约政策、缓冲与语言偏好；演示配置不作为最终经营规则。')},
     {title:p('Test both sides of a change','测试变动后的双端体验'),body:p('Ask a customer to book and reschedule, then ask the owner to adjust a period and identify affected appointments. Record completion, errors, time and assistance.','请顾客预约并改期，再请经营者调整时段并找到受影响预约；记录完成情况、错误、耗时与所需帮助。')}
   ],
-  roadmap:[p('Now · live website: Chinese and English booking + owner admin, one shared database','现在 · 网站已上线：中英文预约 + 店主管理端，共用一个数据库'),p('Next · fix launch bugs and test on real phones and the WeChat in-app browser','下一步 · 修复上线问题，在真实手机和微信内置浏览器中测试'),p('Then · owner interview and observation with real use; anonymous usage stats on this page','之后 · 结合真实使用情况做店主访谈与观察；在本页展示匿名使用数据'),p('Later · reminders and the WeChat mini program on the same booking core','再之后 · 提醒功能，以及基于同一预约核心的微信小程序')],
+  roadmap:[p('Now · live website: Chinese and English booking + owner admin, one shared database','现在 · 网站已上线：中英文预约 + 店主管理端，共用一个数据库'),p('Next · fix launch bugs and test on real phones and the WeChat in-app browser','下一步 · 修复上线问题，在真实手机和微信内置浏览器中测试'),p('Then · owner interview and observation with real use; anonymous usage stats on this page','之后 · 结合真实使用情况做店主访谈与观察；在本页展示匿名使用数据'),p('Later · reminders on the same booking core','再之后 · 基于同一预约核心的提醒功能')],
   evidenceItems:[],
   sourceDocs:['01_Background_and_Pain_Points.txt','Barbershop_Design_Logic_Framework.txt','preview/NAVIGATION_REVIEW.md','SELF_TEST_REPORT.md']
 }];

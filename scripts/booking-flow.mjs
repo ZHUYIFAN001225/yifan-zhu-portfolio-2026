@@ -43,7 +43,7 @@ export function mountFlow(root, before) {
   const head = (x2, y2, mx, my) => { const a = Math.atan2(y2 - my, x2 - mx), A = 12; return `M${P(x2 - Math.cos(a - .45) * A, y2 - Math.sin(a - .45) * A)} L${P(x2, y2)} L${P(x2 - Math.cos(a + .45) * A, y2 - Math.sin(a + .45) * A)}`; };
   function layoutInk() {
     const br = board.getBoundingClientRect(); ink.setAttribute('viewBox', `0 0 ${br.width} ${br.height}`);
-    const box = i => { const r = cards[i].querySelector('button').getBoundingClientRect(); return { l: r.left - br.left, r: r.right - br.left, t: r.top - br.top, b: r.bottom - br.top, cx: (r.left + r.right) / 2 - br.left, cy: (r.top + r.bottom) / 2 - br.top }; };
+    const box = i => { const r = cards[i].querySelector('button').getBoundingClientRect(), f = cards[i].getBoundingClientRect(); return { l: r.left - br.left, r: r.right - br.left, t: r.top - br.top, b: f.bottom - br.top, cx: (r.left + r.right) / 2 - br.left, cy: (r.top + r.bottom) / 2 - br.top }; }; // bottom = under the caption
     const a = box(2), b = box(3), c = box(4), d = box(5);
         // confirm (customer) → diary (owner): straight down; closing (owner) → the customer picks again: straight up
     const x1 = a.cx, y1 = a.b + 10, y2 = b.t - 10;

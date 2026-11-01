@@ -2540,3 +2540,4 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
 .bk-day .bk-dom .bk-dom-slip.is-low .bk-dom-tag{bottom:auto;top:calc(100% + 2px)}
 .bk-dom-hours b{bottom:-2px}
 @media (max-width:699px){.bk-dom-track{height:min(46svh,400px)}.bk-day .bk-dom .bk-dom-slip.is-low .bk-dom-tag{top:auto}.bk-dom-slip{overflow:visible}}
+@media (max-width:699px){.bk-day .bk-dom .bk-dom-slip .bk-dom-tag{top:50%!important;bottom:auto!important;transform:translateY(-50%)}}

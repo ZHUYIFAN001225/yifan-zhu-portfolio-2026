@@ -2408,3 +2408,34 @@ body.bk-rail-on .bk-rail{opacity:1}
 @media (prefers-reduced-motion:reduce){.bk-step-card{opacity:1;transform:none}}
 .bk-day .ux-hero-demo .ux-demo-device{transition:opacity .45s ease}
 body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transition:none}
+
+/* booking: three handwritten acts on the paper diary (booking-hand.mjs) */
+.bk-hand{position:relative;display:flex;flex-direction:column;align-items:center;padding:6vh 16px 10vh}
+.bk-hand-head{width:min(560px,100%);margin:0 0 22px}
+.bk-hand-k{margin:0 0 8px;font:500 12px/1.3 "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:#1f9e6c}
+.bk-hand-t{margin:0;font:600 clamp(24px,2.4vw,36px)/1.15 Inter,system-ui,sans-serif;letter-spacing:-.03em;color:#17362b}
+.bk-hand-fit{position:relative;width:min(760px,100%);display:flex;justify-content:center}
+.bk-sheet{--k:1;position:absolute;top:0;left:50%;width:560px;height:430px;margin-left:-280px;transform:scale(var(--k)) rotate(-1.2deg);transform-origin:50% 0;border-radius:3px;box-shadow:0 30px 50px -28px rgba(60,50,20,.45),0 2px 0 rgba(0,0,0,.04)}
+.bk-sheet{background:linear-gradient(90deg,transparent 63px,rgba(214,82,82,.5) 63px,rgba(214,82,82,.5) 65px,transparent 65px),repeating-linear-gradient(180deg,transparent 0 39px,rgba(90,130,200,.28) 39px 40px) 0 25px/100% 100% no-repeat,#fffdf6}
+.bk-tape{position:absolute;left:50%;top:-14px;width:120px;height:30px;margin-left:-60px;background:rgba(255,255,255,.55);box-shadow:0 1px 2px rgba(0,0,0,.08);transform:rotate(2deg)}
+.bk-ink{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.bk-ink path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.6}
+.bk-ink .is-red{stroke:#d0453b}.bk-ink .is-green{stroke:#1f9e6c}.bk-ink .is-thick{stroke-width:3.6}
+.bk-w{position:absolute;white-space:nowrap;font:500 30px/1 Caveat,"Long Cang",cursive;color:#27408f;clip-path:inset(-30% 100% -30% -4%)}
+:lang(zh) .bk-w,html[lang^=zh] .bk-w{font-size:27px}
+.bk-w.is-big{font-size:40px;font-weight:600}
+.bk-w.is-red{color:#d0453b}.bk-w.is-green{color:#1f9e6c}.bk-w.is-small{font-size:24px}
+.bk-w.is-note2{font-size:30px;transform:rotate(-4deg)}
+.bk-bubble{position:absolute;right:22px;bottom:calc(18px + var(--i) * 46px);display:flex;align-items:center;gap:10px;opacity:0;transform-origin:100% 100%}
+.bk-bubble span{padding:8px 13px;border-radius:12px;background:#95ec69;color:#111;font:500 14px/1.2 Inter,system-ui,sans-serif;box-shadow:0 6px 14px -8px rgba(0,0,0,.35)}
+.bk-bubble .bk-w.is-note{position:static;order:-1;font-size:24px;color:#27408f;transform:rotate(-3deg)}
+.bk-hand[data-act="3"] .bk-sheet{filter:saturate(.85)}
+.bk-hand-space{display:none}
+@media (min-width:1000px){
+  .bk-hand{padding:10vh 0 12vh}
+  .bk-hand[data-act="3"]{align-items:flex-start;padding-left:max(6vw,calc(50vw - 640px));min-height:80vh}
+  .bk-hand[data-act="3"] .bk-hand-fit{justify-content:flex-start;width:640px}
+  .bk-hand[data-act="3"] .bk-sheet{left:0;margin-left:0}
+}
+@media (max-width:999px){ .bk-hand[data-act="3"] .bk-hand-space{display:block;height:72svh} }
+@media (prefers-reduced-motion:reduce){.bk-w{clip-path:none!important}.bk-bubble{opacity:1!important;transform:none!important}}

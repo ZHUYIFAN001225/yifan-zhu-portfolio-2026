@@ -37,8 +37,6 @@ export const STEPS = [
 
 // one beat per piece of the long page: which element, which screen, and who is holding the phone
 const BEATS = [
-  ['#overview .ux-pains', 'schedule', ['Owner · the whole diary in her head', '店主 · 整本预约都记在脑子里']],
-  ['#overview .ux-persona', 'today', ['Owner · what she needs at a glance', '店主 · 一眼要看到的']],
   ['#system .ux-blueprint', 'book', ['Customer · picks a service first', '顾客 · 先选服务']],
   ['#system .ux-needs', 'today', ['Owner · her day, not a chat', '店主 · 她的一天，不是聊天记录']],
   ['#system .ux-lanes', 'mine', ['Customer · my bookings', '顾客 · 我的预约']],
@@ -69,7 +67,7 @@ const HOVER = [
   ['#research .ux-research-plan>div', ['booked', 'services', 'time-off-hours']]
 ];
 // which side of the page each chapter keeps its phone on (desktop)
-export const SIDE = { overview: 'right', system: 'left', strategy: 'left', iteration: 'left', structure: 'right', flow: 'right', interfaces: 'right', build: 'left', challenges: 'left', research: 'left', release: 'left' };
+export const SIDE = { system: 'left', strategy: 'left', iteration: 'left', structure: 'right', flow: 'right', interfaces: 'right', build: 'left', challenges: 'left', research: 'left', release: 'left' };
 
 const P6 = a => ({ x: a[0], y: a[1], s: a[2], rx: a[3], ry: a[4], rz: a[5] });
 
@@ -205,10 +203,19 @@ export function mountStage(root) {
         const m1 = root.querySelector('.bk-moment'); if (m1) push(docY(m1) - vh * .55, { kind: 'off', q: off(1, .85), f: 'book' });
       }
     } else push(0, { kind: 'off', q: off(1), f });
-    const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp')];
-    let story = false;
+    const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand')];
+    let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet
     els.forEach((e, idx) => {
       const top = docY(e), h = e.offsetHeight;
+      if (e.matches('.bk-hand')) {
+        if (e.dataset.act !== '3') return;
+        // act 3: the phone takes over from the paper diary
+        phoneOn = true; f = 'schedule';
+        if (m) { const sp = e.querySelector('.bk-hand-space') || e, t2 = docY(sp), h2 = sp.offsetHeight; push(t2 - vh * .45, { kind: 'off', q: off(1), f }); push(t2 + h2 * .5, { kind: 'hand', q: P6([.5, .5, .5, .03, -.2, 0]), f, spot: SPOT.schedule }); story = true; return; }
+        push(top + h * .55, { kind: 'section', q: P6([.78, .52, .64, .04, -.3, 0]), f, spot: SPOT.schedule, label: ['Owner · the diary keeps itself', '店主 · 预约本自己记'], who: 'o' });
+        return;
+      }
+      if (!phoneOn && !m) return;
       if (e.matches('.bk-step')) {
         const s = STEPS[+e.dataset.i];
         if (!story && m) push(top - vh * .45, { kind: 'off', q: off(1), f });

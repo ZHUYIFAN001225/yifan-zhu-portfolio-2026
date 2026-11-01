@@ -26,7 +26,7 @@ const entries = [
   "scripts/portfolio-catalog.mjs",
   "scripts/gallery.mjs",
   "scripts/v3-site.js",
-  "scripts/phone3d.mjs", "scripts/look-tools.mjs", "scripts/booking-day.mjs", "scripts/booking-stage.mjs",
+  "scripts/phone3d.mjs", "scripts/look-tools.mjs", "scripts/booking-day.mjs", "scripts/booking-stage.mjs", "scripts/booking-hand.mjs",
   "scripts/theme.js",
   "scripts/mobile-work-nav.mjs",
   "styles.css",

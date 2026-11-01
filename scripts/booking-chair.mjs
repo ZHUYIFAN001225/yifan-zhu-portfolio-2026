@@ -84,9 +84,11 @@ export function mountChair(root) {
   $('.bk-call-x').addEventListener('click', hideSum);
 
   const yOf = ([sel, f]) => { const el = document.querySelector(sel); if (!el) return Infinity; const r = el.getBoundingClientRect(); return r.top + scrollY + f * r.height; };
+  // jumps from any in-page link (top nav, case map, skip) scroll smoothly through the triggers: don't ring on those
+  let navAt = 0; document.addEventListener('click', e => { if (e.target.closest?.('a[href^="#"]')) navAt = performance.now(); }, true);
   let lastLine = scrollY + innerHeight * .5;
   const onScroll = () => {
-    const line = scrollY + innerHeight * .5, down = line > lastLine, jump = line - lastLine > innerHeight * 1.2;
+    const line = scrollY + innerHeight * .5, down = line > lastLine, jump = line - lastLine > innerHeight * 1.2 || performance.now() - navAt < 2500;
     if (down && !done) {
       HITS.forEach((h, i) => {
         if (fired.has(i)) return; const y = yOf(h.at);

@@ -373,7 +373,9 @@ export function mountStage(root) {
   const toScreen = (x, y) => { pv.set(x, y, .07); phone.localToWorld(pv); pv.project(cam); return [(pv.x + 1) / 2 * vw, (1 - pv.y) / 2 * vh]; };
   const wob = (k, a) => Math.sin(k * 12.9898 + a) * 2.2;
   function link(st, hold, hv, now, m) {
-    const src = hv?.el || st.el, on = !m && hold && P.rect && P.amt > .6 && src && cv.style.opacity !== '0';
+    // in the story the pen draws by itself; in the long chapters only when you point at something (so reading stays calm)
+    const auto = st.kind === 'story' || st.el?.classList.contains('bk-sheet');
+    const src = hv?.el || (auto ? st.el : null), on = !m && (hv || hold) && P.rect && P.amt > .6 && src && cv.style.opacity !== '0';
     const key = on ? (P.spotKey + '|' + (hv ? 'h' : st.at)) : '';
     if (key !== linkKey) { linkKey = key; linkT0 = now; }
     ink.classList.toggle('is-on', !!on);

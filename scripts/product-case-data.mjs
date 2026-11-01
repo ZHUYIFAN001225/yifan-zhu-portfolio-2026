@@ -296,7 +296,7 @@ export const productCases=[{
       {title:p('Choose','选择'),cells:[p('Picks a service','选服务'),p('—','—'),p('Knows its duration','知道时长')]},
       {title:p('Find a time','找时间'),cells:[p('By date or fixed time','按日期或固定时间'),p('Sets hours once','设一次营业时间'),p('Only times that fit','只给放得下的时间')]},
       {title:p('Book','预约'),cells:[p('Confirms','确认'),p('Nothing','无需操作'),p('Rechecks — no double booking','复核，防重复')]},
-      {title:p('Before visit','到店前'),planned:true,cells:[p('Confirmation + day-before reminder','预约确认 + 前一天提醒'),p('Nothing','无需操作'),p('Sends WeChat reminders','发送微信提醒')]},
+      {title:p('Before visit','到店前'),planned:true,cells:[p('Confirmation · reminder planned, not live yet','预约确认 · 提醒功能规划中，尚未上线'),p('Nothing','无需操作'),p('Reminders: planned, not live yet','提醒：规划中，尚未上线')]},
       {title:p('Visit','到店'),cells:[p('Arrives','到店'),p('Just cuts hair','专心理发'),p('Status updates itself','状态自动流转')]},
       {title:p('Exception','异常'),cells:[p('Rebooks, service kept','保留服务重新约'),p('Closes a day once','一键关闭某天'),p('Moves bookings to “reschedule”','预约转入待改期')]}
     ]

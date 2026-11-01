@@ -11,7 +11,7 @@ const hm = m => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, 
 const dur = m => { m = Math.round(m); const h = Math.floor(m / 60), r = m % 60; return zh() ? (h ? `${h} 小时${r ? ` ${r} 分` : ''}` : `${r} 分钟`) : (h ? `${h} h${r ? ` ${r} min` : ''}` : `${r} min`); };
 const T0 = 570, T1 = 1170, CLOSE = 1110; // the track runs 9:30–19:30, the shop closes at 18:30
 
-const NAMES = { chen: ['Chen', '陈'], mia: ['Mia', 'Mia'], emma: ['Emma', 'Emma'], sun: ['Sun', '孙'], wang: ['Wang', '王阿姨'], li: ['Li', '李'], zhou: ['Zhou', '周'], gao: ['Gao', '高'], lin: ['Lin', '林'], he: ['He', '何'] };
+const NAMES = { chen: ['Chen', '陈'], mia: ['Mia', 'Mia'], emma: ['Emma', 'Emma'], sun: ['Sun', '孙'], wang: ['Wang', '王阿姨'], li: ['Li', '李'], zhou: ['Zhou', '周'], gao: ['Gao', '高'], lin: ['Lin', '林'], he: ['Mr He', '何先生'] };
 const SV = { short: ['short cut', '短发'], long: ['long cut', '长发'], colour: ['colour + bleach', '染 + 漂'] };
 // the day as it was written in the paper diary (lengths are guesses)
 const OLD = [
@@ -34,11 +34,11 @@ const NEW = [
   { id: 'zhou', sv: 'short', at: 960, len: 30 }, { id: 'gao', sv: 'long', at: 990, len: 60 }, { id: 'lin', sv: 'short', at: 1050, len: 30 }
 ];
 const NEW_EVENTS = [
-  { w: [.08, .22], fx: { chen: { re: 1 } }, t: ['Chen cancels in My bookings the night before. Her slot reopens, and Mia books it.', '陈前一晚在“我的预约”里取消了。时段空出来，Mia 约上了。'] },
+  { w: [.08, .22], fx: { chen: { re: 1 } }, t: ['Chen cancels in My bookings the night before. Her slot reopens, and another customer, Mia, books it.', '陈前一晚在“我的预约”里取消了。时段空出来，另一位顾客 Mia 约上了。'] },
   { w: [.26, .44], fx: { emma: { late: 20 } }, t: ['Emma is still 20 minutes late. Two people wait a little, then the break absorbs it.', 'Emma 还是晚了 20 分钟：后面两位稍等一下，到午休就消化掉了。'] },
   { w: [.48, .62], fx: {}, t: ['No calls in the middle of a cut: customers book and change on their own.', '剪发时不用接电话：顾客自己约、自己改。'] },
   { w: [.66, .8], fx: {}, t: ['The colour was booked at its real length, 2½ hours, from the start.', '染发一开始就按真实时长约好：两个半小时。'] },
-  { w: [.84, .94], fx: {}, t: ['He’s long cut didn’t fit today, so she picked tomorrow herself. Closed at 18:30.', '何的长发今天放不下，她自己选了明天。18:30 准时打烊。'] }
+  { w: [.84, .94], fx: {}, t: ['Mr He’s long cut didn’t fit today, so he picked tomorrow himself. Closed at 18:30.', '何先生的长发今天放不下，他自己选了明天。18:30 准时打烊。'] }
 ];
 
 const TEXT = {
@@ -47,7 +47,7 @@ const TEXT = {
   wait: ['Everyone waited', '大家一共多等了'], idle: ['Chair sat empty', '椅子空着'], end: ['Last customer done', '最后一位结束'],
   over: ['after closing', '超过打烊'], ontime: ['before closing', '打烊前'],
   hint: ['Red +′ = minutes a customer waited in the shop. Tap a slip: make them late, or not come at all.', '红色 +′ = 客人在店里干等的分钟。点一张纸条：让 TA 迟到，或者干脆不来。'], reset: ['Replay', '重放'],
-  closing: ['closing 18:30', '打烊 18:30'], brk: ['break, closed in the diary', '午休（已在日程里关掉）'], nsh: ['didn’t come', '没来'], reo: ['reopened → Mia', '空出来 → Mia'], tom: ['He · tomorrow 10:00, chosen by her', '何 · 改到明天 10:00（她自己选的）'],
+  closing: ['closing 18:30', '打烊 18:30'], brk: ['break, closed in the diary', '午休（已在日程里关掉）'], nsh: ['didn’t come', '没来'], reo: ['reopened → Mia', '空出来 → Mia'], tom: ['Mr He · tomorrow 10:00, chosen by himself', '何先生 · 改到明天 10:00（他自己选的）'],
   stampOld: ['Illustrative day', '示意 · 演示场景'], stampNew: ['Illustrative · follows the rules, not measured', '示意 · 按规则推演，非实测'], skip: ['Skip ↓', '跳过 ↓'],
   waitTag: ['wait', '等'], lateTag: ['late', '晚到']
 };

@@ -2614,3 +2614,8 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
 .bk-day .bk-minute-more{color:#eef3ee!important}
 .bk-day .op--3d .op-facts{display:none}
 .bk-day .op-btn{color:#eef3ee!important}.bk-day .op-btn--main{color:#0b1a12!important}.bk-day .op-url{color:#eef3ee!important}
+.bk-hand-head{position:relative}.bk-hand-head .bk-stamp{position:absolute;right:0;top:0}
+@media(max-width:699px){.bk-hand-head .bk-stamp,.bk-story-board .bk-hand-head .bk-stamp{position:static;margin-top:10px}}
+/* illustrative numbers must not look like real metrics */
+.bk-dom-stats b{font-weight:500;color:#5b6f8f!important;font-style:italic}
+.bk-dom-stats{border:1.5px dashed rgba(91,111,143,.4);border-radius:8px;padding:12px 14px}

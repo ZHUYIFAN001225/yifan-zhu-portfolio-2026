@@ -9,7 +9,7 @@ const W = 560, ROW = 40, TOP = 64, LEFT = 78;
 
 // the diary page: rows of handwriting (row, x, text)
 const ROWS = [
-  { id: 'date', row: -1, x: LEFT, big: true, t: ['Sat 24 Oct', '10月24日 周六'] },
+  { id: 'date', row: -1, x: LEFT, big: true, t: ['Sat 3 Oct', '10月3日 周六'] },
   { id: 'r1', row: 0, x: LEFT, t: ['10:00  Chen · short cut', '10:00  陈 · 短发'] },
   { id: 'r2', row: 1, x: LEFT, t: ['11:00  Emma · long cut', '11:00  Emma · 长发'] },
   { id: 'r3', row: 2, x: LEFT, t: ['14:00  Wang · colour + bleach', '14:00  王 · 染 + 漂'] },
@@ -74,7 +74,7 @@ export function mountHand(root, extra = '') {
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const acts = ACTS.map(a => {
     const sec = document.createElement('section'); sec.className = 'bk-hand'; sec.dataset.act = a.n;
-    sec.innerHTML = `<div class="bk-hand-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p></div><div class="bk-hand-fit"><div class="bk-sheet"><i class="bk-tape"></i><svg class="bk-ink" aria-hidden="true"></svg></div></div>${a.n === 3 ? '<div class="bk-hand-space" aria-hidden="true"></div>' : ''}`;
+    sec.innerHTML = `<div class="bk-hand-head"><p class="bk-hand-k"></p><p class="bk-hand-t" role="heading" aria-level="3"></p><span class="bk-stamp"></span></div><div class="bk-hand-fit"><div class="bk-sheet"><i class="bk-tape"></i><svg class="bk-ink" aria-hidden="true"></svg></div></div>${a.n === 3 ? '<div class="bk-hand-space" aria-hidden="true"></div>' : ''}`;
     return { ...a, sec, sheet: sec.querySelector('.bk-sheet'), svg: sec.querySelector('svg'), items: [], p: calm ? 1 : 0 };
   });
   m1.after(acts[0].sec); if (ov) ov.after(acts[1].sec); else m2.before(acts[1].sec); m2.after(acts[2].sec);
@@ -84,7 +84,7 @@ export function mountHand(root, extra = '') {
   function render() {
     const l = zh() ? 1 : 0;
     acts.forEach(a => {
-      a.sec.querySelector('.bk-hand-k').textContent = a.k[l]; a.sec.querySelector('.bk-hand-t').textContent = a.t[l];
+      a.sec.querySelector('.bk-hand-k').textContent = a.k[l]; a.sec.querySelector('.bk-stamp').textContent = l ? '示意 · 根据我的笔记重构，并非她的真实本子' : 'Illustrative · reconstructed from my notes, not her real diary'; a.sec.querySelector('.bk-hand-t').textContent = a.t[l];
       a.sheet.querySelectorAll('.bk-w, .bk-bubble').forEach(e => e.remove()); a.svg.innerHTML = ''; a.items = [];
       const add = (it, from, to, pre) => { a.items.push({ ...it, from, to, pre }); };
       // handwriting

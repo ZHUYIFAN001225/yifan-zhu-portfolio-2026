@@ -26,13 +26,11 @@ export const SPOT = { today: [2, 21.3, 96, 30.6], book: [2, 19, 96, 15], day: [2
 
 // the 12:10 story, one booking step by step. Pose: [x, y, size, rx, ry, rz]; x/y are screen fractions, size is phone height / screen height
 export const STEPS = [
-  { f: 'book', kicker: ['12:10 · Lunch break', '12:10 · 午休'], title: ['One booking, from both sides.', '一笔预约，两端同时发生。'], body: ['Keep scrolling: follow a single booking from the customer’s phone into the owner’s diary.', '往下滚：跟着一笔预约，从顾客的手机走进店主的日程。'], d: [.68, .52, .66, .05, -.4, 0], m: [.5, .35, .42, .05, -.3, 0] },
   { f: 'book', spot: SPOT.book, kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'], d: [.64, .52, .78, .03, .14, 0], m: [.5, .35, .46, .02, .1, 0] },
   { f: 'day', spot: SPOT.day, kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'], d: [.62, .52, .78, .02, -.14, 0], m: [.5, .35, .46, .02, -.1, 0] },
   { f: 'confirm', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling: the phone turns over to the owner’s side, and the card goes with it.', '日期、时间、时长都在一张卡里。继续滚：手机翻到店主那一面，这张卡也跟着过去。'], d: [.6, .52, .76, .03, .2, 0], m: [.5, .35, .46, .03, .14, 0] },
   { f: 'schedule', spot: SPOT.schedule, spin: 1, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'], d: [.66, .52, .78, .03, -.14, 0], m: [.5, .35, .46, .02, -.1, 0] },
-  { f: 'time-off-hours', spot: SPOT['time-off-hours'], kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'], d: [.64, .52, .78, .03, .14, 0], m: [.5, .35, .46, .02, .1, 0] },
-  { f: 'today', spin: -1, kicker: ['18:30 · Closed', '18:30 · 打烊'], title: ['The routine runs itself.', '日常，自己运转。'], body: ['Next: the screens, the rules and how it was built.', '接下来是界面、规则，以及它是怎么做出来的。'], d: [.68, .52, .66, .05, -.4, 0], m: [.5, .35, .42, .05, -.3, 0] }
+  { f: 'time-off-hours', spot: SPOT['time-off-hours'], kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'], d: [.64, .52, .78, .03, .14, 0], m: [.5, .35, .46, .02, .1, 0] }
 ];
 
 // one beat per piece of the long page: which element, which screen, and who is holding the phone

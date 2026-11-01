@@ -111,7 +111,7 @@ export function mountHand(root, extra = '') {
       const step = .6 / ACT2.length;
       ACT2.forEach((it, i) => { const w = Bw(.05 + i * step, .05 + (i + 1) * step); if (it.kind === 'write') write(it, ...w, pre); else add({ ...it }, ...w, pre); });
       BUBBLES2.forEach((b, i) => bubble(b, i + 1, ...Bw(.7 + i * .07, .76 + i * .07), pre));
-      if (n === 3) { add({ kind: 'handoff' }, .1, .55, false); add({ kind: 'handnote' }, .45, .7, false); add({ kind: 'tick' }, .7, .85, false); }
+      if (n === 3) { add({ kind: 'handoff' }, .1, .55, false); add({ kind: 'handnote' }, .45, .7, false); }
     });
     requestAnimationFrame(geometry);
   }
@@ -137,7 +137,7 @@ export function mountHand(root, extra = '') {
         if (it.kind === 'handoff') {
           // from the right edge of the page towards where the phone stands
           const sr = a.sheet.getBoundingClientRect(), k = sr.width / W || 1, wide = innerWidth >= 1000;
-          const tx = wide ? (innerWidth * .66 - sr.left) / k : W * .5, ty = wide ? H * .45 : H + 120 / k;
+          const tx = wide ? (innerWidth * .67 - sr.left) / k : W * .5, ty = wide ? H * .45 : H + 120 / k;
           const [d1, d2] = wide ? arrowD(W - 70, rowY(2) - 6, tx, ty, -10) : arrowD(W * .62, H - 30, W * .5, ty, -60);
           it.paths = [path(a.svg, d1, 'is-green is-thick'), path(a.svg, d2, 'is-green is-thick')];
         }

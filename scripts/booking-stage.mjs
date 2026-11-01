@@ -28,8 +28,8 @@ export const SPOT = { today: [2, 21.3, 96, 30.6], book: [2, 19, 96, 15], day: [2
 export const STEPS = [
   { f: 'book', spot: SPOT.book, tap: [22, 27], kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] },
   { f: 'day', spot: SPOT.day, tap: [50, 45], kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'], d: [0.62, 0.52, 0.74, 0.02, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
-  { f: 'confirm', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling: the phone turns over to the owner’s side, and the card goes with it.', '日期、时间、时长都在一张卡里。继续滚：手机翻到店主那一面，这张卡也跟着过去。'], d: [0.6, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .03, .14, 0] },
-  { f: 'schedule', spot: SPOT.schedule, spin: 1, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'], d: [0.62, 0.52, 0.74, 0.03, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
+  { f: 'confirm', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling and watch it move into the owner’s diary.', '日期、时间、时长都在一张卡里。继续滚，看它走进店主的日程。'], d: [0.6, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .03, .14, 0] },
+  { f: 'schedule', spot: SPOT.schedule, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'], d: [0.62, 0.52, 0.74, 0.03, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
   { f: 'time-off-hours', spot: SPOT['time-off-hours'], tap: [62, 48], kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] }
 ];
 
@@ -107,9 +107,13 @@ export function mountStage(root) {
   const phone = buildPhone(tex); scene.add(phone);
   const P = { g: phone, ctx: sc.getContext('2d'), file: '', img: null, prev: null, fade: 1, drawnAmt: -1, spotKey: '', rect: null, amt: 0, focus: 0, pw: 0, ph: 0 };
   const draw = () => {
-    const p = P; if (!p.img) return; const x = p.ctx;
+    const p = P; if (!p.img) return; const x = p.ctx; x.imageSmoothingQuality = 'high';
     if (p.fade < 1 && p.prev) { paint(x, p.prev, true); x.globalAlpha = ease(p.fade); paint(x, p.img, true); x.globalAlpha = 1; } else paint(x, p.img, true);
-    if (p.amt > .004 && p.fade >= 1) { x.globalAlpha = clamp(p.amt); paint(x, frost(p.img), true); x.globalAlpha = 1; }
+    if (p.amt > .004 && p.fade >= 1 && p.rect) {
+      const W = x.canvas.width, H = x.canvas.height, top = Math.round(W * .118), [rx, ry, rw, rh] = p.rect;
+      const X = rx / 100 * W, Y = top + ry / 100 * (H - top), Wd = rw / 100 * W, Hd = rh / 100 * (H - top);
+      x.save(); x.globalAlpha = clamp(p.amt); x.fillStyle = 'rgba(16,20,32,.18)'; x.beginPath(); x.rect(0, top, W, H - top); x.roundRect(X - 6, Y - 6, Wd + 12, Hd + 12, 18); x.fill('evenodd'); x.restore();
+    }
     p.drawnAmt = p.amt; tex.needsUpdate = true;
   };
   async function show(f) {
@@ -177,10 +181,7 @@ export function mountStage(root) {
       // a full turn when the phone changes side, role or kind of place, like the objects in Silencio
       if (last) {
         const side = q => q.x < .5 ? -1 : 1;
-        if (st.spin) turns += st.spin;
-        else if (last.travel) { /* the travelling card sets its own move */ }
-        else if (side(st.q) !== side(last.q)) turns += side(st.q) > side(last.q) ? 1 : -1;
-        else if (st.kind !== last.kind || (st.who && last.who && st.who !== last.who)) turns += side(st.q) > 0 ? -1 : 1;
+        // no full turns: the phone only moves and leans where that helps you read it
       }
       st.q = { ...st.q, ry: st.q.ry + turns * TAU };
       if (S.length && at <= S[S.length - 1].at + 4) at = S[S.length - 1].at + 4;
@@ -206,7 +207,7 @@ export function mountStage(root) {
         const m1 = root.querySelector('.bk-moment'); if (m1) push(docY(m1) - vh * .55, { kind: 'off', q: off(1, .85), f: 'book' });
       }
     } else push(0, { kind: 'off', q: off(1), f });
-    const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-results, .bk-end')];
+    const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
     let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet
     els.forEach((e, idx) => {
       const top = docY(e), h = e.offsetHeight;
@@ -229,7 +230,7 @@ export function mountStage(root) {
       if (story && m) push(top - vh * .2, { kind: 'off', q: off(-1), f });
       story = false;
       // the pinned day boards and the storyboard get the whole width: the phone steps out to the side
-      if (e.matches('.bk-dom, .bk-story-board, .bk-results, .bk-end')) { if (!phoneOn || m) return;
+      if (e.matches('.bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')) { if (!phoneOn || m) return;
         // step out on the side the phone will come back on, so it never crosses the text on the way
         let n = els[idx + 1]; while (n && !SIDE[n.id] && !n.matches('.bk-step')) n = els[els.indexOf(n) + 1];
         const back = n ? (n.matches('.bk-step') || SIDE[n.id] === 'right' ? 1 : -1) : 1;
@@ -320,7 +321,7 @@ export function mountStage(root) {
     const want = rect && P.rect && !travelling ? 1 : 0;
     P.amt += (want - P.amt) * E(want ? 4.5 : 8); if (!want && P.amt < .004) P.amt = 0;
     if (P.fade < 1) { P.fade = Math.min(1, P.fade + dt / .35); draw(); } else if (Math.abs(P.amt - P.drawnAmt) > .01 || (P.amt === 0 && P.drawnAmt !== 0)) draw();
-    lift.pose(P.amt);
+    lift.pose(0); // the pen points; the screen itself stays real and sharp
     P.focus += ((hv ? 1 : 0) - P.focus) * E(5);
     // pose: station → station, plus hover focus, float and a lean from scroll speed
     let q = mix(poseOf(a.st), poseOf(b.st), e);
@@ -375,7 +376,7 @@ export function mountStage(root) {
   function link(st, hold, hv, now, m) {
     // in the story the pen draws by itself; in the long chapters only when you point at something (so reading stays calm)
     const auto = st.kind === 'story' || st.el?.classList.contains('bk-sheet');
-    const src = hv?.el || (auto ? st.el : null), on = !m && (hv || hold) && P.rect && P.amt > .6 && src && cv.style.opacity !== '0';
+    const src = hv?.el || (auto ? st.el : null), on = (m ? hold : (hv || hold) && src) && P.rect && P.amt > .6 && cv.style.opacity !== '0'; // on phones: the ring only
     const key = on ? (P.spotKey + '|' + (hv ? 'h' : st.at)) : '';
     if (key !== linkKey) { linkKey = key; linkT0 = now; }
     ink.classList.toggle('is-on', !!on);
@@ -384,13 +385,15 @@ export function mountStage(root) {
     const r = P.rect, [w, h] = size(r), [cx, cy] = slot(r);
     const pts = [[cx - w / 2, cy - h / 2], [cx + w / 2, cy - h / 2], [cx - w / 2, cy + h / 2], [cx + w / 2, cy + h / 2]].map(([x, y]) => toScreen(x, y));
     const bx0 = Math.min(...pts.map(p => p[0])), bx1 = Math.max(...pts.map(p => p[0])), by0 = Math.min(...pts.map(p => p[1])), by1 = Math.max(...pts.map(p => p[1]));
-    const sr = src.getBoundingClientRect();
+    const ecx0 = (bx0 + bx1) / 2, ecy0 = (by0 + by1) / 2;
+    if (m) { lLine.setAttribute('d', ''); lHead.setAttribute('d', ''); }
+    const sr = m ? { right: 0, top: 0, bottom: vh, left: 0 } : src.getBoundingClientRect();
     const tx = bx0 - 14, ty = (by0 + by1) / 2, sx = Math.min(sr.right + 16, tx - 60), sy = clamp(ty, Math.max(sr.top + 24, 90), Math.min(sr.bottom - 24, vh - 60));
-    if (sr.bottom < 60 || sr.top > vh - 60 || tx - sx < 40) { ink.classList.remove('is-on'); return; }
+    if (!m && (sr.bottom < 60 || sr.top > vh - 60 || tx - sx < 40)) { ink.classList.remove('is-on'); return; }
     const mx = (sx + tx) / 2, my = Math.min(sy, ty) - 40 - Math.abs(tx - sx) * .08;
-    lLine.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)}`);
+    if (!m) lLine.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)}`);
     const ang = Math.atan2(ty - my, tx - mx), A = 13;
-    lHead.setAttribute('d', `M${(tx - Math.cos(ang - .45) * A).toFixed(1)} ${(ty - Math.sin(ang - .45) * A).toFixed(1)} L${tx.toFixed(1)} ${ty.toFixed(1)} L${(tx - Math.cos(ang + .45) * A).toFixed(1)} ${(ty - Math.sin(ang + .45) * A).toFixed(1)}`);
+    if (!m) lHead.setAttribute('d', `M${(tx - Math.cos(ang - .45) * A).toFixed(1)} ${(ty - Math.sin(ang - .45) * A).toFixed(1)} L${tx.toFixed(1)} ${ty.toFixed(1)} L${(tx - Math.cos(ang + .45) * A).toFixed(1)} ${(ty - Math.sin(ang + .45) * A).toFixed(1)}`);
     const ecx = (bx0 + bx1) / 2, ecy = (by0 + by1) / 2, erx = (bx1 - bx0) / 2 + 12, ery = (by1 - by0) / 2 + 10; let d = '';
     for (let i = 0; i <= 40; i++) { const a = -2.6 + i / 40 * (Math.PI * 2 + .45), k = 1 + i / 40 * .05; d += (i ? ' L' : 'M') + (ecx + Math.cos(a) * erx * k + wob(i, 1)).toFixed(1) + ' ' + (ecy + Math.sin(a) * ery * k + wob(i, 2)).toFixed(1); }
     lRing.setAttribute('d', d);

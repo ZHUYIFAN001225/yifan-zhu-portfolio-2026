@@ -51,7 +51,7 @@ export function buildPhone(screenTex) {
   screen.position.z = front + .0012; g.add(screen);
   // a faint reflection layer so the glass catches the light as it turns
   const sheen = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(sw, sh, R - .02), 24)), new THREE.MeshBasicMaterial({ map: streakTex(), transparent: true, opacity: .22, depthWrite: false, toneMapped: false }));
-  sheen.position.z = front + .0018; g.add(sheen);
+  sheen.position.z = front + .0018; // kept off: a reflection over the screen reads like a screen protector
   // camera plateau and lenses on the back
   const back = -D / 2 - bevel;
   const bump = new THREE.Mesh(new THREE.ExtrudeGeometry(roundedRect(.3, .3, .07), { depth: .014, bevelEnabled: true, bevelThickness: .006, bevelSize: .006, bevelSegments: 4, curveSegments: 16 }), [glass, metal]);

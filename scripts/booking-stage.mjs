@@ -167,6 +167,17 @@ export function mountStage(root) {
       const first = (heroEl.dataset.screens || '').split(',')[0].match(/([\w-]+)\.webp/); if (first) cf = first[1];
       push(vh * .5, { kind: 'hero', c: P7([x0, y0, s0, -.06, -.45, 0, 0]), o: P7([x0 + .04, y0 + 1.1, s0 * .8, .2, -.8, 0, -2]), cf, of, fg: 'c', front: true });
       push(vh * .5 + opH * .5, { kind: 'hero', c: P7([x0, y0 - opH * .5 / vh * .55, s0 * .96, -.02, -.3, 0, 0]), o: P7([x0 + .04, y0 + 1.1, s0 * .8, .2, -.8, 0, -2]), cf, of, fg: 'c', front: true });
+      // …and lands in the live prototype below it: it straightens, sizes itself to the prototype's screen and
+      // follows it exactly; then it fades away and the real, clickable prototype is what you see.
+      const dev = document.querySelector('.ux-hero-demo .ux-demo-device, .ux-hero-demo iframe');
+      if (dev) {
+        const d = dev.getBoundingClientRect(), track = { cx: (d.left + d.width / 2) / innerWidth, mid: d.top + scrollY + d.height / 2, h: d.height };
+        const ph = P7([track.cx, .5, track.h * 1.62 / 1.558 / vh, 0, 0, 0, 0]);
+        push(track.mid, { kind: 'dock', track, c: ph, o: P7([track.cx, 1.7, .5, .2, -.8, 0, -2]), cf: 'book', of, fg: null });
+        push(track.mid + vh * .25, { kind: 'dock', track, c: ph, o: P7([track.cx, 1.7, .5, .2, -.8, 0, -2]), cf: 'book', of, fg: null });
+        const m1 = root.querySelector('.bk-moment');
+        if (m1) push(docY(m1) - vh * .55, { kind: 'off', ...hidden(1), cf: 'book', of }); // out of sight, ready to rise into the story
+      }
     } else push(0, { kind: 'off', ...hidden(1), cf, of });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp')];
     let story = false;
@@ -248,6 +259,9 @@ export function mountStage(root) {
     p.g.scale.setScalar(q.s * h / 1.62);
     p.g.rotation.set(q.rx, q.ry, q.rz);
   };
+  // a docked phone follows its element with the real scroll position, so it sits exactly on it
+  const poseOf = (st, k) => st.track && k === 'c' ? { ...st.c, y: (st.track.mid - scrollY) / vh } : st[k];
+  let fadeAmt = 1;
   const mix = (a, b, t) => ({ x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), s: lerp(a.s, b.s, t), rx: lerp(a.rx, b.rx, t), ry: lerp(a.ry, b.ry, t), rz: lerp(a.rz, b.rz, t), z: lerp(a.z, b.z, t) });
   function frame(now) {
     requestAnimationFrame(frame);
@@ -279,7 +293,7 @@ export function mountStage(root) {
       p.amt += (liftWant - p.amt) * E(liftWant ? 4.5 : 8);
       p.focus += ((hv && isFg ? 1 : 0) - p.focus) * E(5);
       // pose: station → station, plus hover focus, float and a lean from scroll speed
-      let q = mix(a.st[k], b.st[k], e);
+      let q = mix(poseOf(a.st, k), poseOf(b.st, k), e);
       if (p.focus > .001) q = { ...q, s: q.s * (1 + .14 * p.focus), ry: q.ry - (q.ry - Math.round(q.ry / TAU) * TAU) * .75 * p.focus, rx: q.rx * (1 - .7 * p.focus), z: q.z + .5 * p.focus };
       if (peekAmt > .001 && pk && pk.who === k) q = mix(q, { x: .5, y: peekY, s: .42, rx: .02, ry: Math.round(q.ry / TAU) * TAU, rz: 0, z: .3 }, ease(peekAmt));
       const ph = k === 'c' ? 0 : 1.7, calm = 1 - p.focus * .7;
@@ -306,10 +320,15 @@ export function mountStage(root) {
       flyMat.opacity = 1; flyGlowMat.opacity = .85;
     }
     // camera: a slight drift with the pointer, more depth while the page moves
-    cam.position.x += (mx * .22 - cam.position.x) * E(3); cam.position.y += (-my * .14 - cam.position.y) * E(3);
+    // no pointer drift while the phone is landing on the prototype, so it lines up exactly
+    const landing = a.st.kind === 'dock' || b.st.kind === 'dock' || a.st.kind === 'hero';
+    cam.position.x += ((landing ? 0 : mx * .22) - cam.position.x) * E(3); cam.position.y += ((landing ? 0 : -my * .14) - cam.position.y) * E(3);
+    // once it has landed, the 3D phone fades out and the live prototype takes over; it stays out of sight until the story
+    const gone = !m && (a.st.kind === 'dock' || (b.st.kind === 'dock' && e > .97));
+    fadeAmt += ((gone ? 0 : 1) - fadeAmt) * E(gone ? 9 : 6); cv.style.opacity = fadeAmt > .995 ? '' : fadeAmt.toFixed(3);
     cam.lookAt(0, 0, 0);
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
-    cv.classList.toggle('is-front', (!m && sy < heroEnd - vh * .35) || peekAmt > .03);
+    cv.classList.toggle('is-front', (!m && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
     document.body.classList.toggle('bk-hero-handover', !m);
     // a small name tag under the phone that is talking
     const fgK = pk ? pk.who : st.fg, lab = st.label && !pk ? st.label[zh() ? 1 : 0] : '';

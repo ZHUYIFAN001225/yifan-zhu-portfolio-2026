@@ -2459,3 +2459,80 @@ body.bk-awaiting-phone .bk-day .ux-hero-demo .ux-demo-device{opacity:0;transitio
   body.bk-has-phone .bk-day .bk-with-phone.bk-with-phone[data-phone]{padding-left:40px!important;padding-right:30vw!important;translate:calc(var(--bk-side,0) * (30vw - 40px)) 0}
   body.bk-has-phone .bk-day .bk-with-phone.bk-with-phone[data-phone]::before{left:18px}
 }
+
+/* booking: "one ordinary day" boards and the storyboard (booking-domino.mjs) */
+.bk-dom{position:relative;height:300vh}
+.bk-dom[data-mode=new]{height:260vh}
+.bk-dom-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:56px 16px 16px;box-sizing:border-box}
+.bk-dom-head{width:min(1040px,100%);margin:0 0 16px}
+.bk-dom-card{position:relative;width:min(1040px,100%);box-sizing:border-box;padding:22px 28px 18px;background:#fffdf6;border-radius:6px;box-shadow:0 30px 60px -34px rgba(60,50,20,.5),0 2px 0 rgba(0,0,0,.04)}
+.bk-day .bk-dom .bk-w{position:relative;clip-path:none}
+.bk-dom-event{display:block;min-height:34px;margin:0 0 6px;font-size:26px!important;line-height:1.15;white-space:normal!important;color:#d0453b;opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+.bk-dom[data-mode=new] .bk-dom-event{color:#1f9e6c}
+.bk-dom-event.is-in{opacity:1;transform:none}
+.bk-dom-track{position:relative;height:150px;margin:30px 0 14px}
+.bk-dom-hours i{position:absolute;left:calc(var(--s) * 100%);top:0;bottom:0;border-left:1px solid rgba(23,54,43,.09)}
+.bk-dom-hours b{position:absolute;bottom:0;left:-15px;font:500 11px/1 "IBM Plex Mono",ui-monospace,monospace;color:#7a8a80}
+.bk-dom-close{position:absolute;left:calc(var(--s) * 100%);top:0;bottom:16px;border-left:2px dashed #d0453b}
+.bk-dom-close em{position:absolute;left:6px;top:-2px;font:600 11px/1 "IBM Plex Mono",ui-monospace,monospace;font-style:normal;color:#d0453b;white-space:nowrap}
+.bk-dom-over{position:absolute;left:calc(var(--s) * 100%);right:0;top:0;bottom:16px;background:repeating-linear-gradient(135deg,rgba(208,69,59,.08) 0 6px,transparent 6px 12px)}
+.bk-dom-ghost,.bk-dom-slip{position:absolute;left:calc(var(--s) * 100%);width:calc(var(--l) * 100%);top:30px;height:72px;box-sizing:border-box;border-radius:6px}
+.bk-dom-ghost{border:1.5px dashed rgba(39,64,143,.45);opacity:0}
+.bk-dom-slip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:7px 6px 6px 8px;margin:0;background:#fff;border:1px solid rgba(23,54,43,.14);border-left:4px solid #1f9e6c;box-shadow:0 10px 18px -14px rgba(23,54,43,.6);font:600 13px/1.15 Inter,system-ui,sans-serif;color:#17362b;text-align:left;cursor:pointer;transition:background .3s,border-color .3s,opacity .3s}
+.bk-dom-slip:hover{box-shadow:0 0 0 2px rgba(31,158,108,.45),0 10px 18px -14px rgba(23,54,43,.6)}
+.bk-dom-name,.bk-dom-sv{max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:clip}
+.bk-dom-sv{font-weight:500;font-size:11px;color:#5d6f66}
+.bk-dom-slip.is-over{border-left-color:#d0453b;background:#fff3f1}
+.bk-dom-slip.is-ns{opacity:calc(1 - var(--ns) * .55);background:transparent;border-style:dashed;box-shadow:none}
+.bk-dom-slip.is-ns .bk-dom-name{text-decoration:line-through;text-decoration-color:#d0453b}
+.bk-dom-slip.is-ok{border-left-color:#1f9e6c}
+.bk-dom-slip.is-break{cursor:default;background:repeating-linear-gradient(135deg,rgba(23,54,43,.06) 0 5px,transparent 5px 10px),#fbfaf4;border-left-color:#9aa9a0;color:#5d6f66}
+.bk-day .bk-dom .bk-dom-tag{position:absolute;left:0;bottom:calc(100% + 3px);font-size:21px;color:#d0453b;white-space:nowrap;pointer-events:none}
+.bk-dom-call{display:none;position:absolute;right:5px;bottom:5px;width:9px;height:15px;border:1.6px solid #d0453b;border-radius:3px}
+.bk-dom-slip.has-call .bk-dom-call{display:block}
+.bk-dom-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-top:12px;border-top:1px dashed rgba(23,54,43,.18)}
+.bk-dom-sk{display:block;font:500 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#5d6f66}
+.bk-dom-stats b{display:block;margin-top:4px;font:600 clamp(20px,2.2vw,30px)/1.1 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#17362b}
+.bk-dom-stats small{display:block;margin-top:2px;font:500 12px/1.3 Inter,system-ui,sans-serif;color:#1f9e6c}
+.bk-dom.is-late .bk-dom-stats small,.bk-dom[data-mode=old] .bk-dom-wait{color:#d0453b}
+.bk-dom-hint{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 0;font:500 12px/1.4 Inter,system-ui,sans-serif;color:#5d6f66}
+.bk-dom-hint button{padding:6px 12px;border:1px solid rgba(23,54,43,.2);border-radius:999px;background:#fff;font:600 12px/1 Inter,system-ui,sans-serif;color:#17362b;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s}
+.bk-dom.is-user .bk-dom-hint button{opacity:1;pointer-events:auto}
+.bk-day .bk-dom .bk-dom-tom{position:absolute;right:28px;top:22px;font-size:22px;opacity:0;transform:rotate(-2deg) translateY(6px);transition:opacity .6s,transform .8s cubic-bezier(.16,1,.3,1)}
+.bk-day .bk-dom .bk-dom-tom.is-in{opacity:1;transform:rotate(-2deg)}
+@media (max-width:699px){
+  .bk-dom-pin{height:100svh;padding-top:64px}
+  .bk-dom-card{padding:14px 14px 12px}
+  .bk-dom-event{font-size:20px!important;min-height:48px}
+  .bk-dom-track{height:min(46svh,400px);margin:10px 0 10px 42px}
+  .bk-dom-hours i{left:0;right:0;top:calc(var(--s) * 100%);bottom:auto;border-left:0;border-top:1px solid rgba(23,54,43,.09)}
+  .bk-dom-hours b{left:-42px;top:-6px;bottom:auto}
+  .bk-dom-close{left:-6px;right:-6px;top:calc(var(--s) * 100%);bottom:auto;border-left:0;border-top:2px dashed #d0453b}
+  .bk-dom-close em{left:auto;right:0;top:4px}
+  .bk-dom-over{left:0;right:0;top:calc(var(--s) * 100%);bottom:0}
+  .bk-dom-ghost,.bk-dom-slip{left:6px;right:34%;width:auto;top:calc(var(--s) * 100%);height:calc(var(--l) * 100%);border-radius:4px}
+  .bk-dom-slip{flex-direction:row;align-items:center;gap:6px;padding:0 6px;font-size:11px;border-left-width:3px;overflow:hidden}
+  .bk-dom-sv{display:none}
+  .bk-day .bk-dom .bk-dom-tag{position:absolute;left:calc(66% + 8px);right:auto;bottom:auto;font-size:17px}
+  .bk-dom-stats{gap:8px}.bk-dom-sk{font-size:9px}
+  .bk-dom-hint{font-size:11px}
+  .bk-day .bk-dom .bk-dom-tom{position:static;display:block;margin-top:8px;font-size:18px;white-space:normal}
+}
+.bk-story-board{display:flex;flex-direction:column;align-items:center;padding:8vh 16px 12vh}
+.bk-story-board .bk-hand-head{width:min(1100px,100%)}
+.bk-sb-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;width:min(1100px,100%)}
+.bk-sb{margin:0;opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .9s cubic-bezier(.16,1,.3,1)}
+.bk-sb.is-on{opacity:1;transform:none}
+.bk-sb:nth-child(odd) .bk-sb-pic{transform:rotate(-.8deg)}.bk-sb:nth-child(even) .bk-sb-pic{transform:rotate(.7deg)}
+.bk-sb-pic{position:relative;aspect-ratio:13/10;background:#fffdf6;border:2px solid #2b3550;border-radius:3px;box-shadow:0 18px 30px -22px rgba(60,50,20,.55)}
+.bk-sb-pic svg{position:absolute;inset:0;width:100%;height:100%}
+.bk-sb-pic path{fill:none;stroke:#27408f;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.bk-sb-pic .is-red{stroke:#d0453b}.bk-sb-pic .is-green{stroke:#1f9e6c;stroke-width:3.2}.bk-sb-pic .is-faint{stroke:#d6dbe5;stroke-width:3.2}
+.bk-sb.is-ringing .is-red{animation:bk-ring .14s linear infinite alternate}
+@keyframes bk-ring{from{transform:translateX(-1.5px)}to{transform:translateX(1.5px)}}
+.bk-sb-pct{position:absolute;right:7%;top:24%;font:700 11px/1 Inter,system-ui,sans-serif;color:#1f9e6c}
+.bk-day .bk-story-board .bk-sb-say{position:absolute;left:40%;top:7%;font-size:22px;color:#27408f}
+.bk-sb-timer{position:absolute;left:5%;bottom:6%;font:600 12px/1 "IBM Plex Mono",ui-monospace,monospace;color:#d0453b}
+.bk-day .bk-story-board figcaption.bk-w{position:static;display:block;margin-top:12px;font-size:24px;line-height:1.1;white-space:normal}
+@media (max-width:899px){.bk-sb-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
+@media (max-width:520px){.bk-sb-row{grid-template-columns:1fr}.bk-day .bk-story-board figcaption.bk-w{font-size:22px}}

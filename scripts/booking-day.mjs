@@ -20,7 +20,7 @@ export function mount() {
   checklist(root, calm);
   slips(root, calm);
   if (matchMedia('(min-width: 900px)').matches && !calm) timeline(root, moments);
-  import('./booking-hand.mjs').then(h => h.mountHand(root)).catch(e => console.error(e));
+  Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs')]).then(([h, d]) => { h.mountHand(root, d.CHARS()); d.mountDomino(root); }).catch(e => console.error(e));
   stage(root, calm);
   paper(root);
   parallax(root, calm);

@@ -44,14 +44,14 @@ const ACTS = [
 ];
 
 // all the characters the handwriting fonts need (Google Fonts can send just these)
-const CHARS = () => {
-  const all = [...ROWS.flatMap(r => r.t), ...THINK.t, ...NOTES.flatMap(n => n[1]), ...BUBBLE1.note, ...ACT2.flatMap(a => [...(a.t || []), ...(a.note || [])]), 'let the diary keep itself', '让预约本自己记', '0123456789:·?!→()'].join('');
+const CHARS = (extra = '') => {
+  const all = [extra, ...ROWS.flatMap(r => r.t), ...THINK.t, ...NOTES.flatMap(n => n[1]), ...BUBBLE1.note, ...ACT2.flatMap(a => [...(a.t || []), ...(a.note || [])]), 'let the diary keep itself', '让预约本自己记', '0123456789:·?!→()'].join('');
   return [...new Set(all)].join('');
 };
-function loadFonts() {
+function loadFonts(extra) {
   if (document.querySelector('link[data-bk-hand]')) return;
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.dataset.bkHand = '1';
-  l.href = `https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Long+Cang&display=swap&text=${encodeURIComponent(CHARS())}`;
+  l.href = `https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Long+Cang&display=swap&text=${encodeURIComponent(CHARS(extra))}`;
   document.head.append(l);
 }
 
@@ -64,10 +64,10 @@ const scribbleD = (b, r) => { let d = `M${P(b.x - 4, b.y + b.h * .5)}`; const n 
 const circleD = (b, r) => { const cx = b.x + b.w / 2, cy = b.y + b.h / 2, rx = b.w / 2 + 14, ry = b.h / 2 + 10; let d = ''; for (let i = 0; i <= 48; i++) { const a = -2.4 + i / 48 * (Math.PI * 2 + .5), k = 1 + (r() - .5) * .05 + i / 48 * .06; d += (i ? ' L' : 'M') + P(cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k); } return d; };
 const arrowD = (x1, y1, x2, y2, bend = 40) => { const mx = (x1 + x2) / 2 + bend, my = (y1 + y2) / 2; const ang = Math.atan2(y2 - my, x2 - mx), L = 14; return [`M${P(x1, y1)} Q${P(mx, my)} ${P(x2, y2)}`, `M${P(x2 - Math.cos(ang - .45) * L, y2 - Math.sin(ang - .45) * L)} L${P(x2, y2)} L${P(x2 - Math.cos(ang + .45) * L, y2 - Math.sin(ang + .45) * L)}`]; };
 
-export function mountHand(root) {
+export function mountHand(root, extra = '') {
   const m1 = root.querySelector('.bk-moment[data-moment="overview"]'), m2 = root.querySelector('.bk-moment[data-moment="system"]'), ov = root.querySelector('#overview');
   if (!m1 || !m2) return [];
-  loadFonts();
+  loadFonts(extra);
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const acts = ACTS.map(a => {
     const sec = document.createElement('section'); sec.className = 'bk-hand'; sec.dataset.act = a.n;

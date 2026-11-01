@@ -203,7 +203,7 @@ export function mountStage(root) {
         const m1 = root.querySelector('.bk-moment'); if (m1) push(docY(m1) - vh * .55, { kind: 'off', q: off(1, .85), f: 'book' });
       }
     } else push(0, { kind: 'off', q: off(1), f });
-    const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand')];
+    const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board')];
     let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet
     els.forEach((e, idx) => {
       const top = docY(e), h = e.offsetHeight;
@@ -225,6 +225,8 @@ export function mountStage(root) {
       }
       if (story && m) push(top - vh * .2, { kind: 'off', q: off(-1), f });
       story = false;
+      // the pinned day boards and the storyboard get the whole width: the phone steps out to the side
+      if (e.matches('.bk-dom, .bk-story-board')) { if (!phoneOn || m) return; const q = P6([1.35, .5, .5, .1, -1.2, 0]); push(top - vh * .3, { kind: 'off', q, f }); push(top + h - vh * .7, { kind: 'off', q, f }); return; }
       if (m) return; // on phones the text gets the whole width: the 3D lives in the story steps (and in tapped previews)
       if (e.matches('.bk-moment')) {
         // beside the clock, on the side the next chapter will use

@@ -3783,3 +3783,12 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1100vh)}
 .bk-dk-copy{left:68%;top:19%;width:24ch}
 .bk-dk-pw-h{top:7%}
 @media (max-width:999px){.bk-dk-copy{left:60%;top:22%}}
+/* desk v3 — day → evening, and softer handoffs at both ends */
+html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1400vh)}
+.bk-dk{--kEve:0}
+.bk-dk-top{position:absolute;left:0;right:0;top:0;height:22vh;pointer-events:none;background:linear-gradient(180deg,#f3f1ec 0%,rgba(243,241,236,.55) 30%,rgba(243,241,236,0) 100%);opacity:calc(1 - var(--kText));mix-blend-mode:screen}
+.bk-dk-out{position:absolute;inset:0;pointer-events:none;background:#f3f1ec;opacity:var(--kOut)}
+.bk-dk-gl{opacity:1}
+.bk-dk-grain{opacity:calc(.12 * (1 - var(--kOut)))}
+.bk-dk-glow{opacity:calc(max(var(--kPw),var(--kC)) * (1 - var(--kOut)) * .9)}
+.bk-dk-hero{opacity:calc(1 - var(--kText))}

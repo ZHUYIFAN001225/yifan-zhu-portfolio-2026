@@ -69,7 +69,7 @@ export function mountDesk(root) {
 
   // ---------- DOM ----------
   const ov = document.createElement('div'); ov.className = 'bk-dk';
-  ov.innerHTML = `<canvas class="bk-dk-gl" aria-hidden="true"></canvas><div class="bk-dk-glow" aria-hidden="true"></div><div class="bk-dk-grain" aria-hidden="true"></div>
+  ov.innerHTML = `<canvas class="bk-dk-gl" aria-hidden="true"></canvas><div class="bk-dk-glow" aria-hidden="true"></div><div class="bk-dk-grain" aria-hidden="true"></div><div class="bk-dk-top" aria-hidden="true"></div><div class="bk-dk-out" aria-hidden="true"></div>
     <div class="bk-dk-hero"><p class="bk-dk-tag"></p><h1 class="bk-dk-h"><b class="t1"></b><b class="t2"></b><b class="t3"></b></h1><p class="bk-dk-copy"></p>
       <div class="bk-dk-card"><p class="bk-dk-ck"></p><hr><p class="bk-dk-cd"></p><a class="bk-dk-live" target="_blank" rel="noopener"></a></div>
       <p class="bk-dk-scroll"><i></i><span></span></p></div>
@@ -121,28 +121,50 @@ export function mountDesk(root) {
       float dh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float dn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(dh(i), dh(i + vec2(1, 0)), f.x), mix(dh(i + vec2(0, 1)), dh(i + vec2(1, 1)), f.x), f.y); }
       float dfbm(vec2 p){ float v = 0.0, a = .5; for (int i = 0; i < 4; i++){ v += a * dn(p); p = p * 2.03 + 7.1; a *= .5; } return v; }
-      float dappleAt(vec3 w){ float t = uTime * .11; vec2 p = w.xz * .42 + vec2(t * .7, -t * .35); vec2 q = vec2(dfbm(p + vec2(0.0, t)), dfbm(p + vec2(5.2, 1.3 - t * .6)));
-        float n = dfbm(p + 1.6 * q + vec2(t * .3)); float leaves = smoothstep(.34, .74, n); float windowGrad = .78 + .4 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.58 + .62 * leaves) * windowGrad; }`)
+      float dappleAt(vec3 w){ float t = uTime * .09; vec2 p = w.xz * .3 + vec2(t * .5, -t * .25); vec2 q = vec2(dfbm(p + vec2(0.0, t)), dfbm(p + vec2(5.2, 1.3 - t * .6)));
+        float n = dfbm(p + 1.4 * q); float leaves = smoothstep(.3, .8, n);
+        // sun through a window: wide soft diagonal bands that drift, with the leaf shadows faint inside them
+        float d = (w.x * .8 + w.z * .6) * .55 + dfbm(w.xz * .12 + t * .2) * 1.6 + t * .15; float bands = .5 + .5 * sin(d); bands = smoothstep(.15, .95, bands);
+        float windowGrad = .8 + .35 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.62 + .42 * bands + .18 * leaves * bands) * windowGrad; }`)
       .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= mix(1.0, dappleAt(vDp), uDap);'); }; return m; };
   const rim = new THREE.SpotLight(0xffc98a, 0, 30, .6, .8, 1.2); rim.position.set(-4, 9, -5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
   const night = new THREE.HemisphereLight(0x4a56c8, 0x1a0f26, 0); scene.add(night);
+  // the desk lamp, top-left, for the evening: a warm pool over the book and the phone, the rest of the room blue-dark
+  const lamp = new THREE.SpotLight(0xffc27a, 0, 26, .62, .75, 1.3); lamp.position.set(-6.5, 7.5, -4); lamp.castShadow = true; lamp.shadow.mapSize.set(2048, 2048); lamp.shadow.bias = -.0006; lamp.shadow.normalBias = .02; lamp.shadow.radius = 5; scene.add(lamp); lamp.target.position.set(-.5, 0, .4); scene.add(lamp.target);
+  const eveSky = new THREE.HemisphereLight(0x2a3a7a, 0x120c0a, 0); scene.add(eveSky);
   const glow = new THREE.PointLight(0xffb36b, 0, 9, 1.6); glow.castShadow = true; glow.shadow.mapSize.set(1024, 1024); glow.shadow.bias = -.002; scene.add(glow);
 
   // ---------- drawn textures ----------
   const ctex = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
   const woodCanvas = (() => { const c = document.createElement('canvas'); c.width = c.height = 2048; const x = c.getContext('2d'), w = 2048, h = 2048, r = seed(7);
-    x.fillStyle = '#9a6a3c'; x.fillRect(0, 0, w, h);
-    // four planks, each with its own tone, long wavy grain, fine pores and the odd knot
-    for (let pl = 0; pl < 4; pl++) { const y0 = pl * h / 4, tone = ['#a8784a', '#9d6b3e', '#b08052', '#a37043'][pl]; x.fillStyle = tone; x.fillRect(0, y0, w, h / 4);
-      for (let i = 0; i < 160; i++) { const y = y0 + r() * h / 4, k = r(), a = .06 + r() * .22; x.strokeStyle = `rgba(${k > .55 ? '70,40,18' : '215,175,125'},${a})`; x.lineWidth = .6 + r() * 2.6; x.beginPath(); x.moveTo(-20, y); const ph = r() * 9; for (let X = 0; X <= w + 40; X += 48) x.lineTo(X, y + Math.sin(X / 230 + ph) * 9 + Math.sin(X / 61 + ph * 3) * 2); x.stroke(); }
-      if (r() > .4) { const kx = r() * w, ky = y0 + h / 8 + (r() - .5) * h / 6; for (let k = 9; k > 0; k--) { x.strokeStyle = `rgba(60,34,14,${.08 + k * .02})`; x.lineWidth = 2; x.beginPath(); x.ellipse(kx, ky, k * 14, k * 9, .2, 0, Math.PI * 2); x.stroke(); } }
-      x.fillStyle = 'rgba(40,22,8,.55)'; x.fillRect(0, y0, w, 3); x.fillStyle = 'rgba(255,230,190,.12)'; x.fillRect(0, y0 + 3, w, 2); }
-    for (let i = 0; i < 40000; i++) { x.fillStyle = `rgba(60,34,14,${r() * .12})`; x.fillRect(r() * w, r() * h, 1, 1 + r() * 4); }
+    x.fillStyle = '#cfae7c'; x.fillRect(0, 0, w, h);
+    for (let pl = 0; pl < 4; pl++) { const y0 = pl * h / 4, tone = ['#d4b483', '#c9a775', '#d8b98a', '#cdab79'][pl]; x.fillStyle = tone; x.fillRect(0, y0, w, h / 4);
+      for (let i = 0; i < 150; i++) { const y = y0 + r() * h / 4, k = r(), a = .05 + r() * .18; x.strokeStyle = `rgba(${k > .55 ? '120,80,40' : '240,220,180'},${a})`; x.lineWidth = .6 + r() * 2.4; x.beginPath(); x.moveTo(-20, y); const ph = r() * 9; for (let X = 0; X <= w + 40; X += 48) x.lineTo(X, y + Math.sin(X / 230 + ph) * 9 + Math.sin(X / 61 + ph * 3) * 2); x.stroke(); }
+      x.fillStyle = 'rgba(90,60,30,.4)'; x.fillRect(0, y0, w, 3); x.fillStyle = 'rgba(255,240,210,.18)'; x.fillRect(0, y0 + 3, w, 2); }
+    for (let i = 0; i < 30000; i++) { x.fillStyle = `rgba(100,65,30,${r() * .1})`; x.fillRect(r() * w, r() * h, 1, 1 + r() * 4); }
     return c; })();
   const wood = new THREE.CanvasTexture(woodCanvas); wood.colorSpace = THREE.SRGBColorSpace; wood.anisotropy = 16; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(1.6, 1.6);
   const woodBump = new THREE.CanvasTexture(woodCanvas); woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping; woodBump.repeat.set(1.6, 1.6); woodBump.anisotropy = 16;
+  // the self-healing cutting mat: deep green, fine 10 mm grid, bold 50 mm grid, rulers along the edges
+  const MATW = 16.4, MATH = 11.0, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
+    x.fillStyle = '#226b53'; x.fillRect(0, 0, W, H);
+    for (let i = 0; i < 60000; i++) { x.fillStyle = `rgba(${r() > .5 ? '255,255,255' : '0,20,10'},${r() * .06})`; x.fillRect(r() * W, r() * H, 1.5, 1.5); }
+    const m = 150, g = 20 /* px per mm → 10 mm = 200 px? no: 1 unit = 100 px, 10 mm grid = 100 px */, cell = 100;
+    x.strokeStyle = 'rgba(190,225,205,.28)'; x.lineWidth = 1.3;
+    for (let X = m; X <= W - m; X += cell) { x.beginPath(); x.moveTo(X, m); x.lineTo(X, H - m); x.stroke(); }
+    for (let Y = m; Y <= H - m; Y += cell) { x.beginPath(); x.moveTo(m, Y); x.lineTo(W - m, Y); x.stroke(); }
+    x.strokeStyle = 'rgba(205,235,215,.6)'; x.lineWidth = 3;
+    for (let X = m; X <= W - m; X += cell * 5) { x.beginPath(); x.moveTo(X, m); x.lineTo(X, H - m); x.stroke(); }
+    for (let Y = m; Y <= H - m; Y += cell * 5) { x.beginPath(); x.moveTo(m, Y); x.lineTo(W - m, Y); x.stroke(); }
+    x.strokeRect(m, m, W - 2 * m, H - 2 * m);
+    x.fillStyle = 'rgba(215,240,225,.85)'; x.font = '600 30px Inter, system-ui, sans-serif'; x.textAlign = 'center';
+    for (let X = m, n = 0; X <= W - m; X += cell, n++) { const big = n % 5 === 0; x.fillRect(X - 1.5, m - (big ? 34 : 18), 3, big ? 34 : 18); x.fillRect(X - 1.5, H - m, 3, big ? 34 : 18); if (big) { x.fillText(String(n * 10), X, m - 44); x.fillText(String(n * 10), X, H - m + 70); } }
+    x.textAlign = 'right'; for (let Y = m, n = 0; Y <= H - m; Y += cell, n++) { const big = n % 5 === 0; x.fillRect(m - (big ? 34 : 18), Y - 1.5, big ? 34 : 18, 3); x.fillRect(W - m, Y - 1.5, big ? 34 : 18, 3); if (big && n) { x.fillText(String(n * 10), m - 44, Y + 10); x.textAlign = 'left'; x.fillText(String(n * 10), W - m + 44, Y + 10); x.textAlign = 'right'; } }
+    x.textAlign = 'left'; x.fillStyle = 'rgba(215,240,225,.55)'; x.font = '700 34px "Inter Tight", Inter, system-ui, sans-serif'; x.fillText('A2  ·  SELF-HEALING  ·  GLASGOW SALON BOOKING', m + 20, H - 46);
+    return c; })();
+  const matTex = new THREE.CanvasTexture(matCanvas); matTex.colorSpace = THREE.SRGBColorSpace; matTex.anisotropy = 16;
   const times = ['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00'];
-  const page = side => ctex(1024, 1400, (x, w, h) => {
+  const page = (side, ink = 0) => ctex(1024, 1400, (x, w, h) => {
     x.fillStyle = '#f7f2e6'; x.fillRect(0, 0, w, h); const r = seed(side === 'l' ? 11 : 12);
     for (let i = 0; i < 5000; i++) { x.fillStyle = `rgba(120,100,70,${r() * .05})`; x.fillRect(r() * w, r() * h, 1, 1); }
     x.fillStyle = '#17362b'; x.font = '700 46px "Inter Tight", Inter, system-ui, sans-serif'; x.fillText(side === 'l' ? (zh() ? '周四 5 日' : 'THURSDAY 5') : (zh() ? '周五 6 日' : 'FRIDAY 6'), 96, 120);
@@ -150,12 +172,21 @@ export function mountDesk(root) {
     times.forEach((t, i) => { const y = 190 + i * 68; x.strokeStyle = 'rgba(23,54,43,.4)'; x.lineWidth = 2.5; x.beginPath(); x.moveTo(80, y); x.lineTo(w - 80, y); x.stroke(); x.fillStyle = 'rgba(23,54,43,.6)'; x.font = '500 26px Inter, system-ui, sans-serif'; x.fillText(t, 96, y - 14);
       if (notes[i]) { x.save(); x.translate(230, y - 12); x.rotate((r() - .5) * .04); x.fillStyle = '#1d2f7a'; x.font = `italic 600 ${36 + r() * 6}px ${HAND}`; x.fillText(L(notes[i]), 0, 0); x.restore(); } });
     if (side === 'l') { x.strokeStyle = '#d9483c'; x.lineWidth = 4; x.beginPath(); x.moveTo(230, 190 + 3 * 68 - 22); x.lineTo(430, 190 + 3 * 68 - 30); x.stroke(); }
+    // the evening: she sits down after closing and writes up the day — who didn't come, what moved, and tomorrow's list
+    if (ink > 0) {
+      const EV = side === 'l'
+        ? [[6, 560, ['✗ didn’t come', '✗ 没来'], '#15171c'], [3, 560, ['→ Fri 11:00', '→ 周五 11:00'], '#15171c'], [12, 560, ['✓ came 3:10', '✓ 3:10 到'], '#15171c'], [16, 230, ['☎ 3 missed · ring Sun, He, Zhou', '☎ 3 个未接 · 回孙、何、周'], '#b3261e']]
+        : [[0, 560, ['TOMORROW ↓', '明天 ↓'], '#15171c'], [1, 230, ['9:30 Emma? ring back', '9:30 Emma? 回电'], '#15171c'], [3, 230, ['11:00 He (moved)', '11:00 何先生（挪过来）'], '#15171c'], [6, 560, ['Zhou → 12:30?', '周先生 → 12:30?'], '#15171c'], [9, 230, ['2:00 colour — 2h!! block it', '2:00 染发 — 2 小时!! 留住'], '#15171c'], [12, 230, ['Sunday? ask everyone', '周日开不开? 问一圈'], '#15171c'], [15, 230, ['bed. 23:40', '睡觉。23:40'], '#6b6f7a']];
+      EV.forEach((e, i) => { const k0 = i / EV.length, k1 = (i + 1) / EV.length; if (ink <= k0) return; const part = clamp((ink - k0) / (k1 - k0));
+        const [row, X, txt, col] = e, y = 190 + row * 68 - 12; x.save(); x.beginPath(); x.rect(0, y - 50, X + part * 560, 70); x.clip(); x.translate(X, y); x.rotate((r() - .5) * .05); x.fillStyle = col; x.font = `italic 600 ${34 + r() * 5}px ${HAND}`; x.fillText(L(txt), 0, 0); x.restore(); });
+    }
   });
   const note = () => ctex(512, 512, (x, w, h) => { x.fillStyle = '#ffe27a'; x.fillRect(0, 0, w, h); x.fillStyle = 'rgba(0,0,0,.08)'; x.fillRect(0, h - 40, w, 40); x.fillStyle = '#1f2a24'; x.font = `italic 500 58px ${HAND}`; x.fillText(zh() ? '李阿姨 3点?' : 'Mrs Li 3pm?', 50, 180); x.fillText(zh() ? '回电!!' : 'ring back!!', 50, 300); });
 
   // ---------- the counter ----------
   const SPOT = new THREE.Vector3(1.75, .09, .55), SPOT_ROT = -.12, HERO_SCALE = 1.75;
-  const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .018, roughness: .5, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
+  const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .014, roughness: .46, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
+  const mat = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(MATW, MATH, .35), 12)), dapple(new THREE.MeshStandardMaterial({ map: matTex, roughness: .86, metalness: 0 }))); mat.rotation.set(-Math.PI / 2, 0, .035); mat.position.set(.4, .02, -.1); mat.receiveShadow = true; scene.add(mat);
   const propsG = new THREE.Group(); scene.add(propsG);
   const std = o => dapple(new THREE.MeshStandardMaterial(o));
   const shadowy = m => { m.castShadow = true; m.receiveShadow = true; return m; };
@@ -213,7 +244,8 @@ export function mountDesk(root) {
       const tr = (fx - fz) * .6; n.rv += ((tr - n.ro) * w * w - 2 * z * w * n.rv) * dt; n.ro += n.rv * dt;
       n.g.position.set(n.rest.x + n.ox, n.rest.y, n.rest.z + n.oz); n.g.rotation.y = n.rrot + n.ro; });
   }
-  function repaintProps() { pl.material.map?.dispose(); pl.material.map = page('l'); prg.material.map?.dispose(); prg.material.map = page('r'); sticky.material.map?.dispose(); sticky.material.map = note(); [pl, prg, sticky].forEach(m => { m.material.needsUpdate = true; }); }
+  let inkNow = -1; function setInk(k) { k = Math.round(clamp(k) * 14) / 14; if (k === inkNow) return; inkNow = k; pl.material.map?.dispose(); pl.material.map = page('l', k); prg.material.map?.dispose(); prg.material.map = page('r', k); pl.material.needsUpdate = prg.material.needsUpdate = true; }
+  function repaintProps() { inkNow = -1; setInk(Math.max(0, inkNow)); sticky.material.map?.dispose(); sticky.material.map = note(); sticky.material.needsUpdate = true; }
 
   // ---------- the phone and its screen (with the messages that keep coming) ----------
   const SW = SCREEN.w, SH = SCREEN.h, sc = document.createElement('canvas'); sc.width = 780; sc.height = Math.round(780 * SH / SW); const sx = sc.getContext('2d');
@@ -241,11 +273,13 @@ export function mountDesk(root) {
       sx.fillStyle = '#111'; sx.font = `600 28px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(b.who, 124, y + 66);
       sx.fillStyle = '#333'; sx.font = `400 26px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(b.what, 124, y + 94); sx.restore();
     });
+    if (eveAmt > .3 && unread > 2) { const y = top + banners.length * 118 + 6; sx.save(); sx.globalAlpha = eveAmt * heroAmt; sx.fillStyle = 'rgba(248,247,243,.92)'; sx.beginPath(); sx.roundRect(W / 2 - 150, y, 300, 52, 26); sx.fill(); sx.fillStyle = '#d9483c'; sx.beginPath(); sx.arc(W / 2 - 112, y + 26, 11, 0, Math.PI * 2); sx.fill(); sx.fillStyle = '#111'; sx.font = `600 24px -apple-system, Inter, system-ui, sans-serif`; sx.textAlign = 'center'; sx.fillText(`${unread + 9} ${zh() ? '条未读' : 'unread'}`, W / 2 + 10, y + 34); sx.restore(); }
     tex.needsUpdate = true;
   }
+  let unread = 0, eveAmt = 0;
   function tickBanners(now, hero) {
     if (hero < .5 || calm) { if (banners.length && hero < .5) { banners.length = 0; dirty = true; } return; }
-    if (now - lastBanner > (banners.length ? 1700 : 900)) { const list = wxList(); const n = banners.length ? (banners[banners.length - 1].n + 1) % list.length : 0; banners.push({ who: list[n][0], what: list[n][1], t: now, n }); if (banners.length > 4) banners.shift(); lastBanner = now; buzz = now; }
+    if (now - lastBanner > (banners.length ? lerp(1700, 650, eveAmt) : 900)) { unread++; const list = wxList(); const n = banners.length ? (banners[banners.length - 1].n + 1) % list.length : 0; banners.push({ who: list[n][0], what: list[n][1], t: now, n }); if (banners.length > (eveAmt > .5 ? 6 : 4)) banners.shift(); lastBanner = now; buzz = now; }
     dirty = true; // banners animate in
   }
   let buzz = -1e9;
@@ -300,29 +334,34 @@ export function mountDesk(root) {
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
     const lag = 1 - Math.exp(-dt * 5); P.x += (P.tx - P.x) * lag; P.y += (P.ty - P.y) * lag;
     // ---- the timeline (fractions of the pinned scroll) ----
-    const kText = seg(pr, 0, .08), kDark = seg(pr, .03, .22), kUp = seg(pr, .07, .26);           // 1 → 2
-    const kPw = seg(pr, .22, .31) * (1 - seg(pr, .36, .41));                                     // the two big words
-    const kDown = seg(pr, .38, .47);                                                               // 2 → 3 (back to the counter, at night)
-    const kA = seg(pr, .45, .5) * (1 - seg(pr, .62, .66)), kScale = seg(pr, .48, .62);            // feature: fits
-    const kTop = seg(pr, .63, .7);                                                                 // 3 → 4
-    const kB = seg(pr, .68, .73) * (1 - seg(pr, .8, .84)), kGuide = seg(pr, .7, .78);              // feature: moved, not lost
-    const kRise = seg(pr, .82, .9), kC = seg(pr, .86, .91) * (1 - seg(pr, .96, .99)), kTurn = clamp((pr - .86) / .14); // record
-    const kOut = seg(pr, .95, 1);
-    const heroAmt = 1 - kDark;
+    const kText = seg(pr, 0, .07);                                                                  // copy out
+    const kEve = seg(pr, .05, .2), kInk = seg(pr, .13, .3);                                         // day → evening: lamp on, the book fills up
+    const kDark = seg(pr, .3, .42), kUp = seg(pr, .32, .47);                                        // lamp off, the phone rises alone
+    const kPw = seg(pr, .44, .52) * (1 - seg(pr, .56, .6));                                        // the two big words
+    const kDown = seg(pr, .58, .65);                                                                 // back to the counter, at night
+    const kA = seg(pr, .63, .68) * (1 - seg(pr, .76, .79)), kScale = seg(pr, .66, .76);             // feature: fits
+    const kTop = seg(pr, .77, .82);                                                                  // → top view
+    const kB = seg(pr, .81, .85) * (1 - seg(pr, .9, .92)), kGuide = seg(pr, .83, .89);               // feature: moved, not lost
+    const kRise = seg(pr, .9, .95), kC = seg(pr, .93, .97) * (1 - seg(pr, .985, 1)), kTurn = clamp((pr - .93) / .07); // record
+    const kOut = seg(pr, .965, 1);                                                                   // hand over to the paper page
+    const heroAmt = 1 - kDark, lampAmt = kEve * (1 - kDark); eveAmt = lampAmt;
+    setInk(kInk);
     // ---- camera ----
     mix(V.hero.pos, V.dark.pos, kUp, camPos); mix(V.hero.look, V.dark.look, kUp, camLook);
     mix(camPos, V.night.pos, kDown, camPos); mix(camLook, V.night.look, kDown, camLook);
     mix(camPos, V.top.pos, kTop, camPos); mix(camLook, V.top.look, kTop, camLook);
     mix(camPos, V.dark.pos, kRise, camPos); mix(camLook, V.dark.look, kRise, camLook);
+    camPos.y -= 1.6 * kEve * (1 - kUp); camPos.z -= .6 * kEve * (1 - kUp);
     camPos.x += P.x * .5 * (1 - kUp * .6); camPos.z += P.y * .35 * (1 - kUp);
     cam.position.copy(camPos); cam.lookAt(camLook);
     // ---- lights: day → black → night (lit by the phone) → dark top view → black ----
-    const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kDark) ** 1.6, up0 = kUp * (1 - kDown) + kRise;
-    key.intensity = 3.9 * dayAmt; fill.intensity = .6 * dayAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
-    nudge(dt, heroAmt); phoneBlob.material.opacity = .8 * (1 - up0) * dayAmt;
-    night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise); glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise);
+    const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kEve) ** 1.4, up0 = kUp * (1 - kDown) + kRise;
+    key.intensity = 3.9 * dayAmt; fill.intensity = .6 * dayAmt + .12 * lampAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
+    lamp.intensity = 70 * lampAmt; eveSky.intensity = .5 * lampAmt; glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise) + 2.5 * lampAmt;
+    nudge(dt, heroAmt); phoneBlob.material.opacity = .8 * (1 - up0) * Math.max(dayAmt, lampAmt * .6);
+    night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise);
     rim.intensity = (60 * kUp * (1 - kDown) + 26 * kRise) * (1 - kOut);
-    desk.visible = propsG.visible = (dayAmt > .003 || nightAmt > .01 || kTop > .01) && kRise < .98;
+    desk.visible = mat.visible = propsG.visible = (dayAmt > .003 || lampAmt > .003 || nightAmt > .01 || kTop > .01) && kRise < .98;
     // ---- the phone ----
     const up = kUp * (1 - kDown) + kRise; // 0 on the counter, 1 alone in the dark
     const spotY = .09 + nightAmt * .02;
@@ -355,10 +394,10 @@ export function mountDesk(root) {
     const dPhone = cam.position.distanceTo(pv.position), dDesk = cam.position.distanceTo(camLook);
     const focusOnPhone = clamp(kUp * (1 - kDown) + kRise + nightAmt * .6), fu = post.uniforms;
     fu.uFocus.value = lerp(dDesk, dPhone, focusOnPhone); fu.uRange.value = lerp(10.0, 1.6, kUp * (1 - kDown) + kRise) - nightAmt * 6.0; fu.uMax.value = (7 + 11 * (kUp * (1 - kDown) + kRise)) * dpr();
-    fu.uVig.value = .38 + .4 * (1 - dayAmt); fu.uFringe.value = .006 * (kUp * (1 - kDown) + kRise);
+    fu.uVig.value = .38 + .4 * (1 - dayAmt) - .25 * kOut; fu.uFringe.value = .006 * (kUp * (1 - kDown) + kRise);
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
-    S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kA', kA); S('--kScale', kScale); S('--kB', kB); S('--kGuide', kGuide); S('--kC', kC); S('--kOut', kOut); S('--night', nightAmt); S('--kRise', kRise);
+    S('--kEve', kEve); S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kA', kA); S('--kScale', kScale); S('--kB', kB); S('--kGuide', kGuide); S('--kC', kC); S('--kOut', kOut); S('--night', nightAmt); S('--kRise', kRise);
     ov.dataset.scale = kScale < .33 ? 0 : kScale < .66 ? 1 : 2;
   }
   requestAnimationFrame(frame);

@@ -452,7 +452,7 @@ export function mountStage(root) {
     fadeAmt += ((gone ? 0 : 1) - fadeAmt) * E(gone ? 9 : 6); cv.style.opacity = fadeAmt > .995 ? '' : fadeAmt.toFixed(3);
     if (coverGone) { cv.style.opacity = '0'; bub.classList.remove('is-on'); }
     else if (!mcv && cover && window.__bkCoverMap) { const C = window.__bkCoverMap;
-      if (C.V === 'cards' && pr < C.DOCK + .05) cv.style.opacity = '0';
+      if (C.V === 'cards' && pr < C.DOCK + (C.keep ? -.02 : .05)) cv.style.opacity = '0';   // keep: back as soon as the opening is over
       else if (C.V === 'mix' && pr < C.S * .6) cv.style.opacity = '0'; }
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
     cv.classList.toggle('is-front', (!mcv && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);

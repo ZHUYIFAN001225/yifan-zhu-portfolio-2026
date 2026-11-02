@@ -25,7 +25,7 @@ export function mount() {
   { const op = document.querySelector('[data-opening]');
     if (op && !op.parentElement.matches('.bk-cover-pin') && matchMedia('(min-width: 640px)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const pin = document.createElement('div'); pin.className = 'bk-cover-pin'; op.before(pin); pin.append(op); } }
-  Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs'), import('./booking-map.mjs'), import('./booking-try.mjs'), import('./booking-cover.mjs')]).then(([h, d, c, mp, tr, cv]) => { tr.mountTry(root); cv.mountCover(root); cv.mountFeel(); h.mountHand(root, d.CHARS() + c.CHARS() + mp.CHARS() + tr.CHARS() + cv.CHARS()); d.mountDomino(root); c.mountChair(root); mp.mountMap(root); }).catch(e => console.error(e));
+  Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs'), import('./booking-map.mjs'), import('./booking-try.mjs'), import(new URLSearchParams(location.search).get('cover') === 'desk' ? './booking-desk.mjs' : './booking-cover.mjs'), import('./booking-cover.mjs')]).then(([h, d, c, mp, tr, cv, cv0]) => { tr.mountTry(root); (cv.mountDesk || cv.mountCover)(root); cv0.mountFeel(); h.mountHand(root, d.CHARS() + c.CHARS() + mp.CHARS() + tr.CHARS() + cv.CHARS()); d.mountDomino(root); c.mountChair(root); mp.mountMap(root); }).catch(e => console.error(e));
   stage(root, calm);
   regionTags(root);
   paper(root);

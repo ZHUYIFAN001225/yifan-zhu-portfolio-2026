@@ -254,12 +254,12 @@ export function mountStage(root) {
         push(top - vh * .35, { kind: 'off', q: P6([.8, 1.7, .6, -.5, -.7, .14]), f });
         push(top + h * .18, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true, a3: true });
         // holds while the diary and the arrow are read; it leaves only as the diary itself scrolls away
-        a3End = top + h - vh * .22;
+        a3End = top + h - vh * .36;
         push(a3End, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true, a3: true });
         return;
       }
       if (!phoneOn && !m) return;
-      if (!m && phoneOn && !S.some(x => x.gone)) { push(Math.max(top - vh * .38, a3End + vh * .75), { kind: 'off', gone: true, q: P6([.8, -.75, .6, .5, .5, -.12]), f }); return; }
+      if (!m && phoneOn && !S.some(x => x.gone)) { push(Math.max(top - vh * .38, a3End + vh * .55), { kind: 'off', gone: true, q: P6([.8, -.75, .6, .5, .5, -.12]), f }); return; }
       if (!m) return;
       if (e.matches('.bk-step')) {
         const s = STEPS[+e.dataset.i];

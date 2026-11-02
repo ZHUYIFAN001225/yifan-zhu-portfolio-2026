@@ -196,11 +196,14 @@ export function mountStage(root) {
     if (!m && heroEl && op) {
       const r = heroEl.getBoundingClientRect(), x0 = (r.left + r.width / 2) / innerWidth, y0 = (r.top + scrollY + r.height / 2) / vh;
       const s0 = Math.min(.95, r.height * .69 / vh), opH = op.offsetHeight;
-      const first = (heroEl.dataset.screens || '').split(',')[0].match(/([\w-]+)\.webp/); if (first) f = first[1];
-      push(vh * .5, { kind: 'hero', q: P6([x0, y0, s0, -.06, -.45, 0]), f });
-      push(vh * .5 + opH * .5, { kind: 'hero', q: P6([x0, y0 - opH * .5 / vh * .55, s0 * .96, -.02, -.3, 0]), f });
-      // the cover's phone rises up and away as the cover scrolls off (the try-it block has its own live prototype)
-      push(vh * .5 + opH * 1.05, { kind: 'off', q: P6([x0, -.7, s0 * .8, .35, -.1, .08]), f });
+      // the cover: no sideways slide. The phone eases from a slight angle to face you while the title parts, and its
+      // screen turns from the customer's booking to the owner's day — one booking, two sides. Then it lifts away.
+      // It follows the pointer a little the whole time (still: true).
+      f = 'cover-book';
+      push(vh * .5, { kind: 'hero', q: P6([x0, y0, s0, -.05, -.32, 0]), f, still: true });
+      push(vh * .5 + opH * .3, { kind: 'hero', q: P6([.5, y0 - .04, s0 * .98, 0, 0, 0]), f: 'cover-book', still: true });
+      push(vh * .5 + opH * .55, { kind: 'hero', q: P6([.5, y0 - .1, s0 * .94, 0, 0, 0]), f: 'cover-today', still: true });
+      push(vh * .5 + opH * 1.05, { kind: 'off', q: P6([.5, -.75, s0 * .85, .25, 0, 0]), f: 'cover-today' });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
     let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet

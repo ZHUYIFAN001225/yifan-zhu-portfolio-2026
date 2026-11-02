@@ -157,7 +157,9 @@ export function mountHand(root, extra = '') {
   const apply = a => {
     const p = a.p;
     a.items.forEach(it => {
-      const k = it.pre ? 1 : clamp((p - it.from) / Math.max(.001, it.to - it.from));
+      // act 3 on wide screens: the arrow and its note wait for the phone to arrive beside the page, and go before it leaves
+      const gated = a.gp !== undefined && (it.kind === 'handoff' || it.kind === 'handnote');
+      const k = gated ? clamp((a.gp - (it.kind === 'handnote' ? .55 : 0)) / (it.kind === 'handnote' ? .45 : .7)) : it.pre ? 1 : clamp((p - it.from) / Math.max(.001, it.to - it.from));
       if (it.kind === 'write' || it.kind === 'handnote') { const el = it.el; if (el) el.style.clipPath = k >= 1 ? 'none' : `inset(-30% ${(100 - k * 100).toFixed(2)}% -30% -4%)`; }
       if (it.kind === 'bubble') { it.el.style.opacity = k > 0 ? Math.min(1, k * 2.5) : 0; it.el.style.transform = `translateY(${(1 - k) * 14}px) scale(${.92 + k * .08})`; const em = it.el.querySelector('em'); if (em) em.style.clipPath = k >= 1 ? 'none' : `inset(-30% ${(100 - clamp(k * 1.6 - .6) * 100).toFixed(2)}% -30% -4%)`; }
       if (it.paths) { const n = it.paths.length; it.paths.forEach((pa, i) => { const kk = clamp(k * n - i); pa.style.strokeDashoffset = (pa._L * (1 - kk)).toFixed(2); }); }
@@ -174,11 +176,12 @@ export function mountHand(root, extra = '') {
     const dt = Math.min(.08, (now - last) / 1000); last = now; const vh = innerHeight;
     noteTick(dt);
     acts.forEach(a => {
-      const r = a.sheet.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) { if (a.drawn !== a.p) { apply(a); a.drawn = a.p; } return; }
+      const r = a.sheet.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) { if (a.gp) { a.gp = 0; a.drawn = -1; } if (a.drawn !== a.p) { apply(a); a.drawn = a.p; } return; }
       // starts when the page is low on the screen, finished once it is well up in view
       let target; if (calm) target = 1; else if (a.merged) { const sr = a.sec.getBoundingClientRect(); target = clamp(-sr.top / Math.max(1, sr.height - vh)); } else target = clamp((vh * .86 - r.top) / (vh * .62));
       a.p += (target - a.p) * (1 - Math.exp(-dt * 3.2)); // a hand, not a jump
-      if (Math.abs(a.p - a.drawn) > .0005) { apply(a); a.drawn = a.p; }
+      let gm = 0; if (a.n === 3 && innerWidth >= 1000 && !calm) { const g0 = a.gp || 0, want = window.__bkAct3 ? 1 : 0; a.gp = want ? Math.min(1, g0 + dt / 1.1) : Math.max(0, g0 - dt / .45); gm = Math.abs(a.gp - g0); } else a.gp = undefined;
+      if (Math.abs(a.p - a.drawn) > .0005 || gm > 0) { apply(a); a.drawn = a.p; }
     });
   };
   // margin notes: the designer's own pencil, written next to the chapter they comment on

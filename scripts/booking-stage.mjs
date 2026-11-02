@@ -240,7 +240,7 @@ export function mountStage(root) {
       push(end + vh * .05, { kind: 'off', q: P6([.5, -.9, s0 * .7, .4, .3, 0]), f: 'cover-today' });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
-    let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet
+    let story = false, a3End = -1e9, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet
     els.forEach((e, idx) => {
       const top = docY(e), h = e.offsetHeight;
       if (e.matches('.bk-hand')) {
@@ -252,12 +252,14 @@ export function mountStage(root) {
         // (the pointer tilts it); when the page moves on it lifts away upward
         const rest = P6([.78, .52, .64, .04, -.12, 0]), lab = ['Owner · the diary keeps itself', '店主 · 预约本自己记'];
         push(top - vh * .35, { kind: 'off', q: P6([.8, 1.7, .6, -.5, -.7, .14]), f });
-        push(top + h * .18, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
-        push(top + h * .8, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });   // holds while the diary and the arrow are read
+        push(top + h * .18, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true, a3: true });
+        // holds while the diary and the arrow are read; it leaves only as the diary itself scrolls away
+        a3End = top + h - vh * .22;
+        push(a3End, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true, a3: true });
         return;
       }
       if (!phoneOn && !m) return;
-      if (!m && phoneOn && !S.some(x => x.gone)) { push(top - vh * .38, { kind: 'off', gone: true, q: P6([.8, -.75, .6, .5, .5, -.12]), f }); return; }
+      if (!m && phoneOn && !S.some(x => x.gone)) { push(Math.max(top - vh * .38, a3End + vh * .75), { kind: 'off', gone: true, q: P6([.8, -.75, .6, .5, .5, -.12]), f }); return; }
       if (!m) return;
       if (e.matches('.bk-step')) {
         const s = STEPS[+e.dataset.i];
@@ -305,11 +307,11 @@ export function mountStage(root) {
       if (st.kind !== 'off') return;
       let n = null; for (let d = 1; d < S.length && !n; d++) n = [S[i - d], S[i + d]].find(x => x && x.kind !== 'off') || null;
       const q = n ? n.q : P6([.84, .53, .6, 0, -.3, 0]);
-      st.q = P6([1.45, q.y, q.s, q.rx * .5, -.9, 0]);
+      st.q = P6([1.42, q.y, q.s, q.rx * .5, q.ry - .35, 0]);
     });
     // keys: hold each station, then fly to the next one within the last part of the gap
     const K = [];
-    S.forEach((st, i) => { const nx = S[i + 1]; K.push({ at: st.at, st }); if (nx) K.push({ at: nx.at - Math.min(vh * (m ? .9 : 1.3), (nx.at - st.at) * .78), st }); });
+    S.forEach((st, i) => { const nx = S[i + 1]; K.push({ at: st.at, st }); if (nx) K.push({ at: nx.at - Math.min(vh * (m ? .9 : 1.3), (nx.at - st.at) * ((st.a3 || nx.a3) ? .95 : .78)), st }); });
     keys = K;
   }
   const last0 = S => S.length ? S[S.length - 1].q.x : .5;
@@ -360,6 +362,7 @@ export function mountStage(root) {
     // nothing to draw while the phone is parked off screen: render one last frame, then sleep (keeps scrolling and
     // the pointer smooth on long text stretches)
     if (a.st.kind === 'off' && b.st.kind === 'off' && !peek && !(cover && cover.holder.getBoundingClientRect().bottom > 0)) { if (idleDrawn) return; idleDrawn = true; } else idleDrawn = false;
+    { const mv = a.st !== b.st, at3 = !isMobile() && ((a.st.a3 && b.st.a3) || (b.st.a3 && !a.st.a3 && glide(t) > .96)); window.__bkAct3 = at3; }
     const moving = a.st !== b.st, e = moving ? glide(t) : 0, st = e < .5 ? a.st : b.st, same = moving && a.st.q.x === b.st.q.x && a.st.q.y === b.st.q.y && a.st.q.ry === b.st.q.ry && a.st.q.s === b.st.q.s, hold = same ? Math.abs(e - .5) > .1 : (e < .05 || e > .95);
     const time = (now - t0) / 1000, m = isMobile(), mcv = innerWidth < 640; // the cover works down to tablet widths
     if (peek && (Math.abs(scrollY - peek.sy) > 160 || now - peek.t > 6000)) peek = null;

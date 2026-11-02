@@ -59,7 +59,7 @@ function glassLight(day) {
 // A: the chapter list's rail as a lit slider — the part already read glows lamp-amber, and the line bends away around the
 // current chapter, where a small glass knob sits with the light spilling out behind it
 function lumen(day) {
-  const NS = 'http://www.w3.org/2000/svg', X = 15, B = 11, W2 = 26;
+  const NS = 'http://www.w3.org/2000/svg', X = 21, B = 14, W2 = 24;
   const rails = [];
   const add = () => day.querySelectorAll('.bk-script').forEach(ol => {
     if (ol.querySelector(':scope>.bk-lumen')) return;
@@ -89,12 +89,12 @@ function lumen(day) {
       R.ky = R.ky == null ? want : R.ky + (want - R.ky) * E(7);
       R.kf += ((on ? 1 : 0) - R.kf) * E(5);
       const H = R.ol.offsetHeight, y0 = mid(lis[0]) - 8, y1 = mid(lis[lis.length - 1]) + 8;
-      R.svg.setAttribute('viewBox', `0 0 40 ${H}`); R.svg.style.height = H + 'px';
+      R.svg.setAttribute('viewBox', `0 0 44 ${H}`); R.svg.style.height = H + 'px';
       R.t.setAttribute('d', path(y0, y1, R.ky, R.kf));
       const ly = Math.max(y0, R.ky); R.l.setAttribute('d', path(y0, ly, R.ky, R.kf)); R.g.setAttribute('d', path(Math.max(y0, R.ky - 40), ly, R.ky, R.kf));
       R.g.style.opacity = R.kf.toFixed(3);
-      const kx = X - B * R.kf + 1; R.halo.setAttribute('cx', (kx - 4).toFixed(1)); R.halo.setAttribute('cy', R.ky.toFixed(1)); R.halo.style.opacity = (R.kf * .9).toFixed(3);
-      R.knob.style.transform = `translate3d(${(X + 2).toFixed(1)}px,${R.ky.toFixed(1)}px,0) translate(-50%,-50%) scale(${(.6 + .4 * R.kf).toFixed(3)})`;
+      const kx = X - B * R.kf; R.halo.setAttribute('cx', (kx + 2).toFixed(1)); R.halo.setAttribute('cy', R.ky.toFixed(1)); R.halo.style.opacity = (R.kf * .9).toFixed(3);
+      R.knob.style.transform = `translate3d(${(X + 5 * R.kf).toFixed(1)}px,${R.ky.toFixed(1)}px,0) translate(-50%,-50%) scale(${(.6 + .4 * R.kf).toFixed(3)})`;
       R.knob.style.opacity = (.25 + .75 * R.kf).toFixed(3);
     }
   };

@@ -4034,18 +4034,19 @@ html[data-body=a] .bk-sheet.is-glass{--gr:24px}
 html[data-body=a] .bk-day .bk-dom-card{--gr:26px}
 
 /* A · the chapter list as a lit slider (after the glowing weight dial) */
-html[data-body=a] .bk-day .bk-script.has-lumen{padding-left:40px}
+html[data-body=a] .bk-day .bk-script.has-lumen{padding-left:50px}
 html[data-body=a] .bk-day .bk-script.has-lumen::before,html[data-body=a] .bk-day .bk-script.has-lumen::after,html[data-body=a] .bk-day .bk-script.has-lumen li::before{display:none}
-html[data-body=a] .bk-script .bk-lumen{position:absolute;left:0;top:0;width:40px;overflow:visible;pointer-events:none}
+html[data-body=a] .bk-script .bk-lumen{position:absolute;left:0;top:0;width:44px;overflow:visible;pointer-events:none}
 html[data-body=a] .bk-lumen path{fill:none;stroke-linecap:round;stroke-linejoin:round}
-html[data-body=a] .bk-lumen .t{stroke:rgba(255,236,210,.18);stroke-width:1.5}
+html[data-body=a] .bk-lumen .t{stroke:rgba(255,236,210,.26);stroke-width:1.5}
 html[data-body=a] .bk-lumen .l{stroke:var(--x-acc);stroke-width:2;filter:drop-shadow(0 0 3px rgba(240,163,94,.9))}
 html[data-body=a] .bk-lumen .g{stroke:var(--x-acc);stroke-width:7;filter:url(#bkl-b);opacity:0}
 html[data-body=a] .bk-lumen .halo{fill:rgba(240,163,94,.55);filter:url(#bkl-b)}
-html[data-body=a] .bk-script .bk-knob{position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 45%,rgba(0,0,0,.25) 100%),rgba(28,24,20,.85);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 2px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.12),-4px 0 14px rgba(240,163,94,.45),0 4px 10px rgba(0,0,0,.6);will-change:transform}
+html[data-body=a] .bk-script .bk-knob{position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 45%,rgba(0,0,0,.25) 100%),rgba(28,24,20,.85);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 2px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.12),-4px 0 14px rgba(240,163,94,.45),0 4px 10px rgba(0,0,0,.6);will-change:transform}
 html[data-body=a] .bk-script .bk-knob::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--x-acc);box-shadow:0 0 8px 2px rgba(240,163,94,.8)}
 html[data-body=a] .bk-day .bk-script a{color:rgba(241,231,214,.5)!important;background:none!important;border-radius:14px;position:relative;transition:color .35s,background .35s,box-shadow .35s}
 html[data-body=a] .bk-day .bk-script li.is-past a{color:rgba(241,231,214,.72)!important}
 html[data-body=a] .bk-day .bk-script li.is-on a{color:#fff7ea!important;background:radial-gradient(120% 140% at 0% 50%,rgba(240,163,94,.26),rgba(240,163,94,.06) 45%,transparent 70%),linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02) 50%,rgba(255,255,255,.05)),rgba(20,16,12,.5)!important;-webkit-backdrop-filter:blur(14px)!important;backdrop-filter:blur(14px)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 1px 0 0 rgba(255,200,150,.35),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(255,255,255,.08),0 10px 24px -12px rgba(0,0,0,.8)!important}
 html[data-body=a] .bk-day .bk-script li.is-on a span{color:var(--x-acc)}
 html[data-body=a] .bk-day .bk-script a:hover{color:#fff7ea!important}
+html[data-body=a] .bk-day .bk-script.has-lumen>li{background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:0!important}

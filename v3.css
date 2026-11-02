@@ -3542,3 +3542,5 @@ html:has(.bk-day){background:#f3eee3!important}html:has(.bk-day) .site-header.v3
 .bk-bub>i{width:40px}
 .bk-cover-pin .op--3d .op-word:nth-child(2){opacity:calc(1 - var(--sp,0) * .92)!important;transform:scale(calc(1 + var(--sp,0) * .25))!important}
 .bk-cover-pin .op--3d .op-word:nth-child(1),.bk-cover-pin .op--3d .op-word:nth-child(3){transform:translateX(calc(var(--sp,0) * var(--dx) * 100vw))!important}
+.bk-cover-pin .op--3d .op-copy{opacity:max(0,calc(1 - (var(--sp,0) - .55) * 4));transition:opacity .2s}
+.bk-cover-pin .op--3d .op-drag{opacity:max(0,calc(1 - var(--sp,0) * 4))}

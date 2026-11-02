@@ -212,13 +212,20 @@ export function mountStage(root) {
       ];
       f = 'cover-book';
       push(vh * .5, { kind: 'hero', q: P6([x0, y0, s0, -.05, -.32, 0]), f, still: true });
-      const pinH = op.parentElement.matches('.bk-cover-pin') ? op.parentElement.offsetHeight - opH : opH * 1.5, start = vh * .5 + pinH * .14, span = pinH * .84, step = span / B.length;
+      // each message has its own camera: in close on a small part, further back for a big one, tilted and turned
+      // like LOOK's anatomy. The lit part is brought to the middle of the screen; the phone steps aside for the bubble.
+      const holderTop = docY(holder), pinH = holder.matches('.bk-cover-pin') ? holder.offsetHeight - opH : opH * 1.5;
+      const release = holderTop + pinH + vh * .5, start = vh * .5 + pinH * .12, span = (release - vh * .45) - start, step = span / B.length;
+      // [scale, rx, ry, rz, x-shift] per beat
+      const CAM = [[1.08, .3, -.42, .1, -.1], [1.2, -.12, .5, -.08, .11], [.9, .45, -.25, .16, -.08], [1, .26, .5, -.12, .1], [1.2, .14, -.48, .06, -.11], [1.12, -.2, .44, -.1, .11]];
       B.forEach(([file, spot, side, t1, t2], i) => {
-        const at = start + i * step, q = P6([.5, yPin - .02, s0 * .96, 0, side === 'r' ? -.1 : .1, 0]);
+        const [k, rx, ry, rz, dx] = CAM[i], sc = s0 * k, c = (spot[1] + spot[3] / 2) / 100;
+        const y = Math.min(.6, Math.max(.4, .5 - (c - .5) * sc * .6)), at = start + i * step;
+        const q = P6([.5 + dx, y, sc, rx, ry, rz]);
         const st = { kind: 'hero', q, f: file, spot, still: true, bub: { side, t1, t2, spot } };
-        push(at, st); push(at + step * .8, { ...st });
+        push(at, st); push(at + step * .72, { ...st });
       });
-      push(start + span + vh * .35, { kind: 'off', q: P6([.5, -.75, s0 * .85, .25, 0, 0]), f: 'cover-today' });
+      push(release - vh * .3, { kind: 'off', q: P6([.5, -.9, s0 * .8, .4, .3, 0]), f: 'cover-today' });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
     let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet

@@ -158,7 +158,7 @@ export function mountDesk(root) {
     const big = { cx: vw / 2, cy: vh * .5, w: Math.min(vh * .62, vw * .34) * .62, h: Math.min(vh * .62, vw * .34), roll: 0 };
     const m1 = up, m2 = kDown;
     const cx = lerp(lerp(a.cx, big.cx, m1), b.cx, m2), cy = lerp(lerp(a.cy, big.cy, m1), b.cy, m2), w = lerp(lerp(a.w, big.w, m1), b.w, m2), h = lerp(lerp(a.h, big.h, m1), b.h, m2), roll = lerp(lerp(a.roll, 0, m1), b.roll, m2);
-    const scale = h / PH * 1.18; // the render has a little air around the phone
+    const scale = Math.max(h / 988, w / 465) * 1.05; // the phone fills 988×465 of the 600×1080 render
     phEl.style.transform = `translate(${(cx - PW * scale / 2).toFixed(1)}px, ${(cy - PH * scale / 2).toFixed(1)}px) rotate(${roll.toFixed(4)}rad) scale(${scale.toFixed(4)})`;
     // pose inside the render: flat/frontal on the counter; a little turn with the pointer while it floats; standing in the front view
     phone.rotation.set(up * (P.y * .18 + Math.sin(now / 2600) * .05) - kDown * .07, up * P.x * .22, 0);

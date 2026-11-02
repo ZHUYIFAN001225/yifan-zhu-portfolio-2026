@@ -199,86 +199,103 @@ export function mountDesk(root) {
   }
   function drawScreen(now, lit) {
     const W = sc.width, H = sc.height;
-    if (screens.cur === 'lock') {
-      // lock screen: a dark, slightly blue glass; the clock; banners stacking
-      const g = sx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#1a2230'); g.addColorStop(1, '#0a0d12'); sx.fillStyle = g; sx.fillRect(0, 0, W, H);
-      sx.fillStyle = 'rgba(255,255,255,.9)'; sx.textAlign = 'center'; sx.font = `500 ${Math.round(W * .055)}px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(zh() ? (eveAmt > .5 ? '11月5日 周四' : '11月5日 周四') : 'Thursday 5 November', W / 2, W * .33);
-      sx.font = `300 ${Math.round(W * .22)}px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(eveAmt > .5 ? '22:47' : '9:41', W / 2, W * .56); sx.textAlign = 'left';
-      sx.fillStyle = 'rgba(255,255,255,.35)'; sx.beginPath(); sx.roundRect(W / 2 - 110, H - 40, 220, 8, 4); sx.fill();
-      paintIsland();
-    } else { const im = screens.imgs[screens.cur]; if (!im) return; paint(sx, im, true); if (screens.prev && screens.fade < 1) { sx.globalAlpha = 1 - screens.fade; paint(sx, screens.prev, true); sx.globalAlpha = 1; } }
-    const top = Math.round(W * .62);
-    banners.forEach((b, i) => {
-      const age = (now - b.t) / 1000, kin = sm(age / .45), y = (screens.cur === 'lock' ? top : Math.round(W * .118) + 10) + i * 118 - (1 - kin) * 60;
-      sx.save(); sx.globalAlpha = kin; sx.shadowColor = 'rgba(0,0,0,.25)'; sx.shadowBlur = 18; sx.shadowOffsetY = 6;
-      sx.fillStyle = screens.cur === 'lock' ? 'rgba(236,238,244,.92)' : 'rgba(248,247,243,.96)'; sx.beginPath(); sx.roundRect(22, y, W - 44, 104, 26); sx.fill(); sx.shadowColor = 'transparent';
-      sx.fillStyle = '#2dc100'; sx.beginPath(); sx.roundRect(40, y + 20, 64, 64, 16); sx.fill();
-      sx.fillStyle = '#fff'; sx.beginPath(); sx.ellipse(66, y + 48, 16, 13, 0, 0, Math.PI * 2); sx.fill(); sx.beginPath(); sx.ellipse(82, y + 58, 13, 11, 0, 0, Math.PI * 2); sx.fill();
-      sx.fillStyle = '#6b6b70'; sx.font = `500 22px -apple-system, Inter, system-ui, sans-serif`; sx.textBaseline = 'alphabetic'; sx.fillText(L(T.wxk).toUpperCase(), 124, y + 36); sx.textAlign = 'right'; sx.fillText(L(T.now), W - 44, y + 36); sx.textAlign = 'left';
-      sx.fillStyle = '#111'; sx.font = `600 28px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(b.who, 124, y + 66);
-      sx.fillStyle = '#333'; sx.font = `400 26px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(b.what, 124, y + 94); sx.restore();
-    });
-    if (unread > banners.length) { const y = (screens.cur === 'lock' ? top : Math.round(W * .118) + 10) + banners.length * 118 + 6; sx.save(); sx.fillStyle = 'rgba(236,238,244,.9)'; sx.beginPath(); sx.roundRect(W / 2 - 150, y, 300, 52, 26); sx.fill(); sx.fillStyle = '#d9483c'; sx.beginPath(); sx.arc(W / 2 - 112, y + 26, 11, 0, Math.PI * 2); sx.fill(); sx.fillStyle = '#111'; sx.font = `600 24px -apple-system, Inter, system-ui, sans-serif`; sx.textAlign = 'center'; sx.fillText(`${unread - banners.length} ${zh() ? '条更早的未读' : 'more unread'}`, W / 2 + 10, y + 34); sx.restore(); }
+    if (screens.cur === 'lock') drawLock(W, H);
+    else { const im = screens.imgs[screens.cur]; if (!im) return; paint(sx, im, true); if (screens.prev && screens.fade < 1) { sx.globalAlpha = 1 - screens.fade; paint(sx, screens.prev, true); sx.globalAlpha = 1; } }
     // asleep: the glass goes black until the first message wakes it
     if (lit < 1) { sx.fillStyle = `rgba(0,0,0,${1 - lit})`; sx.fillRect(0, 0, W, H); }
     tex.needsUpdate = true;
   }
-  function paintIsland() { const W = sc.width; sx.fillStyle = '#050506'; const iw = W * .3, ih = W * .085; sx.beginPath(); sx.roundRect((W - iw) / 2, W * .028, iw, ih, ih / 2); sx.fill(); }
+  // the iPhone lock screen, as it is out of the box: near-black glass with a faint blue bloom, the date, a big clock,
+  // the alarm pill, the two corner buttons. Thursday 5 November — 8:47 in the morning, 22:47 at night (alarm set for 7:30).
+  // The messages are not on the glass: they rise out of it (below).
+  const SYS = '-apple-system, "SF Pro Display", "Inter Tight", Inter, system-ui, sans-serif';
+  function drawLock(W, H) {
+    const night = eveAmt > .5;
+    sx.fillStyle = '#040507'; sx.fillRect(0, 0, W, H);
+    let g = sx.createRadialGradient(W * .62, H * .45, 0, W * .62, H * .45, W * 1.05); g.addColorStop(0, 'rgba(16,26,58,.95)'); g.addColorStop(1, 'rgba(4,5,7,0)'); sx.fillStyle = g; sx.fillRect(0, 0, W, H);
+    g = sx.createRadialGradient(-W * .1, H * .62, 0, -W * .1, H * .62, W * .8); g.addColorStop(0, 'rgba(46,46,44,.7)'); g.addColorStop(1, 'rgba(4,5,7,0)'); sx.fillStyle = g; sx.fillRect(0, 0, W, H);
+    paintIsland();
+    sx.textAlign = 'center'; sx.textBaseline = 'alphabetic'; sx.fillStyle = 'rgba(236,238,245,.92)';
+    sx.font = `600 ${Math.round(W * .062)}px ${SYS}`; sx.fillText(zh() ? '11月5日 星期四' : 'Thursday, 5 November', W / 2, W * .25);
+    sx.font = `600 ${Math.round(W * .27)}px "SF Pro Rounded", ${SYS}`; sx.fillStyle = 'rgba(226,229,240,.96)';
+    try { sx.letterSpacing = `${-Math.round(W * .006)}px`; } catch {}
+    sx.fillText(night ? '22:47' : '8:47', W / 2, W * .53); try { sx.letterSpacing = '0px'; } catch {}
+    // the alarm pill
+    const pill = night ? (zh() ? '早上 7:30' : '7:30 AM') : (zh() ? '无闹钟' : 'No Alarm');
+    sx.font = `500 ${Math.round(W * .05)}px ${SYS}`; const tw = sx.measureText(pill).width, pw = tw + W * .17, ph = W * .105, py = W * .6;
+    sx.fillStyle = 'rgba(255,255,255,.07)'; sx.beginPath(); sx.roundRect((W - pw) / 2, py, pw, ph, ph / 2); sx.fill();
+    const ix = (W - pw) / 2 + W * .07, iy = py + ph / 2; sx.strokeStyle = 'rgba(236,238,245,.9)'; sx.lineWidth = W * .006;
+    sx.beginPath(); sx.arc(ix, iy + W * .002, W * .018, 0, Math.PI * 2); sx.stroke(); sx.beginPath(); sx.moveTo(ix, iy - W * .008); sx.lineTo(ix, iy + W * .002); sx.lineTo(ix + W * .008, iy + W * .008); sx.stroke();
+    sx.fillStyle = 'rgba(236,238,245,.92)'; sx.textAlign = 'left'; sx.fillText(pill, ix + W * .04, iy + W * .017);
+    // flashlight and camera, and at night the sleep focus between them
+    const by = H - W * .16, br = W * .072;
+    for (const bx of [W * .17, W * .83]) { sx.fillStyle = 'rgba(255,255,255,.12)'; sx.beginPath(); sx.arc(bx, by, br, 0, Math.PI * 2); sx.fill(); }
+    sx.fillStyle = 'rgba(240,240,245,.95)'; sx.beginPath(); sx.roundRect(W * .17 - W * .014, by - W * .028, W * .028, W * .056, W * .006); sx.fill(); sx.fillStyle = 'rgba(30,30,34,1)'; sx.fillRect(W * .17 - W * .006, by - W * .012, W * .012, W * .004);
+    sx.fillStyle = 'rgba(240,240,245,.95)'; sx.beginPath(); sx.roundRect(W * .83 - W * .03, by - W * .02, W * .06, W * .042, W * .008); sx.fill(); sx.fillStyle = 'rgba(30,30,34,1)'; sx.beginPath(); sx.arc(W * .83, by + W * .001, W * .011, 0, Math.PI * 2); sx.fill();
+    if (night) { sx.textAlign = 'center'; sx.fillStyle = 'rgba(236,238,245,.9)'; sx.font = `600 ${Math.round(W * .046)}px ${SYS}`; sx.fillText(zh() ? '睡眠' : 'Sleep', W / 2, by + W * .016); }
+    sx.fillStyle = 'rgba(255,255,255,.55)'; sx.beginPath(); sx.roundRect(W / 2 - W * .17, H - W * .03, W * .34, W * .012, W * .006); sx.fill();
+    sx.textAlign = 'left';
+  }
+  document.fonts?.ready.then(() => { dirty = true; });
+  function paintIsland() { const W = sc.width; sx.fillStyle = '#000'; const iw = W * .3, ih = W * .085; sx.beginPath(); sx.roundRect((W - iw) / 2, W * .028, iw, ih, ih / 2); sx.fill(); }
   let buzz = -1e9;
   const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.prev = screens.cur === 'lock' ? null : screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };
 
   // ---------- the messages, in the air ----------
-  // each new message lights the glass and also rises out of it, to hang over the phone like a headset overlay; the
-  // newest stays lowest, older ones are pushed up and fade; a faint shaft of light joins them to the screen
-  const HOLO_N = 3, CW = .11, CH = .028, holo = new THREE.Group(), hscene = new THREE.Scene(); hscene.add(holo);   // drawn after the grade, crisp
-  const easeBack = t => { const c = 1.5; t = clamp(t) - 1; return 1 + (c + 1) * t * t * t + c * t * t; };
+  // each new message wakes the glass and rises out of it, to stand above the phone like a headset overlay: upright
+  // panes of glass with a little thickness, in the scene (so they take the depth of field and pass behind/in front of
+  // things), each throwing a soft shadow on the mat. The newest stays lowest; older ones are pushed up and fade.
+  const HOLO_N = 3, CW = .1, CHh = CW * 250 / 900, holo = new THREE.Group(); scene.add(holo);
+  const easeBack = t => { const c = 1.4; t = clamp(t) - 1; return 1 + (c + 1) * t * t * t + c * t * t; };
+  const shCv = document.createElement('canvas'); shCv.width = 256; shCv.height = 96; { const x = shCv.getContext('2d'); x.filter = 'blur(14px)'; x.fillStyle = 'rgba(0,0,0,.8)'; x.beginPath(); x.roundRect(36, 30, 184, 36, 18); x.fill(); }
+  const shTex = new THREE.CanvasTexture(shCv);
   const cards = Array.from({ length: HOLO_N + 1 }, () => {
     const c = document.createElement('canvas'); c.width = 900; c.height = 250; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(CW, CW * 250 / 900), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, depthTest: false, opacity: 0 }));
-    m.renderOrder = 6; m.visible = false; holo.add(m); return { c, t, m, b: null, pos: new THREE.Vector3(), a: 0 };
+    const g = new THREE.Group();
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(CW, CHh), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, opacity: 0, side: THREE.DoubleSide }));
+    face.material.color.setScalar(1.3);   // the grade pulls white down; a lit pane should stay bright
+    const back = new THREE.Mesh(face.geometry, new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, opacity: 0, color: 0x9fb4c8 }));
+    back.position.z = -.0022; face.renderOrder = 7; back.renderOrder = 6;   // the glass has a back: at an angle the two read as a thickness
+    g.add(back, face); g.visible = false; holo.add(g);
+    const sh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false, opacity: 0 }));
+    sh.rotation.x = -Math.PI / 2; sh.renderOrder = 2; scene.add(sh);
+    return { c, t, g, face, back, sh, b: null, pos: new THREE.Vector3(), a: 0 };
   });
   function paintCard(cd) {
-    const x = cd.c.getContext('2d'), W = 900, H = 250, b = cd.b, p = 26; x.clearRect(0, 0, W, H);
-    x.save(); x.shadowColor = 'rgba(190,225,255,.55)'; x.shadowBlur = 26;   // the glow of a projected thing
-    x.fillStyle = 'rgba(246,248,252,.86)'; x.beginPath(); x.roundRect(p, p, W - 2 * p, H - 2 * p, 46); x.fill(); x.restore();
-    x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = 2; x.beginPath(); x.roundRect(p + 1, p + 1, W - 2 * p - 2, H - 2 * p - 2, 45); x.stroke();
-    x.fillStyle = '#2dc100'; x.beginPath(); x.roundRect(p + 30, H / 2 - 46, 92, 92, 24); x.fill();
-    x.fillStyle = '#fff'; x.beginPath(); x.ellipse(p + 66, H / 2 - 6, 22, 18, 0, 0, Math.PI * 2); x.fill(); x.beginPath(); x.ellipse(p + 90, H / 2 + 10, 18, 15, 0, 0, Math.PI * 2); x.fill();
-    const tx = p + 150; x.textBaseline = 'alphabetic';
-    x.fillStyle = '#111'; x.font = `600 40px -apple-system, Inter, system-ui, sans-serif`; x.fillText(`${L(T.wxk)} · ${b.who}`, tx, H / 2 - 8);
-    x.fillStyle = '#7a7a80'; x.font = `500 30px -apple-system, Inter, system-ui, sans-serif`; x.textAlign = 'right'; x.fillText(L(T.now), W - p - 34, H / 2 - 8); x.textAlign = 'left';
-    x.fillStyle = '#333'; x.font = `400 36px -apple-system, Inter, system-ui, sans-serif`; let s = b.what; while (x.measureText(s).width > W - tx - p - 34 && s.length > 4) s = s.slice(0, -2); x.fillText(s === b.what ? s : s + '…', tx, H / 2 + 42);
+    const x = cd.c.getContext('2d'), W = 900, H = 250, b = cd.b, p = 18; x.clearRect(0, 0, W, H);
+    const gr = x.createLinearGradient(0, p, 0, H - p); gr.addColorStop(0, 'rgba(250,251,253,.93)'); gr.addColorStop(1, 'rgba(232,237,243,.88)');
+    x.fillStyle = gr; x.beginPath(); x.roundRect(p, p, W - 2 * p, H - 2 * p, 48); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,1)'; x.lineWidth = 4; x.beginPath(); x.roundRect(p + 2, p + 2, W - 2 * p - 4, H - 2 * p - 4, 46); x.stroke();   // the lit edge of the glass
+    x.fillStyle = '#2dc100'; x.beginPath(); x.roundRect(p + 34, H / 2 - 48, 96, 96, 26); x.fill();
+    x.fillStyle = '#fff'; x.beginPath(); x.ellipse(p + 72, H / 2 - 6, 23, 19, 0, 0, Math.PI * 2); x.fill(); x.beginPath(); x.ellipse(p + 96, H / 2 + 11, 19, 16, 0, 0, Math.PI * 2); x.fill();
+    const tx = p + 160; x.textBaseline = 'alphabetic';
+    x.fillStyle = '#111'; x.font = `600 42px ${SYS}`; x.fillText(`${L(T.wxk)} · ${b.who}`, tx, H / 2 - 8);
+    x.fillStyle = '#7a7a80'; x.font = `500 32px ${SYS}`; x.textAlign = 'right'; x.fillText(L(T.now), W - p - 36, H / 2 - 8); x.textAlign = 'left';
+    x.fillStyle = '#333'; x.font = `400 38px ${SYS}`; let s = b.what; while (x.measureText(s).width > W - tx - p - 36 && s.length > 4) s = s.slice(0, -2); x.fillText(s === b.what ? s : s + '…', tx, H / 2 + 44);
     cd.t.needsUpdate = true;
   }
-  const beamCv = document.createElement('canvas'); beamCv.width = 64; beamCv.height = 256; { const x = beamCv.getContext('2d'), g = x.createLinearGradient(0, 256, 0, 0); g.addColorStop(0, 'rgba(200,230,255,.9)'); g.addColorStop(1, 'rgba(200,230,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 256); const s = x.createLinearGradient(0, 0, 64, 0); s.addColorStop(0, 'rgba(0,0,0,1)'); s.addColorStop(.5, 'rgba(0,0,0,0)'); s.addColorStop(1, 'rgba(0,0,0,1)'); x.globalCompositeOperation = 'destination-out'; x.fillStyle = s; x.fillRect(0, 0, 64, 256); }
-  const beam = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(beamCv), transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, opacity: 0 }));
-  beam.renderOrder = 5; holo.add(beam);
-  const shCv = document.createElement('canvas'); shCv.width = shCv.height = 128; { const x = shCv.getContext('2d'), g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); }
-  const holoShadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shCv), transparent: true, depthWrite: false, opacity: 0 }));
-  holoShadow.rotation.x = -Math.PI / 2; scene.add(holoShadow);
-  const hv = { up: new THREE.Vector3(), to: new THREE.Vector3(), base: new THREE.Vector3(), tgt: new THREE.Vector3(), show: 0 };
+  const hv = { base: new THREE.Vector3(), tgt: new THREE.Vector3(), show: 0 };
   function updateHolo(now, dt, want) {
     hv.show += (want - hv.show) * (1 - Math.exp(-dt * 5));
     const list = banners.slice(-HOLO_N);
-    hv.up.set(0, 1, 0).applyQuaternion(cam.quaternion); hv.base.copy(pv.position); hv.base.y += .01; hv.to.copy(cam.position).sub(hv.base).normalize();
-    // free the cards whose message has scrolled off, give the new messages a card that starts on the glass
+    hv.base.copy(pv.position);
     cards.forEach(cd => { if (cd.b && !list.includes(cd.b)) cd.b = cd.a < .02 ? null : cd.b; });
-    list.forEach(b => { if (cards.some(cd => cd.b === b)) return; const cd = cards.find(cd => !cd.b) || cards.reduce((m, cd) => (cd.a < m.a ? cd : m)); cd.b = b; cd.a = 0; cd.pos.copy(hv.base); paintCard(cd); });
-    let top = null;
+    list.forEach(b => { if (cards.some(cd => cd.b === b)) return; const cd = cards.find(cd => !cd.b) || cards.reduce((m, cd) => (cd.a < m.a ? cd : m)); cd.b = b; cd.a = 0; cd.pos.copy(hv.base).y += .004; paintCard(cd); });
     cards.forEach(cd => {
-      if (!cd.b) { cd.m.visible = false; return; }
-      const i = list.indexOf(cd.b), live = i >= 0, slot = live ? list.length - 1 - i : HOLO_N, age = (now - cd.b.t) / 1000, e = easeBack(age / .7);
-      hv.tgt.copy(hv.base).addScaledVector(hv.to, .07 + slot * .012).addScaledVector(hv.up, .03 + slot * (CH + .006) + Math.sin(now / 1500 + slot * 1.7) * .0015);
-      cd.pos.lerp(hv.tgt, 1 - Math.exp(-dt * (live ? 7 : 3)));
-      const aim = (live ? (slot === 0 ? 1 : slot === 1 ? .8 : .55) : 0) * hv.show; cd.a += (aim - cd.a) * (1 - Math.exp(-dt * 8));
-      cd.m.visible = cd.a > .01; cd.m.material.opacity = cd.a * clamp(age / .25);
-      cd.m.position.copy(cd.pos); cd.m.quaternion.copy(cam.quaternion); cd.m.rotateX(-.62); cd.m.rotateY(.1 - slot * .05); cd.m.scale.setScalar(lerp(.35, 1, e) * (1 - slot * .04));
-      if (slot === 0 && live) top = cd;
+      if (!cd.b) { cd.g.visible = false; cd.sh.visible = false; return; }
+      const i = list.indexOf(cd.b), live = i >= 0, slot = live ? list.length - 1 - i : HOLO_N, age = (now - cd.b.t) / 1000, e = easeBack(age / .8);
+      // standing over the phone, each higher one a little further back and to the side
+      hv.tgt.set(hv.base.x - .004 + slot * .011, hv.base.y + .042 + slot * .03 + Math.sin(now / 1600 + slot * 1.9) * .0018, hv.base.z - .006 - slot * .014);
+      cd.pos.lerp(hv.tgt, 1 - Math.exp(-dt * (live ? 6 : 3)));
+      const aim = (live ? (slot === 0 ? 1 : slot === 1 ? .82 : .6) : 0) * hv.show; cd.a += (aim - cd.a) * (1 - Math.exp(-dt * 7));
+      const op = cd.a * clamp(age / .3); cd.g.visible = op > .01; cd.face.material.opacity = op; cd.back.material.opacity = op * .45;
+      // upright, turned towards the camera and leaning back a little, so the shot looks down onto them in perspective
+      cd.g.position.copy(cd.pos); cd.g.rotation.set(-.32, Math.atan2(cam.position.x - cd.pos.x, cam.position.z - cd.pos.z) + .12 - slot * .06, 0, 'YXZ');
+      cd.g.scale.setScalar(lerp(.3, 1, e));
+      // the shadow on the mat: offset away from the light, softer and fainter the higher the pane floats
+      const h = cd.pos.y - .002; cd.sh.visible = op > .01; cd.sh.position.set(cd.pos.x + h * .35, .0102, cd.pos.z + h * .5);
+      cd.sh.scale.set(CW * 1.15 * lerp(.3, 1, e), CW * .36, 1); cd.sh.material.opacity = op * clamp(.7 - h * 5, .15, .6);
     });
-    // the shaft: from the glass to the newest card, strongest just as it arrives
-    holoShadow.position.set(hv.base.x + .02, .0105, hv.base.z - .035); holoShadow.scale.set(.13, .06, 1); holoShadow.material.opacity = .5 * hv.show * clamp(list.length);
-    if (top) { const len = top.pos.distanceTo(hv.base), age = (now - top.b.t) / 1000; beam.position.copy(hv.base).lerp(top.pos, .5); beam.quaternion.copy(cam.quaternion); beam.scale.set(CW * .75, Math.max(len, .001), 1); beam.material.opacity = hv.show * (.16 + .5 * Math.exp(-age * 2.5)); beam.visible = true; }
-    else beam.visible = false;
   }
 
   // ---------- camera, pointer, nudges ----------
@@ -317,12 +334,13 @@ export function mountDesk(root) {
   addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up
   const V = {
-    hero: { pos: new THREE.Vector3(.025, .69, .375), look: new THREE.Vector3(.025, 0, .05), roll: 0 },   // every prop in frame; the props were pulled in around the phone, so it is bigger than in the Blender still
+    hero: { pos: new THREE.Vector3(.025, .69, .375), look: new THREE.Vector3(.025, 0, .05), roll: 0 },
+    dip: { pos: new THREE.Vector3(.06, .56, .5), look: new THREE.Vector3(.06, .02, .03), roll: 0 },   // while the messages float: lower, so they stand up   // every prop in frame; the props were pulled in around the phone, so it is bigger than in the Blender still
     dark: { pos: new THREE.Vector3(0, .9, .001), look: new THREE.Vector3(0, 0, 0), roll: 0 },
     book: { pos: new THREE.Vector3(-.135, .36, .25), look: new THREE.Vector3(-.105, 0, .03), roll: -6 },
     phone: { pos: new THREE.Vector3(.11, .3, .2), look: new THREE.Vector3(.13, .02, .02), roll: 3 }
   };
-  const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), E = new THREE.Euler();
+  const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), E = new THREE.Euler(); let dipAmt = 0;
   const mix = (a, b, t, out) => out.lerpVectors(a, b, t);
   const nudged = []; const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitP = new THREE.Vector3();
   function setupNudges() { for (const [k, amt] of Object.entries(PROPS)) { const g = props[k]; if (!g || !amt) continue; const box = new THREE.Box3().setFromObject(g), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3()); nudged.push({ g, cx: c.x, cz: c.z, rad: Math.max(sz.x, sz.z) * .55 + .04, amt: amt * .01, ox: 0, oz: 0, vx: 0, vz: 0, ro: 0, rv: 0 }); } }
@@ -349,6 +367,9 @@ export function mountDesk(root) {
     const up = kUp * (1 - kBack), onDesk = 1 - up, dayAmt = (1 - kDark * (1 - kBack)) * (1 - kEve), nightAmt = kEve * kBack, blackout = kDark * (1 - kBack);
     // ---- camera ----
     mix(V.hero.pos, V.dark.pos, up, camPos); mix(V.hero.look, V.dark.look, up, camLook); let roll = lerp(V.hero.roll, V.dark.roll, up);
+    // when the messages start to rise, the camera settles a little lower and stays there until the counter goes dark
+    dipAmt += ((banners.length && up < .02 && pr < .1 ? 1 : 0) - dipAmt) * (1 - Math.exp(-dt * 1.3));
+    mix(camPos, V.dip.pos, dipAmt * .55 * (1 - up), camPos); mix(camLook, V.dip.look, dipAmt * .55 * (1 - up), camLook);
     mix(camPos, V.book.pos, kBook * kBack, camPos); mix(camLook, V.book.look, kBook * kBack, camLook); roll = lerp(roll, V.book.roll, kBook * kBack);
     mix(camPos, V.phone.pos, kPhone * kBack, camPos); mix(camLook, V.phone.look, kPhone * kBack, camLook); roll = lerp(roll, V.phone.roll, kPhone * kBack);
     camPos.x += P.x * .018 * (1 - up); camPos.z += P.y * .012 * (1 - up);   // small, so nothing slips out of frame
@@ -378,7 +399,6 @@ export function mountDesk(root) {
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(.5, .12, up) - (kBook * kBack) * .22; fu.uMax.value = (6 + 10 * up + 6 * kBook * kBack) * dpr();
     fu.uVig.value = .25 + .4 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
-    if (holo.children.some(m => m.visible)) { renderer.autoClear = false; renderer.render(hscene, cam); renderer.autoClear = true; }
     // the words
     const tHero = sm(clamp((now - bornAt - 250) / 1700));
     sweep(GROUPS[0], calm ? 1 : tHero, seg(pr, .004, .085));

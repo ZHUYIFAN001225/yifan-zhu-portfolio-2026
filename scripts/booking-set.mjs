@@ -50,7 +50,7 @@ export function mountDesk(root) {
   // ---------- GL ----------
   const cv = $('.bk-dk-gl'); let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false, powerPreference: 'high-performance' }); } catch { ov.classList.add('no-gl'); return; }
-  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
+  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .85;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0e0c0a);
   const envTex = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
@@ -69,7 +69,7 @@ export function mountDesk(root) {
     x.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; return t; })();
   const sun = new THREE.SpotLight(0xffcc8f, 0, 6, .78, .9, 1.4); sun.position.set(-1.45, 1.6, -1.15); sun.target.position.set(-.18, 0, .05); sun.map = cookie;
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .01; sun.shadow.radius = 5; sun.shadow.camera.near = .5; sun.shadow.camera.far = 5; scene.add(sun, sun.target);
-  const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .5, 1.6); room.castShadow = false; scene.add(room);
+  const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .35, 1.6); room.castShadow = false; scene.add(room);
   const sky = new THREE.HemisphereLight(0xb9c4d8, 0x3a2a1c, 0); scene.add(sky);
   const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.6); lamp.position.set(-.45, .55, -.25); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.002; scene.add(lamp);
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
@@ -221,7 +221,7 @@ export function mountDesk(root) {
     camPos.x += P.x * .03 * (1 - up); camPos.z += P.y * .02 * (1 - up);
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
-    sun.intensity = 95 * dayAmt; room.intensity = .9 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .35 * (1 - blackout) * (1 - nightAmt * .5);
+    sun.intensity = 16 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
     lamp.intensity = 7 * nightAmt; rim.intensity = 60 * up * (1 - kOut);
     set.visible = blackout < .995;
     nudge(dt, onDesk);

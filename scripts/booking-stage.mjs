@@ -175,7 +175,7 @@ export function mountStage(root) {
 
   // ---------- stations along the page ----------
   const docY = e => e.getBoundingClientRect().top + scrollY;
-  let keys = [];
+  let keys = [], cover = null, camQ = null;
   function build() {
     const vh = innerHeight, m = isMobile(), S = [];
     let turns = 0, last = null;
@@ -212,20 +212,24 @@ export function mountStage(root) {
       ];
       f = 'cover-book';
       push(vh * .5, { kind: 'hero', q: P6([x0, y0, s0, -.05, -.32, 0]), f, still: true });
-      // each message has its own camera: in close on a small part, further back for a big one, tilted and turned
-      // like LOOK's anatomy. The lit part is brought to the middle of the screen; the phone steps aside for the bubble.
+      // The cover is one continuous camera move (see coverCam in frame()). Shots, as a camera operator would plan them:
+      // push in on the services, an insert on the soonest time, pull back to the calendar while arcing round, then one
+      // turn — the phone shows its back and comes round on the owner's side — and her day: wide, then two close-ups.
       const holderTop = docY(holder), pinH = holder.matches('.bk-cover-pin') ? holder.offsetHeight - opH : opH * 1.5;
-      const release = holderTop + pinH + vh * .5, start = vh * .5 + pinH * .12, span = (release - vh * .45) - start, step = span / B.length;
-      // [scale, rx, ry, rz, x-shift] per beat
-      const CAM = [[1.08, .3, -.42, .1, -.1], [1.2, -.12, .5, -.08, .11], [.9, .45, -.25, .16, -.08], [1, .26, .5, -.12, .1], [1.2, .14, -.48, .06, -.11], [1.12, -.2, .44, -.1, .11]];
-      B.forEach(([file, spot, side, t1, t2], i) => {
-        const [k, rx, ry, rz, dx] = CAM[i], sc = s0 * k, c = (spot[1] + spot[3] / 2) / 100;
-        const y = Math.min(.6, Math.max(.4, .5 - (c - .5) * sc * .6)), at = start + i * step;
-        const q = P6([.5 + dx, y, sc, rx, ry, rz]);
-        const st = { kind: 'hero', q, f: file, spot, still: true, bub: { side, t1, t2, spot } };
-        push(at, st); push(at + step * .72, { ...st });
-      });
-      push(release - vh * .3, { kind: 'off', q: P6([.5, -.9, s0 * .8, .4, .3, 0]), f: 'cover-today' });
+      const release = holderTop + pinH + vh * .5, start = vh * .5 + pinH * .1, end = release - vh * .85;
+      const TW = Math.PI * 2;
+      const shot = (i, k, rx, ry, rz, dx) => { const [file, spot, side, t1, t2] = B[i], sc = s0 * k, c = (spot[1] + spot[3] / 2) / 100;
+        return { q: P6([.5 + dx, Math.min(.62, Math.max(.38, .5 - (c - .5) * sc * .62)), sc, rx, ry, rz]), f: file, spot, bub: { side, t1, t2, spot } }; };
+      const shots = [
+        shot(0, 1.22, .22, -.3, .04, -.1),      // push in, from slightly above
+        shot(1, 1.62, .04, -.08, 0, -.12),      // insert: almost square-on, very close
+        shot(2, 1.0, .3, .22, -.05, .1),        // pull back to the calendar, arc starts
+        shot(3, 1.06, .2, TW - .24, .03, -.1),  // after the turn: her side, wide
+        shot(4, 1.48, .1, TW + .1, 0, .11),     // push in on "add a booking"
+        shot(5, 1.4, -.12, TW + .26, -.07, .11) // close-up, slight dutch angle
+      ];
+      cover = { start, end, step: (end - start) / shots.length, shots, est: P6([x0, y0, s0, -.05, -.32, 0]), est2: P6([.5, .5, s0 * .95, .1, -.4, 0]), exit: P6([.5, -.95, s0 * .7, .5, TW + .5, 0]) };
+      push(end + vh * .05, { kind: 'off', q: P6([.5, -.9, s0 * .7, .4, .3, 0]), f: 'cover-today' });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
     let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet
@@ -339,7 +343,7 @@ export function mountStage(root) {
     else if (y > keys[0].at) for (let i = 0; i < keys.length - 1; i++) if (y < keys[i + 1].at) { a = keys[i]; b = keys[i + 1]; t = (y - a.at) / Math.max(1, b.at - a.at); break; }
     // nothing to draw while the phone is parked off screen: render one last frame, then sleep (keeps scrolling and
     // the pointer smooth on long text stretches)
-    if (a.st.kind === 'off' && b.st.kind === 'off' && !peek) { if (idleDrawn) return; idleDrawn = true; } else idleDrawn = false;
+    if (a.st.kind === 'off' && b.st.kind === 'off' && !peek && !(cover && sy + vh * .5 < cover.end + vh * 1.2)) { if (idleDrawn) return; idleDrawn = true; } else idleDrawn = false;
     const moving = a.st !== b.st, e = moving ? glide(t) : 0, st = e < .5 ? a.st : b.st, same = moving && a.st.q.x === b.st.q.x && a.st.q.y === b.st.q.y && a.st.q.ry === b.st.q.ry && a.st.q.s === b.st.q.s, hold = same ? Math.abs(e - .5) > .1 : (e < .05 || e > .95);
     const time = (now - t0) / 1000, m = isMobile();
     if (peek && (Math.abs(scrollY - peek.sy) > 160 || now - peek.t > 6000)) peek = null;
@@ -347,7 +351,27 @@ export function mountStage(root) {
     const hv = !m && hover && st.kind === 'section' ? hover : null;
     // screen and lifted part
     const pair = !!a.st.bub && a.st.bub === b.st.bub; // the cover's beats: lit and labelled for the whole beat
+    // the cover's continuous camera: scroll is the camera's timeline. Each shot dwells (so its message can be read),
+    // then the camera glides to the next one; the pose is also damped, so every move is smooth.
+    let cov = null;
+    if (!m && cover && y > vh * .5 && y < cover.end + vh * .9) {
+      const ss = cover.shots, sm = t => t * t * (3 - 2 * t), N = ss.length;
+      let tq, tf, tspot = null, tbub = null;
+      if (y < cover.start) { const w = sm(clamp((y - vh * .5) / (cover.start - vh * .5))); tq = mix(cover.est, ss[0].q, w); tf = ss[0].f; }
+      else if (y < cover.end) {
+        const u = (y - cover.start) / cover.step, i = Math.min(N - 1, Math.floor(u)), fr = u - i, nx = ss[i + 1];
+        const w = nx ? sm(clamp((fr - .42) / .58)) : 0;
+        tq = nx ? mix(ss[i].q, nx.q, w) : ss[i].q;
+        // the side change: the phone turns its back to us between shots 3 and 4, and the screen swaps unseen
+        tf = nx && w > .5 ? nx.f : ss[i].f;
+        if (w < .12) { tspot = ss[i].spot; tbub = ss[i].bub; } else if (w > .88 && nx) { tspot = nx.spot; tbub = nx.bub; }
+      } else { const w = sm(clamp((y - cover.end) / (vh * .7))); tq = mix(ss[N - 1].q, cover.exit, w); tf = ss[N - 1].f; }
+      if (!camQ) camQ = { ...tq };
+      for (const k in tq) camQ[k] += (tq[k] - camQ[k]) * E(6);
+      cov = { q: { ...camQ }, f: tf, spot: tspot, bub: tbub };
+    } else camQ = null;
     let file = st.f, rect = hold || pair ? st.spot : null;
+    if (cov) { file = cov.f; rect = cov.spot; }
     if (hv) { file = hv.file; rect = hv.rect; }
     if (pk) { file = pk.file; rect = peekAmt > .7 ? pk.rect : null; }
     show(file);
@@ -374,6 +398,7 @@ export function mountStage(root) {
     key.position.set(2 + pmx * 10 * stillAmt, 4 - pmy * 8 * stillAmt, 5);
     const calm = (1 - P.focus * .7) * (a.st.kind === 'dock' || b.st.kind === 'dock' ? 0 : 1) * (1 - stillAmt * .85);
     q = { ...q, y: q.y + Math.sin(time * 1.05) * .006 * calm, rx: q.rx + Math.sin(time * .7) * .035 * calm + vel * .5 * calm, ry: q.ry + Math.sin(time * .5) * .05 * calm, rz: q.rz + Math.sin(time * .43) * .02 * calm - vel * .35 * calm };
+    if (cov) { q = cov.q; q = { ...q, ry: q.ry + pmx * .35, rx: q.rx + pmy * .2 }; }
     place(q);
     // the booking card: it rises out of the customer's screen, hangs in the air facing you while the phone turns over,
     // then settles into the owner's diary
@@ -406,8 +431,9 @@ export function mountStage(root) {
       tag.classList.toggle('is-on', !hv);
     } else tag.classList.remove('is-on');
     // the message beside the lit part (cover only)
-    if (!m && st.bub && (pair || (hold && e2b(a, b)))) {
-      const bb = st.bub, yy = slot(bb.spot)[1], xx = (bb.side === 'r' ? 1 : -1) * SW / 2;
+    const bbSrc = cov ? cov.bub : (st.bub && (pair || (hold && e2b(a, b))) ? st.bub : null);
+    if (!m && bbSrc) {
+      const bb = bbSrc, yy = slot(bb.spot)[1], xx = (bb.side === 'r' ? 1 : -1) * SW / 2;
       tmpV.set(xx, yy, .06); phone.localToWorld(tmpV); tmpV.project(cam);
       const px = (tmpV.x + 1) / 2 * vw, py = (1 - tmpV.y) / 2 * vh;
       bub.style.transform = `translate3d(${px.toFixed(1)}px,${py.toFixed(1)}px,0)`; bub.dataset.side = bb.side;

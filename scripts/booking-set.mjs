@@ -422,7 +422,7 @@ export function mountDesk(root) {
     set.visible = blackout < .995;
     nudge(dt, onDesk);
     // ---- the phone ----
-    pv.position.set(lerp(SPOT.x, 0, up), lerp(SPOT.y, .5, up), lerp(SPOT.z, 0, up));
+    pv.position.set(lerp(SPOT.x, .015, up), lerp(SPOT.y, .47, up), lerp(SPOT.z, .05, up));   // risen: centred a little low, clear of the header and the heading
     pv.scale.setScalar(PH_SCALE * lerp(1, 1.0, up));
     E.set(up * (P.y * .16 + Math.sin(now / 2600) * .04), SPOT_ROT * (1 - up) + up * P.x * .2, up * Math.sin(now / 3100) * .03, 'XYZ'); pv.rotation.copy(E);
     // when it floats it faces the camera: tilt the flat phone up

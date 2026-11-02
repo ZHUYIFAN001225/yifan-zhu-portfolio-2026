@@ -72,6 +72,7 @@ export function mountDesk(root) {
   const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .35, 1.6); room.castShadow = false; scene.add(room);
   const sky = new THREE.HemisphereLight(0xb9c4d8, 0x3a2a1c, 0); scene.add(sky);
   const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.6); lamp.position.set(-.45, .55, -.25); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.002; scene.add(lamp);
+  window.__bkSet = { get sun() { return sun; }, get scene() { return scene; }, get renderer() { return renderer; }, get props() { return props; } };
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
 
   // ---------- the set, from Blender ----------

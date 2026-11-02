@@ -75,7 +75,7 @@ export function mountDesk(root) {
   gobo.rotation.x = -Math.PI / 2; gobo.position.set(-.42, .34, .3); gobo.castShadow = true; gobo.receiveShadow = false; gobo.renderOrder = -10; scene.add(gobo);
   const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .35, 1.6); room.castShadow = false; scene.add(room);
   const sky = new THREE.HemisphereLight(0xb9c4d8, 0x3a2a1c, 0); scene.add(sky);
-  const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.6); lamp.position.set(-.45, .55, -.25); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.0002; lamp.shadow.normalBias = .0005; scene.add(lamp);
+  const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.8); lamp.position.set(-.5, .62, -.3); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.0002; lamp.shadow.normalBias = .0005; scene.add(lamp);
   window.__bkSet = { get sun() { return sun; }, get scene() { return scene; }, get renderer() { return renderer; }, get props() { return props; } };
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
 
@@ -87,7 +87,7 @@ export function mountDesk(root) {
   // the right page carries the handwriting: lines + ink drawn here, mapped onto the page from the model
   const pageCv = document.createElement('canvas'); pageCv.width = 900; pageCv.height = 1240; const px = pageCv.getContext('2d');
   const pageTex = new THREE.CanvasTexture(pageCv); pageTex.colorSpace = THREE.SRGBColorSpace; pageTex.flipY = false; pageTex.anisotropy = 8;
-  function setupPage() { props.notebook?.traverse(o => { if (o.isMesh && o.name === 'nb_page_r') { o.material = o.material.clone(); o.material.map = pageTex; o.material.needsUpdate = true; } }); drawInk(0, true); }
+  function setupPage() { const pg = props.notebook?.getObjectByName('nb_page_r'); pg?.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.map = pageTex; o.material.needsUpdate = true; } }); drawInk(0, true); }
   const EV = [
     [0, .22, ['TOMORROW ↓', '明天 ↓'], '#15171c'], [1, .22, ['9:30 Emma? ring back', '9:30 Emma? 回电'], '#15171c'], [3, .22, ['11:00 He (moved)', '11:00 何先生（挪过来）'], '#15171c'],
     ['strike', 3, .2, .72], ['fix', 3.55, .3, ['→ 11:30, he rang', '→ 11:30，他来电话了'], '#b3261e'], [6, .5, ['Zhou → 12:30?', '周先生 → 12:30?'], '#15171c'],
@@ -227,7 +227,7 @@ export function mountDesk(root) {
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
     sun.intensity = 3.4 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
-    lamp.intensity = 7 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
+    lamp.intensity = 1.1 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
     set.visible = blackout < .995;
     nudge(dt, onDesk);
     // ---- the phone ----

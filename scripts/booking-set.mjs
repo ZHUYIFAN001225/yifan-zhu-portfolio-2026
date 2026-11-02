@@ -24,7 +24,7 @@ export function mountDesk(root) {
   const op = document.querySelector('[data-opening]'), holder = op?.parentElement;
   if (!op || !holder?.matches('.bk-cover-pin') || op.querySelector('.bk-dk')) return;
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches, fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  window.__bkCoverMap = { V: 'cards', S: 0, E: 1, DOCK: 1.02 };
+  window.__bkCoverMap = { V: 'cards', S: 0, E: 1, DOCK: 1.02, keep: true };   // hidden through the opening; the phone stands beside the story after it
   document.documentElement.dataset.cover = 'desk';
   if (!document.querySelector('link[data-inter-tight]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.dataset.interTight = ''; l.href = 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&display=swap'; document.head.append(l); }
   const liveA = op.querySelector('.op-actions a[target]');

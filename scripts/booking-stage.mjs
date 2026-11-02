@@ -365,7 +365,7 @@ export function mountStage(root) {
     // where the reader really is in the pinned cover, measured live: 0 = cover reaches the top, 1 = cover unpins
     const pr = cover ? (() => { const r = cover.holder.getBoundingClientRect(); return -r.top / Math.max(1, r.height - cover.opH); })() : -1;
     const CM = window.__bkCoverMap || { V: 'phone', S: .04, E: .84, DOCK: .95 };
-    const coverGone = !mcv && cover && pr > CM.DOCK;
+    const coverGone = !mcv && cover && pr > CM.DOCK && !CM.keep;   // keep: the desk opening hands the story to the phone afterwards
     if (!mcv && cover && pr <= CM.DOCK) {
       const ss = cover.shots, N = ss.length, sm5 = t => t * t * t * (t * (t * 6 - 15) + 10);
       const P = i => i < 0 ? cover.est2 : i >= N ? cover.exit : ss[i].q;

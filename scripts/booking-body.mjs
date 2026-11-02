@@ -36,9 +36,14 @@ export function mountBody() {
   build();
 }
 
-// A: mark every pane that takes the glass material (no pointer light — the glass is lit by its own bevel only)
+// A: every pane takes the glass material (no pointer light — the glass is lit by its own rim)
 function glassLight(day) {
   const GLASS = '.bk-sheet, .bk-receipt, .bk-minute li, .bk-ask, .bk-entry li, .bk-results-card, .bk-slip, .bk-textonly, .bk-owner, nav.bk-map, .bk-ledger-list>li, .ux-section .ux-persona, .ux-section .ux-principles>div, .ux-section .ux-process>li, .ux-section .ux-success>li, .ux-iterations .ux-before-after p, .bk-dom-slip, .ux-pains>div.bk-sticky, .bk-ledger.is-after, .bk-dom-card';
-  const scan = () => day.querySelectorAll(GLASS).forEach(el => el.classList.add('is-glass'));   // the drawn parts arrive later; look again
+  // each pane gets its own lit rim (an element, so it can be a gradient ring): that rim is what gives the glass its thickness
+  const scan = () => day.querySelectorAll(GLASS).forEach(el => {   // the drawn parts arrive later; look again
+    el.classList.add('is-glass'); if (el.querySelector(':scope>.bk-rim')) return;
+    if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    const rim = document.createElement('i'); rim.className = 'bk-rim'; rim.setAttribute('aria-hidden', 'true'); el.append(rim);
+  });
   scan(); [800, 2000, 4500].forEach(t => setTimeout(scan, t));
 }

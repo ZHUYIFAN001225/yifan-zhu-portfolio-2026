@@ -4003,3 +4003,9 @@ html[data-body=a] .bk-day .op--3d:has(.bk-dk.no-gl)>*{visibility:visible!importa
 html[data-body=a]:has(.bk-day) :is(.v3-case-tools,.v3-case-categories) a{color:rgba(241,231,214,.72)!important;border-color:rgba(255,236,210,.18)!important;background-color:transparent}
 html[data-body=a]:has(.bk-day) :is(.v3-case-tools,.v3-case-categories) a:is(:hover,[aria-current],.is-active,.is-current){color:#f1e7d6!important}
 html[data-body=a]:has(.bk-day) .v3-case-categories a[aria-current],html[data-body=a]:has(.bk-day) .v3-case-categories a.is-active{background:rgba(255,236,210,.12)!important}
+/* A: thick glass. A lit rim all round — brightest at the top-left corner, catching light again at the bottom-right —
+   an inner edge line just inside it, and a sliver of side face below, so each pane reads as a slab, not a sheet */
+html[data-body=a]{--glass-rim:linear-gradient(135deg,rgba(255,255,255,.7) 0%,rgba(255,255,255,.26) 14%,rgba(255,255,255,.08) 38%,rgba(255,255,255,.05) 60%,rgba(255,255,255,.2) 86%,rgba(255,255,255,.45) 100%)}
+html[data-body=a] .bk-rim{position:absolute;inset:-1px;border-radius:inherit;padding:1.6px;pointer-events:none;z-index:3;background:var(--glass-rim);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+html[data-body=a] .bk-day .is-glass{border-color:transparent!important;box-shadow:inset 0 0 0 2.6px rgba(255,255,255,.035),inset 2px 2px 10px rgba(255,255,255,.07),inset -2px -2px 12px rgba(0,0,0,.35),0 2px 0 -.5px rgba(255,255,255,.1),0 5px 0 -1px rgba(30,24,18,.9),0 6px 0 -1px rgba(255,255,255,.05),0 40px 80px -36px rgba(0,0,0,.9)!important}
+html[data-body=a] .bk-day .ux-section .ux-bp-row>span{box-shadow:inset 1.5px 1.5px 0 rgba(255,255,255,.28),inset -1px -1px 0 rgba(255,255,255,.1),0 3px 0 -1px rgba(0,0,0,.6)!important}

@@ -108,21 +108,39 @@ export function mountDesk(root) {
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene(); const envTex = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
   const cam = new THREE.PerspectiveCamera(34, 1, .1, 100); cam.up.set(0, 0, -1);
-  const key = new THREE.DirectionalLight(0xffe2bd, 2.6); key.position.set(5, 11, 4); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
-  Object.assign(key.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 30 }); key.shadow.bias = -.0005; key.shadow.radius = 4; scene.add(key);
-  const fill = new THREE.HemisphereLight(0xf4f1ea, 0x3a2f24, .9); scene.add(fill);
+  // late-afternoon window light: a warm key from low on the right (long shadows), a cool sky fill from the left
+  const key = new THREE.DirectionalLight(0xffd6a0, 3.4); key.position.set(9, 8.5, 6.5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+  Object.assign(key.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40 }); key.shadow.bias = -.0004; key.shadow.normalBias = .02; key.shadow.radius = 7; scene.add(key);
+  const fill = new THREE.HemisphereLight(0xbfd0ff, 0x4a3320, .42); scene.add(fill);
+  const cool = new THREE.DirectionalLight(0x9fb4ff, .55); cool.position.set(-7, 7, -5); scene.add(cool);
+  // light through leaves: a slow dappled mask multiplied into every counter material, moving as if the tree outside were in a breeze
+  const DAP = { uTime: { value: 0 }, uDap: { value: 1 } };
+  const dapple = m => { m.onBeforeCompile = sh => { sh.uniforms.uTime = DAP.uTime; sh.uniforms.uDap = DAP.uDap;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vDp;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvDp = (modelMatrix * vec4(position, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>\nvarying vec3 vDp; uniform float uTime, uDap;
+      float dh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float dn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(dh(i), dh(i + vec2(1, 0)), f.x), mix(dh(i + vec2(0, 1)), dh(i + vec2(1, 1)), f.x), f.y); }
+      float dfbm(vec2 p){ float v = 0.0, a = .5; for (int i = 0; i < 4; i++){ v += a * dn(p); p = p * 2.03 + 7.1; a *= .5; } return v; }
+      float dappleAt(vec3 w){ float t = uTime * .11; vec2 p = w.xz * .42 + vec2(t * .7, -t * .35); vec2 q = vec2(dfbm(p + vec2(0.0, t)), dfbm(p + vec2(5.2, 1.3 - t * .6)));
+        float n = dfbm(p + 1.6 * q + vec2(t * .3)); float leaves = smoothstep(.36, .72, n); float windowGrad = .62 + .55 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.3 + .95 * leaves) * windowGrad; }`)
+      .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= mix(1.0, dappleAt(vDp), uDap);'); }; return m; };
   const rim = new THREE.SpotLight(0xffc98a, 0, 30, .6, .8, 1.2); rim.position.set(-4, 9, -5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
   const night = new THREE.HemisphereLight(0x4a56c8, 0x1a0f26, 0); scene.add(night);
   const glow = new THREE.PointLight(0xffb36b, 0, 9, 1.6); glow.castShadow = true; glow.shadow.mapSize.set(1024, 1024); glow.shadow.bias = -.002; scene.add(glow);
 
   // ---------- drawn textures ----------
   const ctex = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
-  const wood = ctex(1024, 1024, (x, w, h) => {
-    const r = seed(7); x.fillStyle = '#b8895a'; x.fillRect(0, 0, w, h);
-    for (let i = 0; i < 300; i++) { const y = r() * h, a = .05 + r() * .2, k = r(); x.strokeStyle = `rgba(${k > .5 ? '95,58,28' : '228,196,150'},${a})`; x.lineWidth = .5 + r() * 3; x.beginPath(); x.moveTo(-20, y); for (let X = 0; X <= w + 40; X += 64) x.lineTo(X, y + Math.sin(X / 160 + i) * 7 * r()); x.stroke(); }
-    for (let i = 0; i < 12000; i++) { x.fillStyle = `rgba(80,45,20,${r() * .09})`; x.fillRect(r() * w, r() * h, 1, 1 + r() * 3); }
-    for (let i = 0; i < 5; i++) { const X = r() * w; x.fillStyle = 'rgba(70,40,18,.18)'; x.fillRect(X, 0, 2, h); }
-  }); wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(2, 2);
+  const woodCanvas = (() => { const c = document.createElement('canvas'); c.width = c.height = 2048; const x = c.getContext('2d'), w = 2048, h = 2048, r = seed(7);
+    x.fillStyle = '#9a6a3c'; x.fillRect(0, 0, w, h);
+    // four planks, each with its own tone, long wavy grain, fine pores and the odd knot
+    for (let pl = 0; pl < 4; pl++) { const y0 = pl * h / 4, tone = ['#a8784a', '#9d6b3e', '#b08052', '#a37043'][pl]; x.fillStyle = tone; x.fillRect(0, y0, w, h / 4);
+      for (let i = 0; i < 160; i++) { const y = y0 + r() * h / 4, k = r(), a = .06 + r() * .22; x.strokeStyle = `rgba(${k > .55 ? '70,40,18' : '215,175,125'},${a})`; x.lineWidth = .6 + r() * 2.6; x.beginPath(); x.moveTo(-20, y); const ph = r() * 9; for (let X = 0; X <= w + 40; X += 48) x.lineTo(X, y + Math.sin(X / 230 + ph) * 9 + Math.sin(X / 61 + ph * 3) * 2); x.stroke(); }
+      if (r() > .4) { const kx = r() * w, ky = y0 + h / 8 + (r() - .5) * h / 6; for (let k = 9; k > 0; k--) { x.strokeStyle = `rgba(60,34,14,${.08 + k * .02})`; x.lineWidth = 2; x.beginPath(); x.ellipse(kx, ky, k * 14, k * 9, .2, 0, Math.PI * 2); x.stroke(); } }
+      x.fillStyle = 'rgba(40,22,8,.55)'; x.fillRect(0, y0, w, 3); x.fillStyle = 'rgba(255,230,190,.12)'; x.fillRect(0, y0 + 3, w, 2); }
+    for (let i = 0; i < 40000; i++) { x.fillStyle = `rgba(60,34,14,${r() * .12})`; x.fillRect(r() * w, r() * h, 1, 1 + r() * 4); }
+    return c; })();
+  const wood = new THREE.CanvasTexture(woodCanvas); wood.colorSpace = THREE.SRGBColorSpace; wood.anisotropy = 16; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(1.6, 1.6);
+  const woodBump = new THREE.CanvasTexture(woodCanvas); woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping; woodBump.repeat.set(1.6, 1.6); woodBump.anisotropy = 16;
   const times = ['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00'];
   const page = side => ctex(1024, 1400, (x, w, h) => {
     x.fillStyle = '#f7f2e6'; x.fillRect(0, 0, w, h); const r = seed(side === 'l' ? 11 : 12);
@@ -136,9 +154,10 @@ export function mountDesk(root) {
   const note = () => ctex(512, 512, (x, w, h) => { x.fillStyle = '#ffe27a'; x.fillRect(0, 0, w, h); x.fillStyle = 'rgba(0,0,0,.08)'; x.fillRect(0, h - 40, w, 40); x.fillStyle = '#1f2a24'; x.font = `italic 500 58px ${HAND}`; x.fillText(zh() ? '李阿姨 3点?' : 'Mrs Li 3pm?', 50, 180); x.fillText(zh() ? '回电!!' : 'ring back!!', 50, 300); });
 
   // ---------- the counter ----------
-  const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), new THREE.MeshStandardMaterial({ map: wood, roughness: .62, metalness: 0 })); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
+  const SPOT = new THREE.Vector3(1.75, .09, .55), SPOT_ROT = -.12, HERO_SCALE = 1.75;
+  const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .018, roughness: .5, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
   const propsG = new THREE.Group(); scene.add(propsG);
-  const std = o => new THREE.MeshStandardMaterial(o);
+  const std = o => dapple(new THREE.MeshStandardMaterial(o));
   const shadowy = m => { m.castShadow = true; m.receiveShadow = true; return m; };
   // the paper book — the thing the whole case is about
   const paper = (side, x) => { const m = shadowy(new THREE.Mesh(new THREE.PlaneGeometry(2.3, 3.15), std({ map: page(side), roughness: .95 }))); m.rotation.x = -Math.PI / 2; m.position.set(x, .13, 0); return m; };
@@ -178,7 +197,22 @@ export function mountDesk(root) {
   const clip = (x, z, r) => { const m = new THREE.Mesh(new THREE.TorusGeometry(.14, .018, 8, 24, Math.PI * 1.7), std({ color: 0xb8bcc2, metalness: .9, roughness: .25 })); m.rotation.set(-Math.PI / 2, 0, r); m.position.set(x, .03, z); propsG.add(m); };
   clip(-5.4, 2.6, .4); clip(-5.2, 2.95, 1.9);
   const hclip = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.9, .06, .09), std({ color: 0x17362b, roughness: .4 }))); hclip.rotation.y = -.4; hclip.position.set(1.0, .03, 2.9); propsG.add(hclip);
+  // soft contact shadows under everything that sits on the counter (the shadow map alone leaves things floating)
+  const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'); const g = x.createRadialGradient(128, 128, 10, 128, 128, 128); g.addColorStop(0, 'rgba(20,10,4,.8)'); g.addColorStop(.5, 'rgba(20,10,4,.35)'); g.addColorStop(1, 'rgba(20,10,4,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c); })();
+  const blob = (parent, w, d, x, z, rot = 0, y = .006) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .8 })); m.rotation.set(-Math.PI / 2, 0, rot); m.position.set(x, y, z); m.renderOrder = -1; parent.add(m); return m; };
+  blob(diary, 5.6, 4.1, 0, .05); blob(pencil, 3.6, .5, 0, .02); blob(scissors, 3.4, 1.1, .1, 0); blob(clippers, 1.3, 3.2, 0, .1, 0, .004); blob(comb, 2.8, .9, 0, .05); blob(sticky, 1.5, 1.5, 0, 0, 0, -.03);
+  const phoneBlob = blob(scene, 2.3, 3.8, SPOT.x, SPOT.z, SPOT_ROT);
   const propMats = []; propsG.traverse(o => { if (o.isMesh) propMats.push(o.material); });
+  // things on the counter give way a little when the pointer brushes them, and settle back
+  const nudged = [[diary, 2.6, .05], [pencil, 1.5, .18], [scissors, 1.6, .14], [clippers, 1.3, .12], [comb, 1.4, .14], [sticky, .9, .16]].map(([g, rad, amt]) => ({ g, rad, amt, rest: g.position.clone(), rrot: g.rotation.y, ox: 0, oz: 0, vx: 0, vz: 0, rv: 0, ro: 0 }));
+  const pointerOnDesk = new THREE.Vector3(), ray = new THREE.Ray(), ndc = new THREE.Vector3(), floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  function nudge(dt, amtAll) {
+    ndc.set(P.x, -P.y, .5).unproject(cam); ray.origin.copy(cam.position); ray.direction.copy(ndc).sub(cam.position).normalize(); const hit = ray.intersectPlane(floor, pointerOnDesk);
+    nudged.forEach(n => { let fx = 0, fz = 0; if (hit && amtAll > .5) { const dx = n.rest.x - hit.x, dz = n.rest.z - hit.z, d = Math.hypot(dx, dz); if (d < n.rad && d > 1e-3) { const k = (1 - d / n.rad) ** 2 * n.amt; fx = dx / d * k; fz = dz / d * k; } }
+      const w = 9, z = .9; n.vx += ((fx - n.ox) * w * w - 2 * z * w * n.vx) * dt; n.vz += ((fz - n.oz) * w * w - 2 * z * w * n.vz) * dt; n.ox += n.vx * dt; n.oz += n.vz * dt;
+      const tr = (fx - fz) * .6; n.rv += ((tr - n.ro) * w * w - 2 * z * w * n.rv) * dt; n.ro += n.rv * dt;
+      n.g.position.set(n.rest.x + n.ox, n.rest.y, n.rest.z + n.oz); n.g.rotation.y = n.rrot + n.ro; });
+  }
   function repaintProps() { pl.material.map?.dispose(); pl.material.map = page('l'); prg.material.map?.dispose(); prg.material.map = page('r'); sticky.material.map?.dispose(); sticky.material.map = note(); [pl, prg, sticky].forEach(m => { m.material.needsUpdate = true; }); }
 
   // ---------- the phone and its screen (with the messages that keep coming) ----------
@@ -187,7 +221,6 @@ export function mountDesk(root) {
   const phone = buildPhone(tex); phone.traverse(o => { if (o.isMesh) { o.castShadow = true; [].concat(o.material).forEach(m => { if (m.isMeshStandardMaterial) { m.envMap = envTex; m.envMapIntensity = 1; m.needsUpdate = true; } }); } });
   const flat = new THREE.Group(); flat.rotation.x = -Math.PI / 2; flat.add(phone);
   const pv = new THREE.Group(); pv.add(flat); scene.add(pv);
-  const SPOT = new THREE.Vector3(1.75, .09, .55), SPOT_ROT = -.12, HERO_SCALE = 1.75;
   const screens = { imgs: {}, cur: 'cover-book', prev: null, fade: 1, async load() { for (const n of ['cover-book', 'book', 'window', 'zoom-durations', 'today']) this.imgs[n] = await load(shotSrc(n)); dirty = true; } };
   screens.load();
   const banners = []; let lastBanner = 0, dirty = true;
@@ -219,7 +252,32 @@ export function mountDesk(root) {
   const showScreen = n => { if (screens.cur === n || !screens.imgs[n]) return; screens.prev = screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };
 
   // ---------- camera, pointer, scroll ----------
-  let vw = 0, vh = 0; const resize = () => { vw = op.clientWidth; vh = op.clientHeight; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix(); };
+  // ---------- post: depth of field, vignette, a little colour fringe ----------
+  const dpr = () => Math.min(devicePixelRatio || 1, 1.75);
+  let rt = null, vw = 0, vh = 0;
+  const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: `precision highp float; varying vec2 vUv; uniform sampler2D tCol, tDep; uniform vec2 uRes; uniform float uNear, uFar, uFocus, uRange, uMax, uVig, uFringe;
+      float dist(vec2 uv){ float z = texture2D(tDep, uv).r * 2.0 - 1.0; return (2.0 * uNear * uFar) / (uFar + uNear - z * (uFar - uNear)); }
+      float coc(vec2 uv){ return clamp(abs(dist(uv) - uFocus) / uRange, 0.0, 1.0) * uMax; }
+      void main(){
+        float c0 = coc(vUv); float r = max(c0, .45);
+        vec3 acc = vec3(0.0); float wsum = 0.0; float a0 = fract(sin(dot(vUv * uRes, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832;
+        for (int i = 0; i < 20; i++){ float fi = float(i); float ang = fi * 2.39996 + a0; float rad = sqrt((fi + .5) / 20.0);
+          vec2 o = vec2(cos(ang), sin(ang)) * rad * r / uRes; float ct = coc(vUv + o); float w = (ct >= c0 * .7) ? 1.0 : .25; // out-of-focus things don't bleed over sharp ones in front
+          acc += texture2D(tCol, vUv + o).rgb * w; wsum += w; }
+        vec3 col = acc / wsum;
+        vec2 q = (vUv - .5) * vec2(uRes.x / uRes.y, 1.0); float rr = length(q);
+        if (uFringe > 0.0) { vec2 d = (vUv - .5) * uFringe * rr; col.r = mix(col.r, texture2D(tCol, vUv + d).r, .6); col.b = mix(col.b, texture2D(tCol, vUv - d).b, .6); }
+        col *= 1.0 - uVig * smoothstep(.45, 1.25, rr);
+        col = pow(max(col, 0.0), vec3(1.0 / 2.2));
+        gl_FragColor = vec4(col, 1.0); }` });
+  post.toneMapped = false;
+  const postScene = new THREE.Scene(); postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post)); const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const resize = () => { vw = op.clientWidth; vh = op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix();
+    rt?.dispose(); const W = Math.round(vw * d), H = Math.round(vh * d); const dt = new THREE.DepthTexture(W, H, THREE.UnsignedIntType);
+    rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, depthTexture: dt, depthBuffer: true, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
+    post.uniforms.tCol.value = rt.texture; post.uniforms.tDep.value = dt; post.uniforms.uRes.value.set(W, H); };
   resize(); addEventListener('resize', resize);
   const P = { x: 0, y: 0, tx: 0, ty: 0 };
   addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
@@ -242,8 +300,8 @@ export function mountDesk(root) {
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
     const lag = 1 - Math.exp(-dt * 5); P.x += (P.tx - P.x) * lag; P.y += (P.ty - P.y) * lag;
     // ---- the timeline (fractions of the pinned scroll) ----
-    const kText = seg(pr, 0, .07), kDark = seg(pr, .04, .16), kUp = seg(pr, .07, .2);           // 1 → 2
-    const kPw = seg(pr, .17, .25) * (1 - seg(pr, .36, .41));                                     // the two big words
+    const kText = seg(pr, 0, .08), kDark = seg(pr, .03, .22), kUp = seg(pr, .07, .26);           // 1 → 2
+    const kPw = seg(pr, .22, .31) * (1 - seg(pr, .36, .41));                                     // the two big words
     const kDown = seg(pr, .38, .47);                                                               // 2 → 3 (back to the counter, at night)
     const kA = seg(pr, .45, .5) * (1 - seg(pr, .62, .66)), kScale = seg(pr, .48, .62);            // feature: fits
     const kTop = seg(pr, .63, .7);                                                                 // 3 → 4
@@ -259,8 +317,9 @@ export function mountDesk(root) {
     camPos.x += P.x * .5 * (1 - kUp * .6); camPos.z += P.y * .35 * (1 - kUp);
     cam.position.copy(camPos); cam.lookAt(camLook);
     // ---- lights: day → black → night (lit by the phone) → dark top view → black ----
-    const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kDark) ** 2;
-    key.intensity = 2.6 * dayAmt; fill.intensity = .9 * dayAmt;
+    const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kDark) ** 1.6, up0 = kUp * (1 - kDown) + kRise;
+    key.intensity = 3.4 * dayAmt; fill.intensity = .42 * dayAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
+    nudge(dt, heroAmt); phoneBlob.material.opacity = .8 * (1 - up0) * dayAmt;
     night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise); glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise);
     rim.intensity = (60 * kUp * (1 - kDown) + 26 * kRise) * (1 - kOut);
     desk.visible = propsG.visible = (dayAmt > .003 || nightAmt > .01 || kTop > .01) && kRise < .98;
@@ -292,7 +351,12 @@ export function mountDesk(root) {
       const ar = guides.querySelector('.arrow'), mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - 90 * u;
       ar.setAttribute('d', `M${a.x + 115 * u} ${a.y} Q ${mx} ${my} ${b.x - 115 * u} ${b.y}`); const len = 600 * u; ar.style.strokeDasharray = `${len}`; ar.style.strokeDashoffset = `${len * (1 - sm(kGuide * 1.6 - .5))}`;
     }
-    renderer.render(scene, cam);
+    // focus: on the counter at first, pulled onto the phone as the room darkens, back to the counter at night, onto the book, then the phone
+    const dPhone = cam.position.distanceTo(pv.position), dDesk = cam.position.distanceTo(camLook);
+    const focusOnPhone = clamp(kUp * (1 - kDown) + kRise + nightAmt * .6), fu = post.uniforms;
+    fu.uFocus.value = lerp(dDesk, dPhone, focusOnPhone); fu.uRange.value = lerp(10.0, 1.6, kUp * (1 - kDown) + kRise) - nightAmt * 6.0; fu.uMax.value = (7 + 11 * (kUp * (1 - kDown) + kRise)) * dpr();
+    fu.uVig.value = .5 + .3 * (1 - dayAmt); fu.uFringe.value = .006 * (kUp * (1 - kDown) + kRise);
+    renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kA', kA); S('--kScale', kScale); S('--kB', kB); S('--kGuide', kGuide); S('--kC', kC); S('--kOut', kOut); S('--night', nightAmt); S('--kRise', kRise);
     ov.dataset.scale = kScale < .33 ? 0 : kScale < .66 ? 1 : 2;

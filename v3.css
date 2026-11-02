@@ -3411,3 +3411,55 @@ body.bk-on-paper::before{filter:none!important}
 .op--3d .op-word{font-size:clamp(80px,14vw,250px)!important}
 :lang(zh) .op--3d .op-word{font-size:clamp(72px,13vw,230px)!important;line-height:1!important}
 @media (max-width:760px){.op--3d .op-word{font-size:clamp(64px,19vw,110px)!important}}
+
+/* ======== one material: the whole case is the paper diary, cover included ======== */
+body.bk-on-paper:has(.bk-day){color:#17362b}
+body.bk-on-paper:has(.bk-day) .site-header.v3-header{border-color:rgba(23,54,43,.15)}
+body.bk-on-paper:has(.bk-day) .site-header.v3-header :is(.v3-theme-toggle,[data-lang-switch],.lang-switch){border-color:rgba(23,54,43,.2)!important}
+body.bk-on-paper:has(.bk-day) :is(.v3-product-nav,.v3-filter-row,.case-filter) a{color:#17362b!important;border-color:rgba(23,54,43,.2)!important;background:transparent!important}
+body.bk-on-paper:has(.bk-day) a[href="work.html"],body.bk-on-paper:has(.bk-day) .back-link{color:#17362b!important}
+/* cover: ink on paper, the phone in front */
+.bk-day ~ *, .op--3d{background:transparent!important}
+.op--3d .op-word{color:#17362b!important}
+.op--3d .op-word:nth-child(2),.op--3d .op-word em{color:#1f9e6c!important}
+.op--3d .op-word:nth-child(2) em{color:#17362b!important}
+.op--3d .op-shade,.op--3d .op-wall{display:none!important}
+.bk-day .op--3d .op-copy,.op--3d .op-copy{background:rgba(255,253,246,.78)!important;border:1px solid rgba(23,54,43,.1);box-shadow:0 24px 50px -30px rgba(23,54,43,.4)!important;color:#17362b}
+.op--3d .op-copy :is(p,dd,dt,span,b,small){color:#17362b}
+.op--3d .op-kicker{color:#1f9e6c!important}
+.op--3d .op-live b{color:#1f9e6c!important}
+.op--3d .op-url{background:rgba(23,54,43,.06)!important;border-color:rgba(23,54,43,.12)!important;color:#17362b!important}
+.op--3d .op-btn{color:#17362b!important;border-color:rgba(23,54,43,.3)!important;background:transparent!important}
+.op--3d .op-btn--main{background:#17362b!important;color:#fffdf6!important;border-color:#17362b!important}
+.op--3d :is(.op-drag,.op-scroll){color:#4d6157!important}
+.op--3d .op-scroll span{background:#4d6157!important}
+/* "case in one minute", case map, try-it: paper versions */
+.bk-day .bk-quick :is(.bk-step,.bk-quick-card,ol>li){background:#fffdf6!important;border-color:rgba(23,54,43,.1)!important;box-shadow:0 18px 40px -30px rgba(23,54,43,.4)!important}
+.bk-day .bk-quick :is(h3,h4,p,li,span,b,strong){color:#17362b}
+.bk-day .bk-quick :is(p,small){color:#4d6157}
+.bk-map{background:#fffdf6!important;border-color:rgba(23,54,43,.1)!important;box-shadow:0 24px 50px -30px rgba(23,54,43,.35)!important;color:#17362b}
+.bk-map h2,.bk-map .bk-map-ph h3,.bk-map .bk-map-ph a{color:#17362b!important}
+.bk-map-lead,.bk-map .bk-map-d,.bk-map .bk-map-ph a span{color:#5d6f66!important}
+.bk-map-k{color:#1f9e6c!important}.bk-map .bk-map-n{color:#9aa8a1!important}
+.bk-map .bk-map-ph{background:rgba(23,54,43,.03)!important;border-color:rgba(23,54,43,.08)!important;box-shadow:none!important}
+.bk-map .bk-map-ph a:hover{background:rgba(31,158,108,.1)!important}
+.bk-try-k2{color:#1f9e6c!important}.bk-try-h{color:#17362b!important}.bk-try-sub{color:#4d6157!important}
+.bk-try-switch{background:rgba(23,54,43,.06)!important;border-color:rgba(23,54,43,.12)!important}
+.bk-try-switch button{color:#4d6157!important}.bk-try-switch button[aria-selected="true"]{color:#fffdf6!important}
+.bk-try-switch>i{background:#17362b!important;box-shadow:0 6px 18px -8px rgba(23,54,43,.6)!important}
+.bk-try-note{color:#1f9e6c!important}.bk-try-note.is-top{color:#c47a1c!important}
+.bk-try-links a{color:#17362b!important;border-color:rgba(23,54,43,.25)!important}
+.bk-try-bench .ux-demo-device{box-shadow:0 0 0 1px rgba(0,0,0,.08),0 60px 100px -40px rgba(23,54,43,.55)!important}
+.bk-day .ux-core{color:#17362b!important}
+.bk-day .bk-minute>li{background:#fffdf6!important;border:1px solid rgba(23,54,43,.1)!important;box-shadow:0 18px 40px -30px rgba(23,54,43,.4)!important}
+.bk-day .bk-minute :is(h3,h4,b,strong){color:#17362b!important}
+.bk-day .bk-minute p{color:#4d6157!important}
+.bk-day .bk-minute-more,.bk-day .bk-quick a:not(.bk-receipt-links a){color:#17362b!important}
+.bk-day .bk-quick>.bk-quick-in>p:first-child,.bk-day .bk-quick [class*="-k"]{color:#1f9e6c}
+body.bk-on-paper:has(.bk-day) .v3-case-categories a{color:#4d6157!important;border-color:rgba(23,54,43,.2)!important;background:transparent!important}
+body.bk-on-paper:has(.bk-day) .v3-case-categories a[aria-current]{color:#fffdf6!important;background:#17362b!important;border-color:#17362b!important}
+body.bk-on-paper:has(.bk-day) .v3-case-tools a{color:#17362b!important}
+body.bk-on-paper:has(.bk-day) .v3-case-tools a.v3-tool-primary{background:#17362b!important;color:#fffdf6!important}
+body.bk-on-paper:has(.bk-day) .site-header.v3-header,body.bk-on-paper:has(.bk-day) .site-header.v3-header *{background-color:transparent}
+body.bk-on-paper:has(.bk-day) .site-header.v3-header .v3-theme-toggle,body.bk-on-paper:has(.bk-day) .site-header.v3-header [aria-pressed="true"]{background-color:rgba(23,54,43,.08)!important}
+html:has(.bk-day){background:#f3eee3!important}html:has(.bk-day) .site-header.v3-header{box-shadow:0 0 0 100vmax #f3eee3;clip-path:inset(0 -100vmax)}

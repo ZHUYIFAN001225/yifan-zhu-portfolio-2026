@@ -81,7 +81,7 @@ function timeline(root, moments) {
 function paper(root) {
   const first = root.querySelector('.bk-moment'); if (!first) return;
   let q = false;
-  const run = () => { q = false; const r = first.getBoundingClientRect(); const p = clamp(1 - (r.top - innerHeight * .2) / (innerHeight * .6)); document.body.style.setProperty('--bk-paper', p.toFixed(3)); const mix = (a, b2) => Math.round(a + (b2 - a) * p); document.body.style.setProperty('background-color', `rgb(${mix(20, 243)},${mix(21, 238)},${mix(24, 227)})`, 'important'); document.body.classList.toggle('bk-on-paper', p > .5); };
+  const run = () => { q = false; const r = first.getBoundingClientRect(); const p = 1; /* one material for the whole case: paper from the cover down */ document.body.style.setProperty('--bk-paper', p.toFixed(3)); const mix = (a, b2) => Math.round(a + (b2 - a) * p); document.body.style.setProperty('background-color', `rgb(${mix(20, 243)},${mix(21, 238)},${mix(24, 227)})`, 'important'); document.body.classList.toggle('bk-on-paper', p > .5); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); addEventListener('resize', run); run();
 }
 

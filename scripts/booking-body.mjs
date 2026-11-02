@@ -47,13 +47,15 @@ export function mountBody() {
 function glassLight(day) {
   if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const GLASS = '.bk-sheet, .bk-receipt, .bk-minute li, .bk-ask, .bk-entry li, .bk-results-card, .bk-slip, .bk-textonly, .bk-owner, nav.bk-map, .bk-ledger-list>li, .ux-section .ux-persona, .ux-section .ux-principles>div, .ux-section .ux-process>li, .ux-section .ux-success>li, .ux-iterations .ux-before-after p';
-  const els = [...day.querySelectorAll(GLASS)].filter(el => !el.querySelector(':scope>.bk-glint'));
-  els.forEach(el => {
+  const els = [];
+  const scan = () => day.querySelectorAll(GLASS).forEach(el => {   // the drawn parts of the page arrive later; look again
+    if (el.querySelector(':scope>.bk-glint')) return;
     if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
     const sheen = document.createElement('i'); sheen.className = 'bk-glow'; sheen.setAttribute('aria-hidden', 'true');
     const rim = document.createElement('i'); rim.className = 'bk-glint'; rim.setAttribute('aria-hidden', 'true');
-    el.append(sheen, rim); el.classList.add('is-glass');
+    el.append(sheen, rim); el.classList.add('is-glass'); els.push(el);
   });
+  scan(); [800, 2000, 4500].forEach(t => setTimeout(scan, t));
   let mx = -1e4, my = -1e4, raf = 0;
   const paint = () => { raf = 0;
     for (const el of els) { const r = el.getBoundingClientRect(); if (r.bottom < -200 || r.top > innerHeight + 200) continue;

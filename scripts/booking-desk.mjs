@@ -144,8 +144,8 @@ export function mountDesk(root) {
       x.fillStyle = 'rgba(90,60,30,.4)'; x.fillRect(0, y0, w, 3); x.fillStyle = 'rgba(255,240,210,.18)'; x.fillRect(0, y0 + 3, w, 2); }
     for (let i = 0; i < 30000; i++) { x.fillStyle = `rgba(100,65,30,${r() * .1})`; x.fillRect(r() * w, r() * h, 1, 1 + r() * 4); }
     return c; })();
-  const wood = new THREE.CanvasTexture(woodCanvas); wood.colorSpace = THREE.SRGBColorSpace; wood.anisotropy = 16; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(1.6, 1.6);
-  const woodBump = new THREE.CanvasTexture(woodCanvas); woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping; woodBump.repeat.set(1.6, 1.6); woodBump.anisotropy = 16;
+  const wood = new THREE.CanvasTexture(woodCanvas); wood.colorSpace = THREE.SRGBColorSpace; wood.anisotropy = 16; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(5.8, 5.8);
+  const woodBump = new THREE.CanvasTexture(woodCanvas); woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping; woodBump.repeat.set(5.8, 5.8); woodBump.anisotropy = 16;
   // the self-healing cutting mat: deep green, fine 10 mm grid, bold 50 mm grid, rulers along the edges
   const MATW = 9.4, MATH = 6.5, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
     x.fillStyle = '#226b53'; x.fillRect(0, 0, W, H);
@@ -186,7 +186,7 @@ export function mountDesk(root) {
 
   // ---------- the counter ----------
   const SPOT = new THREE.Vector3(1.75, .09, .55), SPOT_ROT = -.12, HERO_SCALE = 1.75;
-  const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .006, roughness: .55, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
+  const desk = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .006, roughness: .55, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
   const mat = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(MATW, MATH, .35), 12)), dapple(new THREE.MeshStandardMaterial({ map: matTex, roughness: .86, metalness: 0 }))); mat.rotation.set(-Math.PI / 2, 0, .05); mat.position.set(1.3, .02, .3); mat.receiveShadow = true; mat.visible = new URLSearchParams(location.search).get('mat') !== '0'; scene.add(mat);
   const propsG = new THREE.Group(); scene.add(propsG);
   const std = o => dapple(new THREE.MeshStandardMaterial(o));
@@ -387,7 +387,7 @@ export function mountDesk(root) {
     mix(camPos, V.side.pos, kDown, camPos); mix(camLook, V.side.look, kDown, camLook);
     mix(camPos, V.close.pos, kPush * kDown, camPos); mix(camLook, V.close.look, kPush * kDown, camLook);
     camPos.x += P.x * .45 * (1 - kUp * .7); camPos.z += P.y * .3 * (1 - kUp);
-    cam.position.copy(camPos); cam.lookAt(camLook);
+    cam.position.copy(camPos); cam.up.set(0, kDown, -(1 - kDown)).normalize(); cam.lookAt(camLook);
     // ---- light: day → black → day again from the side → evening under the lamp ----
     const onDesk = 1 - kUp * (1 - kDown);                               // 1 while the phone sits on the counter
     const dayAmt = (1 - kDark) ** 1.6 * (1 - kDown) + kDown * (1 - kEve) ** 1.4, lampAmt = kEve * kDown, nightAmt = 0;

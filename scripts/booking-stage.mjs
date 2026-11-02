@@ -428,7 +428,10 @@ export function mountStage(root) {
     key.position.set(2 + pmx * 10 * stillAmt, 4 - pmy * 8 * stillAmt, 5);
     const calm = (1 - P.focus * .7) * (a.st.kind === 'dock' || b.st.kind === 'dock' ? 0 : 1) * (1 - stillAmt * .85);
     q = { ...q, y: q.y + Math.sin(time * 1.05) * .006 * calm, rx: q.rx + Math.sin(time * .7) * .035 * calm + vel * .5 * calm, ry: q.ry + Math.sin(time * .5) * .05 * calm, rz: q.rz + Math.sin(time * .43) * .02 * calm - vel * .35 * calm };
-    if (cov) { q = cov.q; q = { ...q, ry: q.ry + pmx * .35, rx: q.rx + pmy * .2 }; }
+    if (cov) { q = cov.q; q = { ...q, ry: q.ry + pmx * .35, rx: q.rx + pmy * .2 };
+      // narrow windows: never wider than the right-hand 42% of the screen, so the list on the left stays clear
+      const capS = .42 * vw / (vh * .5); if (q.s > capS && pr < CM.E) q = { ...q, s: capS, x: Math.max(q.x, .7) }; }
+    document.body.classList.toggle('bk-in-cover', !!cov);
     place(q);
     // the booking card: it rises out of the customer's screen, hangs in the air facing you while the phone turns over,
     // then settles into the owner's diary

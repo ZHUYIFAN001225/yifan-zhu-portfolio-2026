@@ -3842,3 +3842,4 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1000vh)}
 .bk-set .sx-c{display:inline-block}
 .bk-set .bk-dk-out{background:#0b0a09}
 .bk-set .bk-dk-scroll{opacity:1}
+.bk-set .bk-dk-copy{left:auto;right:clamp(20px,4vw,64px);top:auto;bottom:12%;width:24ch;text-align:right}

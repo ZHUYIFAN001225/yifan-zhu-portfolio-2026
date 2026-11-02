@@ -117,8 +117,13 @@ export function mountDesk(root) {
       // wind: the whole canopy sways a little, each branch a little more, in slow gusts
       float g = .55 + .45 * sin(uTime * .21) * sin(uTime * .13 + 1.7);
       q += uWind * g * (vec2(sin(uTime * .9 + q.y * 7.), cos(uTime * .75 + q.x * 6.)) * .0055 + vec2(sin(uTime * .31), cos(uTime * .27)) * .004);
-      float n = vn(q * 12.5) * .55 + vn(q * 31. + 3.1) * .3 + vn(q * 4.2 + 7.3) * .15;
-      return smoothstep(.555, .615, n) * .85;   // mostly leaves; a few warm gaps
+      // big dark masses of foliage, and within them many small gaps the sun comes through as soft coins of light
+      float mass = vn(q * 5.2 + 1.3) * .65 + vn(q * 11. + 4.1) * .35;
+      float holes = vn(q * 38. + 2.7) * .6 + vn(q * 76. + 9.2) * .4;
+      float gap = smoothstep(.62, .7, holes * .55 + mass * .6 - .02);
+      // only the left of the counter is under the window
+      float side = smoothstep(.14, -.12, p.x + p.z * .35);
+      return gap * side * .9;
     }
     vec3 bakedLight(){
       vec3 day = texture2D(uAmb, vBUv).rgb + texture2D(uSun, vBUv).rgb * leaves(vWP);
@@ -236,7 +241,7 @@ export function mountDesk(root) {
   // ---------- the messages, in the air ----------
   // each new message lights the glass and also rises out of it, to hang over the phone like a headset overlay; the
   // newest stays lowest, older ones are pushed up and fade; a faint shaft of light joins them to the screen
-  const HOLO_N = 3, CW = .086, CH = .0215, holo = new THREE.Group(), hscene = new THREE.Scene(); hscene.add(holo);   // drawn after the grade, crisp
+  const HOLO_N = 3, CW = .11, CH = .028, holo = new THREE.Group(), hscene = new THREE.Scene(); hscene.add(holo);   // drawn after the grade, crisp
   const easeBack = t => { const c = 1.5; t = clamp(t) - 1; return 1 + (c + 1) * t * t * t + c * t * t; };
   const cards = Array.from({ length: HOLO_N + 1 }, () => {
     const c = document.createElement('canvas'); c.width = 900; c.height = 250; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
@@ -259,6 +264,9 @@ export function mountDesk(root) {
   const beamCv = document.createElement('canvas'); beamCv.width = 64; beamCv.height = 256; { const x = beamCv.getContext('2d'), g = x.createLinearGradient(0, 256, 0, 0); g.addColorStop(0, 'rgba(200,230,255,.9)'); g.addColorStop(1, 'rgba(200,230,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 256); const s = x.createLinearGradient(0, 0, 64, 0); s.addColorStop(0, 'rgba(0,0,0,1)'); s.addColorStop(.5, 'rgba(0,0,0,0)'); s.addColorStop(1, 'rgba(0,0,0,1)'); x.globalCompositeOperation = 'destination-out'; x.fillStyle = s; x.fillRect(0, 0, 64, 256); }
   const beam = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(beamCv), transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, opacity: 0 }));
   beam.renderOrder = 5; holo.add(beam);
+  const shCv = document.createElement('canvas'); shCv.width = shCv.height = 128; { const x = shCv.getContext('2d'), g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); }
+  const holoShadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shCv), transparent: true, depthWrite: false, opacity: 0 }));
+  holoShadow.rotation.x = -Math.PI / 2; scene.add(holoShadow);
   const hv = { up: new THREE.Vector3(), to: new THREE.Vector3(), base: new THREE.Vector3(), tgt: new THREE.Vector3(), show: 0 };
   window.__bkSet = { cards, get banners() { return banners; }, hv, holo, cam };
   function updateHolo(now, dt, want) {
@@ -272,14 +280,15 @@ export function mountDesk(root) {
     cards.forEach(cd => {
       if (!cd.b) { cd.m.visible = false; return; }
       const i = list.indexOf(cd.b), live = i >= 0, slot = live ? list.length - 1 - i : HOLO_N, age = (now - cd.b.t) / 1000, e = easeBack(age / .7);
-      hv.tgt.copy(hv.base).addScaledVector(hv.to, .05 + slot * .006).addScaledVector(hv.up, .022 + slot * (CH + .007) + Math.sin(now / 1500 + slot * 1.7) * .0012);
+      hv.tgt.copy(hv.base).addScaledVector(hv.to, .07 + slot * .012).addScaledVector(hv.up, .03 + slot * (CH + .006) + Math.sin(now / 1500 + slot * 1.7) * .0015);
       cd.pos.lerp(hv.tgt, 1 - Math.exp(-dt * (live ? 7 : 3)));
       const aim = (live ? (slot === 0 ? 1 : slot === 1 ? .8 : .55) : 0) * hv.show; cd.a += (aim - cd.a) * (1 - Math.exp(-dt * 8));
       cd.m.visible = cd.a > .01; cd.m.material.opacity = cd.a * clamp(age / .25);
-      cd.m.position.copy(cd.pos); cd.m.quaternion.copy(cam.quaternion); cd.m.rotateX(-.18); cd.m.scale.setScalar(lerp(.35, 1, e) * (1 - slot * .04));
+      cd.m.position.copy(cd.pos); cd.m.quaternion.copy(cam.quaternion); cd.m.rotateX(-.62); cd.m.rotateY(.1 - slot * .05); cd.m.scale.setScalar(lerp(.35, 1, e) * (1 - slot * .04));
       if (slot === 0 && live) top = cd;
     });
     // the shaft: from the glass to the newest card, strongest just as it arrives
+    holoShadow.position.set(hv.base.x + .02, .0105, hv.base.z - .035); holoShadow.scale.set(.13, .06, 1); holoShadow.material.opacity = .5 * hv.show * clamp(list.length);
     if (top) { const len = top.pos.distanceTo(hv.base), age = (now - top.b.t) / 1000; beam.position.copy(hv.base).lerp(top.pos, .5); beam.quaternion.copy(cam.quaternion); beam.scale.set(CW * .75, Math.max(len, .001), 1); beam.material.opacity = hv.show * (.16 + .5 * Math.exp(-age * 2.5)); beam.visible = true; }
     else beam.visible = false;
   }
@@ -320,7 +329,7 @@ export function mountDesk(root) {
   addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up
   const V = {
-    hero: { pos: new THREE.Vector3(.0, .66, .37), look: new THREE.Vector3(.012, 0, .038), roll: 0 },   // tighter than the Blender still: the props were pulled in around the phone
+    hero: { pos: new THREE.Vector3(.02, .56, .315), look: new THREE.Vector3(.025, 0, .035), roll: 0 },   // tighter than the Blender still: the props were pulled in around the phone
     dark: { pos: new THREE.Vector3(0, .9, .001), look: new THREE.Vector3(0, 0, 0), roll: 0 },
     book: { pos: new THREE.Vector3(-.135, .36, .25), look: new THREE.Vector3(-.105, 0, .03), roll: -6 },
     phone: { pos: new THREE.Vector3(.11, .3, .2), look: new THREE.Vector3(.13, .02, .02), roll: 3 }

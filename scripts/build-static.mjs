@@ -26,7 +26,7 @@ const entries = [
   "scripts/portfolio-catalog.mjs",
   "scripts/gallery.mjs",
   "scripts/v3-site.js",
-  "scripts/phone3d.mjs", "scripts/look-tools.mjs", "scripts/booking-day.mjs", "scripts/booking-stage.mjs", "scripts/booking-hand.mjs", "scripts/booking-domino.mjs", "scripts/booking-chair.mjs", "scripts/booking-flow.mjs", "scripts/booking-map.mjs", "scripts/booking-try.mjs", "scripts/booking-cover.mjs", "scripts/booking-desk.mjs",
+  "scripts/phone3d.mjs", "scripts/look-tools.mjs", "scripts/booking-day.mjs", "scripts/booking-stage.mjs", "scripts/booking-hand.mjs", "scripts/booking-domino.mjs", "scripts/booking-chair.mjs", "scripts/booking-flow.mjs", "scripts/booking-map.mjs", "scripts/booking-try.mjs", "scripts/booking-cover.mjs", "scripts/booking-desk.mjs", "scripts/booking-plate.mjs",
   "scripts/theme.js",
   "scripts/mobile-work-nav.mjs",
   "styles.css",

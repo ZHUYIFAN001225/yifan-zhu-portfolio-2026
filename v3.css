@@ -3804,3 +3804,16 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1000vh)}
 .bk-dk-eve{position:absolute;left:clamp(24px,4vw,64px);bottom:9%;width:min(34ch,36vw);pointer-events:none;color:#f3e9d8;opacity:var(--kEveT);filter:blur(calc((1 - var(--kEveT)) * 8px));transform:translateY(calc((1 - var(--kEveT)) * 16px))}
 .bk-dk-eve-k{margin:0 0 10px;font:700 12px/1 "Inter Tight",Inter,system-ui,sans-serif;letter-spacing:.14em;color:#ffc27a}
 .bk-dk-eve-p{margin:0;font:500 clamp(16px,1.35vw,22px)/1.4 "Inter Tight",Inter,system-ui,sans-serif;text-shadow:0 1px 14px rgba(0,0,0,.5)}
+/* plate opening — photographic set, live phone and handwriting on top */
+.bk-plate{background:#0b0a09}
+.bk-plate .bk-pl{position:absolute;inset:0;overflow:hidden;will-change:transform,opacity}
+.bk-plate .bk-pl[data-p="top"]{transform-origin:62% 50%}.bk-plate .bk-pl[data-p="front"]{transform-origin:58% 60%;opacity:0}
+.bk-plate .bk-pl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.bk-plate .bk-ink{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;opacity:.92}
+.bk-plate .bk-pl-night{position:absolute;inset:0;background:linear-gradient(180deg,#121a3a 0%,#0b0d18 60%,#060608 100%);mix-blend-mode:multiply;opacity:calc(var(--eve,0) * .88)}
+.bk-plate .bk-pl-lamp{position:absolute;inset:-10%;background:radial-gradient(42% 46% at 52% 62%,rgba(255,196,120,.95) 0%,rgba(255,170,90,.45) 40%,rgba(255,150,70,0) 72%);mix-blend-mode:screen;opacity:calc(var(--eve,0) * .9)}
+.bk-plate .bk-pl-glow{position:absolute;inset:0;background:radial-gradient(10% 14% at 65.5% 60%,rgba(190,215,255,.55),rgba(190,215,255,0) 70%);mix-blend-mode:screen;opacity:calc(var(--eve,0) * .8)}
+.bk-plate .bk-pl-dim{position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 50%,#0e0c0a 0%,#050403 100%);opacity:0}
+.bk-plate .bk-ph{position:absolute;left:0;top:0;width:600px;height:1080px;transform-origin:0 0;pointer-events:none;will-change:transform}
+.bk-plate .bk-ph canvas{width:100%;height:100%;display:block}
+.bk-plate .bk-dk-h,.bk-plate .bk-dk-tag,.bk-plate .bk-dk-copy{text-shadow:0 2px 24px rgba(0,0,0,.45)}

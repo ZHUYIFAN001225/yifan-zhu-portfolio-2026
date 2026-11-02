@@ -21,7 +21,7 @@ scene.cycles.samples = 160; scene.cycles.use_denoising = True
 scene.render.resolution_x = 2592; scene.render.resolution_y = 1536; scene.render.resolution_percentage = 100
 scene.render.film_transparent = False
 scene.view_settings.view_transform = 'AgX' if 'AgX' in [i.identifier for i in bpy.types.ColorManagedViewSettings.bl_rna.properties['view_transform'].enum_items] else 'Filmic'
-scene.view_settings.look = 'None'; scene.view_settings.exposure = -0.6
+scene.view_settings.look = 'None'; scene.view_settings.exposure = -0.9
 try:
     prefs = bpy.context.preferences.addons['cycles'].preferences
     for dt in ('OPTIX', 'CUDA'):
@@ -54,8 +54,13 @@ def material(name, color=(.8, .8, .8, 1), rough=.5, metal=0, coat=0, coat_rough=
     if image is not None:
         tex = nt.nodes.new('ShaderNodeTexImage'); tex.image = image; tex.location = (-400, 200)
         nt.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
+        if name == 'wood':
+            tc = nt.nodes.new('ShaderNodeTexCoord'); mpn = nt.nodes.new('ShaderNodeMapping'); mpn.inputs['Scale'].default_value = (2.6, 2.6, 1); mpn.inputs['Rotation'].default_value = (0, 0, math.radians(1.5))
+            nt.links.new(tc.outputs['UV'], mpn.inputs['Vector']); nt.links.new(mpn.outputs['Vector'], tex.inputs['Vector'])
     if bump is not None:
-        tex = nt.nodes.new('ShaderNodeTexImage'); tex.image = bump; tex.image.colorspace_settings.name = 'Non-Color'; tex.location = (-600, -200)
+        tex = nt.nodes.new('ShaderNodeTexImage'); tex.image = bump; tex.location = (-600, -200)
+        if name == 'wood': nt.links.new(mpn.outputs['Vector'], tex.inputs['Vector'])
+        else: tex.image.colorspace_settings.name = 'Non-Color'
         b = nt.nodes.new('ShaderNodeBump'); b.inputs['Strength'].default_value = bump_strength; b.location = (-250, -200)
         nt.links.new(tex.outputs['Color'], b.inputs['Height']); nt.links.new(b.outputs['Normal'], bsdf.inputs['Normal'])
     if emission is not None:
@@ -147,7 +152,7 @@ def wood_texture(w=2048, h=2048):
     return np.clip(col, 0, 1), np.clip(bump, 0, 1)
 
 def mat_texture(w=2400, h=1800):
-    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.13, 0.36, 0.27]); col[..., 3] = 1
+    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.075, 0.26, 0.19]); col[..., 3] = 1
     rng = np.random.default_rng(5); col[..., :3] += rng.normal(0, .012, (h, w, 1))
     m = 110; cell = 70
     for X in range(m, w - m + 1, cell): col[m:h - m, X - 1:X + 1, :3] = col[m:h - m, X - 1:X + 1, :3] * .62 + np.array([.72, .86, .78]) * .38
@@ -171,12 +176,13 @@ def page_texture(w=1024, h=1400):
     col[120:124, 96:420, :3] = np.array([.12, .22, .18])  # the day header, a bar where the title sits
     return np.clip(col, 0, 1)
 
-woodC, woodB = wood_texture(); IMG_WOOD = image_from_array('desk_wood', woodC); IMG_WOODB = image_from_array('desk_wood_bump', woodB)
+# the wood comes from the reference photograph itself (grain lifted from it, tiled, on its own colour)
+IMG_WOOD = bpy.data.images.load(os.path.join(OUT, 'ref_wood.png')); IMG_WOODB = IMG_WOOD
 IMG_MAT = image_from_array('cutting_mat', mat_texture()); IMG_PAGE = image_from_array('page', page_texture())
 
 # ---------------------------------------------------------------- materials
 M = dict(
-    wood=material('wood', image=IMG_WOOD, bump=IMG_WOODB, bump_strength=.25, rough=.42, coat=.15, coat_rough=.3),
+    wood=material('wood', image=IMG_WOOD, bump=IMG_WOODB, bump_strength=.12, rough=.38, coat=.2, coat_rough=.25),
     mat=material('cutting_mat', image=IMG_MAT, rough=.9),
     cover=material('cover_cloth', (.07, .17, .12, 1), rough=.75),
     paper=material('paper', image=IMG_PAGE, rough=.95),
@@ -326,27 +332,27 @@ for st in ('NISHITA', 'MULTIPLE_SCATTERING', 'SINGLE_SCATTERING'):
 for k, v in (('sun_elevation', math.radians(22)), ('sun_rotation', math.radians(300)), ('sun_intensity', .25), ('altitude', 0), ('sun_disc', False)):
     try: setattr(sky, k, v)
     except Exception: pass
-bg.inputs['Color'].default_value = (.78, .70, .60, 1); bg.inputs['Strength'].default_value = .5
-sun = bpy.data.lights.new('sun', 'SUN'); sun.energy = 8.0; sun.angle = math.radians(1.0); sun.color = (1.0, .84, .62)
+bg.inputs['Color'].default_value = (.78, .70, .60, 1); bg.inputs['Strength'].default_value = .18
+sun = bpy.data.lights.new('sun', 'SUN'); sun.energy = 22.0; sun.angle = math.radians(1.8); sun.color = (1.0, .84, .62)
 sun_o = bpy.data.objects.new('sun', sun); bpy.context.collection.objects.link(sun_o); sun_o.rotation_euler = Euler((math.radians(52), 0, math.radians(-125)))
-fill = bpy.data.lights.new('fill', 'AREA'); fill.energy = 90; fill.size = 2.5; fill.color = (.86, .90, 1.0)
+fill = bpy.data.lights.new('fill', 'AREA'); fill.energy = 40; fill.size = 2.5; fill.color = (.86, .90, 1.0)
 fill_o = bpy.data.objects.new('fill', fill); bpy.context.collection.objects.link(fill_o); fill_o.location = (-.8, .9, 1.6); fill_o.rotation_euler = Euler((math.radians(30), 0, math.radians(-40)))
 # a venetian blind between the sun and the desk: a transparent plane with opaque bands, so the sun arrives in stripes
 blind = bpy.data.materials.new('blind'); blind.use_nodes = True; bn = blind.node_tree
 for n in list(bn.nodes): bn.nodes.remove(n)
 bout = bn.nodes.new('ShaderNodeOutputMaterial'); mixs = bn.nodes.new('ShaderNodeMixShader'); tr = bn.nodes.new('ShaderNodeBsdfTransparent'); dk = bn.nodes.new('ShaderNodeBsdfDiffuse'); dk.inputs['Color'].default_value = (0, 0, 0, 1)
-wave = bn.nodes.new('ShaderNodeTexWave'); wave.inputs['Scale'].default_value = .55; wave.inputs['Distortion'].default_value = .12; wave.inputs['Detail'].default_value = 0.0
+wave = bn.nodes.new('ShaderNodeTexWave'); wave.inputs['Scale'].default_value = .7; wave.inputs['Distortion'].default_value = .12; wave.inputs['Detail'].default_value = 0.0
 try: wave.bands_direction = 'X'
 except Exception: pass
-ramp = bn.nodes.new('ShaderNodeValToRGB'); ramp.color_ramp.elements[0].position = .22; ramp.color_ramp.elements[1].position = .62
-tco = bn.nodes.new('ShaderNodeTexCoord'); mp = bn.nodes.new('ShaderNodeMapping'); mp.inputs['Rotation'].default_value = (0, 0, math.radians(35))
+ramp = bn.nodes.new('ShaderNodeValToRGB'); ramp.color_ramp.elements[0].position = .28; ramp.color_ramp.elements[1].position = .52
+tco = bn.nodes.new('ShaderNodeTexCoord'); mp = bn.nodes.new('ShaderNodeMapping'); mp.inputs['Rotation'].default_value = (0, 0, math.radians(80))
 bn.links.new(tco.outputs['Object'], mp.inputs['Vector']); bn.links.new(mp.outputs['Vector'], wave.inputs['Vector']); bn.links.new(wave.outputs['Fac'], ramp.inputs['Fac'])
 bn.links.new(ramp.outputs['Color'], mixs.inputs['Fac']); bn.links.new(tr.outputs['BSDF'], mixs.inputs[1]); bn.links.new(dk.outputs['BSDF'], mixs.inputs[2]); bn.links.new(mixs.outputs['Shader'], bout.inputs['Surface'])
-bpy.ops.mesh.primitive_plane_add(size=6, location=(0, 0, 1.6)); bl = bpy.context.object; bl.name = 'blind'; bl.data.materials.append(blind); bl.visible_camera = False; bl.visible_glossy = False; bl.visible_diffuse = False
+# (blind plane off: the slats below do the job more predictably)
 # (the old slats are kept off)
 slat_mat = material('slat', (.1, .1, .1, 1))
-for i in range(0):
-    s = box(f'slat_{i}', (.06, 2.2, .01), loc=(-1.4 + i * .22, 0, 1.1), rot=(0, math.radians(-38), math.radians(-30)), mat=slat_mat)
+for i in range(30):
+    s = box(f'slat_{i}', (.10, 4.0, .01), loc=(-3.2 + i * .19, 0, 1.1), rot=(0, 0, math.radians(-30)), mat=slat_mat)
     s.visible_camera = False; s.visible_glossy = False; s.visible_diffuse = False
     try: s.cycles.is_shadow_catcher = False
     except Exception: pass

@@ -365,13 +365,14 @@ export function mountDesk(root) {
         gl_FragColor = vec4(col, 1.0); }` });
   post.toneMapped = false;
   const postScene = new THREE.Scene(); postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post)); const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  const resize = () => { vw = op.clientWidth; vh = op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, 1.15, 2.2))); cam.updateProjectionMatrix();
+  let inBody = false;
+  const resize = () => { vw = inBody ? innerWidth : op.clientWidth; vh = inBody ? innerHeight : op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, 1.15, 2.2))); cam.updateProjectionMatrix();
     rt?.dispose(); const W = Math.round(vw * d), H = Math.round(vh * d); const dt = new THREE.DepthTexture(W, H, THREE.UnsignedIntType);
     rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, depthTexture: dt, depthBuffer: true, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
     post.uniforms.tCol.value = rt.texture; post.uniforms.tDep.value = dt; post.uniforms.uRes.value.set(W, H); };
   resize(); addEventListener('resize', resize);
   const P = { x: 0, y: 0, tx: 0, ty: 0 };
-  addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
+  addEventListener('pointermove', e => { if (!fine) return; const r = inBody ? { left: 0, top: 0, width: innerWidth, height: innerHeight } : op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up
   const V = {
     hero: { pos: new THREE.Vector3(.025, .69, .375), look: new THREE.Vector3(.025, 0, .05), roll: 0 },
@@ -391,11 +392,62 @@ export function mountDesk(root) {
       const tr = (fx - fz) * 2.2; n.rv += ((tr - n.ro) * w * w - 2 * z * w * n.rv) * dt; n.ro += n.rv * dt;
       n.g.position.set(n.ox, 0, n.oz); n.g.rotation.y = n.ro; });
   }
+  // ---------- after the opening: the same desk, at night, out of focus behind the case (trial: ?body=a) ----------
+  // The canvas moves out of the opening into a fixed layer behind the page; the camera rests on a different thing on
+  // the desk for each chapter and drifts between them as you read. Everything is lamp-lit and far out of focus.
+  const backdrop = document.createElement('div'); backdrop.className = 'bk-backdrop'; backdrop.setAttribute('aria-hidden', 'true');
+  const v3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  const SHOTS = [
+    ['.bk-quick', v3(-.05, .4, .42), v3(-.04, 0, .03)],      // the whole desk under the lamp
+    ['#overview', v3(-.17, .22, .29), v3(-.1, 0, .02)],      // the book
+    ['#system', v3(.21, .19, .29), v3(.13, 0, .04)],         // the phone
+    ['#strategy', v3(.04, .34, .43), v3(.04, 0, .02)],       // the mat, wide
+    ['#interfaces', v3(.16, .14, .17), v3(.13, 0, .04)],     // the phone, close
+    ['#build', v3(-.02, .19, .12), v3(-.03, 0, -.14)],       // the pen and pencil
+    ['#iteration', v3(-.27, .19, .23), v3(-.16, 0, .02)],    // yesterday's page
+    ['#challenges', v3(.35, .15, .31), v3(.245, 0, .115)],   // the shears
+    ['#research', v3(-.02, .15, .43), v3(-.06, 0, .215)],    // the comb
+    ['#release', v3(.13, .3, .24), v3(.13, 0, .04)]];        // the phone again, lit
+  const shotEls = () => SHOTS.map(([sel, p, l]) => ({ el: root.querySelector(sel), p, l })).filter(s => s.el);
+  let shots = null; const bPos = v3(-.05, .4, .42), bLook = v3(-.04, 0, .03), tPos = v3(0, 0, 0), tLook = v3(0, 0, 0);
+  function moveCanvas(toBody) {
+    if (toBody === inBody) return; inBody = toBody;
+    if (toBody) { if (!backdrop.isConnected) document.body.prepend(backdrop); backdrop.append(cv); bPos.copy(cam.position); bLook.copy(camLook); }
+    else ov.prepend(cv);
+    resize();
+  }
+  function bodyFrame(now, dt, fade) {
+    shots ||= shotEls(); if (!shots.length) return;
+    // where we are in the reading: between the chapter whose top has passed the middle of the screen and the next
+    const H = innerHeight * .5; let i = 0, t = 0;
+    for (let k = 0; k < shots.length; k++) { const y = shots[k].el.getBoundingClientRect().top - H; if (y <= 0) i = k; }
+    const y0 = shots[i].el.getBoundingClientRect().top - H, n = shots[i + 1];
+    if (n) { const y1 = n.el.getBoundingClientRect().top - H; t = clamp(-y0 / Math.max(1, y1 - y0)); t = t * t * t * (t * (t * 6 - 15) + 10); }
+    tPos.lerpVectors(shots[i].p, (n || shots[i]).p, t); tLook.lerpVectors(shots[i].l, (n || shots[i]).l, t);
+    tPos.x += Math.sin(now * .00013) * .008 + P.x * .012; tPos.y += Math.sin(now * .0001 + 1) * .005 - P.y * .008;   // it breathes, and leans a little with the pointer
+    const k = 1 - Math.exp(-dt * 1.6); bPos.lerp(tPos, k); bLook.lerp(tLook, k);
+    cam.position.copy(bPos); cam.up.set(0, 1, 0); cam.lookAt(bLook);
+    sun.intensity = 0; room.intensity = .06; sky.intensity = .03; lamp.intensity = .5; rim.intensity = 0; edge.intensity = 0;
+    U.uMix.value = 1; U.uLit.value = 1; U.uTime.value = now / 1000; catcher.visible = true; catcher.material.opacity = .4; set.visible = true;
+    nudge(dt, 0);
+    pv.position.copy(SPOT); pv.scale.setScalar(PH_SCALE); pv.rotation.set(0, SPOT_ROT, 0);
+    eveAmt = 1; drawInk(1);
+    syncBanners(now, 14); showScreen('lock'); updateHolo(now, dt, 0);
+    wake += (1 - wake) * (1 - Math.exp(-dt * 6)); if (screens.fade < 1) { screens.fade = Math.min(1, screens.fade + dt * 3); dirty = true; }
+    if (dirty) { drawScreen(now, wake); dirty = false; }
+    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = 13 * dpr(); fu.uVig.value = .85; fu.uFringe.value = 0;
+    renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+    backdrop.style.opacity = fade.toFixed(3);
+  }
   let last = performance.now();
   function frame(now) {
     requestAnimationFrame(frame);
-    const r = holder.getBoundingClientRect(); if (r.bottom < -100 || r.top > innerHeight + 100) return;
+    const r = holder.getBoundingClientRect();
     const dt = clamp((now - last) / 1000, 0, .05); last = now;
+    // the case body under way (and the trial is on): the desk goes behind the page, fading in out of the black
+    if (document.documentElement.dataset.body === 'a' && ready && r.bottom < innerHeight * .98) { moveCanvas(true); bodyFrame(now, dt, clamp((innerHeight - r.bottom) / (innerHeight * .7))); return; }
+    moveCanvas(false);
+    if (r.bottom < -100 || r.top > innerHeight + 100) return;
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
     const lag = 1 - Math.exp(-dt * 5); P.x += (P.tx - P.x) * lag; P.y += (P.ty - P.y) * lag;
     // ---- timeline ----

@@ -17,6 +17,7 @@ export function mountBody() {
   sw.innerHTML = ['a', 'b'].map(k => `<a href="?body=${k}${location.hash}" class="${k === v ? 'is-on' : ''}">${k.toUpperCase()}</a>`).join('');
   document.body.append(sw);
 
+  if (v === 'a') glassLight(day);
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const HEAD = '.v3-product-section.ux-section>h2, .ux-question, .ux-subhead, .bk-moment-kicker, .bk-moment-line, .bk-receipt-t, .bk-minute h3, .bk-minute .bk-receipt-k, .bk-receipt>.bk-receipt-k';
   const COPY = '.bk-moment-cap';
@@ -39,4 +40,27 @@ export function mountBody() {
   let raf = 0; const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
   addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask);
   build();
+}
+
+// A: every pane of frosted glass has a thickness, and its edge catches the light from the side the pointer is on —
+// the pointer is a lamp held beside the glass; the nearer it is, the brighter the rim and the faint sheen inside
+function glassLight(day) {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const GLASS = '.bk-sheet, .bk-receipt, .bk-minute li, .bk-ask, .bk-entry li, .bk-results-card, .bk-slip, .bk-textonly, .bk-owner, nav.bk-map, .bk-ledger-list>li, .ux-section .ux-persona, .ux-section .ux-principles>div, .ux-section .ux-process>li, .ux-section .ux-success>li, .ux-iterations .ux-before-after p';
+  const els = [...day.querySelectorAll(GLASS)].filter(el => !el.querySelector(':scope>.bk-glint'));
+  els.forEach(el => {
+    if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    const sheen = document.createElement('i'); sheen.className = 'bk-glow'; sheen.setAttribute('aria-hidden', 'true');
+    const rim = document.createElement('i'); rim.className = 'bk-glint'; rim.setAttribute('aria-hidden', 'true');
+    el.append(sheen, rim); el.classList.add('is-glass');
+  });
+  let mx = -1e4, my = -1e4, raf = 0;
+  const paint = () => { raf = 0;
+    for (const el of els) { const r = el.getBoundingClientRect(); if (r.bottom < -200 || r.top > innerHeight + 200) continue;
+      const dx = Math.max(r.left - mx, 0, mx - r.right), dy = Math.max(r.top - my, 0, my - r.bottom), d = Math.hypot(dx, dy);
+      el.style.setProperty('--mx', `${(mx - r.left).toFixed(0)}px`); el.style.setProperty('--my', `${(my - r.top).toFixed(0)}px`);
+      el.style.setProperty('--mi', Math.max(0, 1 - d / 420).toFixed(3)); } };
+  const ask = () => { if (!raf) raf = requestAnimationFrame(paint); };
+  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; ask(); }, { passive: true });
+  addEventListener('scroll', ask, { passive: true });
 }

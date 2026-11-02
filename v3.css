@@ -3945,3 +3945,9 @@ html[data-body=a] .bk-w.is-grey{color:rgba(239,230,214,.5)!important}
 html[data-body=a] .bk-w.is-pencil{color:#aab8d0!important}
 html[data-body=a] .bk-ink path{stroke:#efe6d6}
 html[data-body=a] .bk-ink .is-red{stroke:#ff8f78}html[data-body=a] .bk-ink .is-green{stroke:#86d8ad}html[data-body=a] .bk-ink .is-pencil{stroke:#aab8d0}
+/* A: thick glass — a bright bevel on top, a dark lip under it and a sliver of side face below; and a rim light that
+   follows the pointer round the edge (.bk-glint) with a faint sheen inside on that side (.bk-glow) */
+html[data-body=a] .bk-day .is-glass{box-shadow:inset 0 1px 0 rgba(255,250,240,.24),inset 1px 0 0 rgba(255,250,240,.07),inset -1px 0 0 rgba(0,0,0,.25),inset 0 -1px 0 rgba(0,0,0,.45),0 1px 0 rgba(255,236,210,.12),0 3px 0 -.5px rgba(255,236,210,.07),0 7px 0 -1px rgba(10,8,6,.6),0 50px 90px -45px rgba(0,0,0,.9)!important}
+.bk-glint,.bk-glow{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3}
+.bk-glint{padding:1.5px;background:radial-gradient(300px circle at var(--mx,-9999px) var(--my,-9999px),rgba(255,247,234,calc(var(--mi,0) * 1)) 0%,rgba(255,224,190,calc(var(--mi,0) * .45)) 22%,rgba(255,236,210,0) 62%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.bk-glow{background:radial-gradient(240px circle at var(--mx,-9999px) var(--my,-9999px),rgba(255,236,210,calc(var(--mi,0) * .1)),rgba(255,236,210,0) 70%);mix-blend-mode:screen}

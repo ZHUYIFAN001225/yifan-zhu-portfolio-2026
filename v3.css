@@ -3563,3 +3563,4 @@ html:has(.bk-day){background:#f3eee3!important}html:has(.bk-day) .site-header.v3
 .bk-cap-end{white-space:nowrap;line-height:1.05}
 :lang(zh) .bk-cap-end{font-size:clamp(52px,6.4vw,112px);letter-spacing:-.02em;line-height:1.2}
 :lang(zh) .bk-cap-w{font-size:clamp(72px,9vw,160px)}
+.bk-cover-pin{height:calc(min(92vh,880px) + 640vh)}

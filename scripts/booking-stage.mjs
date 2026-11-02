@@ -364,32 +364,33 @@ export function mountStage(root) {
     let cov = null;
     // where the reader really is in the pinned cover, measured live: 0 = cover reaches the top, 1 = cover unpins
     const pr = cover ? (() => { const r = cover.holder.getBoundingClientRect(); return -r.top / Math.max(1, r.height - cover.opH); })() : -1;
-    const coverGone = !m && cover && pr > .9;
-    if (!m && cover && pr > -.02 && pr <= .9) {
+    const coverGone = !m && cover && pr > .95;
+    if (!m && cover && pr > -.02 && pr <= .95) {
       const ss = cover.shots, N = ss.length, sm5 = t => t * t * t * (t * (t * 6 - 15) + 10);
       const P = i => i < 0 ? cover.est2 : i >= N ? cover.exit : ss[i].q;
       // a camera on a curved track: Catmull-Rom through the shots, so speed never drops to zero mid-move
       const cr = (p0, p1, p2, p3, t) => { const o = {}; for (const k in p1) { const a0 = p0[k], a1 = p1[k], a2 = p2[k], a3 = p3[k]; o[k] = .5 * ((2 * a1) + (-a0 + a2) * t + (2 * a0 - 5 * a1 + 4 * a2 - a3) * t * t + (-a0 + 3 * a1 - 3 * a2 + a3) * t * t * t); } return o; };
       let u, tq, tf, tspot = null, tbub = null, near = -1;
       // 0–.06 settle in · .06–.74 six shots · .74–.88 exit (gone well before the page below arrives)
-      if (pr < .06) u = -1 + clamp(pr / .06);
-      else if (pr < .74) u = (pr - .06) / .68 * N;
-      else u = N - 1 + 1.4 * clamp((pr - .74) / .14);
+      // 0–.04 settle in · .04–.84 six shots (about one screen of scrolling each) · .84–.93 exit
+      if (pr < .04) u = -1 + clamp(pr / .04);
+      else if (pr < .84) u = (pr - .04) / .8 * N;
+      else u = N - 1 + 1.4 * clamp((pr - .84) / .09);
       const i = Math.floor(u), fr = u - i;
       // each shot holds for a beat (30%), then the move eases out and in (smootherstep)
-      const v = fr < .3 ? 0 : sm5((fr - .3) / .7);
+      const v = fr < .5 ? 0 : sm5((fr - .5) / .5); // each shot holds for half its length
       tq = i < 0 ? mix(cover.est, ss[0].q, sm5(clamp(u + 1))) : cr(P(i - 1), P(i), P(i + 1), P(i + 2), v);
       const cur = Math.max(0, Math.min(N - 1, v > .5 ? i + 1 : i));
       tf = ss[cur].f;
-      if (i >= 0 && i < N && v < .1) { tspot = ss[i].spot; tbub = ss[i].bub; near = i; }
+      if (i >= 0 && i < N && v < .15) { tspot = ss[i].spot; tbub = ss[i].bub; near = i; }
       if (!camQ) { camQ = { ...tq }; camV = {}; for (const k in tq) camV[k] = 0; }
       // critically damped spring: the camera has weight, it follows and settles instead of snapping
       const W = 6.5, d = Math.min(dt, .05);
       for (const k in tq) { camV[k] += ((tq[k] - camQ[k]) * W * W - 2 * W * camV[k]) * d; camQ[k] += camV[k] * d; }
       cov = { q: { ...camQ }, f: tf, spot: tspot, bub: tbub };
       // the type behind the phone: each shot's word slides through, against the camera's direction
-      document.querySelector('[data-opening]')?.style.setProperty('--sp', clamp(pr / .05).toFixed(3));
-      const c = cover.cap; c.style.setProperty('--u', u.toFixed(4)); c.style.setProperty('--end', clamp((u - (N - 1)) / .9).toFixed(3));
+      document.querySelector('[data-opening]')?.style.setProperty('--sp', clamp(pr / .035).toFixed(3));
+      const c = cover.cap; c.style.setProperty('--u', u.toFixed(4)); c.style.setProperty('--end', clamp((u - (N - .35)) / .75).toFixed(3));
       const side = c._side(Math.max(0, Math.min(N - 1, Math.round(u))));
       const tag = c.querySelector('.bk-cap-tag'); if (tag) { tag.querySelector('span').textContent = side[zh() ? 1 : 0]; tag.querySelector('b').textContent = `${String(Math.max(1, Math.min(N, Math.round(u) + 1))).padStart(2, '0')} / ${String(N).padStart(2, '0')}`; tag.style.opacity = u > -.4 && u < N - .6 ? 1 : 0; }
     } else { camQ = null; if (cover) { const top = y < vh * .6; cover.cap.style.setProperty('--u', top ? '-1' : String(cover.shots.length + 1)); cover.cap.style.setProperty('--end', top ? '0' : '1'); } }

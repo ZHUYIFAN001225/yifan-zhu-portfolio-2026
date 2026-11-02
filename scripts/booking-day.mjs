@@ -214,7 +214,7 @@ function parallax(root, calm) {
   items.forEach((e, i) => e.style.setProperty('--ps', [.12, -.08, .18, -.05, .1][i % 5]));
   let q = false;
   const run = () => { q = false; const vh = innerHeight;
-    if (type) { type.style.transform = type.closest('.bk-cover-pin') ? '' : `translate3d(0,${(scrollY * .38).toFixed(1)}px,0)`; const op = type.closest('[data-opening]'); op.style.setProperty('--sp', clamp(scrollY / Math.max(1, (op.parentElement.matches('.bk-cover-pin') ? op.parentElement.offsetHeight - innerHeight : op.offsetHeight * .8) * .14)).toFixed(3)); }
+    if (type) { type.style.transform = type.closest('.bk-cover-pin') ? '' : `translate3d(0,${(scrollY * .38).toFixed(1)}px,0)`; const op = type.closest('[data-opening]'); op.style.setProperty('--sp', clamp(scrollY / Math.max(1, (op.parentElement.matches('.bk-cover-pin') ? op.parentElement.offsetHeight - innerHeight : op.offsetHeight * .8) * .035)).toFixed(3)); }
     items.forEach(e => { const r = e.getBoundingClientRect(); if (r.bottom < -100 || r.top > vh + 100) return; const p = (r.top + r.height / 2 - vh / 2); e.style.translate = `0 ${(p * -+e.style.getPropertyValue('--ps')).toFixed(1)}px`; }); };
   addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(run); } }, { passive: true }); run();
 }

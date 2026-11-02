@@ -227,15 +227,14 @@ export function mountDesk(root) {
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
     sun.intensity = 3.4 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
-    lamp.intensity = 7 * nightAmt; rim.intensity = 60 * up * (1 - kOut);
+    lamp.intensity = 7 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
     set.visible = blackout < .995;
     nudge(dt, onDesk);
     // ---- the phone ----
-    pv.position.set(lerp(SPOT.x, 0, up), lerp(SPOT.y, .55, up), lerp(SPOT.z, 0, up));
+    pv.position.set(lerp(SPOT.x, 0, up), lerp(SPOT.y, .5, up), lerp(SPOT.z, 0, up));
     pv.scale.setScalar(PH_SCALE * lerp(1, 1.0, up));
-    E.set(up * (P.y * .18 + Math.sin(now / 2600) * .05) + up * Math.PI / 2 * 0, SPOT_ROT * (1 - up) + up * P.x * .22, 0, 'XYZ'); pv.rotation.copy(E);
+    E.set(up * (P.y * .16 + Math.sin(now / 2600) * .04), SPOT_ROT * (1 - up) + up * P.x * .2, up * Math.sin(now / 3100) * .03, 'XYZ'); pv.rotation.copy(E);
     // when it floats it faces the camera: tilt the flat phone up
-    flat.rotation.x = -Math.PI / 2 + up * Math.PI / 2;
     const bz = (now - buzz) / 1000; if (bz < .35 && onDesk > .5) pv.position.x += Math.sin(bz * 90) * .0012 * (1 - bz / .35);
     rim.target.position.copy(pv.position);
     // ---- the screen ----

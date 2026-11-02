@@ -81,11 +81,11 @@ export function mountDesk(root) {
   function drawInk(k) {
     k = Math.round(clamp(k) * 24) / 24; if (k === inkNow) return; inkNow = k;
     const x = ink.getContext('2d'), w = ink.width, h = ink.height; x.clearRect(0, 0, w, h); const r = seed(5);
-    const rowY = row => h * (.175 + row * .0415);
+    const rowY = row => h * (.215 + row * .0455);
     EV.forEach((e, i) => { const k0 = i / EV.length, k1 = (i + 1) / EV.length; if (k <= k0) return; const part = clamp((k - k0) / (k1 - k0));
-      if (e[0] === 'strike') { const [, row, x0, x1] = e; x.strokeStyle = '#b3261e'; x.lineWidth = h * .004; x.beginPath(); x.moveTo(w * x0, rowY(row) - h * .012); x.lineTo(w * lerp(x0, x1, part), rowY(row) - h * .016); x.stroke(); return; }
+      if (e[0] === 'strike') { const [, row, x0, x1] = e; x.strokeStyle = '#b3261e'; x.lineWidth = h * .005; x.beginPath(); x.moveTo(w * x0, rowY(row) - h * .012); x.lineTo(w * lerp(x0, x1, part), rowY(row) - h * .016); x.stroke(); return; }
       const fix = e[0] === 'fix'; const [row, fx, txt, col] = fix ? e.slice(1) : e, y = rowY(row), X = w * fx;
-      x.save(); x.beginPath(); x.rect(0, y - h * .035, X + part * w * .75, h * .05); x.clip(); x.translate(X, y); x.rotate((r() - .5) * .04); x.fillStyle = col; x.font = `italic 600 ${Math.round(h * (fix ? .02 : .026) + r() * 3)}px ${HAND}`; x.fillText(L(txt), 0, 0); x.restore(); });
+      x.save(); x.beginPath(); x.rect(0, y - h * .045, X + part * w * .75, h * .06); x.clip(); x.translate(X, y); x.rotate((r() - .5) * .04); x.fillStyle = col; x.font = `italic 600 ${Math.round(h * (fix ? .03 : .04) + r() * 3)}px ${HAND}`; x.fillText(L(txt), 0, 0); x.restore(); });
   }
 
   // ---------- the phone ----------
@@ -188,7 +188,7 @@ export function mountDesk(root) {
     // ---- the phone: on its spot, or centre stage ----
     const a = phoneQ(), big = { cx: vw / 2, cy: vh * .5, w: Math.min(vh * .62, vw * .34) * .62, h: Math.min(vh * .62, vw * .34), roll: 0 };
     const cx = lerp(a.cx, big.cx, up), cy = lerp(a.cy, big.cy, up), w = lerp(a.w, big.w, up), h = lerp(a.h, big.h, up), roll = lerp(a.roll, 0, up);
-    const scale = Math.max(h / 988, w / 465) * 1.06;
+    const scale = Math.max(h / 988, w / 465) * 1.09;
     const bz = (now - buzz) / 1000, shiver = bz < .35 && onDesk > .5 ? Math.sin(bz * 90) * 3 * (1 - bz / .35) : 0;
     phEl.style.transform = `translate(${(cx - RW * scale / 2 + shiver).toFixed(1)}px, ${(cy - RH * scale / 2).toFixed(1)}px) rotate(${roll.toFixed(4)}rad) scale(${scale.toFixed(4)})`;
     phone.rotation.set(up * (P.y * .18 + Math.sin(now / 2600) * .05), up * P.x * .22, 0);

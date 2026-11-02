@@ -3640,3 +3640,7 @@ html[data-cover="swirl"] .op--3d :is(.op-type,.op-copy,.op-drag,.op-scroll,.op-p
 .bk-ov-s-h b{display:block;font-weight:inherit}.bk-ov-s-h .s2{color:#1f9e6c}
 .bk-ov-s-t{margin:0 0 22px;max-width:36ch;font:500 16px/1.55 Inter,system-ui,sans-serif;color:#4d6157}
 @media (max-width:999px){.bk-ov-card{width:84px}.bk-ov-foot{flex-direction:column;align-items:flex-start}.bk-ov-s{width:44vw}}
+.bk-ov .bk-ov-h{max-width:none!important;width:auto!important;padding:0!important;color:#17362b!important;text-transform:none!important}
+.bk-ov .bk-ov-h .l1,.bk-ov .bk-ov-h .l2,.bk-ov .bk-ov-h .r1{color:#17362b!important}
+.bk-ov .bk-ov-h .r2{color:#1f9e6c!important;white-space:nowrap}
+.bk-ov .bk-ov-h>span{flex:0 1 auto;white-space:nowrap}

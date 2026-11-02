@@ -335,17 +335,17 @@ export function mountDesk(root) {
 
   // ---------- camera, pointer, nudges ----------
   let vw = 0, vh = 0, rt = null;
-  const dpr = () => Math.min(devicePixelRatio || 1, 1.75);
-  const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
+  const dpr = () => inBody ? .34 : Math.min(devicePixelRatio || 1, 1.75);   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
+  const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: `precision highp float;
       #include <tonemapping_pars_fragment>
-      varying vec2 vUv; uniform sampler2D tCol, tDep; uniform vec2 uRes; uniform float uNear, uFar, uFocus, uRange, uMax, uVig, uFringe;
+      varying vec2 vUv; uniform sampler2D tCol, tDep; uniform vec2 uRes; uniform float uNear, uFar, uFocus, uRange, uMax, uVig, uFringe, uJit;
       float dist(vec2 uv){ float z = texture2D(tDep, uv).r * 2.0 - 1.0; return (2.0 * uNear * uFar) / (uFar + uNear - z * (uFar - uNear)); }
       float coc(vec2 uv){ return clamp(abs(dist(uv) - uFocus) / uRange, 0.0, 1.0) * uMax; }
       void main(){
         float c0 = coc(vUv); float r = c0;
-        vec3 acc = vec3(0.0); float wsum = 0.0; float a0 = fract(sin(dot(vUv * uRes, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832;
+        vec3 acc = vec3(0.0); float wsum = 0.0; float a0 = fract(sin(dot(vUv * uRes, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832 * uJit;
         for (int i = 0; i < 20; i++){ float fi = float(i); float ang = fi * 2.39996 + a0; float rad = sqrt((fi + .5) / 20.0);
           vec2 o = vec2(cos(ang), sin(ang)) * rad * r / uRes; float ct = coc(vUv + o); float w = (ct >= c0 * .7) ? 1.0 : .03; // a sharp, bright thing in front never bleeds a halo into the soft background
           acc += texture2D(tCol, vUv + o).rgb * w; wsum += w; }
@@ -435,7 +435,7 @@ export function mountDesk(root) {
     syncBanners(now, 14); showScreen('lock'); updateHolo(now, dt, 0);
     wake += (1 - wake) * (1 - Math.exp(-dt * 6)); if (screens.fade < 1) { screens.fade = Math.min(1, screens.fade + dt * 3); dirty = true; }
     if (dirty) { drawScreen(now, wake); dirty = false; }
-    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = 13 * dpr(); fu.uVig.value = .85; fu.uFringe.value = 0;
+    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     backdrop.style.opacity = fade.toFixed(3);
   }
@@ -495,7 +495,7 @@ export function mountDesk(root) {
     // ---- focus ----
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(1.1, .12, up) - (kBook * kBack) * .8; fu.uMax.value = (2.2 * (1 - up) + 7 * kBook * kBack) * dpr();
-    fu.uVig.value = .25 + .55 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
+    fu.uVig.value = .25 + .55 * nightAmt - .25 * kOut; fu.uFringe.value = 0; fu.uJit.value = 1;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     // the words
     const tHero = clamp((now - bornAt - 300) / 1900);   // the first heading arrives on load, the rest with the scroll

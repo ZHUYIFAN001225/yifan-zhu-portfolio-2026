@@ -3676,3 +3676,11 @@ html[data-cover="swirl"] .bk-cover-pin>.op{background:#f3f1ec!important;height:1
 .bk-ov .bk-ov-btns a.bk-ov-try{background:#10201a;color:#fff!important;border-color:#10201a}
 .bk-ov .bk-ov-btns a.bk-ov-live{background:transparent;color:#10201a!important;border-color:rgba(16,32,26,.25)}
 @media (max-width:999px){.bk-ov-foot{left:6%;width:80vw}.bk-ov-s{left:52%;width:44vw}}
+
+/* ======== opening v7: WebGL cards ======== */
+.bk-ov-3d{display:none}
+.bk-ov-gl{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.bk-ov .bk-ov-h{z-index:1}
+.bk-ov-foot,.bk-ov-s{z-index:3}
+.bk-ov .bk-ch{display:inline-block;font-style:normal;--lit:0;color:color-mix(in oklab,#10201a calc(100% - var(--lit) * 100%),#1f9e6c);transform:translateY(calc(var(--lit) * -.06em));transition:color .25s,transform .35s cubic-bezier(.16,1,.3,1)}
+.bk-ruler{position:fixed;right:0;top:0;width:22px;height:100vh;z-index:80;pointer-events:none}

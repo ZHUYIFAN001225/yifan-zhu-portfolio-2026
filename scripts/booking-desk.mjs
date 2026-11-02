@@ -128,7 +128,7 @@ export function mountDesk(root) {
         float d = (w.x * .8 + w.z * .6) * .55 + dfbm(w.xz * .12 + t * .2) * 1.6 + t * .15; float bands = .5 + .5 * sin(d); bands = smoothstep(.15, .95, bands);
         float windowGrad = .82 + .22 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.72 + .26 * bands + .1 * leaves * bands) * windowGrad; }`)
       .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= mix(1.0, dappleAt(vDp), uDap);'); }; return m; };
-  const rim = new THREE.SpotLight(0xffc98a, 0, 30, .6, .8, 1.2); rim.position.set(-4, 9, -5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
+  const rim = new THREE.SpotLight(0xffc98a, 0, 8.6, .6, .8, 1.2); rim.position.set(-4, 9.5, -4.5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
   const night = new THREE.HemisphereLight(0x4a56c8, 0x1a0f26, 0); scene.add(night);
   // the desk lamp, top-left, for the evening: a warm pool over the book and the phone, the rest of the room blue-dark
   const lamp = new THREE.SpotLight(0xffc27a, 0, 26, .5, .7, 1.3); lamp.position.set(-6.5, 7.5, -4); lamp.castShadow = true; lamp.shadow.mapSize.set(2048, 2048); lamp.shadow.bias = -.0006; lamp.shadow.normalBias = .02; lamp.shadow.radius = 5; scene.add(lamp); lamp.target.position.set(-.5, 0, .4); scene.add(lamp.target);
@@ -355,7 +355,7 @@ export function mountDesk(root) {
     hero: { pos: new THREE.Vector3(0, 14.8, 3.4), look: new THREE.Vector3(.2, 0, -.3) },
     dark: { pos: new THREE.Vector3(0, 12.2, .001), look: new THREE.Vector3(0, 0, 0) },
     side: { pos: new THREE.Vector3(3.6, 5.2, 8.2), look: new THREE.Vector3(.2, .2, -.3) },     // the counter from the front-right, low
-    close: { pos: new THREE.Vector3(2.4, 3.4, 5.0), look: new THREE.Vector3(-.2, .1, .3) }     // pushed in on the book and the phone
+    close: { pos: new THREE.Vector3(2.9, 4.3, 6.1), look: new THREE.Vector3(-.5, .1, .2) }     // pushed in on the book and the phone
   };
   const look = new THREE.Vector3(), E = new THREE.Euler(), tmp = new THREE.Vector3();
   const mix = (a, b, t, out) => out.lerpVectors(a, b, t);

@@ -100,7 +100,7 @@ export function mountCover(root) {
   let renderer; try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' }); } catch { renderer = null; }
   const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(35, 1, 10, 6000), group = new THREE.Group(); scene.add(group);
   const geo = new THREE.PlaneGeometry(1, 1), loader = new THREE.TextureLoader(), texCache = {};
-  const tex = n => { const k = (zh() ? 'zh' : 'en') + n; if (!texCache[k]) { const t = loader.load(`assets/v3/cover-posters/${zh() ? 'zh' : 'en'}/p${n}.webp`); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; t.minFilter = THREE.LinearMipmapLinearFilter; texCache[k] = t; } return texCache[k]; };
+  const tex = n => { const k = (zh() ? 'zh' : 'en') + n; if (!texCache[k]) { const t = loader.load(`assets/v3/cover-posters/${zh() ? 'zh' : 'en'}/p${n}.webp`); t.colorSpace = THREE.NoColorSpace; t.anisotropy = 4; t.minFilter = THREE.LinearMipmapLinearFilter; texCache[k] = t; } return texCache[k]; };
   const cards = Array.from({ length: COUNT }, (_, j) => {
     const mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false,
       uniforms: { uMap: { value: null }, uStreak: { value: new THREE.Vector2() }, uDof: { value: 0 }, uAlpha: { value: 1 }, uClipX: { value: 1e6 }, uAspect: { value: .75 } } });
@@ -117,9 +117,9 @@ export function mountCover(root) {
 
   const cw = () => Math.min(220, vw * .145);
   // arrangements in px (1 world unit = 1 px at z = 0): [x, y(down), z, rx, ry, rz, scale]
-  const swarm = (j, t) => { const a = rnd(j) * 6.283 + t * (.16 + rnd(j + 9) * .2), depth = (rnd(j + 3) + t * .05) % 1, z = -1500 + depth * 1900;
+  const swarm = (j, t) => { const a = rnd(j) * 6.283 + t * (.16 + rnd(j + 9) * .2), depth = (rnd(j + 3) + t * .05) % 1, z = -1700 + depth * 1950;
     const rr = 220 + Math.sqrt(rnd(j + 5)) * Math.min(vw, 1500) * .44;
-    return [Math.cos(a) * rr, Math.sin(a) * rr * .6, z, (rnd(j + 1) - .5) * 70, (rnd(j + 2) - .5) * 90 + Math.cos(a) * 25, (rnd(j + 4) - .5) * 50, .9]; };
+    return [Math.cos(a) * rr, Math.sin(a) * rr * .6, z, (rnd(j + 1) - .5) * 70, (rnd(j + 2) - .5) * 90 + Math.cos(a) * 25, (rnd(j + 4) - .5) * 50, .6]; };
   const drum = (j, t) => { const a = (j / COUNT) * 6.283 + t * .35, R = Math.min(vw * .22, 340); return [Math.sin(a) * R, (rnd(j + 7) - .5) * 14, Math.cos(a) * R - R * .55, 0, a * 57.3, 0, 1.08]; };
   const table = j => { const c = j % COLS, r = Math.floor(j / COLS), w = cw() * 1.1; return [-vw * .27 + (c - COLS / 2 + .5) * w + (r - 2.5) * w * .32, (r - 2.5) * w * 1.2, -40, 46, 0, -26, 1]; };
 

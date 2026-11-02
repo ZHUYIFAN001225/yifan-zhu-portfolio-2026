@@ -405,9 +405,9 @@ export function mountDesk(root) {
     mix(camPos, V.book.pos, kBook * kBack, camPos); mix(camLook, V.book.look, kBook * kBack, camLook); roll = lerp(roll, V.book.roll, kBook * kBack);
     mix(camPos, V.phone.pos, kPhone * kBack, camPos); mix(camLook, V.phone.look, kPhone * kBack, camLook); roll = lerp(roll, V.phone.roll, kPhone * kBack);
     camPos.x += P.x * .018 * (1 - up);   // left/right: a little parallax
-    { // up/down: orbit about what the camera looks at — pointer low = a few degrees lower, nearer level; high = the plan view
-      const k = (1 - up) * (1 - .6 * kBook * kBack), d = THREE.MathUtils.degToRad(9) * clamp((P.y + 1) / 2) * k;
-      const vx = camPos.x - camLook.x, vy = camPos.y - camLook.y, vz = camPos.z - camLook.z, hz = Math.hypot(vx, vz) || 1e-6, r = Math.hypot(hz, vy), el = Math.atan2(vy, hz) - d;
+    { // up/down: orbit about what the camera looks at — pointer at the top ≈ straight down, at the bottom a good deal lower
+      const k = (1 - up) * (1 - .6 * kBook * kBack), d = THREE.MathUtils.degToRad(lerp(-17, 15, clamp((P.y + 1) / 2))) * k;   // top: nearly plan view; bottom: ~15° lower
+      const vx = camPos.x - camLook.x, vy = camPos.y - camLook.y, vz = camPos.z - camLook.z, hz = Math.hypot(vx, vz) || 1e-6, r = Math.hypot(hz, vy), el = Math.min(Math.atan2(vy, hz) - d, THREE.MathUtils.degToRad(84));
       camPos.set(camLook.x + vx / hz * r * Math.cos(el), camLook.y + r * Math.sin(el), camLook.z + vz / hz * r * Math.cos(el)); }
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----

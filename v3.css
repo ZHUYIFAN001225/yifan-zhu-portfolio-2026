@@ -3924,3 +3924,4 @@ html[data-body=a] .bk-day :is(.v3-outline-button,.bk-try-full){border-color:var(
 html[data-body=a] .bk-minute p{opacity:1!important}
 html[data-body=a]{--x-ink2:rgba(241,231,214,.74)}
 html[data-body=a] .bk-receipt{overflow:hidden}
+.bk-body-switch{left:50%;transform:translateX(-50%);bottom:16px}

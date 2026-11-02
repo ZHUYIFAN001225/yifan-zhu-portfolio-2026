@@ -112,6 +112,7 @@ export function mountDesk(root) {
   const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .35, 1.6); room.castShadow = false; scene.add(room);
   const sky = new THREE.HemisphereLight(0xb9c4d8, 0x3a2a1c, 0); scene.add(sky);
   const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.8); lamp.position.set(-.46, .58, -.3); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.0002; lamp.shadow.normalBias = .0005; scene.add(lamp);
+  const edge = new THREE.PointLight(0xfff4e6, 0, .35, 2); scene.add(edge);
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
 
   // ---------- the set, from Blender ----------
@@ -131,7 +132,7 @@ export function mountDesk(root) {
       // uAmb: the day as baked (the approved light); uSun: the same with the leaves moved a touch by a breeze.
       // The light drifts slowly between them, patch by patch, so the leaf shadows only stir.
       float ph = vn(vWP.xz * 7.) * 6.2832;
-      float w = (.5 - .5 * cos(uTime * .55 + ph + sin(uTime * .23 + ph) * 1.2)) * uWind;
+      float w = (.5 - .5 * cos(uTime * .95 + ph + sin(uTime * .4 + ph) * 1.2)) * uWind;
       vec3 day = mix(texture2D(uAmb, vBUv).rgb, texture2D(uSun, vBUv).rgb, w);
       return mix(day, texture2D(uNight, vBUv).rgb * 1.15, uMix) * ${GAIN.toFixed(2)} * uLit;
     }`;
@@ -244,6 +245,20 @@ export function mountDesk(root) {
     const ix = (W - pw) / 2 + W * .07, iy = py + ph / 2; sx.strokeStyle = 'rgba(236,238,245,.9)'; sx.lineWidth = W * .006;
     sx.beginPath(); sx.arc(ix, iy + W * .002, W * .018, 0, Math.PI * 2); sx.stroke(); sx.beginPath(); sx.moveTo(ix, iy - W * .008); sx.lineTo(ix, iy + W * .002); sx.lineTo(ix + W * .008, iy + W * .008); sx.stroke();
     sx.fillStyle = 'rgba(236,238,245,.92)'; sx.textAlign = 'left'; sx.fillText(pill, ix + W * .04, iy + W * .017);
+    // the notifications, gathered into one stack near the bottom, the way iOS keeps them: the newest on top, the edges
+    // of the older ones showing beneath, and the count under it. The messages themselves float above the phone.
+    const last = banners[banners.length - 1];
+    if (last && unread > 0) {
+      const age = (performance.now() - last.t) / 1000, kin = sm(age / .45), cw = W * .9, cx = (W - cw) / 2, chh = W * .2, cy = H * .63 + (1 - kin) * W * .05;
+      for (let k = Math.min(unread - 1, 2); k >= 1; k--) { sx.fillStyle = `rgba(150,156,170,${.32 - k * .08})`; sx.beginPath(); sx.roundRect(cx + k * W * .035, cy + chh - W * .02 + k * W * .022, cw - k * W * .07, W * .05, W * .03); sx.fill(); }
+      sx.save(); sx.globalAlpha = .55 + .45 * kin; sx.fillStyle = 'rgba(205,210,222,.93)'; sx.beginPath(); sx.roundRect(cx, cy, cw, chh, W * .055); sx.fill(); sx.restore();
+      const ic = W * .1, ix2 = cx + W * .04, iy2 = cy + (chh - ic) / 2; sx.fillStyle = '#2dc100'; sx.beginPath(); sx.roundRect(ix2, iy2, ic, ic, ic * .26); sx.fill();
+      sx.fillStyle = '#fff'; sx.beginPath(); sx.ellipse(ix2 + ic * .4, iy2 + ic * .45, ic * .24, ic * .2, 0, 0, Math.PI * 2); sx.fill(); sx.beginPath(); sx.ellipse(ix2 + ic * .63, iy2 + ic * .62, ic * .2, ic * .17, 0, 0, Math.PI * 2); sx.fill();
+      const tx2 = ix2 + ic + W * .035; sx.textAlign = 'left'; sx.fillStyle = '#111'; sx.font = `600 ${Math.round(W * .042)}px ${SYS}`; sx.fillText(last.who, tx2, cy + chh * .42);
+      sx.fillStyle = '#6e6e74'; sx.font = `500 ${Math.round(W * .034)}px ${SYS}`; sx.textAlign = 'right'; sx.fillText(L(T.now), cx + cw - W * .045, cy + chh * .42); sx.textAlign = 'left';
+      sx.fillStyle = '#2a2a2e'; sx.font = `400 ${Math.round(W * .038)}px ${SYS}`; let t2 = last.what; while (sx.measureText(t2).width > cx + cw - tx2 - W * .05 && t2.length > 4) t2 = t2.slice(0, -2); sx.fillText(t2 === last.what ? t2 : t2 + '…', tx2, cy + chh * .76);
+      if (unread > 1) { sx.textAlign = 'center'; sx.fillStyle = 'rgba(236,238,245,.75)'; sx.font = `500 ${Math.round(W * .036)}px ${SYS}`; sx.fillText(zh() ? `${unread} 条通知` : `${unread} notifications`, W / 2, cy + chh + W * .12); sx.textAlign = 'left'; }
+    }
     // flashlight and camera, and at night the sleep focus between them
     const by = H - W * .16, br = W * .072;
     for (const bx of [W * .17, W * .83]) { sx.fillStyle = 'rgba(255,255,255,.12)'; sx.beginPath(); sx.arc(bx, by, br, 0, Math.PI * 2); sx.fill(); }
@@ -326,12 +341,12 @@ export function mountDesk(root) {
       float dist(vec2 uv){ float z = texture2D(tDep, uv).r * 2.0 - 1.0; return (2.0 * uNear * uFar) / (uFar + uNear - z * (uFar - uNear)); }
       float coc(vec2 uv){ return clamp(abs(dist(uv) - uFocus) / uRange, 0.0, 1.0) * uMax; }
       void main(){
-        float c0 = coc(vUv); float r = max(c0, .45);
+        float c0 = coc(vUv); float r = c0;
         vec3 acc = vec3(0.0); float wsum = 0.0; float a0 = fract(sin(dot(vUv * uRes, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832;
         for (int i = 0; i < 20; i++){ float fi = float(i); float ang = fi * 2.39996 + a0; float rad = sqrt((fi + .5) / 20.0);
           vec2 o = vec2(cos(ang), sin(ang)) * rad * r / uRes; float ct = coc(vUv + o); float w = (ct >= c0 * .7) ? 1.0 : .03; // a sharp, bright thing in front never bleeds a halo into the soft background
           acc += texture2D(tCol, vUv + o).rgb * w; wsum += w; }
-        vec3 col = acc / wsum;
+        vec3 col = c0 < .5 ? texture2D(tCol, vUv).rgb : acc / wsum;   // in focus means sharp
         vec2 q = (vUv - .5) * vec2(uRes.x / uRes.y, 1.0); float rr = length(q);
         if (uFringe > 0.0) { vec2 d = (vUv - .5) * uFringe * rr; col.r = mix(col.r, texture2D(tCol, vUv + d).r, .6); col.b = mix(col.b, texture2D(tCol, vUv - d).b, .6); }
         col *= 1.0 - uVig * smoothstep(.45, 1.25, rr);
@@ -389,7 +404,11 @@ export function mountDesk(root) {
     mix(camPos, V.dip.pos, dipAmt * .55 * (1 - up), camPos); mix(camLook, V.dip.look, dipAmt * .55 * (1 - up), camLook);
     mix(camPos, V.book.pos, kBook * kBack, camPos); mix(camLook, V.book.look, kBook * kBack, camLook); roll = lerp(roll, V.book.roll, kBook * kBack);
     mix(camPos, V.phone.pos, kPhone * kBack, camPos); mix(camLook, V.phone.look, kPhone * kBack, camLook); roll = lerp(roll, V.phone.roll, kPhone * kBack);
-    camPos.x += P.x * .018 * (1 - up); camPos.z += P.y * .012 * (1 - up);   // small, so nothing slips out of frame
+    camPos.x += P.x * .018 * (1 - up);   // left/right: a little parallax
+    { // up/down: orbit about what the camera looks at — pointer low = a few degrees lower, nearer level; high = the plan view
+      const k = (1 - up) * (1 - .6 * kBook * kBack), d = THREE.MathUtils.degToRad(9) * clamp((P.y + 1) / 2) * k;
+      const vx = camPos.x - camLook.x, vy = camPos.y - camLook.y, vz = camPos.z - camLook.z, hz = Math.hypot(vx, vz) || 1e-6, r = Math.hypot(hz, vy), el = Math.atan2(vy, hz) - d;
+      camPos.set(camLook.x + vx / hz * r * Math.cos(el), camLook.y + r * Math.sin(el), camLook.z + vz / hz * r * Math.cos(el)); }
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
     sun.intensity = 2.2 * dayAmt; room.intensity = .45 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .2 * (1 - blackout) * (1 - nightAmt * .8);
@@ -404,6 +423,8 @@ export function mountDesk(root) {
     // when it floats it faces the camera: tilt the flat phone up
     const bz = (now - buzz) / 1000; if (bz < .35 && onDesk > .5) pv.position.x += Math.sin(bz * 90) * .0012 * (1 - bz / .35);
     rim.target.position.copy(pv.position);
+    edge.position.set(pv.position.x + P.x * .075, pv.position.y + .012 + up * .02, pv.position.z + P.y * .13 * (1 - up) + P.y * .1 * up);
+    edge.intensity = fine ? (.08 * (1 - up) * (1 - kOut) + .5 * up) : 0;
     // ---- the screen ----
     const heroMsgs = Math.floor(clamp(pr, 0, .085) / .0107), eveMsgs = Math.floor(clamp(pr - .6, 0, .3) / .022);
     syncBanners(now, up > .05 ? 0 : heroMsgs + eveMsgs); showScreen(up > .05 ? 'cover-book' : 'lock');
@@ -413,7 +434,7 @@ export function mountDesk(root) {
     if (dirty) { drawScreen(now, wake); dirty = banners.some(b => now - b.t < 600) || screens.fade < 1; }
     // ---- focus ----
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
-    fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(.5, .12, up) - (kBook * kBack) * .22; fu.uMax.value = (6 + 10 * up + 6 * kBook * kBack) * dpr();
+    fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(.5, .12, up) - (kBook * kBack) * .22; fu.uMax.value = (6 * (1 - up) + 6 * kBook * kBack) * dpr();
     fu.uVig.value = .25 + .4 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     // the words

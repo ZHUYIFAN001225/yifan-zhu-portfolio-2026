@@ -27,6 +27,12 @@ for k, (x, y, rz) in MOVE.items():
 O['scissors'].scale = (1.0, 1.0, 1.0)
 for k, (x, y) in {'clip_a': (-.26, -.16), 'clip_b': (-.24, -.20), 'clip_c': (-.27, -.24)}.items(): O[k].location.x = x; O[k].location.y = y
 O['mat'].location.x = .05; O['mat'].location.y = -.045; O['mat'].scale = (.5 / .6, .36 / .42, 1)
+rib = O['nb_ribbon']; rib.rotation_euler = (0, 0, 0); rib.location = (.0035, 0, .0192); rib.scale = (1, .20 / .105, 1)
+def rib_piece(name, loc, rot, length):
+    o = rib.copy(); o.data = rib.data.copy(); o.name = name; bpy.context.collection.objects.link(o); o.parent = O['notebook']
+    o.location = loc; o.rotation_euler = rot; o.scale = (1, length / .105, 1); return o
+rib_piece('nb_ribbon_b', (.0035, -.109, .00965), (math.radians(44.8), 0, 0), .0256)            # over the edge of the pages
+rib_piece('nb_ribbon_c', (.0058, -.1315, .0007), (0, 0, math.radians(8)), .027)                  # the tail, lying on the desk
 bpy.context.view_layer.update()
 def kids(name): return [c for c in O[name].children_recursive if c.type in ('MESH', 'CURVE')]
 GROUPS = {'desk': [O['desk']], 'mat': [O['mat']], 'notebook': kids('notebook'), 'pencil': kids('pencil'), 'pen': kids('pen'), 'eraser': kids('eraser'),
@@ -127,15 +133,18 @@ def bake_group(g, objs, tag):
     img.filepath_raw = os.path.join(BAKED, name + '.png'); img.file_format = 'PNG'; img.save()
     IMG[(g, tag)] = img; log('baked', name, f'{time.time()-t:.0f}s')
 
+ONLY = globals().get('BAKE_GROUPS')
 for tag in TAGS:
     set_lights(tag)
-    for g, objs in GROUPS.items(): bake_group(g, objs, tag)
+    for g, objs in GROUPS.items():
+        if not ONLY or g in ONLY: bake_group(g, objs, tag)
 
 # ---------------------------------------------------------------- export: each group with its day bake as the base colour
 for mod in ('io_scene_gltf2', 'bl_ext.blender_org.io_scene_gltf2'):
     try: bpy.ops.preferences.addon_enable(module=mod); break
     except Exception: continue
 for g, objs in GROUPS.items():
+    if ONLY and g not in ONLY: continue
     for o in objs:
         for s in o.material_slots:
             m = s.material; nt = m.node_tree

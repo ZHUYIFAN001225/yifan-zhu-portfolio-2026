@@ -7,15 +7,9 @@ const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const easeOut = t => 1 - (1 - t) ** 3, easeIn = t => t * t * t;
 
 export function mountBody() {
-  const v = new URLSearchParams(location.search).get('body');
-  if (!/^[ab]$/.test(v || '')) return;
+  const v = new URLSearchParams(location.search).get('body') === 'b' ? 'b' : 'a';   // the dark case is the case now (b kept only as a reference)
   const html = document.documentElement; html.dataset.body = v;
   const day = document.querySelector('.bk-day'); if (!day) return;
-
-  // a small switch, so the two can be compared on the same page
-  const sw = document.createElement('div'); sw.className = 'bk-body-switch';
-  sw.innerHTML = ['a', 'b'].map(k => `<a href="?body=${k}${location.hash}" class="${k === v ? 'is-on' : ''}">${k.toUpperCase()}</a>`).join('');
-  document.body.append(sw);
 
   if (v === 'a') glassLight(day);
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;

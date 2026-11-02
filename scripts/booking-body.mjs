@@ -46,7 +46,7 @@ export function mountBody() {
 // the pointer is a lamp held beside the glass; the nearer it is, the brighter the rim and the faint sheen inside
 function glassLight(day) {
   if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  const GLASS = '.bk-sheet, .bk-receipt, .bk-minute li, .bk-ask, .bk-entry li, .bk-results-card, .bk-slip, .bk-textonly, .bk-owner, nav.bk-map, .bk-ledger-list>li, .ux-section .ux-persona, .ux-section .ux-principles>div, .ux-section .ux-process>li, .ux-section .ux-success>li, .ux-iterations .ux-before-after p';
+  const GLASS = '.bk-sheet, .bk-receipt, .bk-minute li, .bk-ask, .bk-entry li, .bk-results-card, .bk-slip, .bk-textonly, .bk-owner, nav.bk-map, .bk-ledger-list>li, .ux-section .ux-persona, .ux-section .ux-principles>div, .ux-section .ux-process>li, .ux-section .ux-success>li, .ux-iterations .ux-before-after p, .bk-dom-slip, .ux-pains>div.bk-sticky, .bk-ledger.is-after';
   const els = [];
   const scan = () => day.querySelectorAll(GLASS).forEach(el => {   // the drawn parts of the page arrive later; look again
     if (el.querySelector(':scope>.bk-glint')) return;

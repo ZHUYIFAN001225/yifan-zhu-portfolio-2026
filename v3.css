@@ -3951,3 +3951,21 @@ html[data-body=a] .bk-day .is-glass{box-shadow:inset 0 1px 0 rgba(255,250,240,.2
 .bk-glint,.bk-glow{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3}
 .bk-glint{padding:1.5px;background:radial-gradient(300px circle at var(--mx,-9999px) var(--my,-9999px),rgba(255,247,234,calc(var(--mi,0) * 1)) 0%,rgba(255,224,190,calc(var(--mi,0) * .45)) 22%,rgba(255,236,210,0) 62%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 .bk-glow{background:radial-gradient(240px circle at var(--mx,-9999px) var(--my,-9999px),rgba(255,236,210,calc(var(--mi,0) * .1)),rgba(255,236,210,0) 70%);mix-blend-mode:screen}
+/* A: one glass for every pane — glassmorphism as in the reference: frosted, strongly blurred, a surface that is
+   brighter at the top left, a bright bevel on the top-left edge, a softer one on the bottom-right, a little body */
+html[data-body=a]{--glass-fill:linear-gradient(135deg,rgba(255,255,255,.15) 0%,rgba(255,255,255,.055) 40%,rgba(255,255,255,.035) 70%,rgba(255,255,255,.085) 100%);--glass-edge:inset 1.5px 1.5px 0 rgba(255,255,255,.38),inset -1px -1.5px 0 rgba(255,255,255,.14),inset 0 0 32px rgba(255,255,255,.035),0 1px 0 rgba(255,255,255,.05),0 34px 70px -34px rgba(0,0,0,.88)}
+html[data-body=a] .bk-day .is-glass,
+html[data-body=a] .bk-day :is(.bk-dom-slip,.bk-dom-slip.is-break,.bk-dom-slip.is-over,.ux-pains>div.bk-sticky,.bk-ledger.is-after,.bk-minute-viz i){background:var(--glass-fill)!important;border:1px solid rgba(255,255,255,.14)!important;-webkit-backdrop-filter:blur(26px) saturate(1.25);backdrop-filter:blur(26px) saturate(1.25);box-shadow:var(--glass-edge)!important}
+html[data-body=a] .bk-day .is-glass{border-radius:22px!important}
+html[data-body=a] .bk-sheet.is-glass{background:linear-gradient(90deg,transparent 63px,rgba(255,138,115,.34) 63px,rgba(255,138,115,.34) 64px,transparent 64px),repeating-linear-gradient(180deg,transparent 0 39px,rgba(255,255,255,.09) 39px 40px) 0 25px/100% 100% no-repeat,var(--glass-fill),rgba(20,16,12,.3)!important;border-radius:24px!important}
+/* the slips keep their state as a thin coloured edge; their writing is light */
+html[data-body=a] .bk-day .bk-dom-slip{border-radius:12px!important;border-left:3px solid #86d8ad!important}
+html[data-body=a] .bk-day .bk-dom-slip.is-over{border-left-color:#ff8f78!important;background:linear-gradient(135deg,rgba(255,143,120,.2),rgba(255,143,120,.05))!important}
+html[data-body=a] .bk-day .bk-dom-slip.is-break{border-left-color:rgba(255,255,255,.3)!important;background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 5px,transparent 5px 10px),var(--glass-fill)!important}
+html[data-body=a] .bk-day .bk-dom-slip.is-ns{background:transparent!important;box-shadow:none!important;border-style:dashed!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-body=a] .bk-day :is(.bk-dom-slip,.bk-dom-slip *,.bk-sticky,.bk-sticky *,.bk-ledger.is-after,.bk-ledger.is-after *){color:#efe6d6!important}
+html[data-body=a] .bk-day .ux-pains>div.bk-sticky{border-radius:22px!important;transform:rotate(calc(var(--r) * .4))}
+html[data-body=a] .bk-day .ux-pains>div.bk-sticky::before{display:none}
+html[data-body=a] .bk-day .ux-pains>div.bk-sticky p{color:rgba(239,230,214,.78)!important;border-top-color:rgba(255,255,255,.14)!important}
+html[data-body=a] .bk-minute-viz i{border-radius:6px!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.35)!important}
+html[data-body=a] .bk-minute-viz i:first-child{border-left:3px solid #ff8f78!important}

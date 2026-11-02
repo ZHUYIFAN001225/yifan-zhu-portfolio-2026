@@ -47,10 +47,11 @@ export function mountDesk(root) {
   };
   text(); document.addEventListener('portfolio:language', () => setTimeout(() => { text(); splitAll(); inkNow = -1; drawLeft(); screens.load(); }, 40));
 
-  // ---------- the words: letter by letter, tied to the scroll (as on oryzo.ai) ----------
-  // every line is split into letters; a soft gradient sweeps across them on the way in and again on the way out, while
-  // the block drifts slowly sideways for its whole life — nothing pops, nothing is simply switched off
-  const CJK = /[　-鿿＀-￯]/;
+  // ---------- the words: letter by letter, tied to the scroll (measured on oryzo.ai) ----------
+  // Headings arrive from their LAST letter and leave from their last letter, sliding in from the right (easing out),
+  // creeping while they hold, then sliding off to the left (easing in) — about a tenth of the screen each way.
+  // Paragraphs go in reading order, first letter first both ways, and drift slowly the other way. Opacity follows the
+  // scroll linearly; along a line it is a soft ramp (a heading spans about half the opacity range from end to end).
   function splitLetters(el) {
     const txt = el.textContent; el.setAttribute('aria-label', txt); el.textContent = ''; const out = [];
     for (const tok of txt.match(/[　-鿿＀-￯]|[^\s　-鿿＀-￯]+|\s+/g) || []) {
@@ -62,19 +63,35 @@ export function mountDesk(root) {
     return out;
   }
   const GROUPS = [
-    { root: '.bk-dk-hero', sel: ['.bk-dk-tag', '.t1', '.t2', '.t3', '.bk-dk-copy', '.bk-dk-ck', '.bk-dk-cd', '.bk-dk-live', '.bk-dk-scroll span'], box: '.bk-dk-card' },
-    { root: '.bk-dk-pw', sel: ['.p1', '.p2', '.bk-dk-pw-k', '.bk-dk-pw-p', '.bk-dk-pw-q'] },
-    { root: '.bk-dk-eve', sel: ['.bk-dk-eve-k', '.bk-dk-eve-p'] }];
-  function splitAll() { GROUPS.forEach(g => { g.el = $(g.root); g.boxEl = g.box ? $(g.box) : null; g.chars = g.sel.flatMap(s => [...ov.querySelectorAll(s)]).flatMap(splitLetters); g.el.style.filter = 'none'; g.el.style.opacity = '1'; g.last = -1; }); }
+    { root: '.bk-dk-hero', box: '.bk-dk-card', blocks: [['h', '.bk-dk-h', ['.t1', '.t2', '.t3']], ['p', '.bk-dk-tag'], ['p', '.bk-dk-copy'], ['p', '.bk-dk-card', ['.bk-dk-ck', '.bk-dk-cd', '.bk-dk-live']], ['p', '.bk-dk-scroll', ['.bk-dk-scroll span']]] },
+    { root: '.bk-dk-pw', blocks: [['h', '.bk-dk-pw-h', ['.p1', '.p2']], ['p', '.bk-dk-pw-k'], ['p', '.bk-dk-pw-p'], ['p', '.bk-dk-pw-q']] },
+    { root: '.bk-dk-eve', blocks: [['p', '.bk-dk-eve-k'], ['p', '.bk-dk-eve-p']] }];
+  function splitAll() {
+    GROUPS.forEach(g => {
+      g.el = $(g.root); g.boxEl = g.box ? $(g.box) : null; g.el.style.filter = 'none'; g.el.style.opacity = '1'; g.el.style.transform = 'none'; g.last = '';
+      g.items = g.blocks.map(([kind, sel, parts]) => { const el = $(sel); if (!el) return null; const chars = (parts || [sel]).flatMap(s => [...ov.querySelectorAll(s)]).flatMap(splitLetters); return { kind, el, chars }; }).filter(Boolean);
+    });
+  }
+  const easeOut = t => 1 - (1 - t) ** 3, easeIn = t => t * t * t;
   function sweep(g, tin, tout) {
-    const key = Math.round(tin * 400) * 1000 + Math.round(tout * 400); if (key === g.last) return; g.last = key;
-    const n = g.chars.length, S = 1.15;
-    g.chars.forEach((c, i) => { const f = n > 1 ? i / (n - 1) : 0, a = clamp(tin * (1 + S) - S * f) * (1 - clamp(tout * (1 + S) - S * f)); const v = a.toFixed(2); if (c._v !== v) { c.style.opacity = v; c._v = v; } });
-    g.el.style.transform = `translate3d(${((1 - sm(tin)) * 46 - sm(tout) * 46).toFixed(1)}px,0,0)`;
-    const life = sm(tin) * (1 - sm(tout)); g.el.style.pointerEvents = life > .6 ? '' : 'none';
-    if (g.boxEl) { const b = g.boxEl; b.style.background = `rgba(20,30,24,${(.42 * life).toFixed(3)})`; b.style.borderColor = `rgba(255,255,255,${(.12 * life).toFixed(3)})`; b.style.backdropFilter = b.style.webkitBackdropFilter = life > .02 ? `blur(${(10 * life).toFixed(1)}px)` : 'none'; b.querySelector('hr') && (b.querySelector('hr').style.opacity = life); }
+    tin = clamp(tin); tout = clamp(tout); const key = `${tin.toFixed(3)}|${tout.toFixed(3)}|${vw}`; if (key === g.last) return; g.last = key;
+    const D = (vw || innerWidth) * .1;
+    g.items.forEach(it => {
+      const h = it.kind === 'h', n = it.chars.length, S = h ? .5 : .35;
+      it.chars.forEach((c, i) => {
+        const f = n > 1 ? i / (n - 1) : 0, k = h ? 1 - f : f;   // a heading leads with its end, a paragraph with its start
+        const a = clamp(tin * (1 + S) - S * k) * (1 - clamp(tout * (1 + S) - S * k)), v = a.toFixed(2);
+        if (c._v !== v) { c.style.opacity = v; c._v = v; }
+      });
+      const x = h ? D * (.72 * (1 - easeOut(tin)) - .72 * easeIn(tout)) - D * .03 * (tin - tout)   // in from the right, off to the left
+                  : D * (-.45 * (1 - easeOut(tin)) + .45 * easeIn(tout)) + D * .03 * (tin - tout);  // the other way, slower
+      it.el.style.translate = `${x.toFixed(1)}px 0`;
+    });
+    const life = Math.min(tin, 1 - tout); g.el.style.pointerEvents = life > .7 ? '' : 'none';
+    if (g.boxEl) { const b = g.boxEl, l = clamp(life * 1.4); b.style.background = `rgba(20,30,24,${(.42 * l).toFixed(3)})`; b.style.borderColor = `rgba(255,255,255,${(.12 * l).toFixed(3)})`; b.style.backdropFilter = b.style.webkitBackdropFilter = l > .02 ? `blur(${(10 * l).toFixed(1)}px)` : 'none'; const hr = b.querySelector('hr'); if (hr) hr.style.opacity = l; }
     const ic = g.el.querySelector('.bk-dk-scroll i'); if (ic) ic.style.opacity = life;
   }
+  const lin = (p, a, b) => clamp((p - a) / (b - a));
   const bornAt = performance.now();
 
   splitAll();
@@ -400,10 +417,10 @@ export function mountDesk(root) {
     fu.uVig.value = .25 + .4 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     // the words
-    const tHero = sm(clamp((now - bornAt - 250) / 1700));
-    sweep(GROUPS[0], calm ? 1 : tHero, seg(pr, .004, .085));
-    sweep(GROUPS[1], seg(pr, .235, .33), seg(pr, .395, .465));
-    sweep(GROUPS[2], seg(pr, .6, .69), seg(pr, .87, .935));
+    const tHero = clamp((now - bornAt - 300) / 1900);   // the first heading arrives on load, the rest with the scroll
+    sweep(GROUPS[0], calm ? 1 : tHero, lin(pr, .004, .085));
+    sweep(GROUPS[1], lin(pr, .235, .325), lin(pr, .395, .465));
+    sweep(GROUPS[2], lin(pr, .6, .685), lin(pr, .87, .935));
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut);
   }

@@ -3599,7 +3599,8 @@ html[data-cover="phone"] .bk-cv-stage{display:none}
 .bk-cv[data-phase="done"] .bk-cv-dock i{opacity:1}
 /* the cover's other parts step back once the list starts */
 html[data-cover] .bk-cover-pin .op--3d .op-copy{opacity:calc(1 - min(1, var(--sp,0) * 1.4))}
-@media (max-width:999px){.bk-cv{display:none}}
+@media (max-width:639px){.bk-cv{display:none}}
+@media (min-width:640px) and (max-width:999px){.bk-cv-list{width:44vw}.bk-cv-list li b,.bk-cv-list li::before{font-size:24px}.bk-cv-end{font-size:44px}.bk-cv-dock i{height:46vh}.bk-cv-card{width:110px}}
 /* the screens sit under the title type, not over it */
 .bk-cv{z-index:auto}
 .bk-cv-stage{z-index:-1}

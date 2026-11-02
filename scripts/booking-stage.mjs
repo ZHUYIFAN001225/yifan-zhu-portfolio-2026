@@ -193,7 +193,7 @@ export function mountStage(root) {
     const off = (dir = 1, x = .5) => P6([x, dir > 0 ? 1.65 : -.65, .5, .2, .6, .1]);
     // the opening: the stage's phone IS the opening phone (desktop); it drifts with the page, then lands in the live prototype
     const op = document.querySelector('[data-opening]'), heroEl = document.querySelector('.op-phone');
-    if (!m && heroEl && op) {
+    if (innerWidth >= 640 && heroEl && op) {
       const r = heroEl.getBoundingClientRect(), orc = op.getBoundingClientRect(), holder = op.parentElement.matches('.bk-cover-pin') ? op.parentElement : op, yIn = (r.top - orc.top + r.height / 2) / vh, x0 = (r.left + r.width / 2) / innerWidth, y0 = yIn + docY(holder) / vh, yPin = yIn; // positions inside the cover, independent of where the page is scrolled to
       const s0 = Math.min(.95, r.height * .69 / vh), opH = op.offsetHeight;
       // the cover: no sideways slide. The phone eases from a slight angle to face you while the title parts, and its
@@ -353,7 +353,7 @@ export function mountStage(root) {
     // the pointer smooth on long text stretches)
     if (a.st.kind === 'off' && b.st.kind === 'off' && !peek && !(cover && cover.holder.getBoundingClientRect().bottom > 0)) { if (idleDrawn) return; idleDrawn = true; } else idleDrawn = false;
     const moving = a.st !== b.st, e = moving ? glide(t) : 0, st = e < .5 ? a.st : b.st, same = moving && a.st.q.x === b.st.q.x && a.st.q.y === b.st.q.y && a.st.q.ry === b.st.q.ry && a.st.q.s === b.st.q.s, hold = same ? Math.abs(e - .5) > .1 : (e < .05 || e > .95);
-    const time = (now - t0) / 1000, m = isMobile();
+    const time = (now - t0) / 1000, m = isMobile(), mcv = innerWidth < 640; // the cover works down to tablet widths
     if (peek && (Math.abs(scrollY - peek.sy) > 160 || now - peek.t > 6000)) peek = null;
     const pk = peek && m ? peek : null; peekAmt += ((pk ? 1 : 0) - peekAmt) * E(pk ? 5 : 7); if (pk) peekY = pk.y;
     const hv = !m && hover && st.kind === 'section' ? hover : null;
@@ -365,8 +365,8 @@ export function mountStage(root) {
     // where the reader really is in the pinned cover, measured live: 0 = cover reaches the top, 1 = cover unpins
     const pr = cover ? (() => { const r = cover.holder.getBoundingClientRect(); return -r.top / Math.max(1, r.height - cover.opH); })() : -1;
     const CM = window.__bkCoverMap || { V: 'phone', S: .04, E: .84, DOCK: .95 };
-    const coverGone = !m && cover && pr > CM.DOCK;
-    if (!m && cover && pr <= CM.DOCK) {
+    const coverGone = !mcv && cover && pr > CM.DOCK;
+    if (!mcv && cover && pr <= CM.DOCK) {
       const ss = cover.shots, N = ss.length, sm5 = t => t * t * t * (t * (t * 6 - 15) + 10);
       const P = i => i < 0 ? cover.est2 : i >= N ? cover.exit : ss[i].q;
       // a camera on a curved track: Catmull-Rom through the shots, so speed never drops to zero mid-move
@@ -424,7 +424,7 @@ export function mountStage(root) {
     // mouse-follow: where the phone stands still, it turns a little toward the pointer and the light moves with it
     pmx += (mx - pmx) * E(4); pmy += (my - pmy) * E(4);
     const stillAmt = a.st.still && b.st.still ? 1 : a.st.still ? 1 - e : b.st.still ? e : 0;
-    if (!m && stillAmt > 0) q = { ...q, ry: q.ry + pmx * .55 * stillAmt, rx: q.rx + pmy * .32 * stillAmt };
+    if (!mcv && stillAmt > 0) q = { ...q, ry: q.ry + pmx * .55 * stillAmt, rx: q.rx + pmy * .32 * stillAmt };
     key.position.set(2 + pmx * 10 * stillAmt, 4 - pmy * 8 * stillAmt, 5);
     const calm = (1 - P.focus * .7) * (a.st.kind === 'dock' || b.st.kind === 'dock' ? 0 : 1) * (1 - stillAmt * .85);
     q = { ...q, y: q.y + Math.sin(time * 1.05) * .006 * calm, rx: q.rx + Math.sin(time * .7) * .035 * calm + vel * .5 * calm, ry: q.ry + Math.sin(time * .5) * .05 * calm, rz: q.rz + Math.sin(time * .43) * .02 * calm - vel * .35 * calm };
@@ -448,14 +448,14 @@ export function mountStage(root) {
     const gone = !m && (a.st.kind === 'dock' || (b.st.kind === 'dock' && e > .97));
     fadeAmt += ((gone ? 0 : 1) - fadeAmt) * E(gone ? 9 : 6); cv.style.opacity = fadeAmt > .995 ? '' : fadeAmt.toFixed(3);
     if (coverGone) { cv.style.opacity = '0'; bub.classList.remove('is-on'); }
-    else if (!m && cover && window.__bkCoverMap) { const C = window.__bkCoverMap;
+    else if (!mcv && cover && window.__bkCoverMap) { const C = window.__bkCoverMap;
       if (C.V === 'cards' && pr < C.DOCK + .05) cv.style.opacity = '0';
       else if (C.V === 'mix' && pr < C.S * .6) cv.style.opacity = '0'; }
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
-    cv.classList.toggle('is-front', (!m && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
+    cv.classList.toggle('is-front', (!mcv && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
     document.body.classList.toggle('bk-hero-handover', !m);
     // the live prototype's frame waits empty until the phone has landed in it
-    document.body.classList.toggle('bk-awaiting-phone', !m && !gone && (a.st.kind === 'hero' || b.st.kind === 'dock'));
+    document.body.classList.toggle('bk-awaiting-phone', !mcv && !gone && (a.st.kind === 'hero' || b.st.kind === 'dock'));
     // a small tag under the phone: whose phone this is right now
     const lab = st.label && !pk ? st.label[zh() ? 1 : 0] : '';
     if (!m && lab && hold) {

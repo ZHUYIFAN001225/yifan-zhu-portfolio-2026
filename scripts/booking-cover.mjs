@@ -23,7 +23,7 @@ const TAU = Math.PI * 2;
 const V = 1000, ASPECT = 720 / 1053, POSTERS = 12;
 const ST = { freeze: [0, .04], gather: [.04, .34], land: [.42, .94], mask: [.7, .97], hero: [.03, .17], scroll: 3 };
 const RING = { above: 22 * Math.PI / 180, wide: .4, high: .32, nearest: 2.6, speed: .32 };
-const WALL = { twist: 35 * Math.PI / 180, tilt: 53 * Math.PI / 180, roll: -6 * Math.PI / 180, gap: .14, size: .5 };
+const WALL = { twist: 35 * Math.PI / 180, tilt: 53 * Math.PI / 180, roll: -6 * Math.PI / 180, gap: .14, size: .56 };
 const SPRING = { w: TAU / 1.15, z: .56 }, TURN = { w: TAU / 1.5, z: .45 };
 const T = {
   l1: ['One shared', '一本共享'], l2: ['diary', '预约本'], r1: ['Two clear', '两边都'],
@@ -200,7 +200,7 @@ export function mountCover(root) {
     const lat = (r() - .5) * .9 * Math.min(vw, vh);
     const from = [Math.cos(a) * R, Math.sin(a) * R], to = [Math.cos(cross) * R, Math.sin(cross) * R];
     const nx = -(to[1] - from[1]), ny = to[0] - from[0], nl = Math.hypot(nx, ny) || 1;
-    c.rail = { from, to, lat: [nx / nl * lat, ny / nl * lat], z0: -420 + r() * 620, zAmp: 60 + r() * 120, g: [40 + r() * 70, 40 + r() * 70, 2.6 + r() * 2.4, 3.1 + r() * 2.2, r() * TAU, r() * TAU],
+    c.rail = { from, to, lat: [nx / nl * lat, ny / nl * lat], z0: -520 + r() * 640, zAmp: 60 + r() * 120, g: [40 + r() * 70, 40 + r() * 70, 2.6 + r() * 2.4, 3.1 + r() * 2.2, r() * TAU, r() * TAU],
       roll: (r() - .5) * .9, tumble: [(r() - .5) * .9, (r() - .5) * .9, .25 + r() * .3, .2 + r() * .3, r() * TAU, r() * TAU] };
     c.life = 8 + r() * 5; c.born = late;
   }
@@ -225,7 +225,7 @@ export function mountCover(root) {
     const c = slot % cols, r = Math.floor(slot / cols);
     const local = new THREE.Vector3((c - (cols - 1) / 2) * gx, -(r - (rows - 1) / 2) * gy, 0);
     const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(-WALL.tilt * .8, WALL.twist * .6, WALL.roll, 'YXZ'));
-    local.applyQuaternion(q); local.x += -vw * .29; local.y += vh * .03; local.z -= 80;
+    local.applyQuaternion(q); local.x += -vw * .28; local.y += vh * .05; local.z -= 100;
     return { p: [local.x, local.y, local.z], q, s: WALL.size };
   };
   cards.forEach(c => { newRail(c, 0); c.born = -c.r() * c.life * .9; });

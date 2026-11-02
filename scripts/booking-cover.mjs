@@ -1,102 +1,89 @@
-// Glasgow Salon Booking — the cover, after two references:
-//  • the motion-preset site: a field of real screens on the floor that rises and regroups, and a list of big words on
-//    the left whose current line drives the arrangement on the right;
-//  • Oryzo (Lusion): one object, text beside it and never on it, a camera move per statement, and at the end the 3D
-//    object lands in a 2D spot on the page instead of flying away.
-// ?cover=mix (default) — screens on the floor gather into the phone, then the phone tells the six points.
-// ?cover=cards — only the screens: each point is a new arrangement of them.
-// ?cover=phone — only the phone (Oryzo).
-// The pinned cover's progress (0–1) is measured live; the 3D phone (booking-stage.mjs) reads the same map.
+// Glasgow Salon Booking — opening, after the motion-preset site the owner of this portfolio pointed to.
+// No phone. A headline split in two halves ("One shared / diary." · "Two clear / (sides)") with a word in brackets that
+// keeps changing; between them dozens of real screens of the product swirl in a 3D vortex. Scrolling winds the vortex
+// into a carousel ring, then lays the ring down as a tilted table of screens on the left while a second statement
+// arrives on the right; then the page carries on. Driven by the pinned cover's real scroll position.
 const zh = () => document.documentElement.lang.startsWith('zh');
 const L = a => a[zh() ? 1 : 0];
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const sm = t => t * t * t * (t * (t * 6 - 15) + 10);
+const lerpA = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 
-const SCR = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'a1', 'a2', 'a3', 'a4'];
-const ITEMS = [
-  { t: ['Pick a service first', '先选服务'], n: ['Its length decides which times can fit.', '时长决定了哪些时间放得下。'], hero: 1 },
-  { t: ['The soonest time, one tap', '最早的时间，点一下'], n: ['Most people never open the calendar.', '大多数人不用翻日历。'], hero: 0 },
-  { t: ['Only times that fit', '只给放得下的时间'], n: ['No more “are you free at 2?”', '不用再问“两点有空吗？”'], hero: 3 },
-  { t: ['Her side: the whole day', '店主这边：一眼看完今天'], n: ['The booking is already in her diary.', '刚约的那单，已经在她的日程里。'], hero: 6 },
-  { t: ['Regulars add by name', '老顾客填名字就行'], n: ['A phone call becomes a booking in a few taps.', '电话来约，点几下就记上。'], hero: 7 },
-  { t: ['Close early, nobody lost', '临时关门，没人被删掉'], n: ['Bookings move out; customers pick a new time.', '预约被移出来，顾客自己重选时间。'], hero: 8 }
-];
-const N = ITEMS.length, COUNT = 20;
-export const CHARS = () => [...ITEMS.flatMap(i => [...i.t, ...i.n]), '顾客这边店主这边两边，同一本预约本。'].join('');
+const SCR = ['c1', 'a1', 'c2', 'a2', 'c3', 'a3', 'c4', 'a4', 'c5', 'c6'];
+const COUNT = 36;
+const T = {
+  l1: ['One shared', '一本共享'], l2: ['diary.', '预约本。'],
+  r1: ['Two clear', '两边都'], r2: ['sides', '清楚'],
+  words: [['customers', '顾客'], ['the owner', '店主'], ['regulars', '老顾客'], ['walk-ins', '临时进店的人']],
+  lead: ['A booking system for a small Glasgow salon: customers book themselves, the owner sees her whole day.', '为格拉斯哥一家小理发店做的预约系统：顾客自己约，店主一眼看完她的一天。'],
+  s1: ['Every screen', '每一屏'], s2: ['is real.', '都是真的。'],
+  s3: ['These are the screens customers and the owner use — live since 21 Oct 2026.', '这些就是顾客和店主每天在用的界面——2026 年 10 月 21 日上线。'],
+  try: ['Try the demo ↓', '试用演示版 ↓'], live: ['Open the real site ↗', '打开真实网站 ↗']
+};
+export const CHARS = () => [...Object.values(T).flat(2)].join('');
 
 export function mountCover(root) {
   const op = document.querySelector('[data-opening]'), holder = op?.parentElement;
-  if (!op || !holder?.matches('.bk-cover-pin') || op.querySelector('.bk-cv')) return;
-  const V = ['cards', 'phone'].includes(new URLSearchParams(location.search).get('cover')) ? new URLSearchParams(location.search).get('cover') : 'mix';
-  const S = V === 'phone' ? .04 : .2, E = .84, DOCK = .93;
-  window.__bkCoverMap = { V, S, E, DOCK };
-  document.documentElement.dataset.cover = V;
+  if (!op || !holder?.matches('.bk-cover-pin') || op.querySelector('.bk-ov')) return;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // the 3D phone stays out of the opening (booking-stage reads this)
+  window.__bkCoverMap = { V: 'cards', S: 0, E: 1, DOCK: 1.02 };
+  document.documentElement.dataset.cover = 'swirl';
+  const liveA = op.querySelector('.op-actions a[target]');
 
-  const wrap = document.createElement('div'); wrap.className = 'bk-cv'; wrap.setAttribute('aria-hidden', 'true');
-  const src = n => `assets/v3/cover-cards/${zh() ? 'zh' : 'en'}/${n}.webp`;
-  wrap.innerHTML = `<div class="bk-cv-stage">${Array.from({ length: COUNT }, (_, j) => `<i class="bk-cv-card"><img alt="" decoding="async" data-n="${SCR[j % SCR.length]}"></i>`).join('')}</div>
-    <div class="bk-cv-list"><p class="bk-cv-k"><span></span><b></b></p><ol>${ITEMS.map(() => '<li><b></b><span></span></li>').join('')}</ol><p class="bk-cv-end"></p></div>
-    <figure class="bk-cv-dock"><i><img alt="" decoding="async"></i></figure>`;
-  op.append(wrap);
-  const cards = [...wrap.querySelectorAll('.bk-cv-card')], lis = [...wrap.querySelectorAll('.bk-cv-list li')];
+  const ov = document.createElement('div'); ov.className = 'bk-ov';
+  ov.innerHTML = `<div class="bk-ov-3d">${Array.from({ length: COUNT }, (_, j) => `<i class="bk-ov-card"><img alt="" decoding="async" data-n="${SCR[j % SCR.length]}"></i>`).join('')}</div>
+    <h1 class="bk-ov-h"><span class="bk-ov-l"><b class="l1"></b><b class="l2"></b></span><span class="bk-ov-r"><b class="r1"></b><b class="r2">(<em></em>)</b></span></h1>
+    <div class="bk-ov-foot"><p class="bk-ov-lead"></p><p class="bk-ov-btns"><a class="bk-ov-live" target="_blank" rel="noopener"></a><a class="bk-ov-try" href="#interactive-demo"></a></p></div>
+    <div class="bk-ov-s"><p class="bk-ov-s-h"><b class="s1"></b><b class="s2"></b></p><p class="bk-ov-s-t"></p><a class="bk-ov-try2" href="#interactive-demo"></a></div>`;
+  op.append(ov);
+  const cards = [...ov.querySelectorAll('.bk-ov-card')], $ = s => ov.querySelector(s);
+  let wi = 0;
   const text = () => {
-    cards.forEach(c => { const im = c.firstChild; im.src = src(im.dataset.n); });
-    wrap.querySelector('.bk-cv-dock img').src = `assets/v3/screens/booking/${zh() ? 'zh/' : ''}cover-today.webp`;
-    lis.forEach((li, i) => { li.querySelector('b').textContent = L(ITEMS[i].t); li.querySelector('span').textContent = L(ITEMS[i].n); });
-    wrap.querySelector('.bk-cv-end').innerHTML = zh() ? '两边，<br>同一本预约本。' : 'Two sides.<br>One diary.';
-    last = -9;
+    cards.forEach(c => { const im = c.firstChild; im.src = `assets/v3/cover-cards/${zh() ? 'zh' : 'en'}/${im.dataset.n}.webp`; });
+    $('.l1').textContent = L(T.l1); $('.l2').textContent = L(T.l2); $('.r1').textContent = L(T.r1);
+    $('.r2 em').textContent = L(T.words[wi]);
+    $('.bk-ov-lead').textContent = L(T.lead); $('.s1').textContent = L(T.s1); $('.s2').textContent = L(T.s2); $('.bk-ov-s-t').textContent = L(T.s3);
+    $('.bk-ov-try').textContent = L(T.try); $('.bk-ov-try2').textContent = L(T.try); $('.bk-ov-live').textContent = L(T.live);
+    if (liveA) $('.bk-ov-live').href = zh() ? (liveA.dataset.hrefZh || liveA.href) : liveA.href; else $('.bk-ov-live').remove();
+  };
+  text(); document.addEventListener('portfolio:language', () => setTimeout(text, 40));
+  // the word in brackets keeps changing, like the reference's "(move)"
+  if (!calm) setInterval(() => { const em = $('.r2 em'); em.classList.add('is-out'); setTimeout(() => { wi = (wi + 1) % T.words.length; em.textContent = L(T.words[wi]); em.classList.remove('is-out'); }, 260); }, 2200);
+
+  // three arrangements of the same screens: [x, y, z, rx, ry, rz, scale, opacity] in px from the centre
+  const vortex = (j, t) => { // a swirl around the middle: screens orbit, come close and fall back
+    const k = j / COUNT, a = k * Math.PI * 2 * 3 + t * .35, rr = 170 + (j % 6) * 52, z = Math.sin(k * 23 + t * .8) * 420 - 80;
+    return [Math.cos(a) * rr, Math.sin(a) * rr * .78, z, Math.sin(a) * 18, -Math.cos(a) * 32, (a * 57.3) % 360 * .12, .62, 1];
+  };
+  const ring = (j, t) => { // a tight carousel: screens stand on a turning drum
+    const a = (j / COUNT) * Math.PI * 2 + t * .45, R = 300;
+    return [Math.sin(a) * R, (j % 2 ? 1 : -1) * 6, Math.cos(a) * R - 140, -6, a * 57.3, 0, .74, 1];
+  };
+  const table = j => { // laid down: a tilted table of screens filling the left half
+    const c = j % 8, r = Math.floor(j / 8), w = innerWidth, h = op.offsetHeight;
+    return [-w * .28 + (c - 3.5) * 126 + r * 34, -h * .3 + r * 210, -r * 30, 48, 0, -24, .9, 1];
   };
 
-  // arrangements, in px from the centre of the right-hand stage; each returns [x, y, z, rx, ry, rz, scale, opacity]
-  const W = () => innerWidth, H = () => op.offsetHeight;
-  // like the reference's opening: the screens lie on a tilted table filling the right half of the first screen
-  const floor = j => { const c = j % 5, r = Math.floor(j / 5), w = W(), h = H(); return [w * .2 + (c - 2) * w * .075 + r * w * .03, -h * .2 + r * h * .16, -r * 40, 50, 0, -22, .82, 1]; };
-  const ARR = [
-    j => { const a = (j / COUNT) * Math.PI * 2, R = 420; return [Math.sin(a) * R * .9, 0, Math.cos(a) * R - R, 0, a * 57.3, 0, .95, 1]; },                     // carousel
-    j => { const c = j % 5, r = Math.floor(j / 5); return [(c - 2) * 128, (r - 1.5) * 250, 0, 38, 0, -16, .78, 1]; },                                           // grid on a tilt
-    j => { const k = j - COUNT / 2, a = k * .32; return [0, Math.sin(a) * 520, Math.cos(a) * 520 - 520, -a * 57.3, 0, 0, .9, Math.cos(a) > 0 ? 1 : 0]; },          // roll
-    j => { const a = (j / COUNT) * Math.PI * 2; return [Math.cos(a) * 330, Math.sin(a) * 330, -120, 0, 0, a * 57.3 + 90, .6, 1]; },                              // ring
-    j => { const h = Math.sin(j * 12.9898) * 43758.5, rnd = h - Math.floor(h), h2 = Math.sin(j * 78.233) * 12345.6, rn2 = h2 - Math.floor(h2); return [(rnd - .5) * 760, (rn2 - .5) * 620, -200 - rnd * 700, 0, (rn2 - .5) * 30, (rnd - .5) * 20, .7, 1]; }, // field
-    j => [(j - COUNT / 2) * 7, (j - COUNT / 2) * -5, -j * 6, 8, -22, -6 + j * .9, .95, 1]                                                                         // stack
-  ];
-  const hero = [0, 0, 160, 0, 0, 0, 1.35, 1];
-  const lerpA = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
-  let last = -9, cx = 0, cy = 0;
-
-  function frame() {
+  let last = -1;
+  function frame(now) {
     requestAnimationFrame(frame);
-    const r = holder.getBoundingClientRect(); if (r.bottom < -200 || r.top > innerHeight) return;
-    const pr = -r.top / Math.max(1, r.height - op.offsetHeight);
-    if (Math.abs(pr - last) < .0004) return; last = pr;
-    const u = pr < S ? -1 + clamp(pr / S) : pr < E ? (pr - S) / (E - S) * N : N - 1 + clamp((pr - E) / (DOCK - E));
-    const cur = Math.max(0, Math.min(N - 1, Math.round(u - .25)));
-    wrap.style.setProperty('--pr', pr.toFixed(4));
-    wrap.dataset.phase = pr < S ? 'floor' : pr < E ? 'tell' : pr < DOCK ? 'land' : 'done';
-    lis.forEach((li, i) => { li.classList.toggle('is-on', pr >= S * .8 && pr < E + .02 && i === cur); li.classList.toggle('is-past', i < cur); });
-    wrap.querySelector('.bk-cv-k span').textContent = cur < 3 ? (zh() ? '顾客这边' : 'Customer side') : (zh() ? '店主这边' : 'Owner side');
-    wrap.querySelector('.bk-cv-k b').textContent = `${String(cur + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
-    // the stage on the right: centre of the cards
-    const stageX = W() * .66 - W() / 2, dock = wrap.querySelector('.bk-cv-dock i').getBoundingClientRect(), orc = op.getBoundingClientRect();
-    const dockX = dock.left + dock.width / 2 - orc.left - W() / 2, dockY = dock.top + dock.height / 2 - orc.top - H() / 2;
-    const stageEl = wrap.firstElementChild, showCards = V === 'cards' || u < 0; stageEl.style.display = showCards ? '' : 'none';
-    if (showCards) cards.forEach((c, j) => {
-      let p;
-      if (u < 0) { // on the floor, rising and gathering (mix: into the phone; cards: into the first arrangement)
-        const t = sm(clamp(u + 1)), f = floor(j);
-        const target = V === 'cards' ? lerpA(ARR[0](j), j === ITEMS[0].hero ? hero : ARR[0](j), 1) : [0, 0, 0, 0, 0, 0, .55, 0];
-        const lift = Math.sin(t * Math.PI) * (80 + (j % 5) * 40);
-        p = lerpA(f, target, t); p[2] += lift; p[0] += stageX * t; p[4] += (j % 2 ? 1 : -1) * 40 * Math.sin(t * Math.PI);
-      } else if (V === 'cards') {
-        const i = Math.min(N - 1, Math.floor(u)), fr = u - i, k = fr < .45 ? 0 : sm((fr - .45) / .55);
-        const A = ARR[i](j), B = ARR[Math.min(N - 1, i + 1)](j);
-        const hA = j === ITEMS[i].hero ? 1 : 0, hB = i + 1 < N && j === ITEMS[i + 1].hero ? 1 : 0;
-        p = lerpA(lerpA(A, hero, hA * (1 - k)), lerpA(B, hero, hB), k); p[0] += stageX;
-        if (pr >= E) { const t = sm(clamp((pr - E) / (DOCK - E))); p = lerpA(p, [dockX, dockY, 0, 0, 0, 0, .5, j === ITEMS[N - 1].hero ? 1 : 0], t); }
-      } else p = [stageX, 0, 0, 0, 0, 0, .55, 0];
-      c.style.transform = `translate(-50%,-50%) translate3d(${p[0].toFixed(1)}px,${p[1].toFixed(1)}px,${p[2].toFixed(1)}px) rotateX(${p[3].toFixed(2)}deg) rotateY(${p[4].toFixed(2)}deg) rotateZ(${p[5].toFixed(2)}deg) scale(${p[6].toFixed(3)})`;
-      c.style.opacity = p[7].toFixed(3); c.style.zIndex = Math.round(1000 + p[2]); c.style.visibility = p[7] < .02 ? 'hidden' : '';
+    const r = holder.getBoundingClientRect(); if (r.bottom < -100 || r.top > innerHeight + 100) return;
+    const t = calm ? 0 : now / 1000, pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
+    // 0–.12 vortex · .12–.42 winds into the ring · .5–.78 the ring lays down as a table · .86+ the page carries on
+    const k1 = sm(clamp((pr - .1) / .32)), k2 = sm(clamp((pr - .5) / .28)), k3 = sm(clamp((pr - .86) / .14));
+    ov.style.setProperty('--k1', k1.toFixed(3)); ov.style.setProperty('--k2', k2.toFixed(3)); ov.style.setProperty('--k3', k3.toFixed(3));
+    cards.forEach((c, j) => {
+      let p = lerpA(vortex(j, t), ring(j, t), k1);
+      if (k2 > 0) p = lerpA(p, table(j), k2);
+      if (k3 > 0) p = [p[0], p[1] - k3 * op.offsetHeight * .9, p[2], p[3], p[4], p[5], p[6], p[7] * (1 - k3)];
+      c.style.transform = `translate(-50%,-50%) translate3d(${p[0].toFixed(1)}px,${p[1].toFixed(1)}px,${p[2].toFixed(1)}px) rotateX(${p[3].toFixed(1)}deg) rotateY(${p[4].toFixed(1)}deg) rotateZ(${p[5].toFixed(1)}deg) scale(${p[6].toFixed(3)})`;
+      // depth: near screens are larger and softly blurred (like the reference's motion blur), far ones paler
+      const near = clamp((p[2] - 140) / 260), far = clamp((-p[2] - 300) / 300);
+      c.style.opacity = (p[7] * (1 - far * .55)).toFixed(3);
+      c.style.filter = near > .02 && k1 < .9 ? `blur(${(near * 5 * (1 - k1)).toFixed(1)}px)` : '';
+      c.style.zIndex = Math.round(1000 + p[2]);
     });
   }
-  text(); document.addEventListener('portfolio:language', () => setTimeout(text, 40));
   requestAnimationFrame(frame);
 }

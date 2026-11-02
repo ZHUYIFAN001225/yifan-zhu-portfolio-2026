@@ -50,7 +50,7 @@ export function mountCover(root) {
   // arrangements, in px from the centre of the right-hand stage; each returns [x, y, z, rx, ry, rz, scale, opacity]
   const W = () => innerWidth, H = () => op.offsetHeight;
   // like the reference's opening: the screens lie on a tilted table filling the right half of the first screen
-  const floor = j => { const c = j % 5, r = Math.floor(j / 5), w = W(), h = H(); return [w * .13 + (c - 2) * w * .085 + r * w * .035, -h * .2 + r * h * .16, -r * 40, 50, 0, -22, .82, 1]; };
+  const floor = j => { const c = j % 5, r = Math.floor(j / 5), w = W(), h = H(); return [w * .2 + (c - 2) * w * .075 + r * w * .03, -h * .2 + r * h * .16, -r * 40, 50, 0, -22, .82, 1]; };
   const ARR = [
     j => { const a = (j / COUNT) * Math.PI * 2, R = 420; return [Math.sin(a) * R * .9, 0, Math.cos(a) * R - R, 0, a * 57.3, 0, .95, 1]; },                     // carousel
     j => { const c = j % 5, r = Math.floor(j / 5); return [(c - 2) * 128, (r - 1.5) * 250, 0, 38, 0, -16, .78, 1]; },                                           // grid on a tilt

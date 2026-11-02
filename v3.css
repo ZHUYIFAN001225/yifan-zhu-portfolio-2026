@@ -3600,3 +3600,8 @@ html[data-cover="phone"] .bk-cv-stage{display:none}
 /* the cover's other parts step back once the list starts */
 html[data-cover] .bk-cover-pin .op--3d .op-copy{opacity:calc(1 - min(1, var(--sp,0) * 1.4))}
 @media (max-width:999px){.bk-cv{display:none}}
+/* the screens sit under the title type, not over it */
+.bk-cv{z-index:auto}
+.bk-cv-stage{z-index:-1}
+.bk-cv-list,.bk-cv-dock{z-index:4}
+.op--3d .op-type{z-index:1}

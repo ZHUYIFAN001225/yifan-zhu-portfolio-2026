@@ -81,11 +81,11 @@ export function mountDesk(root) {
   function drawInk(k) {
     k = Math.round(clamp(k) * 24) / 24; if (k === inkNow) return; inkNow = k;
     const x = ink.getContext('2d'), w = ink.width, h = ink.height; x.clearRect(0, 0, w, h); const r = seed(5);
-    const rowY = row => h * (.215 + row * .0455);
+    const rowY = row => h * (.205 + row * .0462);
     EV.forEach((e, i) => { const k0 = i / EV.length, k1 = (i + 1) / EV.length; if (k <= k0) return; const part = clamp((k - k0) / (k1 - k0));
       if (e[0] === 'strike') { const [, row, x0, x1] = e; x.strokeStyle = '#b3261e'; x.lineWidth = h * .005; x.beginPath(); x.moveTo(w * x0, rowY(row) - h * .012); x.lineTo(w * lerp(x0, x1, part), rowY(row) - h * .016); x.stroke(); return; }
       const fix = e[0] === 'fix'; const [row, fx, txt, col] = fix ? e.slice(1) : e, y = rowY(row), X = w * fx;
-      x.save(); x.beginPath(); x.rect(0, y - h * .045, X + part * w * .75, h * .06); x.clip(); x.translate(X, y); x.rotate((r() - .5) * .04); x.fillStyle = col; x.font = `italic 600 ${Math.round(h * (fix ? .03 : .04) + r() * 3)}px ${HAND}`; x.fillText(L(txt), 0, 0); x.restore(); });
+      x.save(); x.beginPath(); x.rect(0, y - h * .045, X + part * w * .75, h * .06); x.clip(); x.translate(X, y); x.rotate((r() - .5) * .04); x.fillStyle = col; x.font = `italic 600 ${Math.round(h * (fix ? .024 : .031) + r() * 2)}px ${HAND}`; x.fillText(L(txt), 0, 0); x.restore(); });
   }
 
   // ---------- the phone ----------

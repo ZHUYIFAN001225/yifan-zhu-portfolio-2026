@@ -262,13 +262,13 @@ export function mountDesk(root) {
     const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kDark) ** 2;
     key.intensity = 2.6 * dayAmt; fill.intensity = .9 * dayAmt;
     night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise); glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise);
-    rim.intensity = (60 * kUp * (1 - kDown) + 60 * kRise) * (1 - kOut);
+    rim.intensity = (60 * kUp * (1 - kDown) + 26 * kRise) * (1 - kOut);
     desk.visible = propsG.visible = (dayAmt > .003 || nightAmt > .01 || kTop > .01) && kRise < .98;
     // ---- the phone ----
     const up = kUp * (1 - kDown) + kRise; // 0 on the counter, 1 alone in the dark
     const spotY = .09 + nightAmt * .02;
     pv.position.set(lerp(SPOT.x, 0, up), lerp(spotY, 7.0, up), lerp(SPOT.z, 0, up));
-    pv.scale.setScalar(lerp(HERO_SCALE, 1.45, up));
+    pv.scale.setScalar(HERO_SCALE * (1 - up) + 1.45 * kUp * (1 - kDown) + 1.08 * kRise);
     const pwTurn = kUp * (1 - kDown) * (Math.sin(now / 2600) * .06 + P.y * .18), pwY = P.x * .22 * kUp * (1 - kDown);
     const turn = kTurn * Math.PI * 2;
     E.set(pwTurn + turn * kRise + (nightAmt > 0 ? -.08 * nightAmt : 0), SPOT_ROT * (1 - up) + pwY + kRise * P.x * .2, Math.sin(turn) * .3 * kRise, 'XYZ'); pv.rotation.copy(E);
@@ -284,13 +284,13 @@ export function mountDesk(root) {
     // ---- drafting guides over the paper book (feature 4) ----
     if (kB > .01) {
       diary.updateMatrixWorld();
-      const a = proj(A.set(-1.2, .16, -.3).applyMatrix4(diary.matrixWorld), gA), b = proj(B.set(1.25, .16, .35).applyMatrix4(diary.matrixWorld), gB);
+      const a = proj(A.set(-1.35, .16, -.25).applyMatrix4(diary.matrixWorld), gA), b = proj(B.set(1.4, .16, .4).applyMatrix4(diary.matrixWorld), gB);
       const box = (g, c, w, h, k) => { const rr = g.querySelector('rect'); rr.setAttribute('x', c.x - w / 2); rr.setAttribute('y', c.y - h / 2); rr.setAttribute('width', w * k); rr.setAttribute('height', h * k); rr.setAttribute('x', c.x - w * k / 2); rr.setAttribute('y', c.y - h * k / 2);
         [...g.querySelectorAll('circle')].forEach((ci, i) => { ci.setAttribute('cx', c.x + (i % 2 ? 1 : -1) * w * k / 2); ci.setAttribute('cy', c.y + (i < 2 ? -1 : 1) * h * k / 2); ci.setAttribute('r', 4); }); };
       const u = Math.min(vw, vh) / 900;
-      box(guides.querySelector('.g1'), a, 340 * u, 110 * u, sm(kGuide * 2)); box(guides.querySelector('.g2'), b, 340 * u, 110 * u, sm(kGuide * 2 - .6));
+      box(guides.querySelector('.g1'), a, 230 * u, 80 * u, sm(kGuide * 2)); box(guides.querySelector('.g2'), b, 230 * u, 80 * u, sm(kGuide * 2 - .6));
       const ar = guides.querySelector('.arrow'), mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - 90 * u;
-      ar.setAttribute('d', `M${a.x + 170 * u} ${a.y} Q ${mx} ${my} ${b.x - 170 * u} ${b.y}`); const len = 600 * u; ar.style.strokeDasharray = `${len}`; ar.style.strokeDashoffset = `${len * (1 - sm(kGuide * 1.6 - .5))}`;
+      ar.setAttribute('d', `M${a.x + 115 * u} ${a.y} Q ${mx} ${my} ${b.x - 115 * u} ${b.y}`); const len = 600 * u; ar.style.strokeDasharray = `${len}`; ar.style.strokeDashoffset = `${len * (1 - sm(kGuide * 1.6 - .5))}`;
     }
     renderer.render(scene, cam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));

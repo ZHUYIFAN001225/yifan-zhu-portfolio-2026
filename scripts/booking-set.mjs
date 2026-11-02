@@ -135,8 +135,8 @@ export function mountDesk(root) {
       float w = (.5 - .5 * cos(uTime * .95 + ph + sin(uTime * .4 + ph) * 1.2)) * uWind;
       vec3 day = mix(texture2D(uAmb, vBUv).rgb, texture2D(uSun, vBUv).rgb, w);
       // night: darker than the day, and only the lamp's pool over the book really lit — the rest of the desk falls away
-      float pool = mix(.22, 1., smoothstep(.46, .08, distance(vWP.xz, vec2(-.10, .02))));
-      vec3 night = texture2D(uNight, vBUv).rgb * .62 * pool;
+      float pool = mix(.14, 1., smoothstep(.3, .05, distance(vWP.xz, vec2(-.09, .02))));
+      vec3 night = texture2D(uNight, vBUv).rgb * .4 * pool;
       return mix(day, night, uMix) * ${GAIN.toFixed(2)} * uLit;
     }`;
   function bakedMaterial({ amb, sun, night }, page) {

@@ -52,6 +52,7 @@ const T = {
   ],
   shots: [['Book', '预约'], ['Today', '今天'], ['Time off', '临时关店']],
   try: ['Try the demo ↓', '试用演示版 ↓'],
+  ek: ['AFTER CLOSING', '打烊之后'], ep: ['The day gets written up by hand. Who came, who moved, who never showed — and the messages keep coming until she has checked every one.', '一天的账要手写补完：谁来了、谁改了、谁没来——消息还在不停进来，她得一条条核对到很晚。'],
   wx: [['Emma', 'Emma'], ['Running 20 min late, sorry!!', '我要晚 20 分钟，不好意思！！'], ['Mrs Li', '李阿姨'], ['Can I move to 3 o’clock?', '能改到三点吗？'], ['Zhou', '周先生'], ['Are you open Sunday?', '周日开门吗？'], ['Mr He', '何先生'], ['What time was I booked again?', '我约的是几点来着？'], ['+44 7700 900…', '+44 7700 900…'], ['Missed call', '未接来电'], ['Sun', '孙小姐'], ['Still have 11:30?', '11:30 还有吗？']],
   now: ['now', '现在'], wxk: ['WeChat', '微信']
 };
@@ -69,11 +70,11 @@ export function mountDesk(root) {
 
   // ---------- DOM ----------
   const ov = document.createElement('div'); ov.className = 'bk-dk';
-  ov.innerHTML = `<canvas class="bk-dk-gl" aria-hidden="true"></canvas><div class="bk-dk-glow" aria-hidden="true"></div><div class="bk-dk-grain" aria-hidden="true"></div><div class="bk-dk-top" aria-hidden="true"></div><div class="bk-dk-out" aria-hidden="true"></div>
+  ov.innerHTML = `<canvas class="bk-dk-gl" aria-hidden="true"></canvas><div class="bk-dk-glow" aria-hidden="true"></div><div class="bk-dk-grain" aria-hidden="true"></div><div class="bk-dk-out" aria-hidden="true"></div>
     <div class="bk-dk-hero"><p class="bk-dk-tag"></p><h1 class="bk-dk-h"><b class="t1"></b><b class="t2"></b><b class="t3"></b></h1><p class="bk-dk-copy"></p>
       <div class="bk-dk-card"><p class="bk-dk-ck"></p><hr><p class="bk-dk-cd"></p><a class="bk-dk-live" target="_blank" rel="noopener"></a></div>
       <p class="bk-dk-scroll"><i></i><span></span></p></div>
-    <div class="bk-dk-pw"><h2 class="bk-dk-pw-h"><b class="p1"></b><b class="p2"></b></h2><p class="bk-dk-pw-k"></p><p class="bk-dk-pw-p"></p><p class="bk-dk-pw-q"></p></div>
+    <div class="bk-dk-eve"><p class="bk-dk-eve-k"></p><p class="bk-dk-eve-p"></p></div><div class="bk-dk-pw"><h2 class="bk-dk-pw-h"><b class="p1"></b><b class="p2"></b></h2><p class="bk-dk-pw-k"></p><p class="bk-dk-pw-p"></p><p class="bk-dk-pw-q"></p></div>
     <aside class="bk-dk-panel" data-f="a"><i class="bk-dk-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></i><h3></h3><p></p><hr><p class="bk-dk-big"><b></b><b></b></p></aside>
     <aside class="bk-dk-panel" data-f="b"><i class="bk-dk-ic"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 3v4M16 3v4M4 10h16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></i><h3></h3><p></p><hr><p class="bk-dk-big"><b></b><b></b></p></aside>
     <div class="bk-dk-scale" aria-hidden="true"><i class="bk-dk-bar"><b></b></i><span class="s0"><b></b><em></em></span><span class="s1"><b></b><em></em></span><span class="s2"><b></b><em></em></span></div>
@@ -97,7 +98,7 @@ export function mountDesk(root) {
     $('.rk').textContent = L(T.c_k); $('.rm').textContent = L(T.c_m); $('.rr').textContent = L(T.c_r);
     $('.bk-dk-rules').innerHTML = T.c.map(([k, q, w]) => `<li><small>${L(k)}</small><blockquote>${L(q)}</blockquote><span>${L(w)}</span></li>`).join('');
     $('.bk-dk-shots').innerHTML = ['book', 'today', 'time-off'].map((n, i) => `<figure><img src="${shotSrc(n)}" alt="" loading="lazy" decoding="async"><figcaption>${L(T.shots[i])}</figcaption></figure>`).join('');
-    $('.bk-dk-try').textContent = L(T.try);
+    $('.bk-dk-try').textContent = L(T.try); $('.bk-dk-eve-k').textContent = L(T.ek); $('.bk-dk-eve-p').textContent = L(T.ep);
   };
   text(); document.addEventListener('portfolio:language', () => setTimeout(() => { text(); repaintProps(); screens.load(); }, 40));
 
@@ -277,37 +278,48 @@ export function mountDesk(root) {
   const phone = buildPhone(tex); phone.traverse(o => { if (o.isMesh) { o.castShadow = true; [].concat(o.material).forEach(m => { if (m.isMeshStandardMaterial) { m.envMap = envTex; m.envMapIntensity = 1; m.needsUpdate = true; } }); } });
   const flat = new THREE.Group(); flat.rotation.x = -Math.PI / 2; flat.add(phone);
   const pv = new THREE.Group(); pv.add(flat); scene.add(pv);
-  const screens = { imgs: {}, cur: 'cover-book', prev: null, fade: 1, async load() { for (const n of ['cover-book', 'book', 'window', 'zoom-durations', 'today']) this.imgs[n] = await load(shotSrc(n)); dirty = true; } };
+  const screens = { imgs: {}, cur: 'lock', prev: null, fade: 1, async load() { for (const n of ['cover-book', 'today']) this.imgs[n] = await load(shotSrc(n)); dirty = true; } };
   screens.load();
-  const banners = []; let lastBanner = 0, dirty = true;
+  // the messages arrive with the scroll, not on a timer: the phone is asleep until the first one, then wakes and keeps stacking
+  const banners = []; let dirty = true, wake = 0, wantCount = 0, eveAmt = 0, unread = 0;
   const wxList = () => { const o = []; for (let i = 0; i < T.wx.length; i += 2) o.push([L(T.wx[i]), L(T.wx[i + 1])]); return o; };
-  function drawScreen(now, heroAmt) {
-    const im = screens.imgs[screens.cur]; if (!im) return;
-    paint(sx, im, true);
-    if (screens.prev && screens.fade < 1) { sx.globalAlpha = 1 - screens.fade; paint(sx, screens.prev, true); sx.globalAlpha = 1; }
-    // WeChat banners stacking from the top while the counter is in view
-    const W = sc.width, top = Math.round(W * .118) + 10;
+  function syncBanners(now, count) {
+    count = Math.max(0, Math.min(count, 60)); if (count === wantCount) return; const list = wxList();
+    while (banners.length < Math.min(count, 7) && wantCount < count) { const n = wantCount % list.length; banners.push({ who: list[n][0], what: list[n][1], t: now, n }); wantCount++; buzz = now; if (banners.length > (eveAmt > .5 ? 7 : 4)) banners.shift(); }
+    if (wantCount < count) { wantCount = count; buzz = now; }
+    while (wantCount > count) { wantCount--; if (banners.length > 1) banners.pop(); }
+    if (count === 0) banners.length = 0;
+    unread = wantCount; dirty = true;
+  }
+  function drawScreen(now, lit) {
+    const W = sc.width, H = sc.height;
+    if (screens.cur === 'lock') {
+      // lock screen: a dark, slightly blue glass; the clock; banners stacking
+      const g = sx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#1a2230'); g.addColorStop(1, '#0a0d12'); sx.fillStyle = g; sx.fillRect(0, 0, W, H);
+      sx.fillStyle = 'rgba(255,255,255,.9)'; sx.textAlign = 'center'; sx.font = `500 ${Math.round(W * .055)}px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(zh() ? (eveAmt > .5 ? '11月5日 周四' : '11月5日 周四') : 'Thursday 5 November', W / 2, W * .33);
+      sx.font = `300 ${Math.round(W * .22)}px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(eveAmt > .5 ? '22:47' : '9:41', W / 2, W * .56); sx.textAlign = 'left';
+      sx.fillStyle = 'rgba(255,255,255,.35)'; sx.beginPath(); sx.roundRect(W / 2 - 110, H - 40, 220, 8, 4); sx.fill();
+      paintIsland();
+    } else { const im = screens.imgs[screens.cur]; if (!im) return; paint(sx, im, true); if (screens.prev && screens.fade < 1) { sx.globalAlpha = 1 - screens.fade; paint(sx, screens.prev, true); sx.globalAlpha = 1; } }
+    const top = Math.round(W * .62);
     banners.forEach((b, i) => {
-      const age = (now - b.t) / 1000, kin = sm(age / .45), y = top + i * 118 - (1 - kin) * 60;
-      sx.save(); sx.globalAlpha = kin * heroAmt; sx.shadowColor = 'rgba(0,0,0,.25)'; sx.shadowBlur = 18; sx.shadowOffsetY = 6;
-      sx.fillStyle = 'rgba(248,247,243,.96)'; sx.beginPath(); sx.roundRect(22, y, W - 44, 104, 26); sx.fill(); sx.shadowColor = 'transparent';
+      const age = (now - b.t) / 1000, kin = sm(age / .45), y = (screens.cur === 'lock' ? top : Math.round(W * .118) + 10) + i * 118 - (1 - kin) * 60;
+      sx.save(); sx.globalAlpha = kin; sx.shadowColor = 'rgba(0,0,0,.25)'; sx.shadowBlur = 18; sx.shadowOffsetY = 6;
+      sx.fillStyle = screens.cur === 'lock' ? 'rgba(236,238,244,.92)' : 'rgba(248,247,243,.96)'; sx.beginPath(); sx.roundRect(22, y, W - 44, 104, 26); sx.fill(); sx.shadowColor = 'transparent';
       sx.fillStyle = '#2dc100'; sx.beginPath(); sx.roundRect(40, y + 20, 64, 64, 16); sx.fill();
       sx.fillStyle = '#fff'; sx.beginPath(); sx.ellipse(66, y + 48, 16, 13, 0, 0, Math.PI * 2); sx.fill(); sx.beginPath(); sx.ellipse(82, y + 58, 13, 11, 0, 0, Math.PI * 2); sx.fill();
       sx.fillStyle = '#6b6b70'; sx.font = `500 22px -apple-system, Inter, system-ui, sans-serif`; sx.textBaseline = 'alphabetic'; sx.fillText(L(T.wxk).toUpperCase(), 124, y + 36); sx.textAlign = 'right'; sx.fillText(L(T.now), W - 44, y + 36); sx.textAlign = 'left';
       sx.fillStyle = '#111'; sx.font = `600 28px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(b.who, 124, y + 66);
       sx.fillStyle = '#333'; sx.font = `400 26px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(b.what, 124, y + 94); sx.restore();
     });
-    if (eveAmt > .3 && unread > 2) { const y = top + banners.length * 118 + 6; sx.save(); sx.globalAlpha = eveAmt * heroAmt; sx.fillStyle = 'rgba(248,247,243,.92)'; sx.beginPath(); sx.roundRect(W / 2 - 150, y, 300, 52, 26); sx.fill(); sx.fillStyle = '#d9483c'; sx.beginPath(); sx.arc(W / 2 - 112, y + 26, 11, 0, Math.PI * 2); sx.fill(); sx.fillStyle = '#111'; sx.font = `600 24px -apple-system, Inter, system-ui, sans-serif`; sx.textAlign = 'center'; sx.fillText(`${unread + 9} ${zh() ? '条未读' : 'unread'}`, W / 2 + 10, y + 34); sx.restore(); }
+    if (unread > banners.length) { const y = (screens.cur === 'lock' ? top : Math.round(W * .118) + 10) + banners.length * 118 + 6; sx.save(); sx.fillStyle = 'rgba(236,238,244,.9)'; sx.beginPath(); sx.roundRect(W / 2 - 150, y, 300, 52, 26); sx.fill(); sx.fillStyle = '#d9483c'; sx.beginPath(); sx.arc(W / 2 - 112, y + 26, 11, 0, Math.PI * 2); sx.fill(); sx.fillStyle = '#111'; sx.font = `600 24px -apple-system, Inter, system-ui, sans-serif`; sx.textAlign = 'center'; sx.fillText(`${unread - banners.length} ${zh() ? '条更早的未读' : 'more unread'}`, W / 2 + 10, y + 34); sx.restore(); }
+    // asleep: the glass goes black until the first message wakes it
+    if (lit < 1) { sx.fillStyle = `rgba(0,0,0,${1 - lit})`; sx.fillRect(0, 0, W, H); }
     tex.needsUpdate = true;
   }
-  let unread = 0, eveAmt = 0;
-  function tickBanners(now, hero) {
-    if (hero < .5 || calm) { if (banners.length && hero < .5) { banners.length = 0; dirty = true; } return; }
-    if (now - lastBanner > (banners.length ? lerp(1700, 650, eveAmt) : 900)) { unread++; const list = wxList(); const n = banners.length ? (banners[banners.length - 1].n + 1) % list.length : 0; banners.push({ who: list[n][0], what: list[n][1], t: now, n }); if (banners.length > (eveAmt > .5 ? 6 : 4)) banners.shift(); lastBanner = now; buzz = now; }
-    dirty = true; // banners animate in
-  }
+  function paintIsland() { const W = sc.width; sx.fillStyle = '#050506'; const iw = W * .3, ih = W * .085; sx.beginPath(); sx.roundRect((W - iw) / 2, W * .028, iw, ih, ih / 2); sx.fill(); }
   let buzz = -1e9;
-  const showScreen = n => { if (screens.cur === n || !screens.imgs[n]) return; screens.prev = screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };
+  const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.prev = screens.cur === 'lock' ? null : screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };
 
   // ---------- camera, pointer, scroll ----------
   // ---------- post: depth of field, vignette, a little colour fringe ----------
@@ -322,7 +334,7 @@ export function mountDesk(root) {
         float c0 = coc(vUv); float r = max(c0, .45);
         vec3 acc = vec3(0.0); float wsum = 0.0; float a0 = fract(sin(dot(vUv * uRes, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832;
         for (int i = 0; i < 20; i++){ float fi = float(i); float ang = fi * 2.39996 + a0; float rad = sqrt((fi + .5) / 20.0);
-          vec2 o = vec2(cos(ang), sin(ang)) * rad * r / uRes; float ct = coc(vUv + o); float w = (ct >= c0 * .7) ? 1.0 : .25; // out-of-focus things don't bleed over sharp ones in front
+          vec2 o = vec2(cos(ang), sin(ang)) * rad * r / uRes; float ct = coc(vUv + o); float w = (ct >= c0 * .7) ? 1.0 : .03; // a sharp, bright thing in front never bleeds a halo into the soft background
           acc += texture2D(tCol, vUv + o).rgb * w; wsum += w; }
         vec3 col = acc / wsum;
         vec2 q = (vUv - .5) * vec2(uRes.x / uRes.y, 1.0); float rr = length(q);
@@ -342,8 +354,8 @@ export function mountDesk(root) {
   const V = {
     hero: { pos: new THREE.Vector3(0, 14.8, 3.4), look: new THREE.Vector3(.2, 0, -.3) },
     dark: { pos: new THREE.Vector3(0, 12.2, .001), look: new THREE.Vector3(0, 0, 0) },
-    night: { pos: new THREE.Vector3(3.4, 4.6, 7.4), look: new THREE.Vector3(.4, .2, -.2) },
-    top: { pos: new THREE.Vector3(-1.6, 11.5, .6), look: new THREE.Vector3(-1.6, 0, .2) }
+    side: { pos: new THREE.Vector3(3.6, 5.2, 8.2), look: new THREE.Vector3(.2, .2, -.3) },     // the counter from the front-right, low
+    close: { pos: new THREE.Vector3(2.4, 3.4, 5.0), look: new THREE.Vector3(-.2, .1, .3) }     // pushed in on the book and the phone
   };
   const look = new THREE.Vector3(), E = new THREE.Euler(), tmp = new THREE.Vector3();
   const mix = (a, b, t, out) => out.lerpVectors(a, b, t);
@@ -358,70 +370,54 @@ export function mountDesk(root) {
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
     const lag = 1 - Math.exp(-dt * 5); P.x += (P.tx - P.x) * lag; P.y += (P.ty - P.y) * lag;
     // ---- the timeline (fractions of the pinned scroll) ----
-    const kText = seg(pr, 0, .07);                                                                  // copy out
-    const kEve = seg(pr, .05, .2), kInk = seg(pr, .13, .3);                                         // day → evening: lamp on, the book fills up
-    const kDark = seg(pr, .3, .42), kUp = seg(pr, .32, .47);                                        // lamp off, the phone rises alone
-    const kPw = seg(pr, .44, .52) * (1 - seg(pr, .56, .6));                                        // the two big words
-    const kDown = seg(pr, .58, .65);                                                                 // back to the counter, at night
-    const kA = seg(pr, .63, .68) * (1 - seg(pr, .76, .79)), kScale = seg(pr, .66, .76);             // feature: fits
-    const kTop = seg(pr, .77, .82);                                                                  // → top view
-    const kB = seg(pr, .81, .85) * (1 - seg(pr, .9, .92)), kGuide = seg(pr, .83, .89);               // feature: moved, not lost
-    const kRise = seg(pr, .9, .95), kC = seg(pr, .93, .97) * (1 - seg(pr, .985, 1)), kTurn = clamp((pr - .93) / .07); // record
-    const kOut = seg(pr, .965, 1);                                                                   // hand over to the paper page
-    const heroAmt = 1 - kDark, lampAmt = kEve * (1 - kDark); eveAmt = lampAmt;
+    //  day, from above → the room goes dark and the phone rises alone (two big words) → the light comes back, camera low on
+    //  the counter → the sun goes, the lamp comes on, she writes up the day while the phone keeps buzzing → hand over to paper
+    const kText = seg(pr, 0, .07);
+    const kDark = seg(pr, .09, .22), kUp = seg(pr, .1, .26);
+    const kPw = seg(pr, .24, .32) * (1 - seg(pr, .4, .46));
+    const kDown = seg(pr, .44, .56);                                   // back to the counter, in daylight, from the side
+    const kEve = seg(pr, .6, .74), kPush = seg(pr, .62, .86), kInk = seg(pr, .66, .9);
+    const kEveT = seg(pr, .7, .76) * (1 - seg(pr, .9, .94));
+    const kOut = seg(pr, .93, 1);
+    const kA = 0, kScale = 0, kB = 0, kGuide = 0, kC = 0, kRise = 0, kTop = 0, kTurn = 0;
+    eveAmt = kEve;
     setInk(kInk);
     // ---- camera ----
     mix(V.hero.pos, V.dark.pos, kUp, camPos); mix(V.hero.look, V.dark.look, kUp, camLook);
-    mix(camPos, V.night.pos, kDown, camPos); mix(camLook, V.night.look, kDown, camLook);
-    mix(camPos, V.top.pos, kTop, camPos); mix(camLook, V.top.look, kTop, camLook);
-    mix(camPos, V.dark.pos, kRise, camPos); mix(camLook, V.dark.look, kRise, camLook);
-    camPos.y -= 1.6 * kEve * (1 - kUp); camPos.z -= .6 * kEve * (1 - kUp);
-    camPos.x += P.x * .5 * (1 - kUp * .6); camPos.z += P.y * .35 * (1 - kUp);
+    mix(camPos, V.side.pos, kDown, camPos); mix(camLook, V.side.look, kDown, camLook);
+    mix(camPos, V.close.pos, kPush * kDown, camPos); mix(camLook, V.close.look, kPush * kDown, camLook);
+    camPos.x += P.x * .45 * (1 - kUp * .7); camPos.z += P.y * .3 * (1 - kUp);
     cam.position.copy(camPos); cam.lookAt(camLook);
-    // ---- lights: day → black → night (lit by the phone) → dark top view → black ----
-    const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kEve) ** 1.4, up0 = kUp * (1 - kDown) + kRise;
+    // ---- light: day → black → day again from the side → evening under the lamp ----
+    const onDesk = 1 - kUp * (1 - kDown);                               // 1 while the phone sits on the counter
+    const dayAmt = (1 - kDark) ** 1.6 * (1 - kDown) + kDown * (1 - kEve) ** 1.4, lampAmt = kEve * kDown, nightAmt = 0;
     key.intensity = 3.3 * dayAmt; fill.intensity = .6 * dayAmt + .12 * lampAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
-    lamp.intensity = 80 * lampAmt; eveSky.intensity = .3 * lampAmt; glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise) + 2.5 * lampAmt;
-    nudge(dt, heroAmt); phoneBlob.material.opacity = .8 * (1 - up0) * Math.max(dayAmt, lampAmt * .6);
-    night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise);
-    rim.intensity = (60 * kUp * (1 - kDown) + 26 * kRise) * (1 - kOut);
-    desk.visible = propsG.visible = (dayAmt > .003 || lampAmt > .003 || nightAmt > .01 || kTop > .01) && kRise < .98;
+    lamp.intensity = 85 * lampAmt; eveSky.intensity = .3 * lampAmt; glow.intensity = 2.5 * lampAmt; night.intensity = 0;
+    rim.intensity = 42 * kUp * (1 - kDown) * (1 - kOut);
+    nudge(dt, onDesk); phoneBlob.material.opacity = .8 * onDesk * Math.max(dayAmt, lampAmt * .6);
+    desk.visible = propsG.visible = dayAmt > .003 || lampAmt > .003;
     // ---- the phone ----
-    const up = kUp * (1 - kDown) + kRise; // 0 on the counter, 1 alone in the dark
-    const spotY = .09 + nightAmt * .02;
-    pv.position.set(lerp(SPOT.x, 0, up), lerp(spotY, 7.0, up), lerp(SPOT.z, 0, up));
-    pv.scale.setScalar(HERO_SCALE * (1 - up) + 1.45 * kUp * (1 - kDown) + 1.08 * kRise);
-    const pwTurn = kUp * (1 - kDown) * (Math.sin(now / 2600) * .06 + P.y * .18), pwY = P.x * .22 * kUp * (1 - kDown);
-    const turn = kTurn * Math.PI * 2;
-    E.set(pwTurn + turn * kRise + (nightAmt > 0 ? -.08 * nightAmt : 0), SPOT_ROT * (1 - up) + pwY + kRise * P.x * .2, Math.sin(turn) * .3 * kRise, 'XYZ'); pv.rotation.copy(E);
+    const up = kUp * (1 - kDown);
+    pv.position.set(lerp(SPOT.x, 0, up), lerp(.09, 7.0, up), lerp(SPOT.z, 0, up));
+    pv.scale.setScalar(HERO_SCALE * (1 - up) + 1.45 * up);
+    const pwTurn = up * (Math.sin(now / 2600) * .06 + P.y * .18), pwY = P.x * .22 * up;
+    E.set(pwTurn, SPOT_ROT * (1 - up) + pwY, 0, 'XYZ'); pv.rotation.copy(E);
     rim.target.position.copy(pv.position); glow.position.set(pv.position.x, 1.1, pv.position.z + .2);
-    // buzz: a quick shiver when a message lands
-    const bz = (now - buzz) / 1000; if (bz < .35 && heroAmt > .5) pv.position.x += Math.sin(bz * 90) * .012 * (1 - bz / .35);
-    // ---- screens ----
-    tickBanners(now, heroAmt);
-    const svc = kA > 0 ? (kScale < .33 ? 'window' : kScale < .66 ? 'book' : 'zoom-durations') : (kTop > .3 || kRise > 0) ? 'today' : 'cover-book';
-    if (kA > 0 || kTop > .3 || kRise > 0) showScreen(svc); else showScreen('cover-book');
+    const bz = (now - buzz) / 1000; if (bz < .35 && onDesk > .5) pv.position.x += Math.sin(bz * 90) * .012 * (1 - bz / .35);
+    // ---- the screen: asleep → messages with the scroll → the booking page while it floats → the lock screen filling up at night ----
+    const heroMsgs = Math.floor(clamp(pr, 0, .085) / .0107), eveMsgs = Math.floor(clamp(pr - .6, 0, .3) / .022);
+    syncBanners(now, up > .05 ? 0 : heroMsgs + eveMsgs);
+    showScreen(up > .05 ? 'cover-book' : 'lock');
+    const litTarget = (up > .05 || wantCount > 0) ? 1 : 0; wake += (litTarget - wake) * (1 - Math.exp(-dt * 6)); if (Math.abs(litTarget - wake) > .002) dirty = true;
     if (screens.fade < 1) { screens.fade = Math.min(1, screens.fade + dt * 3); dirty = true; }
-    if (dirty) { drawScreen(now, heroAmt); dirty = banners.some(b => now - b.t < 600) || screens.fade < 1; }
-    // ---- drafting guides over the paper book (feature 4) ----
-    if (kB > .01) {
-      diary.updateMatrixWorld();
-      const a = proj(A.set(-1.35, .16, -.25).applyMatrix4(diary.matrixWorld), gA), b = proj(B.set(1.4, .16, .4).applyMatrix4(diary.matrixWorld), gB);
-      const box = (g, c, w, h, k) => { const rr = g.querySelector('rect'); rr.setAttribute('x', c.x - w / 2); rr.setAttribute('y', c.y - h / 2); rr.setAttribute('width', w * k); rr.setAttribute('height', h * k); rr.setAttribute('x', c.x - w * k / 2); rr.setAttribute('y', c.y - h * k / 2);
-        [...g.querySelectorAll('circle')].forEach((ci, i) => { ci.setAttribute('cx', c.x + (i % 2 ? 1 : -1) * w * k / 2); ci.setAttribute('cy', c.y + (i < 2 ? -1 : 1) * h * k / 2); ci.setAttribute('r', 4); }); };
-      const u = Math.min(vw, vh) / 900;
-      box(guides.querySelector('.g1'), a, 230 * u, 80 * u, sm(kGuide * 2)); box(guides.querySelector('.g2'), b, 230 * u, 80 * u, sm(kGuide * 2 - .6));
-      const ar = guides.querySelector('.arrow'), mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - 90 * u;
-      ar.setAttribute('d', `M${a.x + 115 * u} ${a.y} Q ${mx} ${my} ${b.x - 115 * u} ${b.y}`); const len = 600 * u; ar.style.strokeDasharray = `${len}`; ar.style.strokeDashoffset = `${len * (1 - sm(kGuide * 1.6 - .5))}`;
-    }
-    // focus: on the counter at first, pulled onto the phone as the room darkens, back to the counter at night, onto the book, then the phone
+    if (dirty) { drawScreen(now, wake); dirty = banners.some(b => now - b.t < 600) || screens.fade < 1; }
+    // ---- focus: the counter; pulled onto the phone while it floats; the book and the phone in the evening ----
     const dPhone = cam.position.distanceTo(pv.position), dDesk = cam.position.distanceTo(camLook);
-    const focusOnPhone = clamp(kUp * (1 - kDown) + kRise + nightAmt * .6), fu = post.uniforms;
-    fu.uFocus.value = lerp(dDesk, dPhone, focusOnPhone); fu.uRange.value = lerp(10.0, 1.6, kUp * (1 - kDown) + kRise) - nightAmt * 6.0; fu.uMax.value = (7 + 11 * (kUp * (1 - kDown) + kRise)) * dpr();
-    fu.uVig.value = .38 + .4 * (1 - dayAmt) - .25 * kOut; fu.uFringe.value = .006 * (kUp * (1 - kDown) + kRise);
+    const fu = post.uniforms; fu.uFocus.value = lerp(dDesk, dPhone, up + kPush * kDown * .5); fu.uRange.value = lerp(10.0, 1.6, up) - kPush * kDown * 4.5; fu.uMax.value = (7 + 11 * up + 6 * kPush * kDown) * dpr();
+    fu.uVig.value = .38 + .35 * (1 - dayAmt) - .3 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
-    S('--kEve', kEve); S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kA', kA); S('--kScale', kScale); S('--kB', kB); S('--kGuide', kGuide); S('--kC', kC); S('--kOut', kOut); S('--night', nightAmt); S('--kRise', kRise);
+    S('--kEve', kEve); S('--kEveT', kEveT); S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kA', kA); S('--kScale', kScale); S('--kB', kB); S('--kGuide', kGuide); S('--kC', kC); S('--kOut', kOut); S('--night', nightAmt); S('--kRise', kRise);
     ov.dataset.scale = kScale < .33 ? 0 : kScale < .66 ? 1 : 2;
   }
   requestAnimationFrame(frame);

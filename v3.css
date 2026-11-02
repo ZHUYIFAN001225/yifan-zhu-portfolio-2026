@@ -3795,3 +3795,12 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1400vh)}
 .bk-dk::after{opacity:calc((.5 + var(--kDark) * .5) * (1 - var(--kOut)))}
 .bk-dk-top{height:18vh;opacity:calc((1 - var(--kText)) * .8)}
 .bk-dk-top{mix-blend-mode:normal;height:14vh;opacity:calc((1 - var(--kText)) * .55);background:linear-gradient(180deg,#f3f1ec 0%,rgba(243,241,236,.35) 40%,rgba(243,241,236,0) 100%)}
+/* desk v4 — one counter, one camera */
+html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1000vh)}
+.bk-dk{--kEveT:0}
+.bk-dk-glow{display:none}
+.bk-dk-grain{opacity:calc(.07 * (1 - var(--kOut)))}
+.bk-dk-panel,.bk-dk-scale,.bk-dk-formula,.bk-dk-guides,.bk-dk-rec{display:none!important}
+.bk-dk-eve{position:absolute;left:clamp(24px,4vw,64px);bottom:9%;width:min(34ch,36vw);pointer-events:none;color:#f3e9d8;opacity:var(--kEveT);filter:blur(calc((1 - var(--kEveT)) * 8px));transform:translateY(calc((1 - var(--kEveT)) * 16px))}
+.bk-dk-eve-k{margin:0 0 10px;font:700 12px/1 "Inter Tight",Inter,system-ui,sans-serif;letter-spacing:.14em;color:#ffc27a}
+.bk-dk-eve-p{margin:0;font:500 clamp(16px,1.35vw,22px)/1.4 "Inter Tight",Inter,system-ui,sans-serif;text-shadow:0 1px 14px rgba(0,0,0,.5)}

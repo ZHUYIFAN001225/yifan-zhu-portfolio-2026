@@ -45,8 +45,39 @@ export function mountDesk(root) {
     $('.p1').textContent = L(T.p1); $('.p2').textContent = L(T.p2); $('.bk-dk-pw-k').textContent = L(T.p3); $('.bk-dk-pw-p').textContent = L(T.pp); $('.bk-dk-pw-q').textContent = L(T.pq);
     $('.bk-dk-eve-k').textContent = L(T.ek); $('.bk-dk-eve-p').textContent = L(T.ep);
   };
-  text(); document.addEventListener('portfolio:language', () => setTimeout(() => { text(); inkNow = -1; screens.load(); }, 40));
+  text(); document.addEventListener('portfolio:language', () => setTimeout(() => { text(); splitAll(); inkNow = -1; drawLeft(); screens.load(); }, 40));
 
+  // ---------- the words: letter by letter, tied to the scroll (as on oryzo.ai) ----------
+  // every line is split into letters; a soft gradient sweeps across them on the way in and again on the way out, while
+  // the block drifts slowly sideways for its whole life — nothing pops, nothing is simply switched off
+  const CJK = /[　-鿿＀-￯]/;
+  function splitLetters(el) {
+    const txt = el.textContent; el.setAttribute('aria-label', txt); el.textContent = ''; const out = [];
+    for (const tok of txt.match(/[　-鿿＀-￯]|[^\s　-鿿＀-￯]+|\s+/g) || []) {
+      if (/^\s+$/.test(tok)) { el.append(' '); continue; }
+      const w = document.createElement('span'); w.className = 'sx-w'; w.setAttribute('aria-hidden', 'true');
+      for (const ch of tok) { const c = document.createElement('span'); c.className = 'sx-c'; c.textContent = ch; c.style.opacity = '0'; w.append(c); out.push(c); }
+      el.append(w);
+    }
+    return out;
+  }
+  const GROUPS = [
+    { root: '.bk-dk-hero', sel: ['.bk-dk-tag', '.t1', '.t2', '.t3', '.bk-dk-copy', '.bk-dk-ck', '.bk-dk-cd', '.bk-dk-live', '.bk-dk-scroll span'], box: '.bk-dk-card' },
+    { root: '.bk-dk-pw', sel: ['.p1', '.p2', '.bk-dk-pw-k', '.bk-dk-pw-p', '.bk-dk-pw-q'] },
+    { root: '.bk-dk-eve', sel: ['.bk-dk-eve-k', '.bk-dk-eve-p'] }];
+  function splitAll() { GROUPS.forEach(g => { g.el = $(g.root); g.boxEl = g.box ? $(g.box) : null; g.chars = g.sel.flatMap(s => [...ov.querySelectorAll(s)]).flatMap(splitLetters); g.el.style.filter = 'none'; g.el.style.opacity = '1'; g.last = -1; }); }
+  function sweep(g, tin, tout) {
+    const key = Math.round(tin * 400) * 1000 + Math.round(tout * 400); if (key === g.last) return; g.last = key;
+    const n = g.chars.length, S = 1.15;
+    g.chars.forEach((c, i) => { const f = n > 1 ? i / (n - 1) : 0, a = clamp(tin * (1 + S) - S * f) * (1 - clamp(tout * (1 + S) - S * f)); const v = a.toFixed(2); if (c._v !== v) { c.style.opacity = v; c._v = v; } });
+    g.el.style.transform = `translate3d(${((1 - sm(tin)) * 46 - sm(tout) * 46).toFixed(1)}px,0,0)`;
+    const life = sm(tin) * (1 - sm(tout)); g.el.style.pointerEvents = life > .6 ? '' : 'none';
+    if (g.boxEl) { const b = g.boxEl; b.style.background = `rgba(20,30,24,${(.42 * life).toFixed(3)})`; b.style.borderColor = `rgba(255,255,255,${(.12 * life).toFixed(3)})`; b.style.backdropFilter = b.style.webkitBackdropFilter = life > .02 ? `blur(${(10 * life).toFixed(1)}px)` : 'none'; b.querySelector('hr') && (b.querySelector('hr').style.opacity = life); }
+    const ic = g.el.querySelector('.bk-dk-scroll i'); if (ic) ic.style.opacity = life;
+  }
+  const bornAt = performance.now();
+
+  splitAll();
   // ---------- GL ----------
   const cv = $('.bk-dk-gl'); let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false, powerPreference: 'high-performance' }); } catch { ov.classList.add('no-gl'); return; }
@@ -67,35 +98,74 @@ export function mountDesk(root) {
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
 
   // ---------- the set, from Blender ----------
+  // Every surface carries its Cycles lighting, baked in three layers on its last UV set: the room (amb, in the glb), the
+  // sun alone with no leaves (sun), and the desk lamp at night (night). The leaves are cast here, live: each point is
+  // traced towards the sun onto a virtual canopy above the desk, and the canopy moves a little in the wind.
   const set = new THREE.Group(); scene.add(set); const props = {}; let ready = false;
-  // the bake: a day texture (in the glb) and a night texture (beside it) on the same UV set; the material shows a mix
-  const baked = []; let nightMix = 0;
-  const nightTex = n => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_night.jpg`, () => res(t)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; });
+  const baked = []; const U = { uMix: { value: 0 }, uLit: { value: 1 }, uTime: { value: 0 }, uWind: { value: 1 } };
+  const tex2 = (n, tag) => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_${tag}.jpg`, () => res(t), undefined, () => res(null)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; });
   const GAIN = 3.0;   // the bake was made at 0.4× the Blender exposure so sunlit paper fits in 8 bits; put it back here
-  const MIX_FRAG = `vec4 sampledDiffuseColor = texture2D( map, vMapUv ); sampledDiffuseColor.rgb = mix(sampledDiffuseColor.rgb, texture2D( uNight, vMapUv ).rgb * 1.5, uMix) * ${GAIN.toFixed(2)} * uLit; diffuseColor *= sampledDiffuseColor;`;
-  function bakedMaterial(day, night, ch) {
-    day.channel = ch; night.channel = ch; day.anisotropy = 8;
-    const m = new THREE.MeshBasicMaterial({ map: day, side: THREE.DoubleSide });
-    m.onBeforeCompile = sh => { sh.uniforms.uNight = { value: night }; sh.uniforms.uMix = { value: 0 }; sh.uniforms.uLit = { value: 1 }; sh.fragmentShader = sh.fragmentShader.replace('uniform vec3 diffuse;', 'uniform vec3 diffuse; uniform sampler2D uNight; uniform float uMix, uLit;').replace('#include <map_fragment>', `#ifdef USE_MAP\n${MIX_FRAG}\n#endif`); baked.push(sh.uniforms); };
+  const SUN_AT = new THREE.Vector3(-1.5, 1.7, -1.2), CANOPY = .34;   // the Blender sun (three.js axes) and the height of the leaves
+  const LIGHT_GLSL = `
+    uniform sampler2D uAmb, uSun, uNight; uniform float uMix, uLit, uTime, uWind; uniform vec3 uSunAt;
+    varying vec2 vBUv; varying vec3 vWP;
+    float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
+    float leaves(vec3 p){
+      // where this point's ray to the sun crosses the canopy
+      float t = (${CANOPY.toFixed(3)} - p.y) / max(uSunAt.y - p.y, 1e-3); vec2 q = (p + (uSunAt - p) * t).xz;
+      // wind: the whole canopy sways a little, each branch a little more, in slow gusts
+      float g = .55 + .45 * sin(uTime * .21) * sin(uTime * .13 + 1.7);
+      q += uWind * g * (vec2(sin(uTime * .9 + q.y * 7.), cos(uTime * .75 + q.x * 6.)) * .0055 + vec2(sin(uTime * .31), cos(uTime * .27)) * .004);
+      float n = vn(q * 12.5) * .55 + vn(q * 31. + 3.1) * .3 + vn(q * 4.2 + 7.3) * .15;
+      return smoothstep(.555, .615, n) * .85;   // mostly leaves; a few warm gaps
+    }
+    vec3 bakedLight(){
+      vec3 day = texture2D(uAmb, vBUv).rgb + texture2D(uSun, vBUv).rgb * leaves(vWP);
+      return mix(day, texture2D(uNight, vBUv).rgb * 1.15, uMix) * ${GAIN.toFixed(2)} * uLit;
+    }`;
+  function bakedMaterial({ amb, sun, night }, page) {
+    const m = new THREE.MeshBasicMaterial({ color: 0xffffff, map: page || null, side: THREE.DoubleSide });
+    m.onBeforeCompile = sh => {
+      Object.assign(sh.uniforms, U, { uAmb: { value: amb }, uSun: { value: sun }, uNight: { value: night }, uSunAt: { value: SUN_AT } });
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec2 bakeUv; varying vec2 vBUv; varying vec3 vWP;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvBUv = bakeUv; vWP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      // the bake already holds the colour of everything except the pages (baked white, written on here)
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + LIGHT_GLSL)
+        .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= bakedLight();');
+    };
     return m;
   }
-  function pageMaterial(day, night, ch) {
-    day.channel = ch; night.channel = ch;
-    // the handwriting canvas on the page's own UVs, lit by the bake (day/night) on the second set
-    const m = new THREE.MeshBasicMaterial({ map: pageTex, lightMap: day, lightMapIntensity: 1 });
-    m.onBeforeCompile = sh => { sh.uniforms.uNight = { value: night }; sh.uniforms.uMix = { value: 0 }; sh.uniforms.uLit = { value: 1 }; sh.fragmentShader = sh.fragmentShader.replace('uniform vec3 diffuse;', 'uniform vec3 diffuse; uniform sampler2D uNight; uniform float uMix, uLit;').replace('#include <lightmap_fragment>', `reflectedLight.indirectDiffuse += mix(texture2D( lightMap, vLightMapUv ).rgb, texture2D( uNight, vLightMapUv ).rgb * 1.5, uMix) * ${GAIN.toFixed(2)} * uLit;`); baked.push(sh.uniforms); };
-    return m;
-  }
-  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`), nightTex(n)]).then(([o, night]) => {
-    props[n] = o; set.add(o); let day = null, ch = 1; o.traverse(m => { if (m.isMesh && m.material.map && !day) { day = m.material.map; ch = ['uv', 'uv1', 'uv2', 'uv3'].filter(k => m.geometry.attributes[k]).length - 1; } });   // the bake is the last UV set
-    const mat = bakedMaterial(day, night, ch), pg = n === 'notebook' ? o.getObjectByName('nb_page_r') : null, pageMat = pg ? pageMaterial(day, night, ch) : null;
-    o.traverse(m => { if (!m.isMesh) return; m.castShadow = false; m.receiveShadow = false; m.material = (pg && (m === pg || pg.children.includes(m))) ? pageMat : mat; });
-  }).catch(e => console.warn('glb', n, e)))).then(() => { ready = true; setupNudges(); drawInk(0, true); });
+  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`), tex2(n, 'sun'), tex2(n, 'night')]).then(([o, sun, night]) => {
+    props[n] = o; set.add(o); let amb = null;
+    o.traverse(m => { if (!m.isMesh) return; if (!amb && m.material.map) amb = m.material.map; const a = m.geometry.attributes, k = ['uv3', 'uv2', 'uv1'].find(x => a[x]); m.geometry.setAttribute('bakeUv', a[k] || a.uv); });
+    const L3 = { amb, sun, night }, mat = bakedMaterial(L3);
+    const pages = { nb_page_r: bakedMaterial(L3, pageTex), nb_page_l: bakedMaterial(L3, pageTexL) };
+    o.traverse(m => { if (!m.isMesh) return; m.castShadow = false; m.receiveShadow = false; const pg = Object.keys(pages).find(k => m.name === k || m.parent?.name === k); m.material = pg ? pages[pg] : mat; });
+  }).catch(e => console.warn('glb', n, e)))).then(() => { ready = true; setupNudges(); drawInk(0, true); drawLeft(); });
   // the live phone's shadow lands on the mat through this catcher (the bake has no phone in it)
   const catcher = new THREE.Mesh(new THREE.PlaneGeometry(.7, .55), new THREE.ShadowMaterial({ opacity: .55 })); catcher.rotation.x = -Math.PI / 2; catcher.rotation.z = THREE.MathUtils.degToRad(5); catcher.position.set(.09, .0036, .05); catcher.receiveShadow = true; scene.add(catcher);
-  // the right page carries the handwriting: lines + ink drawn here, mapped onto the page from the model
-  const pageCv = document.createElement('canvas'); pageCv.width = 1240; pageCv.height = 900; const px = pageCv.getContext('2d');
+  // the pages: lines + ink drawn here, mapped onto the page planes of the model (portrait, like the paper)
+  const pageCv = document.createElement('canvas'); pageCv.width = 900; pageCv.height = 1240; const px = pageCv.getContext('2d');
   const pageTex = new THREE.CanvasTexture(pageCv); pageTex.colorSpace = THREE.SRGBColorSpace; pageTex.flipY = false; pageTex.anisotropy = 8;
+  const pageCvL = document.createElement('canvas'); pageCvL.width = 900; pageCvL.height = 1240; const pl = pageCvL.getContext('2d');
+  const pageTexL = new THREE.CanvasTexture(pageCvL); pageTexL.colorSpace = THREE.SRGBColorSpace; pageTexL.flipY = false; pageTexL.anisotropy = 8;
+  const TIMES = ['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00'];
+  const rowY = (h, row) => h * (.13 + row * .048);
+  function ruled(x, title) {
+    const w = 900, h = 1240; x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = '#fbf7ee'; x.fillRect(0, 0, w, h);
+    x.fillStyle = '#17362b'; x.font = `700 ${Math.round(h * .03)}px "Inter Tight", Inter, system-ui, sans-serif`; x.fillText(title, w * .09, h * .085);
+    for (let i = 0; i < 17; i++) { x.strokeStyle = 'rgba(23,54,43,.35)'; x.lineWidth = 2; x.beginPath(); x.moveTo(w * .08, rowY(h, i)); x.lineTo(w * .92, rowY(h, i)); x.stroke(); x.fillStyle = 'rgba(23,54,43,.55)'; x.font = `500 ${Math.round(h * .017)}px Inter, system-ui, sans-serif`; x.fillText(TIMES[i], w * .09, rowY(h, i) - h * .008); }
+  }
+  const hand = (x, txt, X, y, size, col, rot) => { x.save(); x.translate(X, y); x.rotate(rot); x.fillStyle = col; x.font = `italic 600 ${Math.round(size)}px ${HAND}`; x.fillText(txt, 0, 0); x.restore(); };
+  // the left page: yesterday, already done — ticked off, one no-show, a cash note
+  const LEFT = [[0, ['9:00 Mrs Li — trim ✓', '9:00 李太太 — 修剪 ✓']], [2, ['10:00 Sun — cut + wash ✓', '10:00 孙先生 — 剪+洗 ✓']], [4, ['11:00 Emma ✓', '11:00 Emma ✓']], [7, ['12:30 Zhou — no show', '12:30 周先生 — 没来']], [10, ['2:00 colour (Anna) ✓', '2:00 染发（Anna）✓']], [13, ['3:30 walk-in, paid cash', '3:30 散客，现金']], [15, ['£ count: 6', '今天：6 位']]];
+  function drawLeft() {
+    const w = 900, h = 1240, r = seed(11); ruled(pl, zh() ? '周四 5 日' : 'THURSDAY 5');
+    LEFT.forEach(([row, t], i) => hand(pl, L(t), w * .22, rowY(h, row) - h * .006, h * .029 + r() * 2, i === 3 ? '#6b6f7a' : '#15171c', (r() - .5) * .035));
+    pl.strokeStyle = '#6b6f7a'; pl.lineWidth = h * .0035; pl.beginPath(); pl.moveTo(w * .21, rowY(h, 7) - h * .014); pl.lineTo(w * .78, rowY(h, 7) - h * .018); pl.stroke();
+    pageTexL.needsUpdate = true;
+  }
   const EV = [
     [0, .22, ['TOMORROW ↓', '明天 ↓'], '#15171c'], [1, .22, ['9:30 Emma? ring back', '9:30 Emma? 回电'], '#15171c'], [3, .22, ['11:00 He (moved)', '11:00 何先生（挪过来）'], '#15171c'],
     ['strike', 3, .2, .72], ['fix', 3.55, .3, ['→ 11:30, he rang', '→ 11:30，他来电话了'], '#b3261e'], [6, .5, ['Zhou → 12:30?', '周先生 → 12:30?'], '#15171c'],
@@ -104,14 +174,11 @@ export function mountDesk(root) {
   let inkNow = -1;
   function drawInk(k, force) {
     k = Math.round(clamp(k) * 24) / 24; if (k === inkNow && !force) return; inkNow = k;
-    const w = 900, h = 1240, r = seed(5); px.setTransform(1, 0, 0, 1, 0, 0); px.fillStyle = '#fbf7ee'; px.fillRect(0, 0, pageCv.width, pageCv.height);
-    px.fillStyle = '#17362b'; px.font = `700 ${Math.round(h * .03)}px "Inter Tight", Inter, system-ui, sans-serif`; px.fillText(zh() ? '周五 6 日' : 'FRIDAY 6', w * .09, h * .085);
-    const rowY = row => h * (.13 + row * .048);
-    for (let i = 0; i < 17; i++) { px.strokeStyle = 'rgba(23,54,43,.35)'; px.lineWidth = 2; px.beginPath(); px.moveTo(w * .08, rowY(i)); px.lineTo(w * .92, rowY(i)); px.stroke(); px.fillStyle = 'rgba(23,54,43,.55)'; px.font = `500 ${Math.round(h * .017)}px Inter, system-ui, sans-serif`; px.fillText(['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00'][i], w * .09, rowY(i) - h * .008); }
+    const w = 900, h = 1240, r = seed(5); ruled(px, zh() ? '周五 6 日' : 'FRIDAY 6');
     EV.forEach((e, i) => { const k0 = i / EV.length, k1 = (i + 1) / EV.length; if (k <= k0) return; const part = clamp((k - k0) / (k1 - k0));
-      if (e[0] === 'strike') { const [, row, x0, x1] = e; px.strokeStyle = '#b3261e'; px.lineWidth = h * .004; px.beginPath(); px.moveTo(w * x0, rowY(row) - h * .012); px.lineTo(w * lerp(x0, x1, part), rowY(row) - h * .016); px.stroke(); return; }
-      const fix = e[0] === 'fix'; const [row, fx, txt, col] = fix ? e.slice(1) : e, y = rowY(row) - h * .006, X = w * fx;
-      px.save(); px.beginPath(); px.rect(0, y - h * .045, X + part * w * .75, h * .06); px.clip(); px.translate(X, y); px.rotate((r() - .5) * .04); px.fillStyle = col; px.font = `italic 600 ${Math.round(h * (fix ? .024 : .031) + r() * 2)}px ${HAND}`; px.fillText(L(txt), 0, 0); px.restore(); });
+      if (e[0] === 'strike') { const [, row, x0, x1] = e; px.strokeStyle = '#b3261e'; px.lineWidth = h * .004; px.beginPath(); px.moveTo(w * x0, rowY(h, row) - h * .012); px.lineTo(w * lerp(x0, x1, part), rowY(h, row) - h * .016); px.stroke(); return; }
+      const fix = e[0] === 'fix'; const [row, fx, txt, col] = fix ? e.slice(1) : e, y = rowY(h, row) - h * .006, X = w * fx;
+      px.save(); px.beginPath(); px.rect(0, y - h * .045, X + part * w * .75, h * .06); px.clip(); hand(px, L(txt), X, y, h * (fix ? .024 : .031) + r() * 2, col, (r() - .5) * .04); px.restore(); });
     pageTex.needsUpdate = true;
   }
 
@@ -166,6 +233,57 @@ export function mountDesk(root) {
   let buzz = -1e9;
   const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.prev = screens.cur === 'lock' ? null : screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };
 
+  // ---------- the messages, in the air ----------
+  // each new message lights the glass and also rises out of it, to hang over the phone like a headset overlay; the
+  // newest stays lowest, older ones are pushed up and fade; a faint shaft of light joins them to the screen
+  const HOLO_N = 3, CW = .086, CH = .0215, holo = new THREE.Group(), hscene = new THREE.Scene(); hscene.add(holo);   // drawn after the grade, crisp
+  const easeBack = t => { const c = 1.5; t = clamp(t) - 1; return 1 + (c + 1) * t * t * t + c * t * t; };
+  const cards = Array.from({ length: HOLO_N + 1 }, () => {
+    const c = document.createElement('canvas'); c.width = 900; c.height = 250; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(CW, CW * 250 / 900), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, depthTest: false, opacity: 0 }));
+    m.renderOrder = 6; m.visible = false; holo.add(m); return { c, t, m, b: null, pos: new THREE.Vector3(), a: 0 };
+  });
+  function paintCard(cd) {
+    const x = cd.c.getContext('2d'), W = 900, H = 250, b = cd.b, p = 26; x.clearRect(0, 0, W, H);
+    x.save(); x.shadowColor = 'rgba(190,225,255,.55)'; x.shadowBlur = 26;   // the glow of a projected thing
+    x.fillStyle = 'rgba(246,248,252,.86)'; x.beginPath(); x.roundRect(p, p, W - 2 * p, H - 2 * p, 46); x.fill(); x.restore();
+    x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = 2; x.beginPath(); x.roundRect(p + 1, p + 1, W - 2 * p - 2, H - 2 * p - 2, 45); x.stroke();
+    x.fillStyle = '#2dc100'; x.beginPath(); x.roundRect(p + 30, H / 2 - 46, 92, 92, 24); x.fill();
+    x.fillStyle = '#fff'; x.beginPath(); x.ellipse(p + 66, H / 2 - 6, 22, 18, 0, 0, Math.PI * 2); x.fill(); x.beginPath(); x.ellipse(p + 90, H / 2 + 10, 18, 15, 0, 0, Math.PI * 2); x.fill();
+    const tx = p + 150; x.textBaseline = 'alphabetic';
+    x.fillStyle = '#111'; x.font = `600 40px -apple-system, Inter, system-ui, sans-serif`; x.fillText(`${L(T.wxk)} · ${b.who}`, tx, H / 2 - 8);
+    x.fillStyle = '#7a7a80'; x.font = `500 30px -apple-system, Inter, system-ui, sans-serif`; x.textAlign = 'right'; x.fillText(L(T.now), W - p - 34, H / 2 - 8); x.textAlign = 'left';
+    x.fillStyle = '#333'; x.font = `400 36px -apple-system, Inter, system-ui, sans-serif`; let s = b.what; while (x.measureText(s).width > W - tx - p - 34 && s.length > 4) s = s.slice(0, -2); x.fillText(s === b.what ? s : s + '…', tx, H / 2 + 42);
+    cd.t.needsUpdate = true;
+  }
+  const beamCv = document.createElement('canvas'); beamCv.width = 64; beamCv.height = 256; { const x = beamCv.getContext('2d'), g = x.createLinearGradient(0, 256, 0, 0); g.addColorStop(0, 'rgba(200,230,255,.9)'); g.addColorStop(1, 'rgba(200,230,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 256); const s = x.createLinearGradient(0, 0, 64, 0); s.addColorStop(0, 'rgba(0,0,0,1)'); s.addColorStop(.5, 'rgba(0,0,0,0)'); s.addColorStop(1, 'rgba(0,0,0,1)'); x.globalCompositeOperation = 'destination-out'; x.fillStyle = s; x.fillRect(0, 0, 64, 256); }
+  const beam = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(beamCv), transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+  beam.renderOrder = 5; holo.add(beam);
+  const hv = { up: new THREE.Vector3(), to: new THREE.Vector3(), base: new THREE.Vector3(), tgt: new THREE.Vector3(), show: 0 };
+  window.__bkSet = { cards, get banners() { return banners; }, hv, holo, cam };
+  function updateHolo(now, dt, want) {
+    hv.show += (want - hv.show) * (1 - Math.exp(-dt * 5));
+    const list = banners.slice(-HOLO_N);
+    hv.up.set(0, 1, 0).applyQuaternion(cam.quaternion); hv.base.copy(pv.position); hv.base.y += .01; hv.to.copy(cam.position).sub(hv.base).normalize();
+    // free the cards whose message has scrolled off, give the new messages a card that starts on the glass
+    cards.forEach(cd => { if (cd.b && !list.includes(cd.b)) cd.b = cd.a < .02 ? null : cd.b; });
+    list.forEach(b => { if (cards.some(cd => cd.b === b)) return; const cd = cards.find(cd => !cd.b) || cards.reduce((m, cd) => (cd.a < m.a ? cd : m)); cd.b = b; cd.a = 0; cd.pos.copy(hv.base); paintCard(cd); });
+    let top = null;
+    cards.forEach(cd => {
+      if (!cd.b) { cd.m.visible = false; return; }
+      const i = list.indexOf(cd.b), live = i >= 0, slot = live ? list.length - 1 - i : HOLO_N, age = (now - cd.b.t) / 1000, e = easeBack(age / .7);
+      hv.tgt.copy(hv.base).addScaledVector(hv.to, .05 + slot * .006).addScaledVector(hv.up, .022 + slot * (CH + .007) + Math.sin(now / 1500 + slot * 1.7) * .0012);
+      cd.pos.lerp(hv.tgt, 1 - Math.exp(-dt * (live ? 7 : 3)));
+      const aim = (live ? (slot === 0 ? 1 : slot === 1 ? .8 : .55) : 0) * hv.show; cd.a += (aim - cd.a) * (1 - Math.exp(-dt * 8));
+      cd.m.visible = cd.a > .01; cd.m.material.opacity = cd.a * clamp(age / .25);
+      cd.m.position.copy(cd.pos); cd.m.quaternion.copy(cam.quaternion); cd.m.rotateX(-.18); cd.m.scale.setScalar(lerp(.35, 1, e) * (1 - slot * .04));
+      if (slot === 0 && live) top = cd;
+    });
+    // the shaft: from the glass to the newest card, strongest just as it arrives
+    if (top) { const len = top.pos.distanceTo(hv.base), age = (now - top.b.t) / 1000; beam.position.copy(hv.base).lerp(top.pos, .5); beam.quaternion.copy(cam.quaternion); beam.scale.set(CW * .75, Math.max(len, .001), 1); beam.material.opacity = hv.show * (.16 + .5 * Math.exp(-age * 2.5)); beam.visible = true; }
+    else beam.visible = false;
+  }
+
   // ---------- camera, pointer, nudges ----------
   let vw = 0, vh = 0, rt = null;
   const dpr = () => Math.min(devicePixelRatio || 1, 1.75);
@@ -202,10 +320,10 @@ export function mountDesk(root) {
   addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up
   const V = {
-    hero: { pos: new THREE.Vector3(-.02, .86, .46), look: new THREE.Vector3(.009, 0, .042), roll: 0 },
+    hero: { pos: new THREE.Vector3(.0, .66, .37), look: new THREE.Vector3(.012, 0, .038), roll: 0 },   // tighter than the Blender still: the props were pulled in around the phone
     dark: { pos: new THREE.Vector3(0, .9, .001), look: new THREE.Vector3(0, 0, 0), roll: 0 },
-    book: { pos: new THREE.Vector3(-.2, .4, .27), look: new THREE.Vector3(-.15, 0, .035), roll: -6 },
-    phone: { pos: new THREE.Vector3(.1, .36, .2), look: new THREE.Vector3(.13, 0, .02), roll: 3 }
+    book: { pos: new THREE.Vector3(-.135, .36, .25), look: new THREE.Vector3(-.105, 0, .03), roll: -6 },
+    phone: { pos: new THREE.Vector3(.11, .3, .2), look: new THREE.Vector3(.13, .02, .02), roll: 3 }
   };
   const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), E = new THREE.Euler();
   const mix = (a, b, t, out) => out.lerpVectors(a, b, t);
@@ -222,14 +340,14 @@ export function mountDesk(root) {
   function frame(now) {
     requestAnimationFrame(frame);
     const r = holder.getBoundingClientRect(); if (r.bottom < -100 || r.top > innerHeight + 100) return;
-    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    const dt = clamp((now - last) / 1000, 0, .05); last = now;
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
     const lag = 1 - Math.exp(-dt * 5); P.x += (P.tx - P.x) * lag; P.y += (P.ty - P.y) * lag;
     // ---- timeline ----
     const kText = seg(pr, 0, .07), kDark = seg(pr, .09, .22), kUp = seg(pr, .1, .26);
     const kPw = seg(pr, .24, .32) * (1 - seg(pr, .4, .46));
     const kBack = seg(pr, .44, .56), kEve = seg(pr, .58, .7), kBook = seg(pr, .6, .72), kInk = seg(pr, .64, .86), kPhone = seg(pr, .8, .9);
-    const kEveT = seg(pr, .62, .68) * (1 - seg(pr, .9, .94)), kOut = seg(pr, .93, 1);
+    const kEveT = seg(pr, .62, .68) * (1 - seg(pr, .9, .94)), kOut = seg(pr, .885, .985);   // a slow fade to black
     eveAmt = kEve; drawInk(kInk);
     const up = kUp * (1 - kBack), onDesk = 1 - up, dayAmt = (1 - kDark * (1 - kBack)) * (1 - kEve), nightAmt = kEve * kBack, blackout = kDark * (1 - kBack);
     // ---- camera ----
@@ -241,7 +359,7 @@ export function mountDesk(root) {
     // ---- light ----
     sun.intensity = 2.2 * dayAmt; room.intensity = .45 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .2 * (1 - blackout) * (1 - nightAmt * .8);
     lamp.intensity = .5 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
-    nightMix = nightAmt; baked.forEach(u => { u.uMix.value = nightMix; u.uLit.value = 1 - blackout; }); catcher.visible = onDesk > .5; catcher.material.opacity = .55 * dayAmt + .4 * nightAmt;
+    U.uMix.value = nightAmt; U.uLit.value = 1 - blackout; U.uTime.value = now / 1000; catcher.visible = onDesk > .5; catcher.material.opacity = .55 * dayAmt + .4 * nightAmt;
     set.visible = blackout < .995;
     nudge(dt, onDesk);
     // ---- the phone ----
@@ -254,6 +372,7 @@ export function mountDesk(root) {
     // ---- the screen ----
     const heroMsgs = Math.floor(clamp(pr, 0, .085) / .0107), eveMsgs = Math.floor(clamp(pr - .6, 0, .3) / .022);
     syncBanners(now, up > .05 ? 0 : heroMsgs + eveMsgs); showScreen(up > .05 ? 'cover-book' : 'lock');
+    updateHolo(now, dt, (up < .05 && kOut < .3 && kBook * kBack < .6 + kPhone) ? 1 : 0);
     const litTarget = (up > .05 || wantCount > 0) ? 1 : 0; wake += (litTarget - wake) * (1 - Math.exp(-dt * 6)); if (Math.abs(litTarget - wake) > .002) dirty = true;
     if (screens.fade < 1) { screens.fade = Math.min(1, screens.fade + dt * 3); dirty = true; }
     if (dirty) { drawScreen(now, wake); dirty = banners.some(b => now - b.t < 600) || screens.fade < 1; }
@@ -262,6 +381,12 @@ export function mountDesk(root) {
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(.5, .12, up) - (kBook * kBack) * .22; fu.uMax.value = (6 + 10 * up + 6 * kBook * kBack) * dpr();
     fu.uVig.value = .25 + .4 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+    if (holo.children.some(m => m.visible)) { renderer.autoClear = false; renderer.render(hscene, cam); renderer.autoClear = true; }
+    // the words
+    const tHero = sm(clamp((now - bornAt - 250) / 1700));
+    sweep(GROUPS[0], calm ? 1 : tHero, seg(pr, .004, .085));
+    sweep(GROUPS[1], seg(pr, .235, .33), seg(pr, .395, .465));
+    sweep(GROUPS[2], seg(pr, .6, .69), seg(pr, .87, .935));
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut);
   }

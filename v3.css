@@ -3836,3 +3836,9 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1000vh)}
 .bk-plate .bk-pl{display:none}
 .bk-plate .bk-ink{width:900px!important;height:1300px!important;max-width:none!important}
 .bk-plate .bk-lamp{opacity:calc(var(--eve,0) * .7)}
+
+/* booking set: letters swept in/out with the scroll; the end fades to black, not to paper */
+.bk-set .sx-w{display:inline-block;white-space:nowrap}
+.bk-set .sx-c{display:inline-block}
+.bk-set .bk-dk-out{background:#0b0a09}
+.bk-set .bk-dk-scroll{opacity:1}

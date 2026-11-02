@@ -134,7 +134,10 @@ export function mountDesk(root) {
       float ph = vn(vWP.xz * 7.) * 6.2832;
       float w = (.5 - .5 * cos(uTime * .95 + ph + sin(uTime * .4 + ph) * 1.2)) * uWind;
       vec3 day = mix(texture2D(uAmb, vBUv).rgb, texture2D(uSun, vBUv).rgb, w);
-      return mix(day, texture2D(uNight, vBUv).rgb * 1.15, uMix) * ${GAIN.toFixed(2)} * uLit;
+      // night: darker than the day, and only the lamp's pool over the book really lit — the rest of the desk falls away
+      float pool = mix(.22, 1., smoothstep(.46, .08, distance(vWP.xz, vec2(-.10, .02))));
+      vec3 night = texture2D(uNight, vBUv).rgb * .62 * pool;
+      return mix(day, night, uMix) * ${GAIN.toFixed(2)} * uLit;
     }`;
   function bakedMaterial({ amb, sun, night }, page) {
     const m = new THREE.MeshBasicMaterial({ color: 0xffffff, map: page || null, side: THREE.DoubleSide });
@@ -440,7 +443,7 @@ export function mountDesk(root) {
     // ---- focus ----
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(1.1, .12, up) - (kBook * kBack) * .8; fu.uMax.value = (2.2 * (1 - up) + 7 * kBook * kBack) * dpr();
-    fu.uVig.value = .25 + .4 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
+    fu.uVig.value = .25 + .55 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     // the words
     const tHero = clamp((now - bornAt - 300) / 1900);   // the first heading arrives on load, the rest with the scroll

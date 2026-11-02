@@ -175,7 +175,7 @@ export function mountStage(root) {
 
   // ---------- stations along the page ----------
   const docY = e => e.getBoundingClientRect().top + scrollY;
-  let keys = [], cover = null, camQ = null;
+  let keys = [], cover = null, camQ = null, camV = null;
   function build() {
     const vh = innerHeight, m = isMobile(), S = [];
     let turns = 0, last = null;
@@ -228,7 +228,15 @@ export function mountStage(root) {
         shot(4, 1.48, .1, TW + .1, 0, .11),     // push in on "add a booking"
         shot(5, 1.4, -.12, TW + .26, -.07, .11) // close-up, slight dutch angle
       ];
-      cover = { start, end, step: (end - start) / shots.length, shots, est: P6([x0, y0, s0, -.05, -.32, 0]), est2: P6([.5, .5, s0 * .95, .1, -.4, 0]), exit: P6([.5, -.95, s0 * .7, .5, TW + .5, 0]) };
+      const WORDS = [['Service first', '先选服务'], ['Soonest, one tap', '最早，点一下'], ['Only open days', '只给开门的日子'], ['Her side', '她的那一边'], ['Add by name', '填名字就行'], ['Nobody lost', '没人被删掉']];
+      const SIDE = i => i < 3 ? ['Customer side', '顾客这边'] : ['Owner side', '店主这边'];
+      let cap = op.querySelector('.bk-cap');
+      if (!cap) { cap = document.createElement('div'); cap.className = 'bk-cap'; cap.setAttribute('aria-hidden', 'true'); op.append(cap); }
+      const fillCap = () => { const L = a => a[zh() ? 1 : 0];
+        cap.innerHTML = `<p class="bk-cap-tag"><span></span><b></b></p>${WORDS.map((w, i) => `<p class="bk-cap-w" style="--i:${i}">${L(w)}</p>`).join('')}<p class="bk-cap-end">${zh() ? '两边，<br>同一本预约本。' : 'Two sides.<br>One diary.'}</p>`;
+        cap._side = SIDE; cap._n = WORDS.length; };
+      fillCap(); if (!cap._lang) { cap._lang = true; document.addEventListener('portfolio:language', () => setTimeout(fillCap, 30)); }
+      cover = { start, end, step: (end - start) / shots.length, shots, cap, est: P6([x0, y0, s0, -.05, -.32, 0]), est2: P6([.5, .5, s0 * .95, .1, -.4, 0]), exit: P6([.5, -.95, s0 * .7, .5, TW + .5, 0]) };
       push(end + vh * .05, { kind: 'off', q: P6([.5, -.9, s0 * .7, .4, .3, 0]), f: 'cover-today' });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
@@ -355,21 +363,31 @@ export function mountStage(root) {
     // then the camera glides to the next one; the pose is also damped, so every move is smooth.
     let cov = null;
     if (!m && cover && y > vh * .5 && y < cover.end + vh * .9) {
-      const ss = cover.shots, sm = t => t * t * (3 - 2 * t), N = ss.length;
-      let tq, tf, tspot = null, tbub = null;
-      if (y < cover.start) { const w = sm(clamp((y - vh * .5) / (cover.start - vh * .5))); tq = mix(cover.est, ss[0].q, w); tf = ss[0].f; }
-      else if (y < cover.end) {
-        const u = (y - cover.start) / cover.step, i = Math.min(N - 1, Math.floor(u)), fr = u - i, nx = ss[i + 1];
-        const w = nx ? sm(clamp((fr - .42) / .58)) : 0;
-        tq = nx ? mix(ss[i].q, nx.q, w) : ss[i].q;
-        // the side change: the phone turns its back to us between shots 3 and 4, and the screen swaps unseen
-        tf = nx && w > .5 ? nx.f : ss[i].f;
-        if (w < .12) { tspot = ss[i].spot; tbub = ss[i].bub; } else if (w > .88 && nx) { tspot = nx.spot; tbub = nx.bub; }
-      } else { const w = sm(clamp((y - cover.end) / (vh * .7))); tq = mix(ss[N - 1].q, cover.exit, w); tf = ss[N - 1].f; }
-      if (!camQ) camQ = { ...tq };
-      for (const k in tq) camQ[k] += (tq[k] - camQ[k]) * E(6);
+      const ss = cover.shots, N = ss.length, sm5 = t => t * t * t * (t * (t * 6 - 15) + 10);
+      const P = i => i < 0 ? cover.est2 : i >= N ? cover.exit : ss[i].q;
+      // a camera on a curved track: Catmull-Rom through the shots, so speed never drops to zero mid-move
+      const cr = (p0, p1, p2, p3, t) => { const o = {}; for (const k in p1) { const a0 = p0[k], a1 = p1[k], a2 = p2[k], a3 = p3[k]; o[k] = .5 * ((2 * a1) + (-a0 + a2) * t + (2 * a0 - 5 * a1 + 4 * a2 - a3) * t * t + (-a0 + 3 * a1 - 3 * a2 + a3) * t * t * t); } return o; };
+      let u, tq, tf, tspot = null, tbub = null, near = -1;
+      if (y < cover.start) { u = -1 + clamp((y - vh * .5) / (cover.start - vh * .5)); }
+      else if (y < cover.end) { u = (y - cover.start) / cover.step; }
+      else u = N - 1 + 1.4 * clamp((y - cover.end) / (vh * .7)) ; // last shot → exit
+      const i = Math.floor(u), fr = u - i;
+      // each shot holds for a beat (30%), then the move eases out and in (smootherstep)
+      const v = fr < .3 ? 0 : sm5((fr - .3) / .7);
+      tq = i < 0 ? mix(cover.est, ss[0].q, sm5(clamp(u + 1))) : cr(P(i - 1), P(i), P(i + 1), P(i + 2), v);
+      const cur = Math.max(0, Math.min(N - 1, v > .5 ? i + 1 : i));
+      tf = ss[cur].f;
+      if (i >= 0 && i < N && v < .1) { tspot = ss[i].spot; tbub = ss[i].bub; near = i; }
+      if (!camQ) { camQ = { ...tq }; camV = {}; for (const k in tq) camV[k] = 0; }
+      // critically damped spring: the camera has weight, it follows and settles instead of snapping
+      const W = 6.5, d = Math.min(dt, .05);
+      for (const k in tq) { camV[k] += ((tq[k] - camQ[k]) * W * W - 2 * W * camV[k]) * d; camQ[k] += camV[k] * d; }
       cov = { q: { ...camQ }, f: tf, spot: tspot, bub: tbub };
-    } else camQ = null;
+      // the type behind the phone: each shot's word slides through, against the camera's direction
+      const c = cover.cap; c.style.setProperty('--u', u.toFixed(4)); c.style.setProperty('--end', clamp((u - (N - 1)) / .9).toFixed(3));
+      const side = c._side(Math.max(0, Math.min(N - 1, Math.round(u))));
+      const tag = c.querySelector('.bk-cap-tag'); if (tag) { tag.querySelector('span').textContent = side[zh() ? 1 : 0]; tag.querySelector('b').textContent = `${String(Math.max(1, Math.min(N, Math.round(u) + 1))).padStart(2, '0')} / ${String(N).padStart(2, '0')}`; tag.style.opacity = u > -.4 && u < N - .6 ? 1 : 0; }
+    } else { camQ = null; if (cover) { const top = y < vh * .6; cover.cap.style.setProperty('--u', top ? '-1' : String(cover.shots.length + 1)); cover.cap.style.setProperty('--end', top ? '0' : '1'); } }
     let file = st.f, rect = hold || pair ? st.spot : null;
     if (cov) { file = cov.f; rect = cov.spot; }
     if (hv) { file = hv.file; rect = hv.rect; }

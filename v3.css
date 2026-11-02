@@ -3544,3 +3544,22 @@ html:has(.bk-day){background:#f3eee3!important}html:has(.bk-day) .site-header.v3
 .bk-cover-pin .op--3d .op-word:nth-child(1),.bk-cover-pin .op--3d .op-word:nth-child(3){transform:translateX(calc(var(--sp,0) * var(--dx) * 100vw))!important}
 .bk-cover-pin .op--3d .op-copy{opacity:max(0,calc(1 - (var(--sp,0) - .55) * 4));transition:opacity .2s}
 .bk-cover-pin .op--3d .op-drag{opacity:max(0,calc(1 - var(--sp,0) * 4))}
+
+/* ======== cover: type behind the phone, one word per shot ======== */
+.bk-cap{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;--u:-1;--end:0}
+.bk-cap-w{position:absolute;left:50%;top:50%;margin:0;white-space:nowrap;font:700 clamp(90px,13vw,230px)/.9 Inter,system-ui,sans-serif;letter-spacing:-.055em;color:rgba(23,54,43,.085);
+  transform:translate(calc(-50% + (var(--i) - var(--u)) * 70vw),-50%) scale(calc(1 - min(1, max(var(--i) - var(--u), var(--u) - var(--i))) * .15));
+  opacity:calc(1 - min(1, max(var(--i) - var(--u), var(--u) - var(--i)) * 1.1));will-change:transform}
+:lang(zh) .bk-cap-w{letter-spacing:-.02em}
+.bk-cap-tag{position:absolute;left:clamp(24px,4vw,64px);top:clamp(110px,16vh,170px);margin:0;display:grid;gap:4px;transition:opacity .4s}
+.bk-cap-tag span{font:600 12px/1.2 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#1f9e6c}
+.bk-cap-tag b{font:600 44px/1 Inter,system-ui,sans-serif;letter-spacing:-.03em;color:#17362b;font-variant-numeric:tabular-nums}
+.bk-cap-end{position:absolute;left:50%;top:50%;margin:0;text-align:center;font:700 clamp(64px,8.5vw,150px)/.95 Inter,system-ui,sans-serif;letter-spacing:-.05em;color:#17362b;
+  transform:translate(-50%,calc(-50% + (1 - var(--end)) * 18vh));opacity:var(--end)}
+.op--3d:not(:has(.bk-cap)) .bk-cap{display:none}
+@media (max-width:999px){.bk-cap{display:none}}
+.bk-cover-pin .op--3d .op-word:nth-child(2){opacity:calc(1 - var(--sp,0))!important}
+.bk-cap-w{color:rgba(23,54,43,.11)}
+.bk-cap-end{white-space:nowrap;line-height:1.05}
+:lang(zh) .bk-cap-end{font-size:clamp(52px,6.4vw,112px);letter-spacing:-.02em;line-height:1.2}
+:lang(zh) .bk-cap-w{font-size:clamp(72px,9vw,160px)}

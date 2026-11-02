@@ -18,11 +18,15 @@ EXPOSURE = 2 ** -1.15 * 0.4    # the hero render's exposure, pre-applied to the 
                                # the website renders the bake at exposure 2.5 to put it back)
 SIZES = {'desk': 2048, 'mat': 2048, 'notebook': 2048, 'scissors': 1024, 'pencil': 1024, 'pen': 1024, 'comb': 1024, 'eraser': 512, 'clips': 512, 'binder': 512}
 O = bpy.data.objects
-# pull everything in around the phone so the shot can be tighter (metres, Blender coords; the phone stays at (.13,-.04))
-MOVE = {'notebook': (-.115, -.03), 'pencil': (.03, .125), 'pen': (-.16, .165), 'eraser': (-.31, .065), 'comb': (-.05, -.205),
-        'scissors': (.285, -.105), 'binder': (-.36, -.135)}
-for k, (x, y) in MOVE.items(): O[k].location.x = x; O[k].location.y = y
-for k, dx, dy in (('clip_a', .09, .045), ('clip_b', .09, .045), ('clip_c', .09, .045)): O[k].location.x += dx; O[k].location.y += dy
+# a tighter still life, so one closer shot holds every prop (Blender coords; the phone stays at (.13,-.04))
+MOVE = {'notebook': (-.11, -.02, None), 'pencil': (.06, .13, None), 'pen': (-.13, .16, None), 'eraser': (-.29, .10, None),
+        'comb': (-.06, -.215, None), 'scissors': (.245, -.115, 110), 'binder': (.30, .12, -35)}
+for k, (x, y, rz) in MOVE.items():
+    O[k].location.x = x; O[k].location.y = y
+    if rz is not None: O[k].rotation_euler.z = math.radians(rz)
+O['scissors'].scale = (1.0, 1.0, 1.0)
+for k, (x, y) in {'clip_a': (-.26, -.16), 'clip_b': (-.24, -.20), 'clip_c': (-.27, -.24)}.items(): O[k].location.x = x; O[k].location.y = y
+O['mat'].location.x = .05; O['mat'].location.y = -.045; O['mat'].scale = (.5 / .6, .36 / .42, 1)
 bpy.context.view_layer.update()
 def kids(name): return [c for c in O[name].children_recursive if c.type in ('MESH', 'CURVE')]
 GROUPS = {'desk': [O['desk']], 'mat': [O['mat']], 'notebook': kids('notebook'), 'pencil': kids('pencil'), 'pen': kids('pen'), 'eraser': kids('eraser'),
@@ -83,14 +87,18 @@ lamp_o = O.get('lamp') or O.new('lamp', lamp)
 if lamp_o.name not in bpy.context.collection.objects: bpy.context.collection.objects.link(lamp_o)
 lamp_o.location = (-.46, .30, .58)
 # the lampshade: a cone that keeps the light in a pool on the notebook side
+GOBO0 = (O['tree_gobo'].location.copy(), O['tree_gobo'].rotation_euler.z)
 def set_lights(tag):
-    """amb: the room only (fill + world).  sun: the sun alone, no leaves (the website casts the leaves, moving).
-    night: the desk lamp, a little room, no sun — and nothing left hanging between the lamp and the desk"""
-    bgs = BG.inputs['Strength']
-    O['tree_gobo'].hide_render = True; O['sun_sheet'].hide_render = tag == 'night'   # the sheet also shades the right half from the sky
-    L['sun'].energy = day['sun'] if tag == 'sun' else 0
-    L['fill'].energy = day['fill'] if tag == 'amb' else (day['fill'] * .14 if tag == 'night' else 0)
-    bgs.default_value = day['world'] if tag == 'amb' else (day['world'] * .3 if tag == 'night' else 0)
+    """day: exactly the approved look — sun through the leafy gobo, the sheet shading the right half, the room.
+    day2: the same with the leaves moved a touch (as by a breeze); the website drifts between the two.
+    night: the desk lamp, a little room, no sun, nothing hanging between the lamp and the desk"""
+    bgs = BG.inputs['Strength']; g = O['tree_gobo']
+    g.location = GOBO0[0].copy(); g.rotation_euler.z = GOBO0[1]
+    if tag == 'day2': g.location.x += .014; g.location.y += .011; g.rotation_euler.z += math.radians(.9)
+    g.hide_render = tag == 'night'; O['sun_sheet'].hide_render = tag == 'night'
+    L['sun'].energy = 0 if tag == 'night' else day['sun']
+    L['fill'].energy = day['fill'] * .14 if tag == 'night' else day['fill']
+    bgs.default_value = day['world'] * .3 if tag == 'night' else day['world']
     lamp.energy = 70 * EXPOSURE if tag == 'night' else 0
 lamp_o.location = (-.40, .22, .52); lamp.shadow_soft_size = .08
 
@@ -103,7 +111,7 @@ try: scene.render.bake.use_pass_transmission = True
 except Exception: pass
 scene.render.bake.margin = 4; scene.render.bake.use_clear = True
 IMG = {}
-TAGS = globals().get('BAKE_TAGS', ('amb', 'sun', 'night'))
+TAGS = globals().get('BAKE_TAGS', ('day', 'day2', 'night'))
 def bake_group(g, objs, tag):
     S = SIZES[g]; name = f'bake_{g}_{tag}'
     img = bpy.data.images.new(name, S, S, alpha=False); img.colorspace_settings.name = 'sRGB'
@@ -134,7 +142,7 @@ for g, objs in GROUPS.items():
             for n in list(nt.nodes): nt.nodes.remove(n)
             out = nt.nodes.new('ShaderNodeOutputMaterial'); bsdf = nt.nodes.new('ShaderNodeBsdfPrincipled')
             bsdf.inputs['Roughness'].default_value = 1; bsdf.inputs['Metallic'].default_value = 0
-            tex = nt.nodes.new('ShaderNodeTexImage'); tex.image = IMG[(g, 'amb')]; uvn = nt.nodes.new('ShaderNodeUVMap'); uvn.uv_map = 'bake'
+            tex = nt.nodes.new('ShaderNodeTexImage'); tex.image = IMG[(g, 'day')]; uvn = nt.nodes.new('ShaderNodeUVMap'); uvn.uv_map = 'bake'
             nt.links.new(uvn.outputs['UV'], tex.inputs['Vector']); nt.links.new(tex.outputs['Color'], bsdf.inputs['Base Color']); nt.links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
     parent = objs[0].parent; sel = [parent] if parent else objs
     select(sel)

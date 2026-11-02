@@ -105,34 +105,23 @@ export function mountDesk(root) {
   const baked = []; const U = { uMix: { value: 0 }, uLit: { value: 1 }, uTime: { value: 0 }, uWind: { value: 1 } };
   const tex2 = (n, tag) => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_${tag}.jpg`, () => res(t), undefined, () => res(null)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; });
   const GAIN = 3.0;   // the bake was made at 0.4× the Blender exposure so sunlit paper fits in 8 bits; put it back here
-  const SUN_AT = new THREE.Vector3(-1.5, 1.7, -1.2), CANOPY = .34;   // the Blender sun (three.js axes) and the height of the leaves
   const LIGHT_GLSL = `
-    uniform sampler2D uAmb, uSun, uNight; uniform float uMix, uLit, uTime, uWind; uniform vec3 uSunAt;
+    uniform sampler2D uAmb, uSun, uNight; uniform float uMix, uLit, uTime, uWind;
     varying vec2 vBUv; varying vec3 vWP;
     float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
-    float leaves(vec3 p){
-      // where this point's ray to the sun crosses the canopy
-      float t = (${CANOPY.toFixed(3)} - p.y) / max(uSunAt.y - p.y, 1e-3); vec2 q = (p + (uSunAt - p) * t).xz;
-      // wind: the whole canopy sways a little, each branch a little more, in slow gusts
-      float g = .55 + .45 * sin(uTime * .21) * sin(uTime * .13 + 1.7);
-      q += uWind * g * (vec2(sin(uTime * .9 + q.y * 7.), cos(uTime * .75 + q.x * 6.)) * .0055 + vec2(sin(uTime * .31), cos(uTime * .27)) * .004);
-      // big dark masses of foliage, and within them many small gaps the sun comes through as soft coins of light
-      float mass = vn(q * 5.2 + 1.3) * .65 + vn(q * 11. + 4.1) * .35;
-      float holes = vn(q * 38. + 2.7) * .6 + vn(q * 76. + 9.2) * .4;
-      float gap = smoothstep(.62, .7, holes * .55 + mass * .6 - .02);
-      // only the left of the counter is under the window
-      float side = smoothstep(.14, -.12, p.x + p.z * .35);
-      return gap * side * .9;
-    }
     vec3 bakedLight(){
-      vec3 day = texture2D(uAmb, vBUv).rgb + texture2D(uSun, vBUv).rgb * leaves(vWP);
+      // uAmb: the day as baked (the approved light); uSun: the same with the leaves moved a touch by a breeze.
+      // The light drifts slowly between them, patch by patch, so the leaf shadows only stir.
+      float ph = vn(vWP.xz * 7.) * 6.2832;
+      float w = (.5 - .5 * cos(uTime * .55 + ph + sin(uTime * .23 + ph) * 1.2)) * uWind;
+      vec3 day = mix(texture2D(uAmb, vBUv).rgb, texture2D(uSun, vBUv).rgb, w);
       return mix(day, texture2D(uNight, vBUv).rgb * 1.15, uMix) * ${GAIN.toFixed(2)} * uLit;
     }`;
   function bakedMaterial({ amb, sun, night }, page) {
     const m = new THREE.MeshBasicMaterial({ color: 0xffffff, map: page || null, side: THREE.DoubleSide });
     m.onBeforeCompile = sh => {
-      Object.assign(sh.uniforms, U, { uAmb: { value: amb }, uSun: { value: sun }, uNight: { value: night }, uSunAt: { value: SUN_AT } });
+      Object.assign(sh.uniforms, U, { uAmb: { value: amb }, uSun: { value: sun }, uNight: { value: night } });
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec2 bakeUv; varying vec2 vBUv; varying vec3 vWP;')
         .replace('#include <project_vertex>', '#include <project_vertex>\nvBUv = bakeUv; vWP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
       // the bake already holds the colour of everything except the pages (baked white, written on here)
@@ -141,7 +130,7 @@ export function mountDesk(root) {
     };
     return m;
   }
-  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`), tex2(n, 'sun'), tex2(n, 'night')]).then(([o, sun, night]) => {
+  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`), tex2(n, 'day2'), tex2(n, 'night')]).then(([o, sun, night]) => {
     props[n] = o; set.add(o); let amb = null;
     o.traverse(m => { if (!m.isMesh) return; if (!amb && m.material.map) amb = m.material.map; const a = m.geometry.attributes, k = ['uv3', 'uv2', 'uv1'].find(x => a[x]); m.geometry.setAttribute('bakeUv', a[k] || a.uv); });
     const L3 = { amb, sun, night }, mat = bakedMaterial(L3);
@@ -268,7 +257,6 @@ export function mountDesk(root) {
   const holoShadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shCv), transparent: true, depthWrite: false, opacity: 0 }));
   holoShadow.rotation.x = -Math.PI / 2; scene.add(holoShadow);
   const hv = { up: new THREE.Vector3(), to: new THREE.Vector3(), base: new THREE.Vector3(), tgt: new THREE.Vector3(), show: 0 };
-  window.__bkSet = { cards, get banners() { return banners; }, hv, holo, cam };
   function updateHolo(now, dt, want) {
     hv.show += (want - hv.show) * (1 - Math.exp(-dt * 5));
     const list = banners.slice(-HOLO_N);
@@ -329,7 +317,7 @@ export function mountDesk(root) {
   addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up
   const V = {
-    hero: { pos: new THREE.Vector3(.02, .56, .315), look: new THREE.Vector3(.025, 0, .035), roll: 0 },   // tighter than the Blender still: the props were pulled in around the phone
+    hero: { pos: new THREE.Vector3(.025, .69, .375), look: new THREE.Vector3(.025, 0, .05), roll: 0 },   // every prop in frame; the props were pulled in around the phone, so it is bigger than in the Blender still
     dark: { pos: new THREE.Vector3(0, .9, .001), look: new THREE.Vector3(0, 0, 0), roll: 0 },
     book: { pos: new THREE.Vector3(-.135, .36, .25), look: new THREE.Vector3(-.105, 0, .03), roll: -6 },
     phone: { pos: new THREE.Vector3(.11, .3, .2), look: new THREE.Vector3(.13, .02, .02), roll: 3 }
@@ -363,7 +351,7 @@ export function mountDesk(root) {
     mix(V.hero.pos, V.dark.pos, up, camPos); mix(V.hero.look, V.dark.look, up, camLook); let roll = lerp(V.hero.roll, V.dark.roll, up);
     mix(camPos, V.book.pos, kBook * kBack, camPos); mix(camLook, V.book.look, kBook * kBack, camLook); roll = lerp(roll, V.book.roll, kBook * kBack);
     mix(camPos, V.phone.pos, kPhone * kBack, camPos); mix(camLook, V.phone.look, kPhone * kBack, camLook); roll = lerp(roll, V.phone.roll, kPhone * kBack);
-    camPos.x += P.x * .03 * (1 - up); camPos.z += P.y * .02 * (1 - up);
+    camPos.x += P.x * .018 * (1 - up); camPos.z += P.y * .012 * (1 - up);   // small, so nothing slips out of frame
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
     sun.intensity = 2.2 * dayAmt; room.intensity = .45 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .2 * (1 - blackout) * (1 - nightAmt * .8);

@@ -299,6 +299,14 @@ export function mountStage(root) {
     });
     const end = els.length ? docY(els[els.length - 1]) + els[els.length - 1].offsetHeight : document.documentElement.scrollHeight;
     if (!m) push(end + vh * .2, { kind: 'off', q: P6([1.35, .5, .5, .1, -1.2, 0]), f }); // leaves to the side, never across the last words
+    // on wide screens the phone always comes in from the right edge and leaves the same way: every off-stage pose is
+    // moved just past the right edge, at the height and size of the nearest pose where it is on stage
+    if (!m) S.forEach((st, i) => {
+      if (st.kind !== 'off') return;
+      let n = null; for (let d = 1; d < S.length && !n; d++) n = [S[i - d], S[i + d]].find(x => x && x.kind !== 'off') || null;
+      const q = n ? n.q : P6([.84, .53, .6, 0, -.3, 0]);
+      st.q = P6([1.45, q.y, q.s, q.rx * .5, -.9, 0]);
+    });
     // keys: hold each station, then fly to the next one within the last part of the gap
     const K = [];
     S.forEach((st, i) => { const nx = S[i + 1]; K.push({ at: st.at, st }); if (nx) K.push({ at: nx.at - Math.min(vh * (m ? .9 : 1.3), (nx.at - st.at) * .78), st }); });

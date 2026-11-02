@@ -219,7 +219,7 @@ export function mountStage(root) {
       const release = holderTop + pinH + vh * .5, start = vh * .5 + pinH * .1, end = release - vh * .85;
       const TW = Math.PI * 2;
       const shot = (i, k, rx, ry, rz, dx) => { const [file, spot, side, t1, t2] = B[i], sc = s0 * k, c = (spot[1] + spot[3] / 2) / 100;
-        return { q: P6([.5 + dx, Math.min(.62, Math.max(.38, .5 - (c - .5) * sc * .62)), sc, rx, ry, rz]), f: file, spot, bub: { side, t1, t2, spot } }; };
+        return { q: P6([.66 + dx * .35, Math.min(.62, Math.max(.38, .5 - (c - .5) * sc * .62)), sc, rx, ry, rz]), f: file, spot, bub: { side, t1, t2, spot } }; };
       const shots = [
         shot(0, 1.22, .22, -.3, .04, -.1),      // push in, from slightly above
         shot(1, 1.62, .04, -.08, 0, -.12),      // insert: almost square-on, very close
@@ -364,8 +364,9 @@ export function mountStage(root) {
     let cov = null;
     // where the reader really is in the pinned cover, measured live: 0 = cover reaches the top, 1 = cover unpins
     const pr = cover ? (() => { const r = cover.holder.getBoundingClientRect(); return -r.top / Math.max(1, r.height - cover.opH); })() : -1;
-    const coverGone = !m && cover && pr > .95;
-    if (!m && cover && pr > -.02 && pr <= .95) {
+    const CM = window.__bkCoverMap || { V: 'phone', S: .04, E: .84, DOCK: .95 };
+    const coverGone = !m && cover && pr > CM.DOCK;
+    if (!m && cover && pr <= CM.DOCK) {
       const ss = cover.shots, N = ss.length, sm5 = t => t * t * t * (t * (t * 6 - 15) + 10);
       const P = i => i < 0 ? cover.est2 : i >= N ? cover.exit : ss[i].q;
       // a camera on a curved track: Catmull-Rom through the shots, so speed never drops to zero mid-move
@@ -373,13 +374,18 @@ export function mountStage(root) {
       let u, tq, tf, tspot = null, tbub = null, near = -1;
       // 0–.06 settle in · .06–.74 six shots · .74–.88 exit (gone well before the page below arrives)
       // 0–.04 settle in · .04–.84 six shots (about one screen of scrolling each) · .84–.93 exit
-      if (pr < .04) u = -1 + clamp(pr / .04);
-      else if (pr < .84) u = (pr - .04) / .8 * N;
-      else u = N - 1 + 1.4 * clamp((pr - .84) / .09);
+      if (pr < CM.S) u = -1 + clamp(pr / CM.S);
+      else if (pr < CM.E) u = (pr - CM.S) / (CM.E - CM.S) * N;
+      else u = N - 1;
       const i = Math.floor(u), fr = u - i;
       // each shot holds for a beat (30%), then the move eases out and in (smootherstep)
       const v = fr < .5 ? 0 : sm5((fr - .5) / .5); // each shot holds for half its length
-      tq = i < 0 ? mix(cover.est, ss[0].q, sm5(clamp(u + 1))) : cr(P(i - 1), P(i), P(i + 1), P(i + 2), v);
+      const est = CM.V === 'phone' ? cover.est : { ...ss[0].q, s: ss[0].q.s * .04, ry: ss[0].q.ry - 2.4 }; // mix: the phone grows out of the point where the screens gather
+      tq = i < 0 ? mix(est, ss[0].q, CM.V === 'phone' ? sm5(clamp(u + 1)) : sm5(clamp((u + .4) / .4))) : i >= N - 1 ? ss[N - 1].q : cr(P(i - 1), P(i), P(i + 1), P(i + 2), v);
+      // Oryzo's move: at the end the phone does not fly off; it lands in the 2D phone on the page and becomes it
+      if (pr > CM.E) { const dk = document.querySelector('.bk-cv-dock img'); if (dk) { const r = dk.getBoundingClientRect();
+        const dq = P6([(r.left + r.width / 2) / vw, (r.top + r.height / 2) / vh, r.height * 1.62 / SH / vh, 0, Math.PI * 2, 0]);
+        tq = mix(tq, dq, sm5(clamp((pr - CM.E) / (CM.DOCK - CM.E - .01)))); } }
       const cur = Math.max(0, Math.min(N - 1, v > .5 ? i + 1 : i));
       tf = ss[cur].f;
       if (i >= 0 && i < N && v < .15) { tspot = ss[i].spot; tbub = ss[i].bub; near = i; }
@@ -442,6 +448,9 @@ export function mountStage(root) {
     const gone = !m && (a.st.kind === 'dock' || (b.st.kind === 'dock' && e > .97));
     fadeAmt += ((gone ? 0 : 1) - fadeAmt) * E(gone ? 9 : 6); cv.style.opacity = fadeAmt > .995 ? '' : fadeAmt.toFixed(3);
     if (coverGone) { cv.style.opacity = '0'; bub.classList.remove('is-on'); }
+    else if (!m && cover && window.__bkCoverMap) { const C = window.__bkCoverMap;
+      if (C.V === 'cards' && pr < C.DOCK + .05) cv.style.opacity = '0';
+      else if (C.V === 'mix' && pr < C.S * .6) cv.style.opacity = '0'; }
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
     cv.classList.toggle('is-front', (!m && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
     document.body.classList.toggle('bk-hero-handover', !m);
@@ -456,7 +465,7 @@ export function mountStage(root) {
       tag.classList.toggle('is-on', !hv);
     } else tag.classList.remove('is-on');
     // the message beside the lit part (cover only)
-    const bbSrc = cov ? cov.bub : (st.bub && (pair || (hold && e2b(a, b))) ? st.bub : null);
+    const bbSrc = window.__bkCoverMap && cover ? null : cov ? cov.bub : (st.bub && (pair || (hold && e2b(a, b))) ? st.bub : null);
     if (!m && bbSrc && !coverGone) {
       const bb = bbSrc, yy = slot(bb.spot)[1], xx = (bb.side === 'r' ? 1 : -1) * SW / 2;
       tmpV.set(xx, yy, .06); phone.localToWorld(tmpV); tmpV.project(cam);

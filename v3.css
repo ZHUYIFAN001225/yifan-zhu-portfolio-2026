@@ -3564,3 +3564,39 @@ html:has(.bk-day){background:#f3eee3!important}html:has(.bk-day) .site-header.v3
 :lang(zh) .bk-cap-end{font-size:clamp(52px,6.4vw,112px);letter-spacing:-.02em;line-height:1.2}
 :lang(zh) .bk-cap-w{font-size:clamp(72px,9vw,160px)}
 .bk-cover-pin{height:calc(min(92vh,880px) + 640vh)}
+
+/* ======== cover after the two references ======== */
+html[data-cover] .bk-cap,html[data-cover] .bk-bub{display:none!important}
+.bk-cv{position:absolute;inset:0;z-index:3;pointer-events:none}
+.bk-cv-stage{position:absolute;inset:0;perspective:1400px;perspective-origin:66% 45%;transform-style:preserve-3d;z-index:0}
+.bk-cv-card{position:absolute;left:50%;top:50%;width:150px;aspect-ratio:360/780;border-radius:14px;overflow:hidden;background:#fbf9f4;transform-style:preserve-3d;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 22px 40px -22px rgba(23,54,43,.45),0 0 0 1px rgba(23,54,43,.08);will-change:transform,opacity}
+.bk-cv-card img{display:block;width:100%;height:100%;object-fit:cover}
+html[data-cover="phone"] .bk-cv-stage{display:none}
+/* the list on the left drives the right */
+.bk-cv-list{position:absolute;left:clamp(24px,4vw,72px);top:50%;transform:translateY(-50%);width:min(40vw,540px);z-index:2;opacity:0;transition:opacity .45s}
+.bk-cv:not([data-phase="floor"]) .bk-cv-list{opacity:1}
+.bk-cv[data-phase="done"] .bk-cv-list ol,.bk-cv[data-phase="land"] .bk-cv-list ol,.bk-cv[data-phase="done"] .bk-cv-k,.bk-cv[data-phase="land"] .bk-cv-k{opacity:0;transition:opacity .4s}
+.bk-cv-k{margin:0 0 18px;display:flex;gap:14px;align-items:baseline;font:600 12px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:#1f9e6c}
+.bk-cv-k b{color:#17362b;letter-spacing:.06em}
+.bk-cv-list ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.bk-cv-list li{position:relative;padding-left:0;transition:padding .45s cubic-bezier(.16,1,.3,1)}
+.bk-cv-list li b{display:block;font:600 clamp(26px,2.7vw,44px)/1.12 Inter,system-ui,sans-serif;letter-spacing:-.035em;color:rgba(23,54,43,.2);transition:color .35s}
+.bk-cv-list li.is-past b{color:rgba(23,54,43,.34)}
+.bk-cv-list li.is-on{padding-left:1.15em}
+.bk-cv-list li.is-on b{color:#17362b}
+.bk-cv-list li::before{content:"→";position:absolute;left:0;top:0;font:600 clamp(26px,2.7vw,44px)/1.12 Inter,system-ui,sans-serif;color:#1f9e6c;opacity:0;transform:translateX(-12px);transition:opacity .3s,transform .45s cubic-bezier(.16,1,.3,1)}
+.bk-cv-list li.is-on::before{opacity:1;transform:none}
+.bk-cv-list li span{display:block;max-height:0;overflow:hidden;opacity:0;font:500 15px/1.5 Inter,system-ui,sans-serif;color:#4d6157;transition:max-height .45s,opacity .35s,margin .45s}
+.bk-cv-list li.is-on span{max-height:3em;opacity:1;margin:4px 0 8px}
+.bk-cv-end{position:absolute;left:0;top:50%;margin:0;transform:translateY(calc(-50% + 20px));opacity:0;font:700 clamp(56px,6.4vw,112px)/1 Inter,system-ui,sans-serif;letter-spacing:-.05em;color:#17362b;white-space:nowrap;transition:opacity .5s,transform .7s cubic-bezier(.16,1,.3,1)}
+:lang(zh) .bk-cv-end{letter-spacing:-.02em;line-height:1.15;font-size:clamp(48px,5.2vw,92px)}
+.bk-cv[data-phase="land"] .bk-cv-end,.bk-cv[data-phase="done"] .bk-cv-end{opacity:1;transform:translateY(-50%)}
+/* where the phone lands: a flat phone on the page */
+.bk-cv-dock{position:absolute;left:66%;top:50%;margin:0;transform:translate(-50%,-50%);z-index:1}
+.bk-cv-dock i{display:block;height:min(58vh,520px);aspect-ratio:540/1170;padding:9px;border-radius:44px;background:#16191c;box-shadow:inset 0 0 0 1.5px #3a3f44,0 40px 70px -34px rgba(23,54,43,.55);opacity:0;transition:opacity .25s}
+.bk-cv-dock img{display:block;width:100%;height:100%;border-radius:36px;object-fit:cover;background:#fbf9f4}
+.bk-cv[data-phase="done"] .bk-cv-dock i{opacity:1}
+/* the cover's other parts step back once the list starts */
+html[data-cover] .bk-cover-pin .op--3d .op-copy{opacity:calc(1 - min(1, var(--sp,0) * 1.4))}
+@media (max-width:999px){.bk-cv{display:none}}

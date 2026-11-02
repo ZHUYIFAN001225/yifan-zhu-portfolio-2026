@@ -3606,3 +3606,4 @@ html[data-cover] .bk-cover-pin .op--3d .op-copy{opacity:calc(1 - min(1, var(--sp
 .bk-cv-stage{z-index:-1}
 .bk-cv-list,.bk-cv-dock{z-index:4}
 .op--3d .op-type{z-index:1}
+html[data-cover] .op--3d .op-phone{visibility:hidden!important}

@@ -155,7 +155,6 @@ export function renderProductDemos(t,document){
     ${moment('system')}${system()}
     ${strategy()}
     ${section('logic',`<div class="ux-decisions">${c.decisions.map((d,i)=>`<article><span class="ux-decision-number">0${i+1}</span><div><h3>${pair(d.title)}</h3><p>${pair(d.why)}</p><dl><dt>${t('Prototype response','原型中的应对')}</dt><dd>${pair(d.how)}</dd><dt>${t('What to validate next','下一步验证')}</dt><dd>${pair(d.test)}</dd></dl></div></article>`).join('')}</div>`)}
-    ${c.explode?explode():''}
     ${c.details?section('interfaces',details()):section('interfaces',`<p>${t('Actual screens from the existing running prototype. Read the sequence here, then follow the prototype steps below. Accounts, prices and appointments shown are demo fixtures.','以下为现有运行原型的真实界面截图。无需点开 Demo，也能按顺序了解产品。所示账号、价格与预约均为演示数据。')}</p><div class="ux-screens">${c.screens.map(s=>image(s)).join('')}</div>`)}
     ${moment('build')}${build()}
     ${iteration()}

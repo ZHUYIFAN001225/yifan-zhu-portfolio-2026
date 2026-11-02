@@ -194,16 +194,31 @@ export function mountStage(root) {
     // the opening: the stage's phone IS the opening phone (desktop); it drifts with the page, then lands in the live prototype
     const op = document.querySelector('[data-opening]'), heroEl = document.querySelector('.op-phone');
     if (!m && heroEl && op) {
-      const r = heroEl.getBoundingClientRect(), x0 = (r.left + r.width / 2) / innerWidth, y0 = (r.top + scrollY + r.height / 2) / vh;
+      const r = heroEl.getBoundingClientRect(), orc = op.getBoundingClientRect(), holder = op.parentElement.matches('.bk-cover-pin') ? op.parentElement : op, yIn = (r.top - orc.top + r.height / 2) / vh, x0 = (r.left + r.width / 2) / innerWidth, y0 = yIn + docY(holder) / vh, yPin = yIn; // positions inside the cover, independent of where the page is scrolled to
       const s0 = Math.min(.95, r.height * .69 / vh), opH = op.offsetHeight;
       // the cover: no sideways slide. The phone eases from a slight angle to face you while the title parts, and its
       // screen turns from the customer's booking to the owner's day — one booking, two sides. Then it lifts away.
       // It follows the pointer a little the whole time (still: true).
+      // the cover introduces the product: the phone turns to face you, then one part of the screen lights up at a time
+      // and a short message pops out beside it saying what it is — customer side first, then the owner's side.
+      const R = { svc: [2, 25.2, 96, 16.4], soon: [2, 43.2, 96, 5.8], cal: [2, 49.6, 96, 37.6], day: [2, 31.5, 96, 26], add: [2, 58.2, 96, 6], move: [2, 65, 96, 6.2] };
+      const B = [
+        ['cover-book', R.svc, 'r', ['Customers pick a service first', '顾客先选服务'], ['Its length decides which times can fit.', '时长决定了哪些时间放得下。']],
+        ['cover-book', R.soon, 'l', ['The soonest time, one tap', '最早的时间，点一下就约'], ['Most people never open the calendar.', '大多数人不用翻日历。']],
+        ['cover-book', R.cal, 'r', ['Only days that are open', '只显示开门的日子'], ['No more “are you free on Friday?”', '不用再问“周五有空吗？”']],
+        ['cover-today', R.day, 'l', ['Her side: the day at a glance', '店主这边：一眼看完今天'], ['The booking is already in her diary.', '刚约的那单，已经在她的日程里。']],
+        ['cover-today', R.add, 'r', ['Regulars who phone? Add by name', '老顾客打电话？填名字就行'], ['No account, no WeChat needed.', '不用账号，不用微信。']],
+        ['cover-today', R.move, 'l', ['Closing early moves bookings', '临时关门，预约自动移出'], ['Nobody is deleted; they pick a new time.', '没有人被删掉，顾客自己重选时间。']]
+      ];
       f = 'cover-book';
       push(vh * .5, { kind: 'hero', q: P6([x0, y0, s0, -.05, -.32, 0]), f, still: true });
-      push(vh * .5 + opH * .3, { kind: 'hero', q: P6([.5, y0 - .04, s0 * .98, 0, 0, 0]), f: 'cover-book', still: true });
-      push(vh * .5 + opH * .55, { kind: 'hero', q: P6([.5, y0 - .1, s0 * .94, 0, 0, 0]), f: 'cover-today', still: true });
-      push(vh * .5 + opH * 1.05, { kind: 'off', q: P6([.5, -.75, s0 * .85, .25, 0, 0]), f: 'cover-today' });
+      const pinH = op.parentElement.matches('.bk-cover-pin') ? op.parentElement.offsetHeight - opH : opH * 1.5, start = vh * .5 + pinH * .14, span = pinH * .84, step = span / B.length;
+      B.forEach(([file, spot, side, t1, t2], i) => {
+        const at = start + i * step, q = P6([.5, yPin - .02, s0 * .96, 0, side === 'r' ? -.1 : .1, 0]);
+        const st = { kind: 'hero', q, f: file, spot, still: true, bub: { side, t1, t2, spot } };
+        push(at, st); push(at + step * .8, { ...st });
+      });
+      push(start + span + vh * .35, { kind: 'off', q: P6([.5, -.75, s0 * .85, .25, 0, 0]), f: 'cover-today' });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
     let story = false, phoneOn = !root.querySelector('.bk-hand[data-act="3"]'); // before act 3 the shop has no phone yet
@@ -301,6 +316,10 @@ export function mountStage(root) {
   // a docked phone follows its element with the real scroll position, so it sits exactly on it
   const poseOf = st => st.track ? { ...st.q, y: (st.track.mid - scrollY) / vh } : st.q;
   const mix = (a, b, t) => ({ x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), s: lerp(a.s, b.s, t), rx: lerp(a.rx, b.rx, t), ry: lerp(a.ry, b.ry, t), rz: lerp(a.rz, b.rz, t) });
+  const bub = document.createElement('div'); bub.className = 'bk-bub'; bub.setAttribute('aria-live', 'polite');
+  bub.innerHTML = '<i aria-hidden="true"></i><div><b></b><span></span></div>'; document.body.append(bub);
+  const bubT = bub.querySelector('b'), bubB = bub.querySelector('span');
+  const e2b = (a, b) => a.st === b.st || !b.st.bub || a.st.bub === b.st.bub;
   function frame(now) {
     requestAnimationFrame(frame);
     if (document.hidden || !keys.length) return;
@@ -320,7 +339,8 @@ export function mountStage(root) {
     const pk = peek && m ? peek : null; peekAmt += ((pk ? 1 : 0) - peekAmt) * E(pk ? 5 : 7); if (pk) peekY = pk.y;
     const hv = !m && hover && st.kind === 'section' ? hover : null;
     // screen and lifted part
-    let file = st.f, rect = hold ? st.spot : null;
+    const pair = !!a.st.bub && a.st.bub === b.st.bub; // the cover's beats: lit and labelled for the whole beat
+    let file = st.f, rect = hold || pair ? st.spot : null;
     if (hv) { file = hv.file; rect = hv.rect; }
     if (pk) { file = pk.file; rect = peekAmt > .7 ? pk.rect : null; }
     show(file);
@@ -378,6 +398,15 @@ export function mountStage(root) {
       if (tagTxt.textContent !== lab) { tagTxt.textContent = lab; tag.dataset.who = st.who === 'o' ? 'owner' : 'customer'; }
       tag.classList.toggle('is-on', !hv);
     } else tag.classList.remove('is-on');
+    // the message beside the lit part (cover only)
+    if (!m && st.bub && (pair || (hold && e2b(a, b)))) {
+      const bb = st.bub, yy = slot(bb.spot)[1], xx = (bb.side === 'r' ? 1 : -1) * SW / 2;
+      tmpV.set(xx, yy, .06); phone.localToWorld(tmpV); tmpV.project(cam);
+      const px = (tmpV.x + 1) / 2 * vw, py = (1 - tmpV.y) / 2 * vh;
+      bub.style.transform = `translate3d(${px.toFixed(1)}px,${py.toFixed(1)}px,0)`; bub.dataset.side = bb.side;
+      const key = bb.t1[0]; if (bub.dataset.key !== key || bub.dataset.lang !== String(zh())) { bub.dataset.key = key; bub.dataset.lang = String(zh()); bubT.textContent = bb.t1[zh() ? 1 : 0]; bubB.textContent = bb.t2[zh() ? 1 : 0]; bub.classList.remove('is-on'); void bub.offsetWidth; }
+      bub.classList.add('is-on');
+    } else bub.classList.remove('is-on');
     link(st, hold, hv, now, m);
     renderer.render(scene, cam);
   }

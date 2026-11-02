@@ -3913,3 +3913,14 @@ html[data-body=b] .bk-minute-n{color:var(--x-red)!important}
 html[data-body=b] .bk-day .bk-stamp{border-color:var(--x-green)!important;color:var(--x-green)!important}
 html[data-body=b] .bk-receipt-links a,html[data-body=b] .bk-minute-more{border-bottom-color:var(--x-red)!important;color:var(--x-ink)!important}
 html[data-body=b] .bk-receipt .is-live .op-live-dot{background:var(--x-green)!important}
+/* A: the rest of the page in the same night — all copy lightened, the remaining white blocks turned to glass; the
+   drawn props (paper sheets, slips, sticky notes, the dark panels) stay as they are */
+html[data-body=a] .bk-day :is(p,span,small,a,button,li,dd,dt,td,th,figcaption,label,em):not(:is(.bk-sheet,.bk-dom-slip,.bk-sticky,.st,.xp,iframe,.bk-stamp,.bk-minute-n,.op) *):not(.bk-stamp):not(.bk-minute-n){color:var(--x-ink2)!important}
+html[data-body=a] .bk-day :is(h1,h2,h3,h4,b,strong,blockquote):not(:is(.bk-sheet,.bk-dom-slip,.bk-sticky,.st,.xp,.op) *){color:var(--x-ink)!important}
+html[data-body=a] .bk-day :is(.ux-section>h2,.bk-receipt-k,.bk-moment-kicker,.bk-script-k,.bk-map-k,.bk-ledger-k,.bk-try-k){color:var(--x-acc)!important}
+html[data-body=a] .bk-day :is(nav.bk-map,.bk-ledger-list>li,.bk-ask-h b,.bk-dom-hint button){background:var(--x-glass)!important;border:1px solid var(--x-line)!important;box-shadow:0 40px 80px -50px rgba(0,0,0,.9)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);color:var(--x-ink)!important}
+html[data-body=a] .bk-day .bk-stamp{background:transparent!important}
+html[data-body=a] .bk-day :is(.v3-outline-button,.bk-try-full){border-color:var(--x-line)!important;color:var(--x-ink)!important}
+html[data-body=a] .bk-minute p{opacity:1!important}
+html[data-body=a]{--x-ink2:rgba(241,231,214,.74)}
+html[data-body=a] .bk-receipt{overflow:hidden}

@@ -109,9 +109,9 @@ export function mountDesk(root) {
   const scene = new THREE.Scene(); const envTex = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
   const cam = new THREE.PerspectiveCamera(34, 1, .1, 100); cam.up.set(0, 0, -1);
   // late-afternoon window light: a warm key from low on the right (long shadows), a cool sky fill from the left
-  const key = new THREE.DirectionalLight(0xffd6a0, 3.4); key.position.set(9, 8.5, 6.5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+  const key = new THREE.DirectionalLight(0xffd9a8, 3.9); key.position.set(9, 8.5, 6.5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
   Object.assign(key.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40 }); key.shadow.bias = -.0004; key.shadow.normalBias = .02; key.shadow.radius = 7; scene.add(key);
-  const fill = new THREE.HemisphereLight(0xbfd0ff, 0x4a3320, .42); scene.add(fill);
+  const fill = new THREE.HemisphereLight(0xcfdcff, 0x5a3f28, .6); scene.add(fill);
   const cool = new THREE.DirectionalLight(0x9fb4ff, .55); cool.position.set(-7, 7, -5); scene.add(cool);
   // light through leaves: a slow dappled mask multiplied into every counter material, moving as if the tree outside were in a breeze
   const DAP = { uTime: { value: 0 }, uDap: { value: 1 } };
@@ -122,7 +122,7 @@ export function mountDesk(root) {
       float dn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(dh(i), dh(i + vec2(1, 0)), f.x), mix(dh(i + vec2(0, 1)), dh(i + vec2(1, 1)), f.x), f.y); }
       float dfbm(vec2 p){ float v = 0.0, a = .5; for (int i = 0; i < 4; i++){ v += a * dn(p); p = p * 2.03 + 7.1; a *= .5; } return v; }
       float dappleAt(vec3 w){ float t = uTime * .11; vec2 p = w.xz * .42 + vec2(t * .7, -t * .35); vec2 q = vec2(dfbm(p + vec2(0.0, t)), dfbm(p + vec2(5.2, 1.3 - t * .6)));
-        float n = dfbm(p + 1.6 * q + vec2(t * .3)); float leaves = smoothstep(.36, .72, n); float windowGrad = .62 + .55 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.3 + .95 * leaves) * windowGrad; }`)
+        float n = dfbm(p + 1.6 * q + vec2(t * .3)); float leaves = smoothstep(.34, .74, n); float windowGrad = .78 + .4 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.58 + .62 * leaves) * windowGrad; }`)
       .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= mix(1.0, dappleAt(vDp), uDap);'); }; return m; };
   const rim = new THREE.SpotLight(0xffc98a, 0, 30, .6, .8, 1.2); rim.position.set(-4, 9, -5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
   const night = new THREE.HemisphereLight(0x4a56c8, 0x1a0f26, 0); scene.add(night);
@@ -318,7 +318,7 @@ export function mountDesk(root) {
     cam.position.copy(camPos); cam.lookAt(camLook);
     // ---- lights: day → black → night (lit by the phone) → dark top view → black ----
     const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kDark) ** 1.6, up0 = kUp * (1 - kDown) + kRise;
-    key.intensity = 3.4 * dayAmt; fill.intensity = .42 * dayAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
+    key.intensity = 3.9 * dayAmt; fill.intensity = .6 * dayAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
     nudge(dt, heroAmt); phoneBlob.material.opacity = .8 * (1 - up0) * dayAmt;
     night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise); glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise);
     rim.intensity = (60 * kUp * (1 - kDown) + 26 * kRise) * (1 - kOut);
@@ -355,7 +355,7 @@ export function mountDesk(root) {
     const dPhone = cam.position.distanceTo(pv.position), dDesk = cam.position.distanceTo(camLook);
     const focusOnPhone = clamp(kUp * (1 - kDown) + kRise + nightAmt * .6), fu = post.uniforms;
     fu.uFocus.value = lerp(dDesk, dPhone, focusOnPhone); fu.uRange.value = lerp(10.0, 1.6, kUp * (1 - kDown) + kRise) - nightAmt * 6.0; fu.uMax.value = (7 + 11 * (kUp * (1 - kDown) + kRise)) * dpr();
-    fu.uVig.value = .5 + .3 * (1 - dayAmt); fu.uFringe.value = .006 * (kUp * (1 - kDown) + kRise);
+    fu.uVig.value = .38 + .4 * (1 - dayAmt); fu.uFringe.value = .006 * (kUp * (1 - kDown) + kRise);
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kA', kA); S('--kScale', kScale); S('--kB', kB); S('--kGuide', kGuide); S('--kC', kC); S('--kOut', kOut); S('--night', nightAmt); S('--kRise', kRise);

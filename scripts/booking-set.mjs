@@ -51,7 +51,7 @@ export function mountDesk(root) {
   const cv = $('.bk-dk-gl'); let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false, powerPreference: 'high-performance' }); } catch { ov.classList.add('no-gl'); return; }
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .85;
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
   const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0e0c0a);
   const envTex = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
   const cam = new THREE.PerspectiveCamera(42, 1, .05, 20);
@@ -60,18 +60,22 @@ export function mountDesk(root) {
   const cookie = (() => { const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d'), r = seed(5);
     const img = x.createImageData(512, 512), d = img.data;
     const grid = (cells) => { const g = Array.from({ length: cells + 1 }, () => Array.from({ length: cells + 1 }, () => r())); return (u, v) => { const X = Math.min(u * cells, cells - 1e-6), Y = Math.min(v * cells, cells - 1e-6), x0 = Math.floor(X), y0 = Math.floor(Y), fx = X - x0, fy = Y - y0, s = t => t * t * (3 - 2 * t); const a = g[y0][x0], b = g[y0][x0 + 1], cc = g[y0 + 1][x0], dd = g[y0 + 1][x0 + 1]; return lerp(lerp(a, b, s(fx)), lerp(cc, dd, s(fx)), s(fy)); }; };
-    const n1 = grid(7), n2 = grid(19), n3 = grid(3);
+    const n1 = grid(13), n2 = grid(34), n3 = grid(4);
     for (let y = 0; y < 512; y++) for (let X = 0; X < 512; X++) { const u = X / 511, v = y / 511;
-      const leaf = sm((n1(u, v) * .55 + n2(u, v) * .3 + n3(u, v) * .15 - .47) / .09);           // gaps between leaves
-      const side = sm((.62 - u + (v - .5) * .35) / .22);                                            // the right side is in shade
-      const edge = sm((.5 - Math.hypot(u - .5, v - .5)) / .18);                                      // inside the cone
-      const k = (.12 + .88 * leaf) * side * edge; const i = (y * 512 + X) * 4; d[i] = d[i + 1] = d[i + 2] = Math.round(255 * k); d[i + 3] = 255; }
+      const leaf = sm((n1(u, v) * .55 + n2(u, v) * .3 + n3(u, v) * .15 - .36) / .06);           // gaps between leaves
+      const side = sm((.74 - u + (v - .5) * .3) / .2);                                            // the right side is in shade
+      const pass = leaf * side; const i = (y * 512 + X) * 4; d[i] = d[i + 1] = d[i + 2] = Math.round(255 * (1 - pass)); d[i + 3] = 255; }
     x.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; return t; })();
-  const sun = new THREE.SpotLight(0xffcc8f, 0, 6, .78, .9, 1.4); sun.position.set(-1.45, 1.6, -1.15); sun.target.position.set(-.18, 0, .05); sun.map = cookie;
-  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .01; sun.shadow.radius = 5; sun.shadow.camera.near = .5; sun.shadow.camera.far = 5; scene.add(sun, sun.target);
+  // the sun: parallel warm light from the upper left; a gobo hangs between it and the counter with the leaf pattern cut
+  // out of it (and the right-hand part solid), so the dapple and the shade are real shadows
+  const sun = new THREE.DirectionalLight(0xffcc8f, 0); sun.position.set(-1.45, 1.6, -1.15); sun.target.position.set(-.18, 0, .05);
+  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.00005; sun.shadow.normalBias = .0005; sun.shadow.radius = 7;
+  Object.assign(sun.shadow.camera, { left: -1.1, right: 1.1, top: 1.1, bottom: -1.1, near: .2, far: 5 }); scene.add(sun, sun.target);
+  const gobo = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ alphaMap: cookie, transparent: true, alphaTest: .5, colorWrite: false, depthWrite: false, side: THREE.DoubleSide }));
+  gobo.rotation.x = -Math.PI / 2; gobo.position.set(-.42, .34, .3); gobo.castShadow = true; gobo.receiveShadow = false; gobo.renderOrder = -10; scene.add(gobo);
   const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .35, 1.6); room.castShadow = false; scene.add(room);
   const sky = new THREE.HemisphereLight(0xb9c4d8, 0x3a2a1c, 0); scene.add(sky);
-  const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.6); lamp.position.set(-.45, .55, -.25); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.002; scene.add(lamp);
+  const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.6); lamp.position.set(-.45, .55, -.25); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.0002; lamp.shadow.normalBias = .0005; scene.add(lamp);
   window.__bkSet = { get sun() { return sun; }, get scene() { return scene; }, get renderer() { return renderer; }, get props() { return props; } };
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
 
@@ -222,7 +226,7 @@ export function mountDesk(root) {
     camPos.x += P.x * .03 * (1 - up); camPos.z += P.y * .02 * (1 - up);
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
-    sun.intensity = 16 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
+    sun.intensity = 3.4 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
     lamp.intensity = 7 * nightAmt; rim.intensity = 60 * up * (1 - kOut);
     set.visible = blackout < .995;
     nudge(dt, onDesk);

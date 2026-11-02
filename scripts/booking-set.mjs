@@ -190,7 +190,7 @@ export function mountDesk(root) {
   const V = {
     hero: { pos: new THREE.Vector3(-.02, .86, .47), look: new THREE.Vector3(.0, 0, -.03), roll: -4 },
     dark: { pos: new THREE.Vector3(0, .9, .001), look: new THREE.Vector3(0, 0, 0), roll: 0 },
-    book: { pos: new THREE.Vector3(-.18, .42, .22), look: new THREE.Vector3(-.12, 0, -.02), roll: -6 },
+    book: { pos: new THREE.Vector3(-.2, .4, .27), look: new THREE.Vector3(-.15, 0, .035), roll: -6 },
     phone: { pos: new THREE.Vector3(.1, .36, .2), look: new THREE.Vector3(.13, 0, .02), roll: 3 }
   };
   const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), E = new THREE.Euler();
@@ -225,8 +225,8 @@ export function mountDesk(root) {
     camPos.x += P.x * .03 * (1 - up); camPos.z += P.y * .02 * (1 - up);
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
-    sun.intensity = 2.9 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
-    lamp.intensity = 1.1 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
+    sun.intensity = 2.9 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .8);
+    lamp.intensity = .7 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
     set.visible = blackout < .995;
     nudge(dt, onDesk);
     // ---- the phone ----
@@ -245,7 +245,7 @@ export function mountDesk(root) {
     // ---- focus ----
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(.5, .12, up) - (kBook * kBack) * .22; fu.uMax.value = (6 + 10 * up + 6 * kBook * kBack) * dpr();
-    fu.uVig.value = .35 + .3 * nightAmt - .3 * kOut; fu.uFringe.value = 0;
+    fu.uVig.value = .35 + .45 * nightAmt - .3 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut);

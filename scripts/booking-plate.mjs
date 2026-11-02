@@ -1,8 +1,8 @@
-// Glasgow Salon Booking — the "plate" opening: two rendered photographs of the counter (from above, and from the front)
-// as the set, with the only things that have to move built live on top — the phone (3D, with its screen), the
-// handwriting that grows on the page, the light that turns from afternoon to lamp-light, the focus, the push-in.
-//   from above, day → the set goes dark and the phone rises alone (two big words) → the front view, day →
-//   evening under the lamp, pushed in on the book and the phone → hand over to paper
+// Glasgow Salon Booking — the counter opening. One photograph of the counter from above is the set; everything on it
+// is cut out into its own layer so it can give way under the pointer, the phone is real 3D with a live screen, and the
+// handwriting is drawn onto the page. One camera: the whole counter by day → the set goes dark and the phone rises
+// alone (two big words) → back to the counter → the lamp comes on and the camera pushes in on the book, then on the
+// phone, while the day gets written up and the messages pile in → hand over to paper.
 import * as THREE from '../assets/v3/lib/three/three.module.min.js';
 import { RoomEnvironment } from '../assets/v3/lib/three/RoomEnvironment.js';
 import { buildPhone, paint, load, SCREEN } from './phone3d.mjs';
@@ -17,12 +17,13 @@ const seed = s => { let t = (s * 2654435761) >>> 0; return () => { t = (t + 0x6D
 const HAND = '"Segoe Print","Bradley Hand","Comic Sans MS","Noto Sans CJK SC",cursive';
 export const CHARS = () => '';
 
-// the two plates, 1296×768, and where things are in them (plate pixels)
-const PLATES = {
-  top: { src: 'assets/v3/desk/plate-top.jpg', w: 1296, h: 768, phone: [[779, 211], [932, 220], [930, 514], [770, 505]], pageR: [[440, 192], [660, 165], [725, 475], [485, 540]], origin: [.62, .5] },
-  front: { src: 'assets/v3/desk/plate-front.jpg', w: 1296, h: 768, phone: [[785, 258], [918, 258], [910, 480], [780, 476]], pageR: [[575, 425], [725, 425], [780, 510], [605, 530]], origin: [.58, .6] }
-};
-// a projective map from the unit square to a quad, as a CSS matrix3d
+// the set: 1296×768 plate pixels. Sprites cut from the same photograph, each at its place.
+const PW_ = 1296, PH_ = 768, DIR = 'assets/v3/desk/top/';
+const SPRITES = { book: [151, 143, 608, 457], pencil: [323, 78, 374, 129], pen: [123, 86, 314, 106], eraser: [48, 243, 99, 80], comb: [388, 581, 309, 88], scissors: [980, 315, 316, 370], binder: [21, 572, 98, 87], clips: [37, 593, 134, 149] };
+const WEIGHT = { book: .25, pencil: 1, pen: 1, eraser: .9, comb: .8, scissors: .45, binder: .7, clips: 1.1 }; // how far each thing gives way
+const PHONE_Q = [[779, 211], [932, 220], [930, 514], [770, 505]];
+const PAGE_R = [[440, 192], [660, 165], [725, 475], [485, 540]]; // the right page, in plate pixels
+const FOCUS = { all: [648, 384], book: [585, 350], phone: [851, 362] };
 function homography(q) {
   const [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = q;
   const dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
@@ -41,8 +42,9 @@ export function mountDesk(root) {
   const liveA = op.querySelector('.op-actions a[target]');
 
   const ov = document.createElement('div'); ov.className = 'bk-dk bk-plate';
-  ov.innerHTML = `<div class="bk-pl" data-p="top"><img src="${PLATES.top.src}" alt="" decoding="async"><canvas class="bk-ink" width="900" height="1300"></canvas></div>
-    <div class="bk-pl" data-p="front"><img src="${PLATES.front.src}" alt="" decoding="async"><canvas class="bk-ink" width="900" height="1300"></canvas><div class="bk-pl-night"></div><div class="bk-pl-lamp"></div><div class="bk-pl-glow"></div></div>
+  ov.innerHTML = `<div class="bk-stage"><div class="bk-set" style="width:${PW_}px;height:${PH_}px"><img class="bk-set-bg" src="${DIR}bg.jpg" alt="" decoding="async">
+      ${Object.entries(SPRITES).map(([k, [x, y, w, h]]) => `<div class="bk-sp" data-k="${k}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"><img src="${DIR}${k}.png" alt="" decoding="async">${k === 'book' ? '<canvas class="bk-ink" width="900" height="1300"></canvas>' : ''}</div>`).join('')}
+      <div class="bk-light"></div><div class="bk-night"></div><div class="bk-lamp"></div><div class="bk-pglow"></div></div></div>
     <div class="bk-pl-dim"></div><div class="bk-ph"><canvas></canvas></div><div class="bk-dk-grain" aria-hidden="true"></div><div class="bk-dk-out" aria-hidden="true"></div>
     <div class="bk-dk-hero"><p class="bk-dk-tag"></p><h1 class="bk-dk-h"><b class="t1"></b><b class="t2"></b><b class="t3"></b></h1><p class="bk-dk-copy"></p>
       <div class="bk-dk-card"><p class="bk-dk-ck"></p><hr><p class="bk-dk-cd"></p><a class="bk-dk-live" target="_blank" rel="noopener"></a></div>
@@ -60,31 +62,46 @@ export function mountDesk(root) {
   };
   text(); document.addEventListener('portfolio:language', () => setTimeout(() => { text(); inkNow = -1; screens.load(); }, 40));
 
-  // ---------- the handwriting that grows on the right page (drawn in page space, mapped onto the plate) ----------
-  const inks = [...ov.querySelectorAll('.bk-ink')];
-  const EV = [[0, .22, ['TOMORROW ↓', '明天 ↓'], '#15171c'], [1, .22, ['9:30 Emma? ring back', '9:30 Emma? 回电'], '#15171c'], [3, .22, ['11:00 He (moved)', '11:00 何先生（挪过来）'], '#15171c'], [6, .5, ['Zhou → 12:30?', '周先生 → 12:30?'], '#15171c'], [9, .22, ['2:00 colour — 2h!! block it', '2:00 染发 — 2 小时!! 留住'], '#15171c'], [12, .22, ['Sunday? ask everyone', '周日开不开? 问一圈'], '#15171c'], [15, .22, ['bed. 23:40', '睡觉。23:40'], '#6b6f7a']];
+  // ---------- the handwriting on the right page: written, crossed out, corrected ----------
+  const ink = $('.bk-ink'); { const [bx, by] = SPRITES.book; const q = PAGE_R.map(([x, y]) => [x - bx, y - by]); ink.style.transform = `${homography(q)} scale(${1 / 900}, ${1 / 1300})`; }
+  // [row, x-fraction, text, colour] — or ['strike', row, x0, x1] to cross a line out, or ['fix', row, x, text] for a correction squeezed in
+  const EV = [
+    [0, .22, ['TOMORROW ↓', '明天 ↓'], '#15171c'],
+    [1, .22, ['9:30 Emma? ring back', '9:30 Emma? 回电'], '#15171c'],
+    [3, .22, ['11:00 He (moved)', '11:00 何先生（挪过来）'], '#15171c'],
+    ['strike', 3, .2, .72],
+    ['fix', 3.55, .3, ['→ 11:30, he rang', '→ 11:30，他来电话了'], '#b3261e'],
+    [6, .5, ['Zhou → 12:30?', '周先生 → 12:30?'], '#15171c'],
+    [9, .22, ['2:00 colour — 2h!! block it', '2:00 染发 — 2 小时!! 留住'], '#15171c'],
+    ['strike', 1, .2, .62],
+    ['fix', 1.55, .3, ['Emma: Fri instead', 'Emma：改周五'], '#b3261e'],
+    [12, .22, ['Sunday? ask everyone', '周日开不开? 问一圈'], '#15171c'],
+    [15, .22, ['bed. 23:40', '睡觉。23:40'], '#6b6f7a']];
   let inkNow = -1;
   function drawInk(k) {
-    k = Math.round(clamp(k) * 14) / 14; if (k === inkNow) return; inkNow = k;
-    inks.forEach(c => { const x = c.getContext('2d'), w = c.width, h = c.height; x.clearRect(0, 0, w, h); const r = seed(5);
-      EV.forEach((e, i) => { const k0 = i / EV.length, k1 = (i + 1) / EV.length; if (k <= k0) return; const part = clamp((k - k0) / (k1 - k0));
-        const [row, fx, txt, col] = e, y = h * (.175 + row * .0415), X = w * fx; x.save(); x.beginPath(); x.rect(0, y - h * .035, X + part * w * .75, h * .05); x.clip(); x.translate(X, y); x.rotate((r() - .5) * .04); x.fillStyle = col; x.font = `italic 600 ${Math.round(h * .026 + r() * 3)}px ${HAND}`; x.fillText(L(txt), 0, 0); x.restore(); }); });
+    k = Math.round(clamp(k) * 24) / 24; if (k === inkNow) return; inkNow = k;
+    const x = ink.getContext('2d'), w = ink.width, h = ink.height; x.clearRect(0, 0, w, h); const r = seed(5);
+    const rowY = row => h * (.175 + row * .0415);
+    EV.forEach((e, i) => { const k0 = i / EV.length, k1 = (i + 1) / EV.length; if (k <= k0) return; const part = clamp((k - k0) / (k1 - k0));
+      if (e[0] === 'strike') { const [, row, x0, x1] = e; x.strokeStyle = '#b3261e'; x.lineWidth = h * .004; x.beginPath(); x.moveTo(w * x0, rowY(row) - h * .012); x.lineTo(w * lerp(x0, x1, part), rowY(row) - h * .016); x.stroke(); return; }
+      const fix = e[0] === 'fix'; const [row, fx, txt, col] = fix ? e.slice(1) : e, y = rowY(row), X = w * fx;
+      x.save(); x.beginPath(); x.rect(0, y - h * .035, X + part * w * .75, h * .05); x.clip(); x.translate(X, y); x.rotate((r() - .5) * .04); x.fillStyle = col; x.font = `italic 600 ${Math.round(h * (fix ? .02 : .026) + r() * 3)}px ${HAND}`; x.fillText(L(txt), 0, 0); x.restore(); });
   }
 
-  // ---------- the phone: real 3D, small, placed exactly over the plate's phone; its own light ----------
+  // ---------- the phone ----------
   const cv = $('.bk-ph canvas'), phEl = $('.bk-ph'); let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' }); } catch { ov.classList.add('no-gl'); return; }
-  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.setClearColor(0, 0);
+  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.setClearColor(0, 0);
   const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
-  const cam = new THREE.PerspectiveCamera(18, .62, .1, 50);
+  const cam = new THREE.PerspectiveCamera(18, .56, .1, 50);
   const key = new THREE.DirectionalLight(0xffe0bf, 1.6); key.position.set(-2, 4, 5); scene.add(key);
   const fill = new THREE.HemisphereLight(0xdfe6ff, 0x3a2e24, .5); scene.add(fill);
   const SW = SCREEN.w, SH = SCREEN.h, sc = document.createElement('canvas'); sc.width = 780; sc.height = Math.round(780 * SH / SW); const sx = sc.getContext('2d');
   const tex = new THREE.CanvasTexture(sc); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const phone = buildPhone(tex); scene.add(phone);
-  const PW = 600, PH = 1080; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(PW, PH, false); cam.aspect = PW / PH; cam.updateProjectionMatrix(); cam.position.set(0, 0, 5.6);
+  const RW = 600, RH = 1080; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(RW, RH, false); cam.aspect = RW / RH; cam.updateProjectionMatrix(); cam.position.set(0, 0, 5.6);
   const shotSrc = n => `assets/v3/screens/booking/${zh() ? 'zh/' : ''}${n}.webp`;
-  const screens = { imgs: {}, cur: 'lock', prev: null, fade: 1, async load() { for (const n of ['cover-book']) this.imgs[n] = await load(shotSrc(n)); dirty = true; } };
+  const screens = { imgs: {}, cur: 'lock', prev: null, fade: 1, async load() { this.imgs['cover-book'] = await load(shotSrc('cover-book')); dirty = true; } };
   screens.load();
   const banners = []; let dirty = true, wake = 0, wantCount = 0, eveAmt = 0, unread = 0, buzz = -1e9;
   const wxList = () => { const o = []; for (let i = 0; i < T.wx.length; i += 2) o.push([L(T.wx[i]), L(T.wx[i + 1])]); return o; };
@@ -102,7 +119,7 @@ export function mountDesk(root) {
       sx.font = `300 ${Math.round(W * .22)}px -apple-system, Inter, system-ui, sans-serif`; sx.fillText(eveAmt > .5 ? '22:47' : '9:41', W / 2, W * .56); sx.textAlign = 'left';
       sx.fillStyle = 'rgba(255,255,255,.35)'; sx.beginPath(); sx.roundRect(W / 2 - 110, H - 40, 220, 8, 4); sx.fill();
       sx.fillStyle = '#050506'; const iw = W * .3, ih = W * .085; sx.beginPath(); sx.roundRect((W - iw) / 2, W * .028, iw, ih, ih / 2); sx.fill();
-    } else { const im = screens.imgs[screens.cur]; if (!im) return; paint(sx, im, true); if (screens.prev && screens.fade < 1) { sx.globalAlpha = 1 - screens.fade; paint(sx, screens.prev, true); sx.globalAlpha = 1; } }
+    } else { const im = screens.imgs[screens.cur]; if (!im) return; paint(sx, im, true); }
     const top = screens.cur === 'lock' ? Math.round(W * .62) : Math.round(W * .118) + 10;
     banners.forEach((b, i) => {
       const age = (now - b.t) / 1000, kin = sm(age / .45), y = top + i * 118 - (1 - kin) * 60;
@@ -118,20 +135,29 @@ export function mountDesk(root) {
     if (lit < 1) { sx.fillStyle = `rgba(0,0,0,${1 - lit})`; sx.fillRect(0, 0, W, H); }
     tex.needsUpdate = true;
   }
-  const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.prev = screens.cur === 'lock' ? null : screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };
+  const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.cur = n; dirty = true; };
 
-  // ---------- geometry of the plates on screen ----------
-  const plates = { top: $('.bk-pl[data-p="top"]'), front: $('.bk-pl[data-p="front"]') };
-  let vw = 0, vh = 0, fit = { s: 1, ox: 0, oy: 0 };
-  const resize = () => { vw = op.clientWidth; vh = op.clientHeight; const s = Math.max(vw / 1296, vh / 768); fit = { s, ox: (vw - 1296 * s) / 2, oy: (vh - 768 * s) / 2 }; placeInk(); };
-  const toScreen = ([x, y]) => [fit.ox + x * fit.s, fit.oy + y * fit.s];
-  function placeInk() { for (const k of ['top', 'front']) { const q = PLATES[k].pageR.map(toScreen); const c = plates[k].querySelector('.bk-ink'); c.style.transform = `${homography(q)} scale(${1 / 900}, ${1 / 1300})`; } }
+  // ---------- the camera (a 2D view of the set), the pointer, the sprites that give way ----------
+  const stage = $('.bk-stage');
+  let vw = 0, vh = 0, fitS = 1;
+  const resize = () => { vw = op.clientWidth; vh = op.clientHeight; fitS = Math.max(vw / PW_, vh / PH_); };
   resize(); addEventListener('resize', resize);
-  const P = { x: 0, y: 0, tx: 0, ty: 0 };
-  addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
-  // the phone's rectangle in a plate (centre, width, height, roll) after the plate's own push-in transform
-  const phoneRect = (k, push) => { const q = PLATES[k].phone.map(toScreen), cx = (q[0][0] + q[2][0]) / 2, cy = (q[0][1] + q[2][1]) / 2, w = Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]), h = Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1]), roll = Math.atan2(q[1][1] - q[0][1], q[1][0] - q[0][0]);
-    const [ox, oy] = PLATES[k].origin, OX = vw * ox, OY = vh * oy, s = 1 + .3 * push; return { cx: OX + (cx - OX) * s, cy: OY + (cy - OY) * s, w: w * s, h: h * s, roll }; };
+  const P = { x: 0, y: 0, tx: 0, ty: 0, sx: -1e4, sy: -1e4 };
+  addEventListener('pointermove', e => { const r = op.getBoundingClientRect(); P.sx = e.clientX - r.left; P.sy = e.clientY - r.top; if (!fine) return; P.tx = P.sx / r.width * 2 - 1; P.ty = P.sy / r.height * 2 - 1; }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', () => { P.sx = P.sy = -1e4; });
+  // view: zoom z about a focus point (plate px), with a little pointer drift; returns the plate→screen mapping
+  let view = { z: 1, fx: FOCUS.all[0], fy: FOCUS.all[1], dx: 0, dy: 0 };
+  const toScreen = ([x, y]) => [vw / 2 + (x - view.fx) * fitS * view.z + view.dx, vh / 2 + (y - view.fy) * fitS * view.z + view.dy];
+  const toPlate = (sx, sy) => [(sx - vw / 2 - view.dx) / (fitS * view.z) + view.fx, (sy - vh / 2 - view.dy) / (fitS * view.z) + view.fy];
+  const sprites = [...ov.querySelectorAll('.bk-sp')].map(el => { const k = el.dataset.k, [x, y, w, h] = SPRITES[k]; return { el, k, cx: x + w / 2, cy: y + h / 2, rad: Math.max(w, h) * .55 + 40, amt: WEIGHT[k] * 9, ox: 0, oy: 0, vx: 0, vy: 0, ro: 0, rv: 0 }; });
+  function nudge(dt, on) {
+    const [px, py] = toPlate(P.sx, P.sy);
+    sprites.forEach(n => { let fx = 0, fy = 0; if (on > .5 && P.sx > -1e3) { const dx = n.cx - px, dy = n.cy - py, d = Math.hypot(dx, dy); if (d < n.rad && d > 1e-3) { const k = (1 - d / n.rad) ** 2 * n.amt; fx = dx / d * k; fy = dy / d * k; } }
+      const w = 9, z = .85; n.vx += ((fx - n.ox) * w * w - 2 * z * w * n.vx) * dt; n.vy += ((fy - n.oy) * w * w - 2 * z * w * n.vy) * dt; n.ox += n.vx * dt; n.oy += n.vy * dt;
+      const tr = (fx - fy) * .004; n.rv += ((tr - n.ro) * w * w - 2 * z * w * n.rv) * dt; n.ro += n.rv * dt;
+      n.el.style.transform = `translate(${n.ox.toFixed(2)}px, ${n.oy.toFixed(2)}px) rotate(${n.ro.toFixed(4)}rad)`; });
+  }
+  const phoneQ = () => { const q = PHONE_Q.map(toScreen), cx = (q[0][0] + q[2][0]) / 2, cy = (q[0][1] + q[2][1]) / 2, w = Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]), h = Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1]), roll = Math.atan2(q[1][1] - q[0][1], q[1][0] - q[0][0]); return { cx, cy, w, h, roll }; };
   let last = performance.now();
   function frame(now) {
     requestAnimationFrame(frame);
@@ -139,40 +165,42 @@ export function mountDesk(root) {
     const dt = Math.min(.05, (now - last) / 1000); last = now;
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
     const lag = 1 - Math.exp(-dt * 5); P.x += (P.tx - P.x) * lag; P.y += (P.ty - P.y) * lag;
-    // timeline
+    // ---- timeline ----
     const kText = seg(pr, 0, .07), kDark = seg(pr, .09, .22), kUp = seg(pr, .1, .26);
     const kPw = seg(pr, .24, .32) * (1 - seg(pr, .4, .46));
-    const kDown = seg(pr, .44, .56), kEve = seg(pr, .6, .74), kPush = seg(pr, .62, .86), kInk = seg(pr, .66, .9);
-    const kEveT = seg(pr, .7, .76) * (1 - seg(pr, .9, .94)), kOut = seg(pr, .93, 1);
+    const kBack = seg(pr, .44, .56);                                  // the light returns, the phone comes down
+    const kEve = seg(pr, .58, .7);                                     // sun → lamp
+    const kBook = seg(pr, .6, .72), kInk = seg(pr, .64, .86);          // in on the book, writing
+    const kPhone = seg(pr, .8, .9);                                    // across to the phone
+    const kEveT = seg(pr, .62, .68) * (1 - seg(pr, .9, .94)), kOut = seg(pr, .93, 1);
     eveAmt = kEve; drawInk(kInk);
-    const up = kUp * (1 - kDown), onDesk = 1 - up;
-    // plates: the top one dims to black, the front one comes up; the front pushes in through the evening
-    const tp = plates.top, fp = plates.front;
-    tp.style.opacity = (1 - kDown).toFixed(3); tp.style.filter = `brightness(${(1 - kDark).toFixed(3)})`;
-    tp.style.transform = `scale(${(1 + .06 * kDark + P.x * 0).toFixed(4)}) translate(${(P.x * -6).toFixed(1)}px, ${(P.y * -4).toFixed(1)}px)`;
-    fp.style.opacity = kDown.toFixed(3); fp.style.transform = `scale(${(1 + .3 * kPush).toFixed(4)}) translate(${(P.x * -5).toFixed(1)}px, ${(P.y * -3).toFixed(1)}px)`;
-    fp.style.setProperty('--eve', kEve.toFixed(3));
-    $('.bk-pl-dim').style.opacity = (kUp * (1 - kDown)).toFixed(3);
-    // the phone: over the plate's phone, then centre stage, then over the standing phone in the front plate
-    const a = phoneRect('top', 0), b = phoneRect('front', kPush);
-    const big = { cx: vw / 2, cy: vh * .5, w: Math.min(vh * .62, vw * .34) * .62, h: Math.min(vh * .62, vw * .34), roll: 0 };
-    const m1 = up, m2 = kDown;
-    const cx = lerp(lerp(a.cx, big.cx, m1), b.cx, m2), cy = lerp(lerp(a.cy, big.cy, m1), b.cy, m2), w = lerp(lerp(a.w, big.w, m1), b.w, m2), h = lerp(lerp(a.h, big.h, m1), b.h, m2), roll = lerp(lerp(a.roll, 0, m1), b.roll, m2);
-    const scale = Math.max(h / 988, w / 465) * 1.05; // the phone fills 988×465 of the 600×1080 render
-    phEl.style.transform = `translate(${(cx - PW * scale / 2).toFixed(1)}px, ${(cy - PH * scale / 2).toFixed(1)}px) rotate(${roll.toFixed(4)}rad) scale(${scale.toFixed(4)})`;
-    // pose inside the render: flat/frontal on the counter; a little turn with the pointer while it floats; standing in the front view
-    phone.rotation.set(up * (P.y * .18 + Math.sin(now / 2600) * .05) - kDown * .07, up * P.x * .22, 0);
-    key.intensity = 1.6 * (1 - kEve * .5); fill.intensity = .5 * (1 - kEve * .6); key.color.setHex(kEve > .5 ? 0xffc27a : 0xffe0bf);
-    // the screen
+    const up = kUp * (1 - kBack), onDesk = 1 - up;
+    // ---- camera: whole counter → (dark) → whole counter → book close-up → phone close-up ----
+    const z = 1 + .05 * kDark * (1 - kBack) + 1.05 * kBook - .25 * kPhone;
+    const fx = lerp(lerp(FOCUS.all[0], FOCUS.book[0], kBook), FOCUS.phone[0], kPhone), fy = lerp(lerp(FOCUS.all[1], FOCUS.book[1], kBook), FOCUS.phone[1], kPhone);
+    view = { z, fx, fy, dx: P.x * -8 * (1 - up), dy: P.y * -5 * (1 - up) };
+    const [sx0, sy0] = toScreen([0, 0]);
+    stage.style.transform = `translate(${sx0.toFixed(2)}px, ${sy0.toFixed(2)}px) scale(${(fitS * z).toFixed(5)})`;
+    stage.style.filter = `brightness(${(1 - kDark * (1 - kBack)).toFixed(3)})`;
+    stage.style.setProperty('--eve', kEve.toFixed(3)); stage.style.setProperty('--sun', (Math.sin(now / 9000) * .5 + .5).toFixed(3));
+    $('.bk-pl-dim').style.opacity = up.toFixed(3);
+    nudge(dt, onDesk);
+    // ---- the phone: on its spot, or centre stage ----
+    const a = phoneQ(), big = { cx: vw / 2, cy: vh * .5, w: Math.min(vh * .62, vw * .34) * .62, h: Math.min(vh * .62, vw * .34), roll: 0 };
+    const cx = lerp(a.cx, big.cx, up), cy = lerp(a.cy, big.cy, up), w = lerp(a.w, big.w, up), h = lerp(a.h, big.h, up), roll = lerp(a.roll, 0, up);
+    const scale = Math.max(h / 988, w / 465) * 1.06;
+    const bz = (now - buzz) / 1000, shiver = bz < .35 && onDesk > .5 ? Math.sin(bz * 90) * 3 * (1 - bz / .35) : 0;
+    phEl.style.transform = `translate(${(cx - RW * scale / 2 + shiver).toFixed(1)}px, ${(cy - RH * scale / 2).toFixed(1)}px) rotate(${roll.toFixed(4)}rad) scale(${scale.toFixed(4)})`;
+    phone.rotation.set(up * (P.y * .18 + Math.sin(now / 2600) * .05), up * P.x * .22, 0);
+    key.intensity = 1.6 * (1 - kEve * .45); fill.intensity = .5 * (1 - kEve * .6); key.color.setHex(kEve > .5 ? 0xffc27a : 0xffe0bf);
+    // ---- the screen ----
     const heroMsgs = Math.floor(clamp(pr, 0, .085) / .0107), eveMsgs = Math.floor(clamp(pr - .6, 0, .3) / .022);
     syncBanners(now, up > .05 ? 0 : heroMsgs + eveMsgs); showScreen(up > .05 ? 'cover-book' : 'lock');
     const litTarget = (up > .05 || wantCount > 0) ? 1 : 0; wake += (litTarget - wake) * (1 - Math.exp(-dt * 6)); if (Math.abs(litTarget - wake) > .002) dirty = true;
-    if (screens.fade < 1) { screens.fade = Math.min(1, screens.fade + dt * 3); dirty = true; }
-    if (dirty) { drawScreen(now, wake); dirty = banners.some(x => now - x.t < 600) || screens.fade < 1; }
-    const bz = (now - buzz) / 1000; phEl.style.marginLeft = bz < .35 && onDesk > .5 ? `${(Math.sin(bz * 90) * 3 * (1 - bz / .35)).toFixed(1)}px` : '0px';
+    if (dirty) { drawScreen(now, wake); dirty = banners.some(x => now - x.t < 600); }
     renderer.render(scene, cam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
-    S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut); S('--kDown', kDown);
+    S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut);
   }
   requestAnimationFrame(frame);
 }

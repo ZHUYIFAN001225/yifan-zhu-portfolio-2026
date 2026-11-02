@@ -3998,3 +3998,4 @@ html[data-body=a]:has(.bk-day),html[data-body=a] body:has(.bk-day){background-co
 }
 @keyframes bk-set-in{from{opacity:0}to{opacity:1}}
 .bk-body-switch{display:none!important}
+html[data-body=a] .bk-day .op--3d:has(.bk-dk.no-gl)>*{visibility:visible!important}   /* no WebGL: the static opening stays */

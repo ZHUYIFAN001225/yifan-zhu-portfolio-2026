@@ -42,27 +42,9 @@ export function mountBody() {
   build();
 }
 
-// A: every pane of frosted glass has a thickness, and its edge catches the light from the side the pointer is on —
-// the pointer is a lamp held beside the glass; the nearer it is, the brighter the rim and the faint sheen inside
+// A: mark every pane that takes the glass material (no pointer light — the glass is lit by its own bevel only)
 function glassLight(day) {
-  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const GLASS = '.bk-sheet, .bk-receipt, .bk-minute li, .bk-ask, .bk-entry li, .bk-results-card, .bk-slip, .bk-textonly, .bk-owner, nav.bk-map, .bk-ledger-list>li, .ux-section .ux-persona, .ux-section .ux-principles>div, .ux-section .ux-process>li, .ux-section .ux-success>li, .ux-iterations .ux-before-after p, .bk-dom-slip, .ux-pains>div.bk-sticky, .bk-ledger.is-after, .bk-dom-card';
-  const els = [];
-  const scan = () => day.querySelectorAll(GLASS).forEach(el => {   // the drawn parts of the page arrive later; look again
-    if (el.querySelector(':scope>.bk-glint')) return;
-    if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
-    const sheen = document.createElement('i'); sheen.className = 'bk-glow'; sheen.setAttribute('aria-hidden', 'true');
-    const rim = document.createElement('i'); rim.className = 'bk-glint'; rim.setAttribute('aria-hidden', 'true');
-    el.append(sheen, rim); el.classList.add('is-glass'); els.push(el);
-  });
+  const scan = () => day.querySelectorAll(GLASS).forEach(el => el.classList.add('is-glass'));   // the drawn parts arrive later; look again
   scan(); [800, 2000, 4500].forEach(t => setTimeout(scan, t));
-  let mx = -1e4, my = -1e4, raf = 0;
-  const paint = () => { raf = 0;
-    for (const el of els) { const r = el.getBoundingClientRect(); if (r.bottom < -200 || r.top > innerHeight + 200) continue;
-      const dx = Math.max(r.left - mx, 0, mx - r.right), dy = Math.max(r.top - my, 0, my - r.bottom), d = Math.hypot(dx, dy);
-      el.style.setProperty('--mx', `${(mx - r.left).toFixed(0)}px`); el.style.setProperty('--my', `${(my - r.top).toFixed(0)}px`);
-      el.style.setProperty('--mi', Math.max(0, 1 - d / 420).toFixed(3)); } };
-  const ask = () => { if (!raf) raf = requestAnimationFrame(paint); };
-  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; ask(); }, { passive: true });
-  addEventListener('scroll', ask, { passive: true });
 }

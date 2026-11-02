@@ -109,7 +109,7 @@ export function mountDesk(root) {
   const scene = new THREE.Scene(); const envTex = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
   const cam = new THREE.PerspectiveCamera(34, 1, .1, 100); cam.up.set(0, 0, -1);
   // late-afternoon window light: a warm key from low on the right (long shadows), a cool sky fill from the left
-  const key = new THREE.DirectionalLight(0xffd9a8, 3.9); key.position.set(9, 8.5, 6.5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+  const key = new THREE.DirectionalLight(0xffd9a8, 3.3); key.position.set(9, 8.5, 6.5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
   Object.assign(key.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40 }); key.shadow.bias = -.0004; key.shadow.normalBias = .02; key.shadow.radius = 7; scene.add(key);
   const fill = new THREE.HemisphereLight(0xcfdcff, 0x5a3f28, .6); scene.add(fill);
   const cool = new THREE.DirectionalLight(0x9fb4ff, .55); cool.position.set(-7, 7, -5); scene.add(cool);
@@ -125,7 +125,7 @@ export function mountDesk(root) {
         float n = dfbm(p + 1.4 * q); float leaves = smoothstep(.3, .8, n);
         // sun through a window: wide soft diagonal bands that drift, with the leaf shadows faint inside them
         float d = (w.x * .8 + w.z * .6) * .55 + dfbm(w.xz * .12 + t * .2) * 1.6 + t * .15; float bands = .5 + .5 * sin(d); bands = smoothstep(.15, .95, bands);
-        float windowGrad = .8 + .35 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.62 + .42 * bands + .18 * leaves * bands) * windowGrad; }`)
+        float windowGrad = .8 + .35 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.68 + .32 * bands + .14 * leaves * bands) * windowGrad; }`)
       .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= mix(1.0, dappleAt(vDp), uDap);'); }; return m; };
   const rim = new THREE.SpotLight(0xffc98a, 0, 30, .6, .8, 1.2); rim.position.set(-4, 9, -5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
   const night = new THREE.HemisphereLight(0x4a56c8, 0x1a0f26, 0); scene.add(night);
@@ -146,7 +146,7 @@ export function mountDesk(root) {
   const wood = new THREE.CanvasTexture(woodCanvas); wood.colorSpace = THREE.SRGBColorSpace; wood.anisotropy = 16; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(1.6, 1.6);
   const woodBump = new THREE.CanvasTexture(woodCanvas); woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping; woodBump.repeat.set(1.6, 1.6); woodBump.anisotropy = 16;
   // the self-healing cutting mat: deep green, fine 10 mm grid, bold 50 mm grid, rulers along the edges
-  const MATW = 14.2, MATH = 9.6, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
+  const MATW = 9.8, MATH = 6.9, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
     x.fillStyle = '#226b53'; x.fillRect(0, 0, W, H);
     for (let i = 0; i < 60000; i++) { x.fillStyle = `rgba(${r() > .5 ? '255,255,255' : '0,20,10'},${r() * .06})`; x.fillRect(r() * W, r() * H, 1.5, 1.5); }
     const m = 150, g = 20 /* px per mm → 10 mm = 200 px? no: 1 unit = 100 px, 10 mm grid = 100 px */, cell = 100;
@@ -186,7 +186,7 @@ export function mountDesk(root) {
   // ---------- the counter ----------
   const SPOT = new THREE.Vector3(1.75, .09, .55), SPOT_ROT = -.12, HERO_SCALE = 1.75;
   const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .014, roughness: .46, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
-  const mat = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(MATW, MATH, .35), 12)), dapple(new THREE.MeshStandardMaterial({ map: matTex, roughness: .86, metalness: 0 }))); mat.rotation.set(-Math.PI / 2, 0, .035); mat.position.set(.4, .02, -.1); mat.receiveShadow = true; scene.add(mat);
+  const mat = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(MATW, MATH, .35), 12)), dapple(new THREE.MeshStandardMaterial({ map: matTex, roughness: .86, metalness: 0 }))); mat.rotation.set(-Math.PI / 2, 0, .05); mat.position.set(1.7, .02, .35); mat.receiveShadow = true; mat.visible = new URLSearchParams(location.search).get('mat') !== '0'; scene.add(mat);
   const propsG = new THREE.Group(); scene.add(propsG);
   const std = o => dapple(new THREE.MeshStandardMaterial(o));
   const shadowy = m => { m.castShadow = true; m.receiveShadow = true; return m; };
@@ -202,40 +202,70 @@ export function mountDesk(root) {
     const body = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.065, .065, 3.2, 6), std({ color: 0xe8b134, roughness: .5 }))); body.rotation.z = Math.PI / 2;
     const tip = new THREE.Mesh(new THREE.ConeGeometry(.065, .36, 12), std({ color: 0xd9bf98, roughness: .8 })); tip.rotation.z = -Math.PI / 2; tip.position.x = 1.78;
     const lead = new THREE.Mesh(new THREE.ConeGeometry(.022, .12, 8), std({ color: 0x222222 })); lead.rotation.z = -Math.PI / 2; lead.position.x = 1.91;
-    const band = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .22, 12), std({ color: 0xc7c9cc, metalness: .8, roughness: .3 })); band.rotation.z = Math.PI / 2; band.position.x = -1.6;
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .22, 12), dapple(new THREE.MeshPhysicalMaterial({ color: 0xc7c9cc, metalness: 1, roughness: .3, envMap: envTex, envMapIntensity: .4 }))); band.rotation.z = Math.PI / 2; band.position.x = -1.6;
     const eraser = new THREE.Mesh(new THREE.CylinderGeometry(.066, .066, .2, 12), std({ color: 0xe88a8a, roughness: .9 })); eraser.rotation.z = Math.PI / 2; eraser.position.x = -1.8;
     pencil.add(body, tip, lead, band, eraser); pencil.position.set(-1.0, .07, -2.35); pencil.rotation.y = .2; propsG.add(pencil); }
-  // scissors — two blades crossed, ring handles
+  // materials with a room to reflect: steel, chrome, glossy plastic
+  const phys = o => dapple(new THREE.MeshPhysicalMaterial(o));
+  const steel = phys({ color: 0xaab0b8, metalness: 1, roughness: .28, envMap: envTex, envMapIntensity: .45 });
+  const chrome = phys({ color: 0xc9cdd3, metalness: 1, roughness: .12, envMap: envTex, envMapIntensity: .6 });
+  const graphite = phys({ color: 0x1c1f24, metalness: .2, roughness: .38, clearcoat: .7, clearcoatRoughness: .3, envMap: envTex, envMapIntensity: .22 });
+  const rubber = std({ color: 0x15171a, roughness: .92 });
+  const tube = (pts, r, m, closed = false) => new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([x, y, z]) => new THREE.Vector3(x, y, z)), closed, 'centripetal'), 96, r, 10, closed), m);
+  // hairdressing scissors — tapered blades, finger rings with a tang
   const scissors = new THREE.Group(); {
-    const steel = std({ color: 0xcfd3d8, metalness: 1, roughness: .22 });
-    const half = sgn => { const g = new THREE.Group(); const blade = shadowy(new THREE.Mesh(new THREE.BoxGeometry(1.7, .035, .13), steel)); blade.position.x = .95; blade.scale.z = 1; const shank = new THREE.Mesh(new THREE.BoxGeometry(.9, .035, .09), steel); shank.position.x = -.5; const ring = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.19, .035, 10, 32), steel)); ring.rotation.x = Math.PI / 2; ring.position.set(-1.1, 0, sgn * .12); g.add(blade, shank, ring); g.rotation.y = sgn * .16; return g; };
-    const screw = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .09, 16), steel);
-    scissors.add(half(1), half(-1), screw); scissors.position.set(3.6, .06, 2.7); scissors.rotation.y = -.5; propsG.add(scissors); }
-  // hair clippers
+    const bladeShape = () => { const sh = new THREE.Shape(); sh.moveTo(-1.0, -.06); sh.lineTo(.2, -.07); sh.quadraticCurveTo(1.25, -.05, 1.75, 0); sh.quadraticCurveTo(1.2, .06, .2, .07); sh.lineTo(-1.0, .05); sh.lineTo(-1.0, -.06); return sh; };
+    const half = sgn => { const g = new THREE.Group();
+      const blade = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(bladeShape(), { depth: .03, bevelEnabled: true, bevelThickness: .008, bevelSize: .008, bevelSegments: 3 }), steel)); blade.rotation.x = -Math.PI / 2; blade.position.y = sgn > 0 ? .04 : .01;
+      const ring = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.2, .032, 12, 40), steel)); ring.rotation.x = Math.PI / 2; ring.scale.set(1, 1.15, 1); ring.position.set(-1.32, .03, sgn * .2);
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .22, 10), steel); neck.rotation.z = Math.PI / 2; neck.rotation.y = -sgn * .5; neck.position.set(-1.1, .03, sgn * .1);
+      g.add(blade, ring, neck); g.rotation.y = sgn * .13; return g; };
+    const screw = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, .09, 20), chrome); screw.position.y = .03;
+    const rest = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, .26, 8), steel); rest.rotation.z = Math.PI / 2; rest.rotation.y = .9; rest.position.set(-1.52, .03, -.3);
+    scissors.add(half(1), half(-1), screw, rest); scissors.position.set(3.7, .02, 2.6); scissors.rotation.y = -.5; propsG.add(scissors); }
+  // cordless hair clippers — graphite body with a rubber grip, chrome blade set, a cable curling away
   const clippers = new THREE.Group(); {
-    const body = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(roundedRect(.62, 1.7, .18), { depth: .34, bevelEnabled: true, bevelThickness: .04, bevelSize: .04, bevelSegments: 4 }), std({ color: 0x1b1d20, roughness: .45, metalness: .2 }))); body.rotation.x = -Math.PI / 2; body.position.y = .04;
-    const head = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.66, .14, .3), std({ color: 0xb8bcc4, metalness: 1, roughness: .25 }))); head.position.set(0, .12, -1.0);
-    for (let i = 0; i < 14; i++) { const t = new THREE.Mesh(new THREE.BoxGeometry(.026, .05, .14), std({ color: 0xdfe3e8, metalness: 1, roughness: .2 })); t.position.set(-.3 + i * .046, .2, -1.1); clippers.add(t); }
-    const sw = new THREE.Mesh(new THREE.BoxGeometry(.12, .03, .34), std({ color: 0xd9483c, roughness: .5 })); sw.position.set(0, .43, .15);
-    const cord = new THREE.Mesh(new THREE.TorusGeometry(.9, .025, 8, 60, Math.PI * .9), std({ color: 0x111214, roughness: .6 })); cord.rotation.x = -Math.PI / 2; cord.position.set(.4, .02, 1.6); cord.rotation.z = .3;
-    clippers.add(body, head, sw, cord); clippers.position.set(4.6, 0, -.3); clippers.rotation.y = .95; propsG.add(clippers); }
+    const bodyShape = (() => { const sh = new THREE.Shape(); sh.moveTo(-.3, -.9); sh.quadraticCurveTo(-.36, .2, -.42, .62); sh.quadraticCurveTo(-.44, .9, -.3, .92); sh.lineTo(.3, .92); sh.quadraticCurveTo(.44, .9, .42, .62); sh.quadraticCurveTo(.36, .2, .3, -.9); sh.quadraticCurveTo(0, -1.0, -.3, -.9); return sh; })();
+    const body = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(bodyShape, { depth: .36, bevelEnabled: true, bevelThickness: .06, bevelSize: .06, bevelSegments: 6, curveSegments: 24 }), graphite)); body.rotation.x = -Math.PI / 2; body.position.y = .06;
+    const grip = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(roundedRect(.52, .9, .1), { depth: .02, bevelEnabled: true, bevelThickness: .01, bevelSize: .01, bevelSegments: 2 }), rubber)); grip.rotation.x = -Math.PI / 2; grip.position.set(0, .49, -.15);
+    const head = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.78, .1, .28), chrome)); head.position.set(0, .22, 1.02); head.rotation.x = .1;
+    const headBase = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.7, .16, .22), steel)); headBase.position.set(0, .2, .88);
+    for (let i = 0; i < 18; i++) { const t = new THREE.Mesh(new THREE.BoxGeometry(.022, .04, .16), chrome); t.position.set(-.34 + i * .04, .26, 1.14); clippers.add(t); }
+    const lever = new THREE.Mesh(new THREE.BoxGeometry(.06, .05, .3), chrome); lever.position.set(.36, .3, .55); lever.rotation.z = .4;
+    const sw = new THREE.Mesh(new THREE.BoxGeometry(.14, .03, .26), phys({ color: 0x8e949c, metalness: .6, roughness: .35, envMap: envTex })); sw.position.set(0, .49, .5);
+    const cord = tube([[0, .05, -1.0], [-.5, .04, -1.3], [-1.3, .03, -1.1], [-1.7, .03, -.3], [-1.4, .03, .5], [-2.0, .03, 1.2]], .022, rubber);
+    clippers.add(body, grip, head, headBase, lever, sw, cord); clippers.position.set(4.7, 0, -.5); clippers.rotation.y = .95; propsG.add(clippers); }
   // comb
-  const comb = new THREE.Group(); { const m = std({ color: 0x101416, roughness: .35, metalness: .1 }); const back = shadowy(new THREE.Mesh(new THREE.BoxGeometry(2.4, .05, .22), m)); back.position.z = -.1; comb.add(back);
+  const comb = new THREE.Group(); { const m = phys({ color: 0x15181c, roughness: .3, metalness: .05, clearcoat: .5, clearcoatRoughness: .3, envMap: envTex, envMapIntensity: .12 }); const back = shadowy(new THREE.Mesh(new THREE.BoxGeometry(2.4, .05, .22), m)); back.position.z = -.1; comb.add(back);
     for (let i = 0; i < 34; i++) { const t = new THREE.Mesh(new THREE.BoxGeometry(.028, .045, .38), m); t.position.set(-1.14 + i * .069, 0, .2); comb.add(t); }
-    comb.position.set(-2.4, .05, 2.75); comb.rotation.y = .08; propsG.add(comb); }
-  // sticky note, hair clip, a couple of pins
-  const sticky = shadowy(new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.15), std({ map: note(), roughness: .95 }))); sticky.rotation.set(-Math.PI / 2, 0, -.22); sticky.position.set(-4.6, .04, -1.55); propsG.add(sticky);
-  const clip = (x, z, r) => { const m = new THREE.Mesh(new THREE.TorusGeometry(.14, .018, 8, 24, Math.PI * 1.7), std({ color: 0xb8bcc2, metalness: .9, roughness: .25 })); m.rotation.set(-Math.PI / 2, 0, r); m.position.set(x, .03, z); propsG.add(m); };
-  clip(-5.4, 2.6, .4); clip(-5.2, 2.95, 1.9);
+    comb.position.set(-1.5, .05, 3.0); comb.rotation.y = .08; propsG.add(comb); }
+  // the writing things: a pen, an eraser, paper clips and a binder clip (she writes everything down)
+  const pen = new THREE.Group(); {
+    const barrel = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.052, .048, 2.3, 24), phys({ color: 0x17362b, roughness: .25, clearcoat: 1, clearcoatRoughness: .15, envMap: envTex, envMapIntensity: .25 }))); barrel.rotation.z = Math.PI / 2;
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(.058, .056, .7, 24), chrome); cap.rotation.z = Math.PI / 2; cap.position.x = -1.1;
+    const clipM = new THREE.Mesh(new THREE.BoxGeometry(.5, .02, .05), chrome); clipM.position.set(-1.1, .075, 0);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(.048, .3, 20), chrome); tip.rotation.z = -Math.PI / 2; tip.position.x = 1.3;
+    pen.add(barrel, cap, clipM, tip); pen.position.set(-3.4, .06, -2.7); pen.rotation.y = .22; propsG.add(pen); }
+  const eraser = new THREE.Group(); {
+    const block = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.72, .2, .3), std({ color: 0xf1eee6, roughness: .85 }))); block.position.y = .1;
+    const sleeve = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.4, .215, .32), std({ color: 0x2e4ea8, roughness: .6 }))); sleeve.position.set(.12, .1, 0);
+    eraser.add(block, sleeve); eraser.position.set(-5.3, 0, -.9); eraser.rotation.y = .5; propsG.add(eraser); }
+  const paperclip = (x, z, r) => { const m = tube([[-.42, 0, -.12], [.36, 0, -.12], [.44, 0, -.04], [.44, 0, .04], [.36, 0, .12], [-.3, 0, .12], [-.38, 0, .06], [-.38, 0, -.03], [-.3, 0, -.08], [.2, 0, -.08], [.26, 0, -.02], [.26, 0, .03], [.2, 0, .07], [-.2, 0, .07]], .014, steel); m.position.set(x, .02, z); m.rotation.y = r; propsG.add(m); return m; };
+  paperclip(-5.4, 2.6, .4); paperclip(-5.1, 2.95, 1.9); paperclip(1.3, .03, -2.95);
+  const binder = new THREE.Group(); {
+    const b = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.6, .26, .26), phys({ color: 0x111316, roughness: .35, clearcoat: .6, envMap: envTex, envMapIntensity: .15 }))); b.position.y = .13;
+    [1, -1].forEach(sg => { const w = tube([[-.2, .26, sg * .1], [-.2, .42, sg * .3], [.2, .42, sg * .3], [.2, .26, sg * .1]], .012, chrome); binder.add(w); });
+    binder.add(b); binder.position.set(-5.6, 0, 2.2); binder.rotation.y = -.6; propsG.add(binder); }
   const hclip = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.9, .06, .09), std({ color: 0x17362b, roughness: .4 }))); hclip.rotation.y = -.4; hclip.position.set(1.0, .03, 2.9); propsG.add(hclip);
+  const sticky = null;
   // soft contact shadows under everything that sits on the counter (the shadow map alone leaves things floating)
   const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'); const g = x.createRadialGradient(128, 128, 10, 128, 128, 128); g.addColorStop(0, 'rgba(20,10,4,.8)'); g.addColorStop(.5, 'rgba(20,10,4,.35)'); g.addColorStop(1, 'rgba(20,10,4,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c); })();
   const blob = (parent, w, d, x, z, rot = 0, y = .006) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .8 })); m.rotation.set(-Math.PI / 2, 0, rot); m.position.set(x, y, z); m.renderOrder = -1; parent.add(m); return m; };
-  blob(diary, 5.6, 4.1, 0, .05); blob(pencil, 3.6, .5, 0, .02); blob(scissors, 3.4, 1.1, .1, 0); blob(clippers, 1.3, 3.2, 0, .1, 0, .004); blob(comb, 2.8, .9, 0, .05); blob(sticky, 1.5, 1.5, 0, 0, 0, -.03);
+  blob(diary, 5.6, 4.1, 0, .05); blob(pencil, 3.6, .5, 0, .02); blob(scissors, 3.6, 1.2, .1, 0); blob(clippers, 1.4, 2.6, 0, .1, 0, .004); blob(comb, 2.8, .9, 0, .05); blob(pen, 2.7, .5, 0, 0); blob(eraser, 1.1, .7, 0, 0); blob(binder, .9, .7, 0, 0);
   const phoneBlob = blob(scene, 2.3, 3.8, SPOT.x, SPOT.z, SPOT_ROT);
   const propMats = []; propsG.traverse(o => { if (o.isMesh) propMats.push(o.material); });
   // things on the counter give way a little when the pointer brushes them, and settle back
-  const nudged = [[diary, 2.6, .05], [pencil, 1.5, .18], [scissors, 1.6, .14], [clippers, 1.3, .12], [comb, 1.4, .14], [sticky, .9, .16]].map(([g, rad, amt]) => ({ g, rad, amt, rest: g.position.clone(), rrot: g.rotation.y, ox: 0, oz: 0, vx: 0, vz: 0, rv: 0, ro: 0 }));
+  const nudged = [[diary, 2.6, .05], [pencil, 1.5, .18], [scissors, 1.6, .14], [clippers, 1.3, .12], [comb, 1.4, .14], [pen, 1.4, .2], [eraser, .9, .22], [binder, .8, .16]].map(([g, rad, amt]) => ({ g, rad, amt, rest: g.position.clone(), rrot: g.rotation.y, ox: 0, oz: 0, vx: 0, vz: 0, rv: 0, ro: 0 }));
   const pointerOnDesk = new THREE.Vector3(), ray = new THREE.Ray(), ndc = new THREE.Vector3(), floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   function nudge(dt, amtAll) {
     ndc.set(P.x, -P.y, .5).unproject(cam); ray.origin.copy(cam.position); ray.direction.copy(ndc).sub(cam.position).normalize(); const hit = ray.intersectPlane(floor, pointerOnDesk);
@@ -245,7 +275,7 @@ export function mountDesk(root) {
       n.g.position.set(n.rest.x + n.ox, n.rest.y, n.rest.z + n.oz); n.g.rotation.y = n.rrot + n.ro; });
   }
   let inkNow = -1; function setInk(k) { k = Math.round(clamp(k) * 14) / 14; if (k === inkNow) return; inkNow = k; pl.material.map?.dispose(); pl.material.map = page('l', k); prg.material.map?.dispose(); prg.material.map = page('r', k); pl.material.needsUpdate = prg.material.needsUpdate = true; }
-  function repaintProps() { inkNow = -1; setInk(Math.max(0, inkNow)); sticky.material.map?.dispose(); sticky.material.map = note(); sticky.material.needsUpdate = true; }
+  function repaintProps() { inkNow = -1; setInk(Math.max(0, inkNow)); }
 
   // ---------- the phone and its screen (with the messages that keep coming) ----------
   const SW = SCREEN.w, SH = SCREEN.h, sc = document.createElement('canvas'); sc.width = 780; sc.height = Math.round(780 * SH / SW); const sx = sc.getContext('2d');
@@ -356,12 +386,12 @@ export function mountDesk(root) {
     cam.position.copy(camPos); cam.lookAt(camLook);
     // ---- lights: day → black → night (lit by the phone) → dark top view → black ----
     const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kEve) ** 1.4, up0 = kUp * (1 - kDown) + kRise;
-    key.intensity = 3.9 * dayAmt; fill.intensity = .6 * dayAmt + .12 * lampAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
+    key.intensity = 3.3 * dayAmt; fill.intensity = .6 * dayAmt + .12 * lampAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
     lamp.intensity = 80 * lampAmt; eveSky.intensity = .3 * lampAmt; glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise) + 2.5 * lampAmt;
     nudge(dt, heroAmt); phoneBlob.material.opacity = .8 * (1 - up0) * Math.max(dayAmt, lampAmt * .6);
     night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise);
     rim.intensity = (60 * kUp * (1 - kDown) + 26 * kRise) * (1 - kOut);
-    desk.visible = mat.visible = propsG.visible = (dayAmt > .003 || lampAmt > .003 || nightAmt > .01 || kTop > .01) && kRise < .98;
+    desk.visible = propsG.visible = (dayAmt > .003 || lampAmt > .003 || nightAmt > .01 || kTop > .01) && kRise < .98;
     // ---- the phone ----
     const up = kUp * (1 - kDown) + kRise; // 0 on the counter, 1 alone in the dark
     const spotY = .09 + nightAmt * .02;

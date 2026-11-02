@@ -364,12 +364,14 @@ for st in ('NISHITA', 'MULTIPLE_SCATTERING', 'SINGLE_SCATTERING'):
 for k, v in (('sun_elevation', math.radians(22)), ('sun_rotation', math.radians(300)), ('sun_intensity', .25), ('altitude', 0), ('sun_disc', False)):
     try: setattr(sky, k, v)
     except Exception: pass
-bg.inputs['Color'].default_value = (.70, .62, .55, 1); bg.inputs['Strength'].default_value = .5
-sun = bpy.data.lights.new('sun', 'AREA'); sun.energy = 1700; sun.size = .6; sun.color = (1.0, .80, .56); sun.shape = 'SQUARE'
+bg.inputs['Color'].default_value = (.70, .62, .55, 1); bg.inputs['Strength'].default_value = .12
+sun = bpy.data.lights.new('sun', 'AREA'); sun.energy = 1000; sun.size = .3; sun.color = (1.0, .80, .56); sun.shape = 'SQUARE'
 sun_o = bpy.data.objects.new('sun', sun); bpy.context.collection.objects.link(sun_o); sun_o.location = (-1.5, 1.2, 1.7)
 sun_o.rotation_euler = (Vector((0, 0, 0)) - sun_o.location).to_track_quat('-Z', 'Y').to_euler()
-fill = bpy.data.lights.new('fill', 'AREA'); fill.energy = 160; fill.size = 2.5; fill.color = (.86, .90, 1.0)
-fill_o = bpy.data.objects.new('fill', fill); bpy.context.collection.objects.link(fill_o); fill_o.location = (-.8, .9, 1.6); fill_o.rotation_euler = Euler((math.radians(30), 0, math.radians(-40)))
+# the room: a wide, low, cool lamp from the front — it slips in under the gobo and the sheet, so the shaded half still reads
+fill = bpy.data.lights.new('fill', 'AREA'); fill.energy = 260; fill.size = 2.2; fill.color = (.86, .90, 1.0)
+fill_o = bpy.data.objects.new('fill', fill); bpy.context.collection.objects.link(fill_o); fill_o.location = (.4, -1.7, .26)
+fill_o.rotation_euler = (Vector((0, 0, .02)) - fill_o.location).to_track_quat('-Z', 'Y').to_euler()
 # a venetian blind between the sun and the desk: a transparent plane with opaque bands, so the sun arrives in stripes
 blind = bpy.data.materials.new('blind'); blind.use_nodes = True; bn = blind.node_tree
 for n in list(bn.nodes): bn.nodes.remove(n)
@@ -390,20 +392,16 @@ gobo = bpy.data.materials.new('gobo'); gobo.use_nodes = True; gn = gobo.node_tre
 for n in list(gn.nodes): gn.nodes.remove(n)
 gout = gn.nodes.new('ShaderNodeOutputMaterial'); gmix = gn.nodes.new('ShaderNodeMixShader'); gtr = gn.nodes.new('ShaderNodeBsdfTransparent'); gdk = gn.nodes.new('ShaderNodeBsdfDiffuse'); gdk.inputs['Color'].default_value = (0, 0, 0, 1)
 gco = gn.nodes.new('ShaderNodeTexCoord'); gmp = gn.nodes.new('ShaderNodeMapping'); gmp.inputs['Scale'].default_value = (1, 1, 1)
-n1 = gn.nodes.new('ShaderNodeTexNoise'); n1.inputs['Scale'].default_value = 4.2; n1.inputs['Detail'].default_value = 5; n1.inputs['Roughness'].default_value = .62; n1.inputs['Distortion'].default_value = .9
+n1 = gn.nodes.new('ShaderNodeTexNoise'); n1.inputs['Scale'].default_value = 2.6; n1.inputs['Detail'].default_value = 5; n1.inputs['Roughness'].default_value = .62; n1.inputs['Distortion'].default_value = .9
 n2 = gn.nodes.new('ShaderNodeTexNoise'); n2.inputs['Scale'].default_value = 1.4; n2.inputs['Detail'].default_value = 2
 gn.links.new(gco.outputs['Object'], gmp.inputs['Vector']); gn.links.new(gmp.outputs['Vector'], n1.inputs['Vector']); gn.links.new(gmp.outputs['Vector'], n2.inputs['Vector'])
 gadd = gn.nodes.new('ShaderNodeMath'); gadd.operation = 'ADD'; gn.links.new(n1.outputs['Fac'], gadd.inputs[0]); gn.links.new(n2.outputs['Fac'], gadd.inputs[1])
-gr = gn.nodes.new('ShaderNodeValToRGB'); gr.color_ramp.elements[0].position = .90; gr.color_ramp.elements[1].position = 1.08   # below → leaf (dark), above → gap (light)
-gn.links.new(gadd.outputs['Value'], gr.inputs['Fac'])
+gmul = gn.nodes.new('ShaderNodeMath'); gmul.operation = 'MULTIPLY'; gmul.inputs[1].default_value = .5; gn.links.new(gadd.outputs['Value'], gmul.inputs[0])
+gr = gn.nodes.new('ShaderNodeValToRGB'); gr.color_ramp.elements[0].position = .50; gr.color_ramp.elements[1].position = .58   # below → leaf (dark), above → gap (light)
+gn.links.new(gmul.outputs['Value'], gr.inputs['Fac'])
 gn.links.new(gr.outputs['Color'], gmix.inputs['Fac']); gn.links.new(gdk.outputs['BSDF'], gmix.inputs[1]); gn.links.new(gtr.outputs['BSDF'], gmix.inputs[2]); gn.links.new(gmix.outputs['Shader'], gout.inputs['Surface'])
 bpy.ops.mesh.primitive_plane_add(size=3.0, location=(-.28, .22, .34)); gb = bpy.context.object; gb.name = 'tree_gobo'; gb.data.materials.append(gobo); gb.visible_camera = False
-try: gb.visible_shadow = True
-except Exception: pass
-# the sheet that keeps direct sun off the right half (its edge is soft because the lamp has size)
-sheet = box('sun_sheet', (2.4, 3.0, .004), loc=(.92, .05, .34), rot=(0, 0, math.radians(-25)), mat=slat_mat); sheet.visible_camera = False
-try: sheet.visible_shadow = True
-except Exception: pass
+sheet = box('sun_sheet', (2.4, 3.0, .004), loc=(.98, .02, .34), rot=(0, 0, math.radians(-25)), mat=slat_mat); sheet.visible_camera = False
 
 # ---------------------------------------------------------------- camera: above, a touch forward, like the reference
 cam = bpy.data.cameras.new('cam'); cam.lens = 36; cam.sensor_width = 36

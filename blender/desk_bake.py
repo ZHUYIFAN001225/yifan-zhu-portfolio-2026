@@ -17,6 +17,7 @@ scene.render.use_compositing = False
 EXPOSURE = 2 ** -1.15 * 0.4    # the hero render's exposure, pre-applied to the lights (×0.4 so sunlit paper stays below 1 in 8 bits;
                                # the website renders the bake at exposure 2.5 to put it back)
 SIZES = {'desk': 2048, 'mat': 2048, 'notebook': 2048, 'scissors': 1024, 'pencil': 1024, 'pen': 1024, 'comb': 1024, 'eraser': 512, 'clips': 512, 'binder': 512}
+SIZES.update(globals().get('BAKE_SIZES', {}))
 O = bpy.data.objects
 # a tighter still life, so one closer shot holds every prop (Blender coords; the phone stays at (.13,-.04))
 MOVE = {'notebook': (-.11, -.02, None), 'pencil': (.06, .13, None), 'pen': (-.13, .16, None), 'eraser': (-.29, .10, None),

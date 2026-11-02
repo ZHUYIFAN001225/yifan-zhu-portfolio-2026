@@ -7,7 +7,7 @@ import * as THREE from '../assets/v3/lib/three/three.module.min.js';
 import { RoomEnvironment } from '../assets/v3/lib/three/RoomEnvironment.js';
 import { buildPhone, paint, load, SCREEN } from './phone3d.mjs';
 import { loadGLB } from './glb-lite.mjs';
-import { T } from './booking-desk.mjs';
+import { T } from './booking-copy.mjs';
 const zh = () => document.documentElement.lang.startsWith('zh');
 const L = a => a[zh() ? 1 : 0];
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -346,7 +346,12 @@ export function mountDesk(root) {
         for (int i = 0; i < 20; i++){ float fi = float(i); float ang = fi * 2.39996 + a0; float rad = sqrt((fi + .5) / 20.0);
           vec2 o = vec2(cos(ang), sin(ang)) * rad * r / uRes; float ct = coc(vUv + o); float w = (ct >= c0 * .7) ? 1.0 : .03; // a sharp, bright thing in front never bleeds a halo into the soft background
           acc += texture2D(tCol, vUv + o).rgb * w; wsum += w; }
-        vec3 col = c0 < .5 ? texture2D(tCol, vUv).rgb : acc / wsum;   // in focus means sharp
+        vec3 col;
+        if (c0 < .5) {   // in focus: the pixel itself, with a light unsharp mask so the grain of the wood reads
+          vec2 px = 1.0 / uRes; vec3 c = texture2D(tCol, vUv).rgb;
+          vec3 nb = (texture2D(tCol, vUv + vec2(px.x, 0.)).rgb + texture2D(tCol, vUv - vec2(px.x, 0.)).rgb + texture2D(tCol, vUv + vec2(0., px.y)).rgb + texture2D(tCol, vUv - vec2(0., px.y)).rgb) * .25;
+          col = max(c + (c - nb) * .45, 0.0);
+        } else col = acc / wsum;
         vec2 q = (vUv - .5) * vec2(uRes.x / uRes.y, 1.0); float rr = length(q);
         if (uFringe > 0.0) { vec2 d = (vUv - .5) * uFringe * rr; col.r = mix(col.r, texture2D(tCol, vUv + d).r, .6); col.b = mix(col.b, texture2D(tCol, vUv - d).b, .6); }
         col *= 1.0 - uVig * smoothstep(.45, 1.25, rr);
@@ -434,7 +439,7 @@ export function mountDesk(root) {
     if (dirty) { drawScreen(now, wake); dirty = banners.some(b => now - b.t < 600) || screens.fade < 1; }
     // ---- focus ----
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
-    fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(.5, .12, up) - (kBook * kBack) * .22; fu.uMax.value = (6 * (1 - up) + 6 * kBook * kBack) * dpr();
+    fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(1.1, .12, up) - (kBook * kBack) * .8; fu.uMax.value = (2.2 * (1 - up) + 7 * kBook * kBack) * dpr();
     fu.uVig.value = .25 + .4 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     // the words

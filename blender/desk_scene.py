@@ -21,7 +21,7 @@ scene.cycles.samples = 160; scene.cycles.use_denoising = True
 scene.render.resolution_x = 2592; scene.render.resolution_y = 1536; scene.render.resolution_percentage = 100
 scene.render.film_transparent = False
 scene.view_settings.view_transform = 'AgX' if 'AgX' in [i.identifier for i in bpy.types.ColorManagedViewSettings.bl_rna.properties['view_transform'].enum_items] else 'Filmic'
-scene.view_settings.exposure = -1.0
+scene.view_settings.exposure = -1.45
 for lk in ('AgX - Medium High Contrast', 'Medium High Contrast', 'High Contrast'):
     try: scene.view_settings.look = lk; break
     except Exception: continue
@@ -58,7 +58,7 @@ def material(name, color=(.8, .8, .8, 1), rough=.5, metal=0, coat=0, coat_rough=
         tex = nt.nodes.new('ShaderNodeTexImage'); tex.image = image; tex.location = (-400, 200)
         nt.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
         if name == 'wood':
-            tc = nt.nodes.new('ShaderNodeTexCoord'); mpn = nt.nodes.new('ShaderNodeMapping'); mpn.inputs['Scale'].default_value = (2.6, 2.6, 1); mpn.inputs['Rotation'].default_value = (0, 0, math.radians(1.5))
+            tc = nt.nodes.new('ShaderNodeTexCoord'); mpn = nt.nodes.new('ShaderNodeMapping'); mpn.inputs['Scale'].default_value = (1, 1, 1); mpn.inputs['Rotation'].default_value = (0, 0, math.radians(1.5))
             nt.links.new(tc.outputs['UV'], mpn.inputs['Vector']); nt.links.new(mpn.outputs['Vector'], tex.inputs['Vector'])
     if bump is not None:
         tex = nt.nodes.new('ShaderNodeTexImage'); tex.image = bump; tex.location = (-600, -200)
@@ -155,7 +155,7 @@ def wood_texture(w=2048, h=2048):
     return np.clip(col, 0, 1), np.clip(bump, 0, 1)
 
 def mat_texture(w=2400, h=1800):
-    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.10, 0.31, 0.23]); col[..., 3] = 1
+    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.08, 0.26, 0.19]); col[..., 3] = 1
     rng = np.random.default_rng(5); col[..., :3] += rng.normal(0, .012, (h, w, 1))
     m = 110; cell = 70
     for X in range(m, w - m + 1, cell): col[m:h - m, X - 1:X + 1, :3] = col[m:h - m, X - 1:X + 1, :3] * .62 + np.array([.72, .86, .78]) * .38
@@ -185,7 +185,7 @@ IMG_MAT = image_from_array('cutting_mat', mat_texture()); IMG_PAGE = image_from_
 
 # ---------------------------------------------------------------- materials
 M = dict(
-    wood=material('wood', image=IMG_WOOD, bump=IMG_WOODB, bump_strength=.2, rough=.52, coat=.04, coat_rough=.4),
+    wood=material('wood', image=IMG_WOOD, bump=IMG_WOODB, bump_strength=.18, rough=.5, coat=.04, coat_rough=.4),
     mat=material('cutting_mat', image=IMG_MAT, rough=.9),
     cover=material('cover_cloth', (.05, .13, .09, 1), rough=.8),
     paper=material('paper', image=IMG_PAGE, rough=.95),
@@ -206,12 +206,41 @@ M = dict(
     phone_glass=material('phone_glass', (.01, .012, .02, 1), rough=.08, coat=1, coat_rough=.03),
 )
 
+# procedural oak: long wavy rings + fine pores, in the reference's colours — seamless by construction
+def oak_nodes(m):
+    nt = m.node_tree; bsdf = next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')
+    tc = nt.nodes.new('ShaderNodeTexCoord'); mp = nt.nodes.new('ShaderNodeMapping'); mp.inputs['Scale'].default_value = (1, 1, 1); mp.inputs['Rotation'].default_value = (0, 0, math.radians(2))
+    nt.links.new(tc.outputs['Object'], mp.inputs['Vector'])
+    warp = nt.nodes.new('ShaderNodeTexNoise'); warp.inputs['Scale'].default_value = 1.2; warp.inputs['Detail'].default_value = 3; warp.inputs['Roughness'].default_value = .55
+    nt.links.new(mp.outputs['Vector'], warp.inputs['Vector'])
+    wave = nt.nodes.new('ShaderNodeTexWave'); wave.wave_type = 'BANDS'; wave.inputs['Scale'].default_value = 150; wave.inputs['Distortion'].default_value = 2.2; wave.inputs['Detail'].default_value = 2; wave.inputs['Detail Scale'].default_value = 1.2; wave.inputs['Detail Roughness'].default_value = .5
+    try: wave.bands_direction = 'Y'
+    except Exception: pass
+    nt.links.new(mp.outputs['Vector'], wave.inputs['Vector'])
+    pores = nt.nodes.new('ShaderNodeTexNoise'); pores.inputs['Scale'].default_value = 420; pores.inputs['Detail'].default_value = 2; pores.inputs['Roughness'].default_value = .7
+    stretch = nt.nodes.new('ShaderNodeMapping'); stretch.inputs['Scale'].default_value = (1, 14, 1)   # pores elongated along the grain
+    nt.links.new(mp.outputs['Vector'], stretch.inputs['Vector']); nt.links.new(stretch.outputs['Vector'], pores.inputs['Vector'])
+    big = nt.nodes.new('ShaderNodeTexNoise'); big.inputs['Scale'].default_value = .7; big.inputs['Detail'].default_value = 1
+    nt.links.new(mp.outputs['Vector'], big.inputs['Vector'])
+    ramp = nt.nodes.new('ShaderNodeValToRGB'); e = ramp.color_ramp.elements; e[0].position = .0; e[0].color = (.72, .50, .28, 1); e[1].position = 1.0; e[1].color = (.50, .32, .16, 1)
+    e2 = ramp.color_ramp.elements.new(.6); e2.color = (.66, .45, .25, 1)
+    nt.links.new(wave.outputs['Fac'], ramp.inputs['Fac'])
+    mixp = nt.nodes.new('ShaderNodeMix'); mixp.data_type = 'RGBA'; mixp.blend_type = 'MULTIPLY'; mixp.inputs['Factor'].default_value = .25
+    nt.links.new(ramp.outputs['Color'], mixp.inputs[6]); nt.links.new(pores.outputs['Fac'], mixp.inputs[7])
+    mixb = nt.nodes.new('ShaderNodeMix'); mixb.data_type = 'RGBA'; mixb.blend_type = 'MULTIPLY'; mixb.inputs['Factor'].default_value = .22
+    nt.links.new(mixp.outputs[2], mixb.inputs[6]); nt.links.new(big.outputs['Color'], mixb.inputs[7])
+    nt.links.new(mixb.outputs[2], bsdf.inputs['Base Color'])
+    bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = .08; bump.inputs['Distance'].default_value = .001
+    nt.links.new(wave.outputs['Fac'], bump.inputs['Height']); nt.links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
+    rr = nt.nodes.new('ShaderNodeMapRange'); rr.inputs['From Min'].default_value = 0; rr.inputs['From Max'].default_value = 1; rr.inputs['To Min'].default_value = .62; rr.inputs['To Max'].default_value = .42
+    nt.links.new(wave.outputs['Fac'], rr.inputs['Value']); nt.links.new(rr.outputs['Result'], bsdf.inputs['Roughness'])
+
 # ---------------------------------------------------------------- the set
 exportables = {}
 # desk
 bpy.ops.mesh.primitive_plane_add(size=1.7, location=(0, 0, 0)); desk = bpy.context.object; desk.name = 'desk'; desk.data.materials.append(M['wood'])
 # cutting mat 60×45 cm
-bpy.ops.mesh.primitive_plane_add(size=1, location=(.09, -.05, .003), rotation=(0, 0, math.radians(3))); mat_o = bpy.context.object; mat_o.name = 'mat'; mat_o.scale = (.60, .42, 1); bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+bpy.ops.mesh.primitive_plane_add(size=1, location=(.09, -.05, .003), rotation=(0, 0, math.radians(3))); mat_o = bpy.context.object; mat_o.name = 'mat'; mat_o.rotation_euler.z = math.radians(5); mat_o.scale = (.60, .42, 1); bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 sol = mat_o.modifiers.new('solid', 'SOLIDIFY'); sol.thickness = .003; sol.offset = -1; bv = mat_o.modifiers.new('bevel', 'BEVEL'); bv.width = .002; bv.segments = 3
 mat_o.data.materials.append(M['mat']); smooth(mat_o, 40)
 exportables['mat'] = [mat_o]
@@ -230,7 +259,7 @@ def notebook():
         if side > 0:  # flip the uv so both pages read upright
             pass
     rib = box('nb_ribbon', (.010, .105, .0012), loc=(.108, -.035, .0192), rot=(0, 0, math.radians(-10)), bevel=.0004, mat=M['ribbon']); objs.append(rib)
-    return group('notebook', objs, loc=(-.15, -.05, 0), rot_z=math.radians(8)), objs
+    return group('notebook', objs, loc=(-.16, -.04, 0), rot_z=math.radians(11)), objs
 nb, nb_objs = notebook(); exportables['notebook'] = nb_objs
 bpy.context.view_layer.update()
 with open(os.path.join(RENDER, 'debug.txt'), 'w') as fh:
@@ -244,7 +273,7 @@ def pencil():
     fer = cylinder('pc_ferrule', .0039, .011, loc=(-.087, 0, 0), rot=(0, math.radians(90), 0), verts=32, mat=M['ferrule']); objs.append(fer)
     er = cylinder('pc_eraser', .0037, .009, loc=(-.097, 0, 0), rot=(0, math.radians(90), 0), verts=32, mat=M['eraser_pink']); objs.append(er)
     for o in objs: o.location.z += .0038
-    return group('pencil', objs, loc=(.0, .17, 0), rot_z=math.radians(-9)), objs
+    return group('pencil', objs, loc=(.02, .165, 0), rot_z=math.radians(-6)), objs
 pc, pc_objs = pencil(); exportables['pencil'] = pc_objs
 
 def pen():
@@ -255,14 +284,14 @@ def pen():
     cap = cylinder('pen_cap', .0044, .004, loc=(-.062, 0, 0), rot=(0, math.radians(90), 0), verts=40, mat=M['chrome']); objs.append(cap)
     clip = box('pen_clip', (.045, .004, .0015), loc=(-.040, 0, .0052), bevel=.0005, mat=M['chrome']); objs.append(clip)
     for o in objs: o.location.z += .0044
-    return group('pen', objs, loc=(-.19, .225, 0), rot_z=math.radians(-11)), objs
+    return group('pen', objs, loc=(-.21, .215, 0), rot_z=math.radians(-19)), objs
 pn, pn_objs = pen(); exportables['pen'] = pn_objs
 
 def eraser():
     objs = []
     blk = box('er_block', (.052, .022, .013), loc=(0, 0, .0065), bevel=.0015, mat=M['eraser_white']); objs.append(blk)
     slv = box('er_sleeve', (.028, .0232, .0135), loc=(.010, 0, .00675), bevel=.001, mat=M['eraser_blue']); objs.append(slv)
-    return group('eraser', objs, loc=(-.40, .03, 0), rot_z=math.radians(35)), objs
+    return group('eraser', objs, loc=(-.41, .05, 0), rot_z=math.radians(52)), objs
 er, er_objs = eraser(); exportables['eraser'] = er_objs
 
 def comb():
@@ -271,7 +300,7 @@ def comb():
     tooth = box('comb_tooth', (.0018, .022, .0035), loc=(-.088, -.006, .00175), bevel=.0004, mat=M['black'])
     arr = tooth.modifiers.new('array', 'ARRAY'); arr.count = 46; arr.use_relative_offset = False; arr.use_constant_offset = True; arr.constant_offset_displace = (.0039, 0, 0)
     objs.append(tooth)
-    return group('comb', objs, loc=(-.10, -.25, 0), rot_z=math.radians(2)), objs
+    return group('comb', objs, loc=(-.08, -.255, 0), rot_z=math.radians(-7)), objs
 cb, cb_objs = comb(); exportables['comb'] = cb_objs
 
 def scissors():
@@ -295,7 +324,7 @@ def scissors():
     ringB = torus('sc_ring_b', .0100, .0024, loc=(-.071, -.043, .0055), mat=M['steel']); objs.append(ringB)
     tang = curve_tube('sc_tang', [(-.081, -.047, .0055), (-.093, -.054, .0055), (-.104, -.052, .0055), (-.108, -.044, .0055)], .0018, mat=M['steel']); objs.append(tang)
     bump = cylinder('sc_bumper', .0016, .004, loc=(-.052, -.021, .0055), rot=(math.radians(90), 0, 0), verts=12, mat=M['black']); objs.append(bump)
-    g_ = group('scissors', objs, loc=(.33, -.11, 0), rot_z=math.radians(142)); g_.scale = (1.25, 1.25, 1.25); return g_, objs
+    g_ = group('scissors', objs, loc=(.34, -.13, 0), rot_z=math.radians(151)); g_.scale = (1.25, 1.25, 1.25); return g_, objs
 sc, sc_objs = scissors(); exportables['scissors'] = sc_objs
 
 def paperclip(name, loc, rz):
@@ -335,9 +364,10 @@ for st in ('NISHITA', 'MULTIPLE_SCATTERING', 'SINGLE_SCATTERING'):
 for k, v in (('sun_elevation', math.radians(22)), ('sun_rotation', math.radians(300)), ('sun_intensity', .25), ('altitude', 0), ('sun_disc', False)):
     try: setattr(sky, k, v)
     except Exception: pass
-bg.inputs['Color'].default_value = (.70, .62, .55, 1); bg.inputs['Strength'].default_value = .16
-sun = bpy.data.lights.new('sun', 'SUN'); sun.energy = 22.0; sun.angle = math.radians(4.0); sun.color = (1.0, .80, .56)
-sun_o = bpy.data.objects.new('sun', sun); bpy.context.collection.objects.link(sun_o); sun_o.rotation_euler = Euler((math.radians(48), 0, math.radians(-140)))
+bg.inputs['Color'].default_value = (.70, .62, .55, 1); bg.inputs['Strength'].default_value = .12
+sun = bpy.data.lights.new('sun', 'AREA'); sun.energy = 1400; sun.size = .22; sun.color = (1.0, .80, .56); sun.shape = 'SQUARE'
+sun_o = bpy.data.objects.new('sun', sun); bpy.context.collection.objects.link(sun_o); sun_o.location = (-1.5, 1.2, 1.7)
+sun_o.rotation_euler = (Vector((0, 0, 0)) - sun_o.location).to_track_quat('-Z', 'Y').to_euler()
 fill = bpy.data.lights.new('fill', 'AREA'); fill.energy = 40; fill.size = 2.5; fill.color = (.86, .90, 1.0)
 fill_o = bpy.data.objects.new('fill', fill); bpy.context.collection.objects.link(fill_o); fill_o.location = (-.8, .9, 1.6); fill_o.rotation_euler = Euler((math.radians(30), 0, math.radians(-40)))
 # a venetian blind between the sun and the desk: a transparent plane with opaque bands, so the sun arrives in stripes
@@ -355,16 +385,18 @@ bn.links.new(ramp.outputs['Color'], mixs.inputs['Fac']); bn.links.new(tr.outputs
 # (the old slats are kept off)
 slat_mat = material('slat', (.1, .1, .1, 1))
 slats = []
-for i in range(16):
-    s_ = box(f'slat_{i}', (.15, 6.0, .01), loc=(-3.2 + i * .44, 0, 0), mat=slat_mat)
-    s_.visible_camera = False; s_.visible_glossy = False; s_.visible_diffuse = False; slats.append(s_)
-group('blind', slats, loc=(-.9, 1.05, 1.25), rot_z=math.radians(-62))   # the array is set where its shadow lands on the counter
+for i in range(18):
+    s_ = box(f'slat_{i}', (.065, 4.0, .004), loc=(-1.2 + i * .155, 0, 0), mat=slat_mat)
+    s_.visible_camera = False; slats.append(s_)
+    try: s_.visible_shadow = True
+    except Exception: pass
+group('blind', slats, loc=(-.28, .22, .32), rot_z=math.radians(-62))   # the array is set where its shadow lands on the counter
 
 # ---------------------------------------------------------------- camera: above, a touch forward, like the reference
 cam = bpy.data.cameras.new('cam'); cam.lens = 36; cam.sensor_width = 36
-cam.dof.use_dof = True; cam.dof.focus_distance = 1.02; cam.dof.aperture_fstop = 4.0
+cam.dof.use_dof = True; cam.dof.focus_distance = .98; cam.dof.aperture_fstop = 4.0
 cam_o = bpy.data.objects.new('cam', cam); bpy.context.collection.objects.link(cam_o)
-cam_o.location = (-.03, -.24, 1.0); cam_o.rotation_euler = Euler((math.radians(13), 0, math.radians(-5)))
+cam_o.location = (-.02, -.46, .86); cam_o.rotation_euler = Euler((math.radians(26), 0, math.radians(-4)))
 scene.camera = cam_o
 
 # ---------------------------------------------------------------- export each thing as .glb (y-up, metres; textures embedded)
@@ -388,6 +420,37 @@ for name, objs in exportables.items():
     export(name, [parent] if parent else objs)
 export('desk', [desk])
 bpy.ops.object.select_all(action='DESELECT')
+
+# ---------------------------------------------------------------- grade: the light arrives from the left; the right falls off; soft vignette
+def build_grade(ct, out_node):
+    rl = ct.nodes.new('CompositorNodeRLayers')
+    ell = ct.nodes.new('CompositorNodeEllipseMask')
+    for k, v in (('x', .34), ('y', .56), ('width', 1.4), ('height', 1.2)):
+        try: setattr(ell, k, v)
+        except Exception:
+            try: ell.inputs[k.capitalize()].default_value = v
+            except Exception: pass
+    blur = ct.nodes.new('CompositorNodeBlur'); blur.filter_type = 'GAUSS'
+    try: blur.use_relative = True; blur.factor_x = 28; blur.factor_y = 28
+    except Exception: blur.size_x = 500; blur.size_y = 500
+    ct.links.new(ell.outputs['Mask'], blur.inputs['Image'])
+    mr = ct.nodes.new('CompositorNodeMapRange'); mr.inputs['From Min'].default_value = 0; mr.inputs['From Max'].default_value = 1; mr.inputs['To Min'].default_value = .5; mr.inputs['To Max'].default_value = 1.06
+    ct.links.new(blur.outputs['Image'], mr.inputs['Value'])
+    mul = ct.nodes.new('CompositorNodeMixRGB'); mul.blend_type = 'MULTIPLY'; mul.inputs['Fac'].default_value = 1
+    ct.links.new(rl.outputs['Image'], mul.inputs[1]); ct.links.new(mr.outputs['Value'], mul.inputs[2])
+    ct.links.new(mul.outputs['Image'], out_node.inputs[0])
+try:
+    if hasattr(scene, 'compositing_node_group'):
+        ng = bpy.data.node_groups.new('grade', 'CompositorNodeTree')
+        try: ng.interface.new_socket('Image', in_out='OUTPUT', socket_type='NodeSocketColor')
+        except Exception: pass
+        outn = ng.nodes.new('NodeGroupOutput'); build_grade(ng, outn); scene.compositing_node_group = ng
+    else:
+        scene.use_nodes = True; ct = scene.node_tree
+        for n in list(ct.nodes): ct.nodes.remove(n)
+        comp = ct.nodes.new('CompositorNodeComposite'); build_grade(ct, comp)
+    scene.render.use_compositing = True
+except Exception as ex: print('compositor skipped', ex)
 
 # ---------------------------------------------------------------- render the hero still
 scene.render.image_settings.file_format = 'PNG'; scene.render.filepath = os.path.join(RENDER, 'hero.png')

@@ -3972,3 +3972,10 @@ html[data-body=a] .bk-minute-viz i:first-child{border-left:3px solid #ff8f78!imp
 html[data-body=a] .bk-day .bk-dom-card{background:var(--glass-fill),rgba(18,14,11,.42)!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:26px!important;-webkit-backdrop-filter:blur(30px) saturate(1.2);backdrop-filter:blur(30px) saturate(1.2);box-shadow:var(--glass-edge)!important}
 html[data-body=a] .bk-day .bk-dom-card :is(p,span,b,em,small,time){color:rgba(239,230,214,.8)!important}
 html[data-body=a] .bk-day .bk-dom-card :is(.bk-dom-track,.bk-dom-hours){border-color:rgba(255,255,255,.1)!important}
+/* A: the opening hands over to the page without a cut — no black at the end, the same vignette as the backdrop, and a
+   see-through opening once the desk has moved behind the page */
+html[data-body=a] .bk-set .bk-dk-out{background:radial-gradient(120% 95% at 50% 42%,rgba(14,12,10,.18) 0%,rgba(14,12,10,.62) 70%,rgba(14,12,10,.86) 100%)!important}
+html[data-body=a] .bk-dk.is-through,html[data-body=a] .bk-dk.is-through .bk-dk-out{background:transparent!important}
+html[data-body=a] .bk-dk.is-through .bk-dk-grain{display:none}
+html[data-body=a] .bk-cover-pin>.op,html[data-body=a] .bk-cover-pin{background:transparent!important}
+.bk-backdrop{transition:none}

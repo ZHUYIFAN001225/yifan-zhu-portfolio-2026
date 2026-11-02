@@ -410,8 +410,9 @@ export function mountDesk(root) {
     ['#release', v3(.13, .3, .24), v3(.13, 0, .04)]];        // the phone again, lit
   const shotEls = () => SHOTS.map(([sel, p, l]) => ({ el: root.querySelector(sel), p, l })).filter(s => s.el);
   let shots = null; const bPos = v3(-.05, .4, .42), bLook = v3(-.04, 0, .03), tPos = v3(0, 0, 0), tLook = v3(0, 0, 0);
+  const bodyA = () => document.documentElement.dataset.body === 'a';
   function moveCanvas(toBody) {
-    if (toBody === inBody) return; inBody = toBody;
+    if (toBody === inBody) return; inBody = toBody; ov.classList.toggle('is-through', toBody);   // the opening turns see-through: the same desk carries on behind it
     if (toBody) { if (!backdrop.isConnected) document.body.prepend(backdrop); backdrop.append(cv); bPos.copy(cam.position); bLook.copy(camLook); }
     else ov.prepend(cv);
     resize();
@@ -445,7 +446,7 @@ export function mountDesk(root) {
     const r = holder.getBoundingClientRect();
     const dt = clamp((now - last) / 1000, 0, .05); last = now;
     // the case body under way (and the trial is on): the desk goes behind the page, fading in out of the black
-    if (document.documentElement.dataset.body === 'a' && ready && r.bottom < innerHeight * .98) { moveCanvas(true); bodyFrame(now, dt, clamp((innerHeight - r.bottom) / (innerHeight * .7))); return; }
+    if (bodyA() && ready && r.bottom < innerHeight * .995) { moveCanvas(true); bodyFrame(now, dt, 1); return; }
     moveCanvas(false);
     if (r.bottom < -100 || r.top > innerHeight + 100) return;
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
@@ -496,6 +497,10 @@ export function mountDesk(root) {
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(1.1, .12, up) - (kBook * kBack) * .8; fu.uMax.value = (2.2 * (1 - up) + 7 * kBook * kBack) * dpr();
     fu.uVig.value = .25 + .55 * nightAmt - .25 * kOut; fu.uFringe.value = 0; fu.uJit.value = 1;
+    if (bodyA()) {   // the dark case: no fade to black — the close-up drifts out of focus into the same defocus the page sits on
+      fu.uMax.value = lerp(fu.uMax.value, 13 * dpr(), kOut); fu.uRange.value = lerp(fu.uRange.value, .06, kOut); fu.uFocus.value = lerp(fu.uFocus.value, cam.position.distanceTo(camLook) * .55, kOut);
+      fu.uVig.value = lerp(fu.uVig.value, .85, kOut); fu.uJit.value = 1 - kOut;
+    }
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     // the words
     const tHero = clamp((now - bornAt - 300) / 1900);   // the first heading arrives on load, the rest with the scroll

@@ -125,7 +125,7 @@ export function mountDesk(root) {
         float n = dfbm(p + 1.4 * q); float leaves = smoothstep(.3, .8, n);
         // sun through a window: wide soft diagonal bands that drift, with the leaf shadows faint inside them
         float d = (w.x * .8 + w.z * .6) * .55 + dfbm(w.xz * .12 + t * .2) * 1.6 + t * .15; float bands = .5 + .5 * sin(d); bands = smoothstep(.15, .95, bands);
-        float windowGrad = .8 + .35 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.68 + .32 * bands + .14 * leaves * bands) * windowGrad; }`)
+        float windowGrad = .82 + .22 * smoothstep(-9.0, 7.0, w.x + w.z * .4); return (.72 + .26 * bands + .1 * leaves * bands) * windowGrad; }`)
       .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= mix(1.0, dappleAt(vDp), uDap);'); }; return m; };
   const rim = new THREE.SpotLight(0xffc98a, 0, 30, .6, .8, 1.2); rim.position.set(-4, 9, -5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
   const night = new THREE.HemisphereLight(0x4a56c8, 0x1a0f26, 0); scene.add(night);
@@ -146,7 +146,7 @@ export function mountDesk(root) {
   const wood = new THREE.CanvasTexture(woodCanvas); wood.colorSpace = THREE.SRGBColorSpace; wood.anisotropy = 16; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(1.6, 1.6);
   const woodBump = new THREE.CanvasTexture(woodCanvas); woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping; woodBump.repeat.set(1.6, 1.6); woodBump.anisotropy = 16;
   // the self-healing cutting mat: deep green, fine 10 mm grid, bold 50 mm grid, rulers along the edges
-  const MATW = 9.8, MATH = 6.9, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
+  const MATW = 9.4, MATH = 6.5, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
     x.fillStyle = '#226b53'; x.fillRect(0, 0, W, H);
     for (let i = 0; i < 60000; i++) { x.fillStyle = `rgba(${r() > .5 ? '255,255,255' : '0,20,10'},${r() * .06})`; x.fillRect(r() * W, r() * H, 1.5, 1.5); }
     const m = 150, g = 20 /* px per mm → 10 mm = 200 px? no: 1 unit = 100 px, 10 mm grid = 100 px */, cell = 100;
@@ -185,8 +185,8 @@ export function mountDesk(root) {
 
   // ---------- the counter ----------
   const SPOT = new THREE.Vector3(1.75, .09, .55), SPOT_ROT = -.12, HERO_SCALE = 1.75;
-  const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .014, roughness: .46, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
-  const mat = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(MATW, MATH, .35), 12)), dapple(new THREE.MeshStandardMaterial({ map: matTex, roughness: .86, metalness: 0 }))); mat.rotation.set(-Math.PI / 2, 0, .05); mat.position.set(1.7, .02, .35); mat.receiveShadow = true; mat.visible = new URLSearchParams(location.search).get('mat') !== '0'; scene.add(mat);
+  const desk = new THREE.Mesh(new THREE.PlaneGeometry(44, 44), dapple(new THREE.MeshStandardMaterial({ map: wood, bumpMap: woodBump, bumpScale: .006, roughness: .55, metalness: 0 }))); desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
+  const mat = new THREE.Mesh(planeUV(new THREE.ShapeGeometry(roundedRect(MATW, MATH, .35), 12)), dapple(new THREE.MeshStandardMaterial({ map: matTex, roughness: .86, metalness: 0 }))); mat.rotation.set(-Math.PI / 2, 0, .05); mat.position.set(1.3, .02, .3); mat.receiveShadow = true; mat.visible = new URLSearchParams(location.search).get('mat') !== '0'; scene.add(mat);
   const propsG = new THREE.Group(); scene.add(propsG);
   const std = o => dapple(new THREE.MeshStandardMaterial(o));
   const shadowy = m => { m.castShadow = true; m.receiveShadow = true; return m; };
@@ -212,29 +212,23 @@ export function mountDesk(root) {
   const graphite = phys({ color: 0x1c1f24, metalness: .2, roughness: .38, clearcoat: .7, clearcoatRoughness: .3, envMap: envTex, envMapIntensity: .22 });
   const rubber = std({ color: 0x15171a, roughness: .92 });
   const tube = (pts, r, m, closed = false) => new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([x, y, z]) => new THREE.Vector3(x, y, z)), closed, 'centripetal'), 96, r, 10, closed), m);
-  // hairdressing scissors — tapered blades, finger rings with a tang
+  // hairdressing shears (closed): two slender blades, a knurled pivot screw, offset rounded shanks, finger rings and a tang
   const scissors = new THREE.Group(); {
-    const bladeShape = () => { const sh = new THREE.Shape(); sh.moveTo(-1.0, -.06); sh.lineTo(.2, -.07); sh.quadraticCurveTo(1.25, -.05, 1.75, 0); sh.quadraticCurveTo(1.2, .06, .2, .07); sh.lineTo(-1.0, .05); sh.lineTo(-1.0, -.06); return sh; };
-    const half = sgn => { const g = new THREE.Group();
-      const blade = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(bladeShape(), { depth: .03, bevelEnabled: true, bevelThickness: .008, bevelSize: .008, bevelSegments: 3 }), steel)); blade.rotation.x = -Math.PI / 2; blade.position.y = sgn > 0 ? .04 : .01;
-      const ring = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.2, .032, 12, 40), steel)); ring.rotation.x = Math.PI / 2; ring.scale.set(1, 1.15, 1); ring.position.set(-1.32, .03, sgn * .2);
-      const neck = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .22, 10), steel); neck.rotation.z = Math.PI / 2; neck.rotation.y = -sgn * .5; neck.position.set(-1.1, .03, sgn * .1);
-      g.add(blade, ring, neck); g.rotation.y = sgn * .13; return g; };
-    const screw = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, .09, 20), chrome); screw.position.y = .03;
-    const rest = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, .26, 8), steel); rest.rotation.z = Math.PI / 2; rest.rotation.y = .9; rest.position.set(-1.52, .03, -.3);
-    scissors.add(half(1), half(-1), screw, rest); scissors.position.set(3.7, .02, 2.6); scissors.rotation.y = -.5; propsG.add(scissors); }
-  // cordless hair clippers — graphite body with a rubber grip, chrome blade set, a cable curling away
-  const clippers = new THREE.Group(); {
-    const bodyShape = (() => { const sh = new THREE.Shape(); sh.moveTo(-.3, -.9); sh.quadraticCurveTo(-.36, .2, -.42, .62); sh.quadraticCurveTo(-.44, .9, -.3, .92); sh.lineTo(.3, .92); sh.quadraticCurveTo(.44, .9, .42, .62); sh.quadraticCurveTo(.36, .2, .3, -.9); sh.quadraticCurveTo(0, -1.0, -.3, -.9); return sh; })();
-    const body = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(bodyShape, { depth: .36, bevelEnabled: true, bevelThickness: .06, bevelSize: .06, bevelSegments: 6, curveSegments: 24 }), graphite)); body.rotation.x = -Math.PI / 2; body.position.y = .06;
-    const grip = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(roundedRect(.52, .9, .1), { depth: .02, bevelEnabled: true, bevelThickness: .01, bevelSize: .01, bevelSegments: 2 }), rubber)); grip.rotation.x = -Math.PI / 2; grip.position.set(0, .49, -.15);
-    const head = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.78, .1, .28), chrome)); head.position.set(0, .22, 1.02); head.rotation.x = .1;
-    const headBase = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.7, .16, .22), steel)); headBase.position.set(0, .2, .88);
-    for (let i = 0; i < 18; i++) { const t = new THREE.Mesh(new THREE.BoxGeometry(.022, .04, .16), chrome); t.position.set(-.34 + i * .04, .26, 1.14); clippers.add(t); }
-    const lever = new THREE.Mesh(new THREE.BoxGeometry(.06, .05, .3), chrome); lever.position.set(.36, .3, .55); lever.rotation.z = .4;
-    const sw = new THREE.Mesh(new THREE.BoxGeometry(.14, .03, .26), phys({ color: 0x8e949c, metalness: .6, roughness: .35, envMap: envTex })); sw.position.set(0, .49, .5);
-    const cord = tube([[0, .05, -1.0], [-.5, .04, -1.3], [-1.3, .03, -1.1], [-1.7, .03, -.3], [-1.4, .03, .5], [-2.0, .03, 1.2]], .022, rubber);
-    clippers.add(body, grip, head, headBase, lever, sw, cord); clippers.position.set(4.7, 0, -.5); clippers.rotation.y = .95; propsG.add(clippers); }
+    const blade = (len, w0, flip) => { const sh = new THREE.Shape(); sh.moveTo(0, -w0 / 2); sh.lineTo(0, w0 / 2); sh.quadraticCurveTo(len * .55, w0 / 2 * .9, len, flip ? .005 : -.005); sh.quadraticCurveTo(len * .6, flip ? -w0 * .15 : -w0 / 2 * .95, 0, -w0 / 2);
+      const m = shadowy(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .03, bevelEnabled: true, bevelThickness: .01, bevelSize: .008, bevelSegments: 3, curveSegments: 24 }), steel)); m.rotation.x = -Math.PI / 2; return m; };
+    const b1 = blade(2.15, .17, false); b1.position.set(0, .05, .0); const b2 = blade(2.05, .17, true); b2.position.set(0, .085, .025); b2.rotation.z = 0;
+    const pivot = new THREE.Mesh(new THREE.CylinderGeometry(.11, .11, .05, 32), chrome); pivot.position.set(0, .11, 0);
+    for (let i = 0; i < 28; i++) { const k = new THREE.Mesh(new THREE.BoxGeometry(.012, .05, .03), chrome); const a = i / 28 * Math.PI * 2; k.position.set(Math.cos(a) * .11, .11, Math.sin(a) * .11); k.rotation.y = -a; scissors.add(k); }
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(.045, .055, .03, 24), steel); cap.position.set(0, .15, 0);
+    // shanks: rounded, each curving to its own ring
+    const shankA = tube([[-.05, .05, .03], [-.6, .05, .12], [-1.15, .05, .22], [-1.45, .05, .3]], .042, steel);          // finger side
+    const shankB = tube([[-.05, .08, -.03], [-.5, .08, -.2], [-.95, .08, -.5], [-1.2, .08, -.68]], .042, steel);          // thumb side
+    const ringA = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.21, .045, 14, 48), steel)); ringA.rotation.x = Math.PI / 2; ringA.position.set(-1.66, .05, .36); ringA.scale.set(1, 1.1, 1);
+    const ringB = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.2, .045, 14, 48), steel)); ringB.rotation.x = Math.PI / 2; ringB.position.set(-1.4, .08, -.82);
+    const tang = tube([[-1.6, .08, -.9], [-1.82, .08, -1.02], [-2.02, .08, -1.0], [-2.1, .08, -.86]], .035, steel);
+    const bumper = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .08, 10), rubber); bumper.position.set(-1.1, .07, -.42);
+    scissors.add(b1, b2, pivot, cap, shankA, shankB, ringA, ringB, tang, bumper);
+    scissors.position.set(4.1, .0, 2.0); scissors.rotation.y = 2.25; scissors.scale.setScalar(.88); propsG.add(scissors); }
   // comb
   const comb = new THREE.Group(); { const m = phys({ color: 0x15181c, roughness: .3, metalness: .05, clearcoat: .5, clearcoatRoughness: .3, envMap: envTex, envMapIntensity: .12 }); const back = shadowy(new THREE.Mesh(new THREE.BoxGeometry(2.4, .05, .22), m)); back.position.z = -.1; comb.add(back);
     for (let i = 0; i < 34; i++) { const t = new THREE.Mesh(new THREE.BoxGeometry(.028, .045, .38), m); t.position.set(-1.14 + i * .069, 0, .2); comb.add(t); }
@@ -261,11 +255,11 @@ export function mountDesk(root) {
   // soft contact shadows under everything that sits on the counter (the shadow map alone leaves things floating)
   const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'); const g = x.createRadialGradient(128, 128, 10, 128, 128, 128); g.addColorStop(0, 'rgba(20,10,4,.8)'); g.addColorStop(.5, 'rgba(20,10,4,.35)'); g.addColorStop(1, 'rgba(20,10,4,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c); })();
   const blob = (parent, w, d, x, z, rot = 0, y = .006) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .8 })); m.rotation.set(-Math.PI / 2, 0, rot); m.position.set(x, y, z); m.renderOrder = -1; parent.add(m); return m; };
-  blob(diary, 5.6, 4.1, 0, .05); blob(pencil, 3.6, .5, 0, .02); blob(scissors, 3.6, 1.2, .1, 0); blob(clippers, 1.4, 2.6, 0, .1, 0, .004); blob(comb, 2.8, .9, 0, .05); blob(pen, 2.7, .5, 0, 0); blob(eraser, 1.1, .7, 0, 0); blob(binder, .9, .7, 0, 0);
+  blob(diary, 5.6, 4.1, 0, .05); blob(pencil, 3.6, .5, 0, .02); blob(scissors, 4.6, 1.6, -.1, -.2, 0); blob(comb, 2.8, .9, 0, .05); blob(pen, 2.7, .5, 0, 0); blob(eraser, 1.1, .7, 0, 0); blob(binder, .9, .7, 0, 0);
   const phoneBlob = blob(scene, 2.3, 3.8, SPOT.x, SPOT.z, SPOT_ROT);
   const propMats = []; propsG.traverse(o => { if (o.isMesh) propMats.push(o.material); });
   // things on the counter give way a little when the pointer brushes them, and settle back
-  const nudged = [[diary, 2.6, .05], [pencil, 1.5, .18], [scissors, 1.6, .14], [clippers, 1.3, .12], [comb, 1.4, .14], [pen, 1.4, .2], [eraser, .9, .22], [binder, .8, .16]].map(([g, rad, amt]) => ({ g, rad, amt, rest: g.position.clone(), rrot: g.rotation.y, ox: 0, oz: 0, vx: 0, vz: 0, rv: 0, ro: 0 }));
+  const nudged = [[diary, 2.6, .05], [pencil, 1.5, .18], [scissors, 1.8, .14], [comb, 1.4, .14], [pen, 1.4, .2], [eraser, .9, .22], [binder, .8, .16]].map(([g, rad, amt]) => ({ g, rad, amt, rest: g.position.clone(), rrot: g.rotation.y, ox: 0, oz: 0, vx: 0, vz: 0, rv: 0, ro: 0 }));
   const pointerOnDesk = new THREE.Vector3(), ray = new THREE.Ray(), ndc = new THREE.Vector3(), floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   function nudge(dt, amtAll) {
     ndc.set(P.x, -P.y, .5).unproject(cam); ray.origin.copy(cam.position); ray.direction.copy(ndc).sub(cam.position).normalize(); const hit = ray.intersectPlane(floor, pointerOnDesk);
@@ -346,7 +340,7 @@ export function mountDesk(root) {
   const P = { x: 0, y: 0, tx: 0, ty: 0 };
   addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   const V = {
-    hero: { pos: new THREE.Vector3(0, 13.2, 3.2), look: new THREE.Vector3(.2, 0, -.3) },
+    hero: { pos: new THREE.Vector3(0, 14.8, 3.4), look: new THREE.Vector3(.2, 0, -.3) },
     dark: { pos: new THREE.Vector3(0, 12.2, .001), look: new THREE.Vector3(0, 0, 0) },
     night: { pos: new THREE.Vector3(3.4, 4.6, 7.4), look: new THREE.Vector3(.4, .2, -.2) },
     top: { pos: new THREE.Vector3(-1.6, 11.5, .6), look: new THREE.Vector3(-1.6, 0, .2) }

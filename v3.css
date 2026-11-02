@@ -3794,3 +3794,4 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1400vh)}
 .bk-dk-hero{opacity:calc(1 - var(--kText))}
 .bk-dk::after{opacity:calc((.5 + var(--kDark) * .5) * (1 - var(--kOut)))}
 .bk-dk-top{height:18vh;opacity:calc((1 - var(--kText)) * .8)}
+.bk-dk-top{mix-blend-mode:normal;height:14vh;opacity:calc((1 - var(--kText)) * .55);background:linear-gradient(180deg,#f3f1ec 0%,rgba(243,241,236,.35) 40%,rgba(243,241,236,0) 100%)}

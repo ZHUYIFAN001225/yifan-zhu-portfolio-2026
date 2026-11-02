@@ -3999,3 +3999,6 @@ html[data-body=a]:has(.bk-day),html[data-body=a] body:has(.bk-day){background-co
 @keyframes bk-set-in{from{opacity:0}to{opacity:1}}
 .bk-body-switch{display:none!important}
 html[data-body=a] .bk-day .op--3d:has(.bk-dk.no-gl)>*{visibility:visible!important}   /* no WebGL: the static opening stays */
+html[data-body=a]:has(.bk-day) :is(.v3-case-tools,.v3-case-categories) a{color:rgba(241,231,214,.72)!important;border-color:rgba(255,236,210,.18)!important;background-color:transparent}
+html[data-body=a]:has(.bk-day) :is(.v3-case-tools,.v3-case-categories) a:is(:hover,[aria-current],.is-active,.is-current){color:#f1e7d6!important}
+html[data-body=a]:has(.bk-day) .v3-case-categories a[aria-current],html[data-body=a]:has(.bk-day) .v3-case-categories a.is-active{background:rgba(255,236,210,.12)!important}

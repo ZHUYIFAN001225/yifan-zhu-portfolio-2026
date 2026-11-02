@@ -161,9 +161,9 @@ function glassLight(root) {
 function mobileLite(root) {
   const zh = () => document.documentElement.lang.startsWith('zh');
   root.querySelectorAll('.ux-principles:not(.bk-table), .ux-build, .ux-hard, .ux-opps, .ux-research-plan, .ux-iterations, .ux-details').forEach(g => {
-    if (g.classList.contains('bk-rail') || g.children.length < 2) return;
-    g.classList.add('bk-rail');
-    const n = g.children.length, c = document.createElement('p'); c.className = 'bk-rail-n'; c.setAttribute('aria-hidden', 'true');
+    if (g.classList.contains('bk-swipe') || g.children.length < 2) return;
+    g.classList.add('bk-swipe');
+    const n = g.children.length, c = document.createElement('p'); c.className = 'bk-swipe-n'; c.setAttribute('aria-hidden', 'true');
     c.innerHTML = `<span>${[...Array(n)].map((_, i) => `<i${i ? '' : ' class="is-on"'}></i>`).join('')}</span><em>1 / ${n}</em><b></b>`;
     const hint = () => c.querySelector('b').textContent = zh() ? '左右滑动' : 'swipe'; hint(); document.addEventListener('portfolio:language', hint);
     g.after(c);
@@ -171,7 +171,7 @@ function mobileLite(root) {
       const w = g.children[0].getBoundingClientRect().width + 12, i = Math.min(n - 1, Math.round(g.scrollLeft / w));
       c.querySelector('em').textContent = `${i + 1} / ${n}`; c.querySelectorAll('i').forEach((d, k) => d.classList.toggle('is-on', k === i)); }); }, { passive: true });
   });
-  root.querySelectorAll('.ux-section-body > p:not(.bk-note):not(.ux-research-status), .ux-section-body > .ux-flow-note, .ux-evidence-note p, .bk-entry-note, .bk-rail > * p, .bk-rail figcaption p').forEach(p => {
+  root.querySelectorAll('.ux-section-body > p:not(.bk-note):not(.ux-research-status), .ux-section-body > .ux-flow-note, .ux-evidence-note p, .bk-entry-note, .bk-swipe > * p, .bk-swipe figcaption p').forEach(p => {
     if (p.textContent.trim().length < 70) return;
     p.classList.add('bk-clamp'); p.addEventListener('click', () => p.classList.toggle('is-open'));
   });

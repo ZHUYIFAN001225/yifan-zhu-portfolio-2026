@@ -3496,3 +3496,23 @@ html:has(.bk-day){background:#f3eee3!important}html:has(.bk-day) .site-header.v3
 }
 @media (max-width:699px){.bk-day .bk-swipe{opacity:1!important;transform:none!important;position:relative!important}.bk-day .bk-swipe>*{opacity:1!important}}
 @media (max-width:699px){.bk-day .bk-swipe{top:auto!important;left:auto!important;inset:auto!important}}
+
+/* ======== booking: design anatomy on paper (LOOK's motion, this case's material) ======== */
+.bk-day .xp{background:transparent!important;box-shadow:none!important;border-radius:0!important;color:#17362b;overflow:visible}
+.bk-day .xp *{text-shadow:none!important}
+.bk-day .xp-stage{background:transparent!important}
+.bk-day .xp-kicker{color:#1f9e6c!important;letter-spacing:.16em}
+.bk-day .xp-copy h2{color:#17362b!important}
+.bk-day .xp-lead,.bk-day .xp-hint{color:#4d6157!important}
+.bk-day .xp-list{border-color:rgba(23,54,43,.15)!important}
+.bk-day .xp-list li{border-color:rgba(23,54,43,.12)!important;cursor:pointer}
+.bk-day .xp-list .xp-n{color:#9aa8a1!important}
+.bk-day .xp-list h3{color:#7d8c84!important;transition:color .3s}
+.bk-day .xp-list p{color:#4d6157!important}
+.bk-day .xp-list li.is-on h3,.bk-day .xp-list li:hover h3{color:#17362b!important}
+.bk-day .xp-list li.is-on .xp-n{color:#1f9e6c!important}
+.bk-day .xp-layer.is-on::after{box-shadow:0 0 0 2px rgba(31,158,108,.9),0 0 26px rgba(63,226,160,.55)!important}
+.bk-day .xp-layer img{filter:drop-shadow(0 calc(var(--spread) * 10px) calc(var(--spread) * 14px) rgba(23,54,43,.22))}
+.bk-day .xp-layer.is-on img{filter:drop-shadow(0 24px 30px rgba(23,54,43,.35))}
+.bk-day .xp-phone .dev-status{color:#16241d}
+.bk-day .xp{margin:60px 0 160px!important}

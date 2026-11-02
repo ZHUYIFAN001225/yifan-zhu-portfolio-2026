@@ -449,11 +449,16 @@ export function mountStage(root) {
     cam.lookAt(0, 0, 0);
     // once it has landed, the 3D phone fades and the live prototype takes over; it reappears for the story
     const gone = !m && (a.st.kind === 'dock' || (b.st.kind === 'dock' && e > .97));
-    fadeAmt += ((gone ? 0 : 1) - fadeAmt) * E(gone ? 9 : 6); cv.style.opacity = fadeAmt > .995 ? '' : fadeAmt.toFixed(3);
-    if (coverGone) { cv.style.opacity = '0'; bub.classList.remove('is-on'); }
+    // when it comes and goes it slides — in from the right edge, and back out to the right — rather than popping or fading
+    let hide = gone;
+    if (coverGone) { hide = true; bub.classList.remove('is-on'); }
     else if (!mcv && cover && window.__bkCoverMap) { const C = window.__bkCoverMap;
-      if (C.V === 'cards' && pr < C.DOCK + (C.keep ? -.02 : .05)) cv.style.opacity = '0';   // keep: back as soon as the opening is over
-      else if (C.V === 'mix' && pr < C.S * .6) cv.style.opacity = '0'; }
+      if (C.V === 'cards' && pr < C.DOCK + (C.keep ? -.02 : .05)) hide = true;   // keep: back as soon as the opening is over
+      else if (C.V === 'mix' && pr < C.S * .6) hide = true; }
+    fadeAmt += ((hide ? 0 : 1) - fadeAmt) * E(hide ? 4.5 : 3.2);
+    const sl = fadeAmt < .5 ? 4 * fadeAmt ** 3 : 1 - (-2 * fadeAmt + 2) ** 3 / 2, off = (1 - sl) * Math.min(vw * .62, 820);
+    cv.style.transform = sl > .999 ? '' : `translate3d(${off.toFixed(1)}px,0,0)`;
+    cv.style.opacity = fadeAmt < .004 ? '0' : '';
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
     cv.classList.toggle('is-front', (!mcv && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
     document.body.classList.toggle('bk-hero-handover', !m);

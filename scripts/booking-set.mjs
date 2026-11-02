@@ -17,7 +17,7 @@ const seg = (p, a, b) => sm((p - a) / (b - a));
 const seed = s => { let t = (s * 2654435761) >>> 0; return () => { t = (t + 0x6D2B79F5) >>> 0; let r = Math.imul(t ^ (t >>> 15), 1 | t); r ^= r + Math.imul(r ^ (r >>> 7), 61 | r); return ((r ^ (r >>> 14)) >>> 0) / 4294967296; }; };
 const HAND = '"Segoe Print","Bradley Hand","Comic Sans MS","Noto Sans CJK SC",cursive';
 export const CHARS = () => '';
-const MODELS = 'assets/v3/desk/models/';
+const MODELS = 'assets/v3/desk/baked/';   // the Blender bake: every surface carries its Cycles lighting (day + night) in its texture
 const PROPS = { notebook: .05, pencil: .9, pen: .9, eraser: .8, comb: .7, scissors: .4, clips: 1, binder: .7, mat: 0 }; // how far each thing gives way (× 1 cm)
 
 export function mountDesk(root) {
@@ -50,43 +50,52 @@ export function mountDesk(root) {
   // ---------- GL ----------
   const cv = $('.bk-dk-gl'); let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false, powerPreference: 'high-performance' }); } catch { ov.classList.add('no-gl'); return; }
-  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .85;
+  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.NoToneMapping;   // the scene renders linear into a target; AgX (as in Blender) is applied in the post pass
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
   const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0e0c0a);
   const envTex = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
   const cam = new THREE.PerspectiveCamera(42, 1, .05, 20);
   // ---- light, as in the Blender file: a warm sun from the upper left carrying a leafy, irregular pattern over the left half;
   //      the room from the front, low and cool; in the evening a desk lamp over the book and the phone
-  const cookie = (() => { const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d'), r = seed(5);
-    const img = x.createImageData(512, 512), d = img.data;
-    const grid = (cells) => { const g = Array.from({ length: cells + 1 }, () => Array.from({ length: cells + 1 }, () => r())); return (u, v) => { const X = Math.min(u * cells, cells - 1e-6), Y = Math.min(v * cells, cells - 1e-6), x0 = Math.floor(X), y0 = Math.floor(Y), fx = X - x0, fy = Y - y0, s = t => t * t * (3 - 2 * t); const a = g[y0][x0], b = g[y0][x0 + 1], cc = g[y0 + 1][x0], dd = g[y0 + 1][x0 + 1]; return lerp(lerp(a, b, s(fx)), lerp(cc, dd, s(fx)), s(fy)); }; };
-    const n1 = grid(13), n2 = grid(34), n3 = grid(4);
-    for (let y = 0; y < 512; y++) for (let X = 0; X < 512; X++) { const u = X / 511, v = y / 511;
-      const leaf = sm((n1(u, v) * .55 + n2(u, v) * .3 + n3(u, v) * .15 - .36) / .06);           // gaps between leaves
-      const side = sm((.74 - u + (v - .5) * .3) / .2);                                            // the right side is in shade
-      const pass = leaf * side; const i = (y * 512 + X) * 4; d[i] = d[i + 1] = d[i + 2] = Math.round(255 * (1 - pass)); d[i + 3] = 255; }
-    x.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; return t; })();
-  // the sun: parallel warm light from the upper left; a gobo hangs between it and the counter with the leaf pattern cut
-  // out of it (and the right-hand part solid), so the dapple and the shade are real shadows
-  const sun = new THREE.DirectionalLight(0xffcc8f, 0); sun.position.set(-1.45, 1.6, -1.15); sun.target.position.set(-.18, 0, .05);
-  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.00005; sun.shadow.normalBias = .0005; sun.shadow.radius = 7;
-  Object.assign(sun.shadow.camera, { left: -1.1, right: 1.1, top: 1.1, bottom: -1.1, near: .2, far: 5 }); scene.add(sun, sun.target);
-  const gobo = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ alphaMap: cookie, transparent: true, alphaTest: .5, colorWrite: false, depthWrite: false, side: THREE.DoubleSide }));
-  gobo.rotation.x = -Math.PI / 2; gobo.position.set(-.42, .34, .3); gobo.castShadow = true; gobo.receiveShadow = false; gobo.renderOrder = -10; scene.add(gobo);
+  // the counter itself is lit by the bake; these lights exist for the live phone (and its shadow on the mat)
+  const sun = new THREE.DirectionalLight(0xffcc8f, 0); sun.position.set(-1.5, 1.7, -1.2); sun.target.position.set(0, 0, 0);
+  sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); sun.shadow.bias = -.00005; sun.shadow.normalBias = .0005; sun.shadow.radius = 5;
+  Object.assign(sun.shadow.camera, { left: -.5, right: .5, top: .5, bottom: -.5, near: .5, far: 5 }); scene.add(sun, sun.target);
   const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .35, 1.6); room.castShadow = false; scene.add(room);
   const sky = new THREE.HemisphereLight(0xb9c4d8, 0x3a2a1c, 0); scene.add(sky);
-  const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.8); lamp.position.set(-.5, .62, -.3); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.0002; lamp.shadow.normalBias = .0005; scene.add(lamp);
+  const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.8); lamp.position.set(-.46, .58, -.3); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.0002; lamp.shadow.normalBias = .0005; scene.add(lamp);
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
 
   // ---------- the set, from Blender ----------
   const set = new THREE.Group(); scene.add(set); const props = {}; let ready = false;
-  const onMaterial = m => { if (/steel|chrome|ferrule/.test(m.name)) { m.envMapIntensity = .5; m.roughness = Math.max(m.roughness, .18); } if (/paper$/.test(m.name)) { m.roughness = 1; } if (m.name === 'wood') { m.roughness = .5; m.envMapIntensity = .25; } };
-  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => loadGLB(`${MODELS}${n}.glb`, { envMap: envTex, envMapIntensity: .35, onMaterial }).then(o => { props[n] = o; set.add(o); if (n === 'desk') o.traverse(m => { if (m.isMesh) m.castShadow = false; }); }).catch(e => console.warn('glb', n, e))))
-    .then(() => { ready = true; setupPage(); setupNudges(); });
+  // the bake: a day texture (in the glb) and a night texture (beside it) on the same UV set; the material shows a mix
+  const baked = []; let nightMix = 0;
+  const nightTex = n => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_night.jpg`, () => res(t)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; });
+  const GAIN = 3.0;   // the bake was made at 0.4× the Blender exposure so sunlit paper fits in 8 bits; put it back here
+  const MIX_FRAG = `vec4 sampledDiffuseColor = texture2D( map, vMapUv ); sampledDiffuseColor.rgb = mix(sampledDiffuseColor.rgb, texture2D( uNight, vMapUv ).rgb * 1.5, uMix) * ${GAIN.toFixed(2)} * uLit; diffuseColor *= sampledDiffuseColor;`;
+  function bakedMaterial(day, night, ch) {
+    day.channel = ch; night.channel = ch; day.anisotropy = 8;
+    const m = new THREE.MeshBasicMaterial({ map: day, side: THREE.DoubleSide });
+    m.onBeforeCompile = sh => { sh.uniforms.uNight = { value: night }; sh.uniforms.uMix = { value: 0 }; sh.uniforms.uLit = { value: 1 }; sh.fragmentShader = sh.fragmentShader.replace('uniform vec3 diffuse;', 'uniform vec3 diffuse; uniform sampler2D uNight; uniform float uMix, uLit;').replace('#include <map_fragment>', `#ifdef USE_MAP\n${MIX_FRAG}\n#endif`); baked.push(sh.uniforms); };
+    return m;
+  }
+  function pageMaterial(day, night, ch) {
+    day.channel = ch; night.channel = ch;
+    // the handwriting canvas on the page's own UVs, lit by the bake (day/night) on the second set
+    const m = new THREE.MeshBasicMaterial({ map: pageTex, lightMap: day, lightMapIntensity: 1 });
+    m.onBeforeCompile = sh => { sh.uniforms.uNight = { value: night }; sh.uniforms.uMix = { value: 0 }; sh.uniforms.uLit = { value: 1 }; sh.fragmentShader = sh.fragmentShader.replace('uniform vec3 diffuse;', 'uniform vec3 diffuse; uniform sampler2D uNight; uniform float uMix, uLit;').replace('#include <lightmap_fragment>', `reflectedLight.indirectDiffuse += mix(texture2D( lightMap, vLightMapUv ).rgb, texture2D( uNight, vLightMapUv ).rgb * 1.5, uMix) * ${GAIN.toFixed(2)} * uLit;`); baked.push(sh.uniforms); };
+    return m;
+  }
+  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`), nightTex(n)]).then(([o, night]) => {
+    props[n] = o; set.add(o); let day = null, ch = 1; o.traverse(m => { if (m.isMesh && m.material.map && !day) { day = m.material.map; ch = ['uv', 'uv1', 'uv2', 'uv3'].filter(k => m.geometry.attributes[k]).length - 1; } });   // the bake is the last UV set
+    const mat = bakedMaterial(day, night, ch), pg = n === 'notebook' ? o.getObjectByName('nb_page_r') : null, pageMat = pg ? pageMaterial(day, night, ch) : null;
+    o.traverse(m => { if (!m.isMesh) return; m.castShadow = false; m.receiveShadow = false; m.material = (pg && (m === pg || pg.children.includes(m))) ? pageMat : mat; });
+  }).catch(e => console.warn('glb', n, e)))).then(() => { ready = true; setupNudges(); drawInk(0, true); });
+  // the live phone's shadow lands on the mat through this catcher (the bake has no phone in it)
+  const catcher = new THREE.Mesh(new THREE.PlaneGeometry(.7, .55), new THREE.ShadowMaterial({ opacity: .55 })); catcher.rotation.x = -Math.PI / 2; catcher.rotation.z = THREE.MathUtils.degToRad(5); catcher.position.set(.09, .0036, .05); catcher.receiveShadow = true; scene.add(catcher);
   // the right page carries the handwriting: lines + ink drawn here, mapped onto the page from the model
   const pageCv = document.createElement('canvas'); pageCv.width = 1240; pageCv.height = 900; const px = pageCv.getContext('2d');
   const pageTex = new THREE.CanvasTexture(pageCv); pageTex.colorSpace = THREE.SRGBColorSpace; pageTex.flipY = false; pageTex.anisotropy = 8;
-  function setupPage() { const pg = props.notebook?.getObjectByName('nb_page_r'); pg?.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.map = pageTex; o.material.needsUpdate = true; } }); drawInk(0, true); }
   const EV = [
     [0, .22, ['TOMORROW ↓', '明天 ↓'], '#15171c'], [1, .22, ['9:30 Emma? ring back', '9:30 Emma? 回电'], '#15171c'], [3, .22, ['11:00 He (moved)', '11:00 何先生（挪过来）'], '#15171c'],
     ['strike', 3, .2, .72], ['fix', 3.55, .3, ['→ 11:30, he rang', '→ 11:30，他来电话了'], '#b3261e'], [6, .5, ['Zhou → 12:30?', '周先生 → 12:30?'], '#15171c'],
@@ -95,7 +104,7 @@ export function mountDesk(root) {
   let inkNow = -1;
   function drawInk(k, force) {
     k = Math.round(clamp(k) * 24) / 24; if (k === inkNow && !force) return; inkNow = k;
-    const w = 900, h = 1240, r = seed(5); px.setTransform(1, 0, 0, 1, 0, 0); px.fillStyle = '#efe9da'; px.fillRect(0, 0, pageCv.width, pageCv.height);
+    const w = 900, h = 1240, r = seed(5); px.setTransform(1, 0, 0, 1, 0, 0); px.fillStyle = '#fbf7ee'; px.fillRect(0, 0, pageCv.width, pageCv.height);
     px.fillStyle = '#17362b'; px.font = `700 ${Math.round(h * .03)}px "Inter Tight", Inter, system-ui, sans-serif`; px.fillText(zh() ? '周五 6 日' : 'FRIDAY 6', w * .09, h * .085);
     const rowY = row => h * (.13 + row * .048);
     for (let i = 0; i < 17; i++) { px.strokeStyle = 'rgba(23,54,43,.35)'; px.lineWidth = 2; px.beginPath(); px.moveTo(w * .08, rowY(i)); px.lineTo(w * .92, rowY(i)); px.stroke(); px.fillStyle = 'rgba(23,54,43,.55)'; px.font = `500 ${Math.round(h * .017)}px Inter, system-ui, sans-serif`; px.fillText(['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00'][i], w * .09, rowY(i) - h * .008); }
@@ -160,9 +169,11 @@ export function mountDesk(root) {
   // ---------- camera, pointer, nudges ----------
   let vw = 0, vh = 0, rt = null;
   const dpr = () => Math.min(devicePixelRatio || 1, 1.75);
-  const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
+  const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
-    fragmentShader: `precision highp float; varying vec2 vUv; uniform sampler2D tCol, tDep; uniform vec2 uRes; uniform float uNear, uFar, uFocus, uRange, uMax, uVig, uFringe;
+    fragmentShader: `precision highp float;
+      #include <tonemapping_pars_fragment>
+      varying vec2 vUv; uniform sampler2D tCol, tDep; uniform vec2 uRes; uniform float uNear, uFar, uFocus, uRange, uMax, uVig, uFringe;
       float dist(vec2 uv){ float z = texture2D(tDep, uv).r * 2.0 - 1.0; return (2.0 * uNear * uFar) / (uFar + uNear - z * (uFar - uNear)); }
       float coc(vec2 uv){ return clamp(abs(dist(uv) - uFocus) / uRange, 0.0, 1.0) * uMax; }
       void main(){
@@ -175,11 +186,14 @@ export function mountDesk(root) {
         vec2 q = (vUv - .5) * vec2(uRes.x / uRes.y, 1.0); float rr = length(q);
         if (uFringe > 0.0) { vec2 d = (vUv - .5) * uFringe * rr; col.r = mix(col.r, texture2D(tCol, vUv + d).r, .6); col.b = mix(col.b, texture2D(tCol, vUv - d).b, .6); }
         col *= 1.0 - uVig * smoothstep(.45, 1.25, rr);
+        col = AgXToneMapping(col);
         col = pow(max(col, 0.0), vec3(1.0 / 2.2));
+        float lum = dot(col, vec3(.2126, .7152, .0722)); col = mix(vec3(lum), col, 1.12);
+        col = clamp((col - .5) * 1.2 + .5 - .015, 0.0, 1.0);
         gl_FragColor = vec4(col, 1.0); }` });
   post.toneMapped = false;
   const postScene = new THREE.Scene(); postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post)); const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  const resize = () => { vw = op.clientWidth; vh = op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix();
+  const resize = () => { vw = op.clientWidth; vh = op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, 1.15, 2.2))); cam.updateProjectionMatrix();
     rt?.dispose(); const W = Math.round(vw * d), H = Math.round(vh * d); const dt = new THREE.DepthTexture(W, H, THREE.UnsignedIntType);
     rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, depthTexture: dt, depthBuffer: true, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
     post.uniforms.tCol.value = rt.texture; post.uniforms.tDep.value = dt; post.uniforms.uRes.value.set(W, H); };
@@ -188,7 +202,7 @@ export function mountDesk(root) {
   addEventListener('pointermove', e => { if (!fine) return; const r = op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up
   const V = {
-    hero: { pos: new THREE.Vector3(-.02, .86, .47), look: new THREE.Vector3(.0, 0, -.03), roll: -4 },
+    hero: { pos: new THREE.Vector3(-.02, .86, .46), look: new THREE.Vector3(.009, 0, .042), roll: 0 },
     dark: { pos: new THREE.Vector3(0, .9, .001), look: new THREE.Vector3(0, 0, 0), roll: 0 },
     book: { pos: new THREE.Vector3(-.2, .4, .27), look: new THREE.Vector3(-.15, 0, .035), roll: -6 },
     phone: { pos: new THREE.Vector3(.1, .36, .2), look: new THREE.Vector3(.13, 0, .02), roll: 3 }
@@ -225,8 +239,9 @@ export function mountDesk(root) {
     camPos.x += P.x * .03 * (1 - up); camPos.z += P.y * .02 * (1 - up);
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
-    sun.intensity = 2.9 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .8);
-    lamp.intensity = .7 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
+    sun.intensity = 2.2 * dayAmt; room.intensity = .45 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .2 * (1 - blackout) * (1 - nightAmt * .8);
+    lamp.intensity = .5 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
+    nightMix = nightAmt; baked.forEach(u => { u.uMix.value = nightMix; u.uLit.value = 1 - blackout; }); catcher.visible = onDesk > .5; catcher.material.opacity = .55 * dayAmt + .4 * nightAmt;
     set.visible = blackout < .995;
     nudge(dt, onDesk);
     // ---- the phone ----
@@ -245,7 +260,7 @@ export function mountDesk(root) {
     // ---- focus ----
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(.5, .12, up) - (kBook * kBack) * .22; fu.uMax.value = (6 + 10 * up + 6 * kBook * kBack) * dpr();
-    fu.uVig.value = .35 + .45 * nightAmt - .3 * kOut; fu.uFringe.value = 0;
+    fu.uVig.value = .25 + .4 * nightAmt - .25 * kOut; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut);

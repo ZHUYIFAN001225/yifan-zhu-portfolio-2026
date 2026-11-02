@@ -53,7 +53,7 @@ export async function loadGLB(url, { envMap = null, envMapIntensity = 1, onMater
     const group = new THREE.Group();
     for (const prim of g.meshes[mi].primitives) {
       const geo = new THREE.BufferGeometry();
-      for (const [k, v] of Object.entries(prim.attributes)) { const name = { POSITION: 'position', NORMAL: 'normal', TEXCOORD_0: 'uv', COLOR_0: 'color' }[k]; if (name) geo.setAttribute(name, accessor(v)); }
+      for (const [k, v] of Object.entries(prim.attributes)) { const name = { POSITION: 'position', NORMAL: 'normal', TEXCOORD_0: 'uv', TEXCOORD_1: 'uv1', TEXCOORD_2: 'uv2', TEXCOORD_3: 'uv3', COLOR_0: 'color' }[k]; if (name) geo.setAttribute(name, accessor(v)); }
       if (prim.indices != null) geo.setIndex(accessor(prim.indices));
       if (!geo.attributes.normal) geo.computeVertexNormals();
       const o = new THREE.Mesh(geo, await material(prim.material)); o.castShadow = true; o.receiveShadow = true; group.add(o);

@@ -253,7 +253,7 @@ export function mountStage(root) {
         const rest = P6([.78, .52, .64, .04, -.12, 0]), lab = ['Owner · the diary keeps itself', '店主 · 预约本自己记'];
         push(top - vh * .35, { kind: 'off', q: P6([.8, 1.7, .6, -.5, -.7, .14]), f });
         push(top + h * .18, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
-        push(top + h * .62, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });
+        push(top + h * .8, { kind: 'section', q: rest, f, spot: null, label: lab, who: 'o', still: true });   // holds while the diary and the arrow are read
         return;
       }
       if (!phoneOn && !m) return;

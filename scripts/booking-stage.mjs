@@ -236,7 +236,7 @@ export function mountStage(root) {
         cap.innerHTML = `<p class="bk-cap-tag"><span></span><b></b></p>${WORDS.map((w, i) => `<p class="bk-cap-w" style="--i:${i}">${L(w)}</p>`).join('')}<p class="bk-cap-end">${zh() ? '两边，<br>同一本预约本。' : 'Two sides.<br>One diary.'}</p>`;
         cap._side = SIDE; cap._n = WORDS.length; };
       fillCap(); if (!cap._lang) { cap._lang = true; document.addEventListener('portfolio:language', () => setTimeout(fillCap, 30)); }
-      cover = { start, end, step: (end - start) / shots.length, shots, cap, est: P6([x0, y0, s0, -.05, -.32, 0]), est2: P6([.5, .5, s0 * .95, .1, -.4, 0]), exit: P6([.5, -.95, s0 * .7, .5, TW + .5, 0]) };
+      cover = holder === op ? null : { holder, opH, start, end, step: (end - start) / shots.length, shots, cap, est: P6([x0, y0, s0, -.05, -.32, 0]), est2: P6([.5, .5, s0 * .95, .1, -.4, 0]), exit: P6([.5, -.95, s0 * .7, .5, TW + .5, 0]) };
       push(end + vh * .05, { kind: 'off', q: P6([.5, -.9, s0 * .7, .4, .3, 0]), f: 'cover-today' });
     } else push(0, { kind: 'off', q: off(1), f });
     const els = [...root.querySelectorAll('.bk-moment, .v3-product-section.ux-section, .bk-step, .xp, .bk-hand, .bk-dom, .bk-story-board, .bk-chair, .bk-results, .bk-end')];
@@ -351,7 +351,7 @@ export function mountStage(root) {
     else if (y > keys[0].at) for (let i = 0; i < keys.length - 1; i++) if (y < keys[i + 1].at) { a = keys[i]; b = keys[i + 1]; t = (y - a.at) / Math.max(1, b.at - a.at); break; }
     // nothing to draw while the phone is parked off screen: render one last frame, then sleep (keeps scrolling and
     // the pointer smooth on long text stretches)
-    if (a.st.kind === 'off' && b.st.kind === 'off' && !peek && !(cover && sy + vh * .5 < cover.end + vh * 1.2)) { if (idleDrawn) return; idleDrawn = true; } else idleDrawn = false;
+    if (a.st.kind === 'off' && b.st.kind === 'off' && !peek && !(cover && cover.holder.getBoundingClientRect().bottom > 0)) { if (idleDrawn) return; idleDrawn = true; } else idleDrawn = false;
     const moving = a.st !== b.st, e = moving ? glide(t) : 0, st = e < .5 ? a.st : b.st, same = moving && a.st.q.x === b.st.q.x && a.st.q.y === b.st.q.y && a.st.q.ry === b.st.q.ry && a.st.q.s === b.st.q.s, hold = same ? Math.abs(e - .5) > .1 : (e < .05 || e > .95);
     const time = (now - t0) / 1000, m = isMobile();
     if (peek && (Math.abs(scrollY - peek.sy) > 160 || now - peek.t > 6000)) peek = null;
@@ -362,15 +362,19 @@ export function mountStage(root) {
     // the cover's continuous camera: scroll is the camera's timeline. Each shot dwells (so its message can be read),
     // then the camera glides to the next one; the pose is also damped, so every move is smooth.
     let cov = null;
-    if (!m && cover && y > vh * .5 && y < cover.end + vh * .9) {
+    // where the reader really is in the pinned cover, measured live: 0 = cover reaches the top, 1 = cover unpins
+    const pr = cover ? (() => { const r = cover.holder.getBoundingClientRect(); return -r.top / Math.max(1, r.height - cover.opH); })() : -1;
+    const coverGone = !m && cover && pr > .9;
+    if (!m && cover && pr > -.02 && pr <= .9) {
       const ss = cover.shots, N = ss.length, sm5 = t => t * t * t * (t * (t * 6 - 15) + 10);
       const P = i => i < 0 ? cover.est2 : i >= N ? cover.exit : ss[i].q;
       // a camera on a curved track: Catmull-Rom through the shots, so speed never drops to zero mid-move
       const cr = (p0, p1, p2, p3, t) => { const o = {}; for (const k in p1) { const a0 = p0[k], a1 = p1[k], a2 = p2[k], a3 = p3[k]; o[k] = .5 * ((2 * a1) + (-a0 + a2) * t + (2 * a0 - 5 * a1 + 4 * a2 - a3) * t * t + (-a0 + 3 * a1 - 3 * a2 + a3) * t * t * t); } return o; };
       let u, tq, tf, tspot = null, tbub = null, near = -1;
-      if (y < cover.start) { u = -1 + clamp((y - vh * .5) / (cover.start - vh * .5)); }
-      else if (y < cover.end) { u = (y - cover.start) / cover.step; }
-      else u = N - 1 + 1.4 * clamp((y - cover.end) / (vh * .7)) ; // last shot → exit
+      // 0–.06 settle in · .06–.74 six shots · .74–.88 exit (gone well before the page below arrives)
+      if (pr < .06) u = -1 + clamp(pr / .06);
+      else if (pr < .74) u = (pr - .06) / .68 * N;
+      else u = N - 1 + 1.4 * clamp((pr - .74) / .14);
       const i = Math.floor(u), fr = u - i;
       // each shot holds for a beat (30%), then the move eases out and in (smootherstep)
       const v = fr < .3 ? 0 : sm5((fr - .3) / .7);
@@ -384,6 +388,7 @@ export function mountStage(root) {
       for (const k in tq) { camV[k] += ((tq[k] - camQ[k]) * W * W - 2 * W * camV[k]) * d; camQ[k] += camV[k] * d; }
       cov = { q: { ...camQ }, f: tf, spot: tspot, bub: tbub };
       // the type behind the phone: each shot's word slides through, against the camera's direction
+      document.querySelector('[data-opening]')?.style.setProperty('--sp', clamp(pr / .05).toFixed(3));
       const c = cover.cap; c.style.setProperty('--u', u.toFixed(4)); c.style.setProperty('--end', clamp((u - (N - 1)) / .9).toFixed(3));
       const side = c._side(Math.max(0, Math.min(N - 1, Math.round(u))));
       const tag = c.querySelector('.bk-cap-tag'); if (tag) { tag.querySelector('span').textContent = side[zh() ? 1 : 0]; tag.querySelector('b').textContent = `${String(Math.max(1, Math.min(N, Math.round(u) + 1))).padStart(2, '0')} / ${String(N).padStart(2, '0')}`; tag.style.opacity = u > -.4 && u < N - .6 ? 1 : 0; }
@@ -435,6 +440,7 @@ export function mountStage(root) {
     // once it has landed, the 3D phone fades and the live prototype takes over; it reappears for the story
     const gone = !m && (a.st.kind === 'dock' || (b.st.kind === 'dock' && e > .97));
     fadeAmt += ((gone ? 0 : 1) - fadeAmt) * E(gone ? 9 : 6); cv.style.opacity = fadeAmt > .995 ? '' : fadeAmt.toFixed(3);
+    if (coverGone) { cv.style.opacity = '0'; bub.classList.remove('is-on'); }
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
     cv.classList.toggle('is-front', (!m && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
     document.body.classList.toggle('bk-hero-handover', !m);
@@ -450,7 +456,7 @@ export function mountStage(root) {
     } else tag.classList.remove('is-on');
     // the message beside the lit part (cover only)
     const bbSrc = cov ? cov.bub : (st.bub && (pair || (hold && e2b(a, b))) ? st.bub : null);
-    if (!m && bbSrc) {
+    if (!m && bbSrc && !coverGone) {
       const bb = bbSrc, yy = slot(bb.spot)[1], xx = (bb.side === 'r' ? 1 : -1) * SW / 2;
       tmpV.set(xx, yy, .06); phone.localToWorld(tmpV); tmpV.project(cam);
       const px = (tmpV.x + 1) / 2 * vw, py = (1 - tmpV.y) / 2 * vh;

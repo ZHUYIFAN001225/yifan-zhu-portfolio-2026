@@ -21,7 +21,10 @@ scene.cycles.samples = 160; scene.cycles.use_denoising = True
 scene.render.resolution_x = 2592; scene.render.resolution_y = 1536; scene.render.resolution_percentage = 100
 scene.render.film_transparent = False
 scene.view_settings.view_transform = 'AgX' if 'AgX' in [i.identifier for i in bpy.types.ColorManagedViewSettings.bl_rna.properties['view_transform'].enum_items] else 'Filmic'
-scene.view_settings.look = 'None'; scene.view_settings.exposure = -0.9
+scene.view_settings.exposure = -1.0
+for lk in ('AgX - Medium High Contrast', 'Medium High Contrast', 'High Contrast'):
+    try: scene.view_settings.look = lk; break
+    except Exception: continue
 try:
     prefs = bpy.context.preferences.addons['cycles'].preferences
     for dt in ('OPTIX', 'CUDA'):
@@ -152,7 +155,7 @@ def wood_texture(w=2048, h=2048):
     return np.clip(col, 0, 1), np.clip(bump, 0, 1)
 
 def mat_texture(w=2400, h=1800):
-    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.075, 0.26, 0.19]); col[..., 3] = 1
+    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.10, 0.31, 0.23]); col[..., 3] = 1
     rng = np.random.default_rng(5); col[..., :3] += rng.normal(0, .012, (h, w, 1))
     m = 110; cell = 70
     for X in range(m, w - m + 1, cell): col[m:h - m, X - 1:X + 1, :3] = col[m:h - m, X - 1:X + 1, :3] * .62 + np.array([.72, .86, .78]) * .38
@@ -169,7 +172,7 @@ def mat_texture(w=2400, h=1800):
     return np.clip(col, 0, 1)
 
 def page_texture(w=1024, h=1400):
-    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.95, 0.92, 0.84]); col[..., 3] = 1
+    col = np.zeros((h, w, 4), np.float32); col[..., :3] = np.array([0.90, 0.86, 0.76]); col[..., 3] = 1
     rng = np.random.default_rng(9); col[..., :3] += rng.normal(0, .006, (h, w, 1))
     for i in range(17):
         y = 190 + i * 68; col[y - 1:y + 2, 80:w - 80, :3] = np.array([.42, .52, .56])
@@ -182,13 +185,13 @@ IMG_MAT = image_from_array('cutting_mat', mat_texture()); IMG_PAGE = image_from_
 
 # ---------------------------------------------------------------- materials
 M = dict(
-    wood=material('wood', image=IMG_WOOD, bump=IMG_WOODB, bump_strength=.12, rough=.38, coat=.2, coat_rough=.25),
+    wood=material('wood', image=IMG_WOOD, bump=IMG_WOODB, bump_strength=.2, rough=.52, coat=.04, coat_rough=.4),
     mat=material('cutting_mat', image=IMG_MAT, rough=.9),
-    cover=material('cover_cloth', (.07, .17, .12, 1), rough=.75),
+    cover=material('cover_cloth', (.05, .13, .09, 1), rough=.8),
     paper=material('paper', image=IMG_PAGE, rough=.95),
-    paper_edge=material('paper_edge', (.93, .89, .80, 1), rough=.95),
+    paper_edge=material('paper_edge', (.86, .81, .70, 1), rough=.95),
     ribbon=material('ribbon', (.75, .10, .08, 1), rough=.7),
-    yellow=material('pencil_yellow', (.95, .62, .08, 1), rough=.45, coat=.4, coat_rough=.15),
+    yellow=material('pencil_yellow', (.92, .55, .06, 1), rough=.4, coat=.5, coat_rough=.12),
     woodtip=material('pencil_wood', (.80, .66, .46, 1), rough=.8),
     graphite=material('graphite', (.08, .08, .09, 1), rough=.35, metal=.3),
     ferrule=material('ferrule', (.80, .82, .85, 1), rough=.3, metal=1),
@@ -208,7 +211,7 @@ exportables = {}
 # desk
 bpy.ops.mesh.primitive_plane_add(size=1.7, location=(0, 0, 0)); desk = bpy.context.object; desk.name = 'desk'; desk.data.materials.append(M['wood'])
 # cutting mat 60×45 cm
-bpy.ops.mesh.primitive_plane_add(size=1, location=(.05, -.04, .003), rotation=(0, 0, math.radians(2))); mat_o = bpy.context.object; mat_o.name = 'mat'; mat_o.scale = (.52, .37, 1); bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+bpy.ops.mesh.primitive_plane_add(size=1, location=(.09, -.05, .003), rotation=(0, 0, math.radians(3))); mat_o = bpy.context.object; mat_o.name = 'mat'; mat_o.scale = (.60, .42, 1); bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 sol = mat_o.modifiers.new('solid', 'SOLIDIFY'); sol.thickness = .003; sol.offset = -1; bv = mat_o.modifiers.new('bevel', 'BEVEL'); bv.width = .002; bv.segments = 3
 mat_o.data.materials.append(M['mat']); smooth(mat_o, 40)
 exportables['mat'] = [mat_o]
@@ -241,7 +244,7 @@ def pencil():
     fer = cylinder('pc_ferrule', .0039, .011, loc=(-.087, 0, 0), rot=(0, math.radians(90), 0), verts=32, mat=M['ferrule']); objs.append(fer)
     er = cylinder('pc_eraser', .0037, .009, loc=(-.097, 0, 0), rot=(0, math.radians(90), 0), verts=32, mat=M['eraser_pink']); objs.append(er)
     for o in objs: o.location.z += .0038
-    return group('pencil', objs, loc=(-.03, .16, 0), rot_z=math.radians(-12)), objs
+    return group('pencil', objs, loc=(.0, .17, 0), rot_z=math.radians(-9)), objs
 pc, pc_objs = pencil(); exportables['pencil'] = pc_objs
 
 def pen():
@@ -252,7 +255,7 @@ def pen():
     cap = cylinder('pen_cap', .0044, .004, loc=(-.062, 0, 0), rot=(0, math.radians(90), 0), verts=40, mat=M['chrome']); objs.append(cap)
     clip = box('pen_clip', (.045, .004, .0015), loc=(-.040, 0, .0052), bevel=.0005, mat=M['chrome']); objs.append(clip)
     for o in objs: o.location.z += .0044
-    return group('pen', objs, loc=(-.28, .20, 0), rot_z=math.radians(-20)), objs
+    return group('pen', objs, loc=(-.19, .225, 0), rot_z=math.radians(-11)), objs
 pn, pn_objs = pen(); exportables['pen'] = pn_objs
 
 def eraser():
@@ -268,7 +271,7 @@ def comb():
     tooth = box('comb_tooth', (.0018, .022, .0035), loc=(-.088, -.006, .00175), bevel=.0004, mat=M['black'])
     arr = tooth.modifiers.new('array', 'ARRAY'); arr.count = 46; arr.use_relative_offset = False; arr.use_constant_offset = True; arr.constant_offset_displace = (.0039, 0, 0)
     objs.append(tooth)
-    return group('comb', objs, loc=(-.06, -.24, 0), rot_z=math.radians(3)), objs
+    return group('comb', objs, loc=(-.10, -.25, 0), rot_z=math.radians(2)), objs
 cb, cb_objs = comb(); exportables['comb'] = cb_objs
 
 def scissors():
@@ -292,7 +295,7 @@ def scissors():
     ringB = torus('sc_ring_b', .0100, .0024, loc=(-.071, -.043, .0055), mat=M['steel']); objs.append(ringB)
     tang = curve_tube('sc_tang', [(-.081, -.047, .0055), (-.093, -.054, .0055), (-.104, -.052, .0055), (-.108, -.044, .0055)], .0018, mat=M['steel']); objs.append(tang)
     bump = cylinder('sc_bumper', .0016, .004, loc=(-.052, -.021, .0055), rot=(math.radians(90), 0, 0), verts=12, mat=M['black']); objs.append(bump)
-    return group('scissors', objs, loc=(.24, -.15, 0), rot_z=math.radians(140)), objs
+    g_ = group('scissors', objs, loc=(.33, -.11, 0), rot_z=math.radians(142)); g_.scale = (1.25, 1.25, 1.25); return g_, objs
 sc, sc_objs = scissors(); exportables['scissors'] = sc_objs
 
 def paperclip(name, loc, rz):
@@ -332,9 +335,9 @@ for st in ('NISHITA', 'MULTIPLE_SCATTERING', 'SINGLE_SCATTERING'):
 for k, v in (('sun_elevation', math.radians(22)), ('sun_rotation', math.radians(300)), ('sun_intensity', .25), ('altitude', 0), ('sun_disc', False)):
     try: setattr(sky, k, v)
     except Exception: pass
-bg.inputs['Color'].default_value = (.78, .70, .60, 1); bg.inputs['Strength'].default_value = .18
-sun = bpy.data.lights.new('sun', 'SUN'); sun.energy = 22.0; sun.angle = math.radians(1.8); sun.color = (1.0, .84, .62)
-sun_o = bpy.data.objects.new('sun', sun); bpy.context.collection.objects.link(sun_o); sun_o.rotation_euler = Euler((math.radians(52), 0, math.radians(-125)))
+bg.inputs['Color'].default_value = (.70, .62, .55, 1); bg.inputs['Strength'].default_value = .16
+sun = bpy.data.lights.new('sun', 'SUN'); sun.energy = 22.0; sun.angle = math.radians(4.0); sun.color = (1.0, .80, .56)
+sun_o = bpy.data.objects.new('sun', sun); bpy.context.collection.objects.link(sun_o); sun_o.rotation_euler = Euler((math.radians(48), 0, math.radians(-140)))
 fill = bpy.data.lights.new('fill', 'AREA'); fill.energy = 40; fill.size = 2.5; fill.color = (.86, .90, 1.0)
 fill_o = bpy.data.objects.new('fill', fill); bpy.context.collection.objects.link(fill_o); fill_o.location = (-.8, .9, 1.6); fill_o.rotation_euler = Euler((math.radians(30), 0, math.radians(-40)))
 # a venetian blind between the sun and the desk: a transparent plane with opaque bands, so the sun arrives in stripes
@@ -351,14 +354,14 @@ bn.links.new(ramp.outputs['Color'], mixs.inputs['Fac']); bn.links.new(tr.outputs
 # (blind plane off: the slats below do the job more predictably)
 # (the old slats are kept off)
 slat_mat = material('slat', (.1, .1, .1, 1))
-for i in range(30):
-    s = box(f'slat_{i}', (.10, 4.0, .01), loc=(-3.2 + i * .19, 0, 1.1), rot=(0, 0, math.radians(-30)), mat=slat_mat)
-    s.visible_camera = False; s.visible_glossy = False; s.visible_diffuse = False
-    try: s.cycles.is_shadow_catcher = False
-    except Exception: pass
+slats = []
+for i in range(16):
+    s_ = box(f'slat_{i}', (.15, 6.0, .01), loc=(-3.2 + i * .44, 0, 0), mat=slat_mat)
+    s_.visible_camera = False; s_.visible_glossy = False; s_.visible_diffuse = False; slats.append(s_)
+group('blind', slats, loc=(-.9, 1.05, 1.25), rot_z=math.radians(-62))   # the array is set where its shadow lands on the counter
 
 # ---------------------------------------------------------------- camera: above, a touch forward, like the reference
-cam = bpy.data.cameras.new('cam'); cam.lens = 40; cam.sensor_width = 36
+cam = bpy.data.cameras.new('cam'); cam.lens = 36; cam.sensor_width = 36
 cam.dof.use_dof = True; cam.dof.focus_distance = 1.02; cam.dof.aperture_fstop = 4.0
 cam_o = bpy.data.objects.new('cam', cam); bpy.context.collection.objects.link(cam_o)
 cam_o.location = (-.03, -.24, 1.0); cam_o.rotation_euler = Euler((math.radians(13), 0, math.radians(-5)))

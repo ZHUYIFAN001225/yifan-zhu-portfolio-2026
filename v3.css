@@ -4055,3 +4055,7 @@ html[data-body=a] .bk-rim>.h{padding:2.5px;background:radial-gradient(circle 170
 html[data-body=a] .bk-rim>s{inset:-5px;filter:blur(12px)}
 html[data-body=a] .bk-rim>s>b{padding:9px;background:radial-gradient(circle 180px at calc(var(--mx,50%) + 5px) calc(var(--my,50%) + 5px),rgba(var(--glass-glow),.95),rgba(var(--glass-glow),.3) 50%,rgba(var(--glass-glow),0) 80%)}
 html[data-body=a] .is-lit>.bk-rim>s>b{opacity:1}
+/* hover edge light: warm white (lamp-lit glass), no green */
+html[data-body=a]{--glass-glow:255,238,218}
+html[data-body=a] .bk-rim>.h{background:radial-gradient(circle 170px at var(--mx,50%) var(--my,50%),rgba(255,255,255,1),rgba(255,244,230,.9) 22%,rgba(255,238,218,.3) 55%,rgba(255,238,218,0) 80%)}
+html[data-body=a] .bk-rim>s>b{background:radial-gradient(circle 180px at calc(var(--mx,50%) + 5px) calc(var(--my,50%) + 5px),rgba(255,226,190,.75),rgba(255,214,170,.22) 50%,rgba(255,214,170,0) 80%)}

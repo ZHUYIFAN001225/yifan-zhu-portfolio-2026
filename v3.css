@@ -3969,3 +3969,6 @@ html[data-body=a] .bk-day .ux-pains>div.bk-sticky::before{display:none}
 html[data-body=a] .bk-day .ux-pains>div.bk-sticky p{color:rgba(239,230,214,.78)!important;border-top-color:rgba(255,255,255,.14)!important}
 html[data-body=a] .bk-minute-viz i{border-radius:6px!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.35)!important}
 html[data-body=a] .bk-minute-viz i:first-child{border-left:3px solid #ff8f78!important}
+html[data-body=a] .bk-day .bk-dom-card{background:var(--glass-fill),rgba(18,14,11,.42)!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:26px!important;-webkit-backdrop-filter:blur(30px) saturate(1.2);backdrop-filter:blur(30px) saturate(1.2);box-shadow:var(--glass-edge)!important}
+html[data-body=a] .bk-day .bk-dom-card :is(p,span,b,em,small,time){color:rgba(239,230,214,.8)!important}
+html[data-body=a] .bk-day .bk-dom-card :is(.bk-dom-track,.bk-dom-hours){border-color:rgba(255,255,255,.1)!important}

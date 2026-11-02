@@ -3792,3 +3792,5 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 1400vh)}
 .bk-dk-grain{opacity:calc(.12 * (1 - var(--kOut)))}
 .bk-dk-glow{opacity:calc(max(var(--kPw),var(--kC)) * (1 - var(--kOut)) * .9)}
 .bk-dk-hero{opacity:calc(1 - var(--kText))}
+.bk-dk::after{opacity:calc((.5 + var(--kDark) * .5) * (1 - var(--kOut)))}
+.bk-dk-top{height:18vh;opacity:calc((1 - var(--kText)) * .8)}

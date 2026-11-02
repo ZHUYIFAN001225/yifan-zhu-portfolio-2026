@@ -130,7 +130,7 @@ export function mountDesk(root) {
   const rim = new THREE.SpotLight(0xffc98a, 0, 30, .6, .8, 1.2); rim.position.set(-4, 9, -5); scene.add(rim); rim.target.position.set(0, 6, 0); scene.add(rim.target);
   const night = new THREE.HemisphereLight(0x4a56c8, 0x1a0f26, 0); scene.add(night);
   // the desk lamp, top-left, for the evening: a warm pool over the book and the phone, the rest of the room blue-dark
-  const lamp = new THREE.SpotLight(0xffc27a, 0, 26, .62, .75, 1.3); lamp.position.set(-6.5, 7.5, -4); lamp.castShadow = true; lamp.shadow.mapSize.set(2048, 2048); lamp.shadow.bias = -.0006; lamp.shadow.normalBias = .02; lamp.shadow.radius = 5; scene.add(lamp); lamp.target.position.set(-.5, 0, .4); scene.add(lamp.target);
+  const lamp = new THREE.SpotLight(0xffc27a, 0, 26, .5, .7, 1.3); lamp.position.set(-6.5, 7.5, -4); lamp.castShadow = true; lamp.shadow.mapSize.set(2048, 2048); lamp.shadow.bias = -.0006; lamp.shadow.normalBias = .02; lamp.shadow.radius = 5; scene.add(lamp); lamp.target.position.set(-.5, 0, .4); scene.add(lamp.target);
   const eveSky = new THREE.HemisphereLight(0x2a3a7a, 0x120c0a, 0); scene.add(eveSky);
   const glow = new THREE.PointLight(0xffb36b, 0, 9, 1.6); glow.castShadow = true; glow.shadow.mapSize.set(1024, 1024); glow.shadow.bias = -.002; scene.add(glow);
 
@@ -146,7 +146,7 @@ export function mountDesk(root) {
   const wood = new THREE.CanvasTexture(woodCanvas); wood.colorSpace = THREE.SRGBColorSpace; wood.anisotropy = 16; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(1.6, 1.6);
   const woodBump = new THREE.CanvasTexture(woodCanvas); woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping; woodBump.repeat.set(1.6, 1.6); woodBump.anisotropy = 16;
   // the self-healing cutting mat: deep green, fine 10 mm grid, bold 50 mm grid, rulers along the edges
-  const MATW = 16.4, MATH = 11.0, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
+  const MATW = 14.2, MATH = 9.6, matCanvas = (() => { const W = 3280, H = 2200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), r = seed(3);
     x.fillStyle = '#226b53'; x.fillRect(0, 0, W, H);
     for (let i = 0; i < 60000; i++) { x.fillStyle = `rgba(${r() > .5 ? '255,255,255' : '0,20,10'},${r() * .06})`; x.fillRect(r() * W, r() * H, 1.5, 1.5); }
     const m = 150, g = 20 /* px per mm → 10 mm = 200 px? no: 1 unit = 100 px, 10 mm grid = 100 px */, cell = 100;
@@ -357,7 +357,7 @@ export function mountDesk(root) {
     // ---- lights: day → black → night (lit by the phone) → dark top view → black ----
     const nightAmt = kDown * (1 - kTop), dayAmt = (1 - kEve) ** 1.4, up0 = kUp * (1 - kDown) + kRise;
     key.intensity = 3.9 * dayAmt; fill.intensity = .6 * dayAmt + .12 * lampAmt; cool.intensity = .55 * dayAmt; DAP.uTime.value = now / 1000; DAP.uDap.value = dayAmt * .95;
-    lamp.intensity = 70 * lampAmt; eveSky.intensity = .5 * lampAmt; glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise) + 2.5 * lampAmt;
+    lamp.intensity = 80 * lampAmt; eveSky.intensity = .3 * lampAmt; glow.intensity = 14 * nightAmt + 3 * kTop * (1 - kRise) + 2.5 * lampAmt;
     nudge(dt, heroAmt); phoneBlob.material.opacity = .8 * (1 - up0) * Math.max(dayAmt, lampAmt * .6);
     night.intensity = .55 * nightAmt + .18 * kTop * (1 - kRise);
     rim.intensity = (60 * kUp * (1 - kDown) + 26 * kRise) * (1 - kOut);

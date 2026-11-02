@@ -62,8 +62,8 @@ export function mountCover(root) {
   // [x, y, z, rx, ry, rz, scale] in px from the centre of the cover
   const swarm = (j, t) => { // a swirl around the middle: cards orbit at different depths and come past the camera
     const a = rnd(j) * 6.283 + t * (.18 + rnd(j + 9) * .22), depth = ((rnd(j + 3) + t * .045) % 1), z = -1300 + depth * 1700;
-    const rr = 160 + rnd(j + 5) * Math.min(W(), 1400) * .38;
-    return [Math.cos(a) * rr, Math.sin(a) * rr * .62, z, (rnd(j + 1) - .5) * 70, (rnd(j + 2) - .5) * 90 + Math.cos(a) * 25, (rnd(j + 4) - .5) * 50, .82];
+    const rr = 240 + Math.sqrt(rnd(j + 5)) * Math.min(W(), 1500) * .42;
+    return [Math.cos(a) * rr, Math.sin(a) * rr * .62, z, (rnd(j + 1) - .5) * 70, (rnd(j + 2) - .5) * 90 + Math.cos(a) * 25, (rnd(j + 4) - .5) * 50, .66];
   };
   const drum = (j, t) => { // a turning drum of upright cards
     const a = (j / COUNT) * 6.283 * 2 + t * .4, R = Math.min(W() * .2, 300), lvl = j < COUNT / 2 ? -1 : 1;

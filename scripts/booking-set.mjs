@@ -85,7 +85,7 @@ export function mountDesk(root) {
   Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => loadGLB(`${MODELS}${n}.glb`, { envMap: envTex, envMapIntensity: .35, onMaterial }).then(o => { props[n] = o; set.add(o); if (n === 'desk') o.traverse(m => { if (m.isMesh) m.castShadow = false; }); }).catch(e => console.warn('glb', n, e))))
     .then(() => { ready = true; setupPage(); setupNudges(); });
   // the right page carries the handwriting: lines + ink drawn here, mapped onto the page from the model
-  const pageCv = document.createElement('canvas'); pageCv.width = 900; pageCv.height = 1240; const px = pageCv.getContext('2d');
+  const pageCv = document.createElement('canvas'); pageCv.width = 1240; pageCv.height = 900; const px = pageCv.getContext('2d');
   const pageTex = new THREE.CanvasTexture(pageCv); pageTex.colorSpace = THREE.SRGBColorSpace; pageTex.flipY = false; pageTex.anisotropy = 8;
   function setupPage() { const pg = props.notebook?.getObjectByName('nb_page_r'); pg?.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.map = pageTex; o.material.needsUpdate = true; } }); drawInk(0, true); }
   const EV = [
@@ -96,7 +96,7 @@ export function mountDesk(root) {
   let inkNow = -1;
   function drawInk(k, force) {
     k = Math.round(clamp(k) * 24) / 24; if (k === inkNow && !force) return; inkNow = k;
-    const w = pageCv.width, h = pageCv.height, r = seed(5); px.fillStyle = '#efe9da'; px.fillRect(0, 0, w, h);
+    const w = 900, h = 1240, r = seed(5); px.setTransform(1, 0, 0, 1, 0, 0); px.fillStyle = '#efe9da'; px.fillRect(0, 0, pageCv.width, pageCv.height); px.setTransform(0, 1, -1, 0, pageCv.width, 0); // the page's uv runs along its long side
     px.fillStyle = '#17362b'; px.font = `700 ${Math.round(h * .03)}px "Inter Tight", Inter, system-ui, sans-serif`; px.fillText(zh() ? '周五 6 日' : 'FRIDAY 6', w * .09, h * .085);
     const rowY = row => h * (.13 + row * .048);
     for (let i = 0; i < 17; i++) { px.strokeStyle = 'rgba(23,54,43,.35)'; px.lineWidth = 2; px.beginPath(); px.moveTo(w * .08, rowY(i)); px.lineTo(w * .92, rowY(i)); px.stroke(); px.fillStyle = 'rgba(23,54,43,.55)'; px.font = `500 ${Math.round(h * .017)}px Inter, system-ui, sans-serif`; px.fillText(['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00'][i], w * .09, rowY(i) - h * .008); }

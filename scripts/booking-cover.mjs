@@ -65,9 +65,9 @@ export function mountCover(root) {
     const rr = 240 + Math.sqrt(rnd(j + 5)) * Math.min(W(), 1500) * .42;
     return [Math.cos(a) * rr, Math.sin(a) * rr * .62, z, (rnd(j + 1) - .5) * 70, (rnd(j + 2) - .5) * 90 + Math.cos(a) * 25, (rnd(j + 4) - .5) * 50, .66];
   };
-  const drum = (j, t) => { // a turning drum of upright cards
-    const a = (j / COUNT) * 6.283 * 2 + t * .4, R = Math.min(W() * .2, 300), lvl = j < COUNT / 2 ? -1 : 1;
-    return [Math.sin(a) * R, lvl * cw() * .72, Math.cos(a) * R - R * .6, 0, a * 57.3, 0, .9];
+  const drum = (j, t) => { // a turning drum of upright cards, one ring, packed like the reference
+    const a = (j / COUNT) * 6.283 + t * .35, R = Math.min(W() * .22, 340);
+    return [Math.sin(a) * R, (rnd(j + 7) - .5) * 14, Math.cos(a) * R - R * .55, 0, a * 57.3, 0, 1.05];
   };
   const table = j => { // a tilted table of cards filling the left half
     const c = j % COLS, r = Math.floor(j / COLS), w = cw() * 1.08;

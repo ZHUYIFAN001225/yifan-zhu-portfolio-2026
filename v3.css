@@ -3979,3 +3979,12 @@ html[data-body=a] .bk-dk.is-through,html[data-body=a] .bk-dk.is-through .bk-dk-o
 html[data-body=a] .bk-dk.is-through .bk-dk-grain{display:none}
 html[data-body=a] .bk-cover-pin>.op,html[data-body=a] .bk-cover-pin{background:transparent!important}
 .bk-backdrop{transition:none}
+/* A: smoked glass — dark, mostly opaque, the desk only just showing through; white type reads cleanly on it. The
+   bevel and the faint sheen stay, so it is still glass. (Replaces the pale frosted fill everywhere.) */
+html[data-body=a]{--glass-fill:linear-gradient(135deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.02) 38%,rgba(255,255,255,0) 70%,rgba(255,255,255,.03) 100%),rgba(17,14,11,.6)}
+html[data-body=a] .bk-day .is-glass,html[data-body=a] .bk-day .bk-dom-card,
+html[data-body=a] .bk-day .ux-section :is(.ux-bp-row>span,.ux-blueprint,.ux-bp-lane,.ux-bp-stage){background:var(--glass-fill)!important;-webkit-backdrop-filter:blur(24px) saturate(1.1);backdrop-filter:blur(24px) saturate(1.1)}
+html[data-body=a] .bk-day .ux-section .ux-bp-row>span{border:1px solid rgba(255,255,255,.09)!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.16)!important;color:rgba(244,238,228,.9)!important}
+html[data-body=a] .bk-day .ux-section .ux-blueprint{border:1px solid rgba(255,255,255,.12)!important;border-radius:24px!important;box-shadow:var(--glass-edge)!important;padding:10px}
+html[data-body=a] .bk-day .ux-section :is(.ux-bp-row>span:first-child,.ux-bp-head span,.ux-bp-row b){color:#fff!important}
+html[data-body=a] .bk-sheet.is-glass{background:linear-gradient(90deg,transparent 63px,rgba(255,138,115,.34) 63px,rgba(255,138,115,.34) 64px,transparent 64px),repeating-linear-gradient(180deg,transparent 0 39px,rgba(255,255,255,.08) 39px 40px) 0 25px/100% 100% no-repeat,var(--glass-fill)!important}

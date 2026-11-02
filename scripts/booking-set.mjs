@@ -76,7 +76,6 @@ export function mountDesk(root) {
   const room = new THREE.DirectionalLight(0xdfe6ff, 0); room.position.set(.5, .35, 1.6); room.castShadow = false; scene.add(room);
   const sky = new THREE.HemisphereLight(0xb9c4d8, 0x3a2a1c, 0); scene.add(sky);
   const lamp = new THREE.PointLight(0xffc27a, 0, 2.2, 1.8); lamp.position.set(-.5, .62, -.3); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.bias = -.0002; lamp.shadow.normalBias = .0005; scene.add(lamp);
-  window.__bkSet = { redraw: () => { inkNow = -1; drawInk(.9, true); }, get sun() { return sun; }, get scene() { return scene; }, get renderer() { return renderer; }, get props() { return props; } };
   const rim = new THREE.SpotLight(0xffc98a, 0, 4, .6, .8, 1.2); rim.position.set(-.8, 1.4, .9); scene.add(rim); rim.target.position.set(0, .7, 0); scene.add(rim.target);
 
   // ---------- the set, from Blender ----------
@@ -97,7 +96,6 @@ export function mountDesk(root) {
   function drawInk(k, force) {
     k = Math.round(clamp(k) * 24) / 24; if (k === inkNow && !force) return; inkNow = k;
     const w = 900, h = 1240, r = seed(5); px.setTransform(1, 0, 0, 1, 0, 0); px.fillStyle = '#efe9da'; px.fillRect(0, 0, pageCv.width, pageCv.height);
-    const ROT = window.__pageRot ?? 1; [[1, 0, 0, 1, 0, 0], [0, 1, -1, 0, pageCv.width, 0], [-1, 0, 0, -1, pageCv.width, pageCv.height], [0, -1, 1, 0, 0, pageCv.height]][ROT] && px.setTransform(...[[1, 0, 0, 1, 0, 0], [0, 1, -1, 0, pageCv.width, 0], [-1, 0, 0, -1, pageCv.width, pageCv.height], [0, -1, 1, 0, 0, pageCv.height]][ROT]);
     px.fillStyle = '#17362b'; px.font = `700 ${Math.round(h * .03)}px "Inter Tight", Inter, system-ui, sans-serif`; px.fillText(zh() ? '周五 6 日' : 'FRIDAY 6', w * .09, h * .085);
     const rowY = row => h * (.13 + row * .048);
     for (let i = 0; i < 17; i++) { px.strokeStyle = 'rgba(23,54,43,.35)'; px.lineWidth = 2; px.beginPath(); px.moveTo(w * .08, rowY(i)); px.lineTo(w * .92, rowY(i)); px.stroke(); px.fillStyle = 'rgba(23,54,43,.55)'; px.font = `500 ${Math.round(h * .017)}px Inter, system-ui, sans-serif`; px.fillText(['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00'][i], w * .09, rowY(i) - h * .008); }
@@ -227,7 +225,7 @@ export function mountDesk(root) {
     camPos.x += P.x * .03 * (1 - up); camPos.z += P.y * .02 * (1 - up);
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
-    sun.intensity = 3.4 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
+    sun.intensity = 2.9 * dayAmt; room.intensity = .55 * (1 - blackout) * (1 - nightAmt * .6); sky.intensity = .22 * (1 - blackout) * (1 - nightAmt * .5);
     lamp.intensity = 1.1 * nightAmt; rim.intensity = 3.5 * up * (1 - kOut);
     set.visible = blackout < .995;
     nudge(dt, onDesk);

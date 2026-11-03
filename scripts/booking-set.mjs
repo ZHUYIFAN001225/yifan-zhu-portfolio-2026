@@ -405,14 +405,22 @@ export function mountDesk(root) {
     const listen = () => addEventListener('deviceorientation', onTilt, { passive: true });
     const D = window.DeviceOrientationEvent;
     if (typeof D.requestPermission === 'function') {   // iPhone: Safari asks once, and only after a tap
-      const tilt = document.createElement('button'); tilt.type = 'button'; tilt.className = 'bk-dk-tilt';
-      const lab = () => tilt.textContent = zh() ? '↻ 倾斜手机，换个角度看' : '↻ Tilt your phone to look around'; lab();
+      // Safari only shows its motion prompt after a tap, so the page offers it the moment it opens: a card in the middle
+      // of the desk. "Turn on" asks; "No thanks", or scrolling on, puts it away. Any first tap elsewhere asks too.
+      const tilt = document.createElement('div'); tilt.className = 'bk-dk-tilt'; tilt.setAttribute('role', 'dialog');
+      tilt.innerHTML = '<i class="bk-tilt-ph" aria-hidden="true"><b></b></i><p class="bk-tilt-t"></p><p class="bk-tilt-s"></p><div class="bk-tilt-a"><button type="button" class="on"></button><button type="button" class="no"></button></div>';
+      const lab = () => { const z = zh(); tilt.querySelector('.bk-tilt-t').textContent = z ? '倾斜手机，换个角度看' : 'Tilt to look around the desk';
+        tilt.querySelector('.bk-tilt-s').textContent = z ? '左右、前后轻轻倾斜，镜头会跟着动。' : 'Tip your phone left, right, forward or back — the camera follows.';
+        tilt.querySelector('.on').textContent = z ? '开启' : 'Turn on'; tilt.querySelector('.no').textContent = z ? '不用了' : 'No thanks'; }; lab();
       document.addEventListener('portfolio:language', () => setTimeout(lab, 40));
-      // the request must come from a tap: the button, or any tap on the page — whichever comes first, once
       let asked = false;
-      const ask = () => { if (asked) return; asked = true; const done = () => { listen(); tilt.remove(); }; try { D.requestPermission().then(done, done); } catch { done(); } };
-      tilt.addEventListener('click', ask); document.addEventListener('click', ask, { once: true }); document.addEventListener('touchend', ask, { once: true, passive: true });
-      ov.append(tilt);
+      const close = () => { tilt.classList.add('is-out'); setTimeout(() => tilt.remove(), 450); };
+      const ask = () => { if (asked) return; asked = true; const done = () => { listen(); close(); }; try { D.requestPermission().then(done, done); } catch { done(); } };
+      tilt.querySelector('.on').addEventListener('click', e => { e.stopPropagation(); ask(); });
+      tilt.querySelector('.no').addEventListener('click', e => { e.stopPropagation(); asked = true; close(); });
+      document.addEventListener('click', ask, { once: true });
+      const away = () => { if (scrollY > innerHeight * .6 && !asked) { close(); removeEventListener('scroll', away); } }; addEventListener('scroll', away, { passive: true });
+      ov.append(tilt); setTimeout(() => tilt.classList.add('is-in'), 900);
     } else listen();
   }
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up

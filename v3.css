@@ -4250,3 +4250,87 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
 @media (max-width:639px){ .bk-set .bk-jrow{margin:8px 2px 0;justify-content:flex-end} .bk-set .bk-jrow .bk-jk{display:none!important} }
 /* phones: the desk behind the page as one soft, even blur */
 .bk-backdrop.is-soft canvas{filter:blur(14px) saturate(1.05);transform:scale(1.12);transform-origin:50% 50%}
+
+/* ======================= LOOK film on phones: the same pinned story as on a computer, laid out for a tall screen
+   (it used to fall back to a plain list with the phone hidden). Words wrap between words only. ======================= */
+.fm-wd{display:inline-block;white-space:nowrap}
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .fm .fm-track{height:calc(var(--units,11) * 100svh)!important}
+  .fm .fm-stage{position:sticky;top:0;height:100svh;min-height:0}
+  .fm .fm-mobile{display:none!important}
+  .fm .fm-phone{display:block;--dw:min(196px,27svh);top:63%}
+  .fm .fm-steps{display:block;left:6vw;top:13svh;width:88vw;height:auto}
+  .fm .fm-step{top:0;transform:none}
+  .fm .fm-step h2{font-size:clamp(24px,7vw,30px);margin-bottom:8px}
+  .fm .fm-body{font-size:14.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .fm .fm-num{margin-bottom:8px}
+  .fm .fm-rail{display:flex;left:6vw;bottom:calc(92px + env(safe-area-inset-bottom,0px));flex-wrap:wrap;max-width:88vw}
+  .fm .fm-rail li{width:18px}
+  .fm .fm-hint{display:flex;bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .fm .fm-duo{display:block}
+  .fm .fm-callout{display:none}
+  /* the opening: the type fills the width and wraps only between words; the phone stands below it */
+  .fm .fm-type{justify-content:flex-start;padding:21svh 5vw 0}
+  .fm .fm-line>span{font-size:clamp(46px,14.2vw,64px);line-height:.92}
+  :lang(zh) .fm .fm-line>span{font-size:clamp(40px,12vw,56px);line-height:1.08}
+  .fm .fm-line:nth-child(2){text-align:right}
+  .fm .fm-kicker{top:calc(7svh);left:6vw;right:6vw;font-size:10.5px}
+  .fm .fm-photo{width:calc(var(--z) * 24vw)}
+  .fm.is-story .fm-phone{left:50%;top:64%;transform:translate(-50%,-50%) rotateX(8deg) rotateY(-12deg) rotateZ(2deg)}
+  .fm.is-duo .fm-phone{transform:translate(-50%,-50%) rotateX(4deg) rotateY(-6deg)}
+  .fm .fm-skip{bottom:calc(92px + env(safe-area-inset-bottom,0px))!important}
+}
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .fm:not(.is-story):not(.is-duo) .fm-phone{top:77%;transform:translate(-50%,-50%) scale(.74)}
+  .fm .fm-type{padding-top:17svh}
+}
+
+/* ======================= LOOK on phones (the computer layout is untouched above 760px) ======================= */
+.lk-loop-cap{display:none}
+@media (max-width:760px){
+  /* the two ropes come back, down the screen edges */
+  .lk-threads{display:block!important}
+  /* the business model: tags on a rail you slide along, each wide enough to read */
+  [data-product-case=beauty] .ux-principles--4.lk-rail{display:flex!important;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;
+    margin:0 -16px 0 0;padding:46px 18px 22px 0!important;
+    background:linear-gradient(180deg,#e9e1d8,#a8968a 60%,#7d6c61) 0 22px/100% 5px no-repeat local!important}
+  [data-product-case=beauty] .ux-principles--4.lk-rail::-webkit-scrollbar{display:none}
+  [data-product-case=beauty] .lk-rail::before,[data-product-case=beauty] .lk-rail::after{display:none!important}
+  [data-product-case=beauty] .lk-rail>.lk-tag{flex:0 0 60%;scroll-snap-align:start;min-width:0}
+  [data-product-case=beauty] .lk-rail>.lk-tag:last-child{margin-right:18px}
+  /* decisions: full width, no zigzag */
+  [data-product-case=beauty] .ux-decisions article,[data-product-case=beauty] .ux-decisions article:nth-child(even){width:auto!important;margin-left:0!important;margin-right:0!important}
+  /* the big words between parts rise in a second, not three — on a phone you are past them before they finish */
+  .lk-act-words,.lk-act-arrow{transition:transform 1s cubic-bezier(.16,1,.3,1) calc(.1s + var(--li) * .14s)!important}
+  .lk-act-kicker{transition:opacity .8s ease,transform 1s cubic-bezier(.16,1,.3,1)!important}
+  .lk-act-cap{transition:opacity .9s ease .6s,transform 1.1s cubic-bezier(.16,1,.3,1) .6s!important}
+  /* the growth loop: a dial that fits the screen; numbered dots round the ring, the step on top written beneath */
+  .lk-loop{--size:86vw;margin:24px auto 64px}
+  [data-product-case=beauty] .lk-loop-nodes>li.lk-node{width:34px!important}
+  [data-product-case=beauty] .lk-loop-nodes>li.lk-node .lk-node-label{display:none!important}
+  .lk-loop-cap{display:block;position:absolute;left:50%;top:calc(100% + 14px);translate:-50% 0;width:88vw;margin:0;text-align:center;font:600 15px/1.35 Inter,system-ui,sans-serif;color:var(--lk-ink,#2a1d30)}
+  .lk-loop-cap b{display:inline-block;margin-right:8px;padding:2px 8px;border-radius:999px;background:#c2457a;color:#fff;font-size:12px;vertical-align:1px}
+}
+
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .fm .fm-duo{left:6vw;width:88vw;top:13svh;transform:none}
+  .fm .fm-duo-title{font-size:clamp(26px,7.6vw,32px);margin-bottom:8px}
+  .fm .fm-duo-body{font-size:14.5px;line-height:1.45}
+  .fm .fm-duo-pills{margin-top:14px;flex-wrap:wrap}
+  .fm .fm-duo-l,.fm .fm-duo-r{font-size:13px;padding:7px 12px}
+}
+/* LOOK on phones, as on the salon case: straight into the film, no site bar dropping back in on the way up, and the
+   Browse bar in the page's own dark glass */
+@media (max-width:760px){
+  body:has([data-product-case=beauty]) :is(.v3-case-tools,.v3-case-categories){display:none!important}
+  body:has([data-product-case=beauty]) .site-header{position:relative!important;transform:none!important}
+  html.v3-header-hidden body:has([data-product-case=beauty]) .site-header{transform:none!important}
+  body:has([data-product-case=beauty]) .ux-case-index{top:0!important}
+  body:has([data-product-case=beauty]) .v3-mobile-dock{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 50%,rgba(255,255,255,.06)),rgba(22,14,22,.74)!important;border:0!important;border-radius:20px!important;
+    -webkit-backdrop-filter:blur(16px) saturate(1.1);backdrop-filter:blur(16px) saturate(1.1);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.12),0 18px 40px -16px rgba(0,0,0,.85)!important;color:#f6eef6!important}
+  body:has([data-product-case=beauty]) .v3-mobile-dock :is(button,strong,span){color:#f6eef6!important}
+  body:has([data-product-case=beauty]) .v3-mobile-dock small{color:rgba(246,238,246,.55)!important}
+  body:has([data-product-case=beauty]) .v3-mobile-dock svg,body:has([data-product-case=beauty]) .v3-mobile-dock svg *{stroke:#f59ab8!important}
+  body:has([data-product-case=beauty]) .v3-mobile-dock>*+*{border-left-color:rgba(255,255,255,.12)!important}
+}

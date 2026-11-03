@@ -749,7 +749,8 @@ window.addEventListener('pagereveal',event=>{
     if (dir && move(dir)) e.preventDefault();
   });
   // any other way of scrolling (scrollbar, touchpad momentum after leaving, links) lands on the nearest moment
-  let st = 0; addEventListener('scroll', () => { if (!wide.matches || jumping) return; clearTimeout(st); st = setTimeout(() => { if (inside()) show(nearest()); else { const r = track.getBoundingClientRect(); show(r.top > 0 ? 0 : M - 1); } }, 60); }, { passive: true });
+  // phones too: scrolling moves the film from moment to moment
+  let st = 0; addEventListener('scroll', () => { if (calm.matches || jumping) return; clearTimeout(st); st = setTimeout(() => { if (inside()) show(nearest()); else { const r = track.getBoundingClientRect(); show(r.top > 0 ? 0 : M - 1); } }, 60); }, { passive: true });
   document.addEventListener('portfolio:language', () => { const m = cur; cur = -1; curStep = -2; show(m < 0 ? 0 : m); });
   show(nearest());
   // the phone leans toward the pointer anywhere on the stage
@@ -793,7 +794,7 @@ window.addEventListener('pagereveal',event=>{
 (() => {
   const fm = document.querySelector('[data-film]'); if (!fm) return;
   const lines = [...fm.querySelectorAll('.fm-line>span')];
-  const split = () => lines.forEach(sp => { const t = sp.childNodes[0]; if (!t || t.nodeType !== 3) return; const txt = t.textContent; const frag = document.createDocumentFragment(); [...txt].forEach((ch, k) => { const i = document.createElement('span'); i.className = 'fm-ch'; i.textContent = ch; i.style.setProperty('--c', k); frag.append(i); }); sp.replaceChild(frag, t); });
+  const split = () => lines.forEach(sp => { const t = sp.childNodes[0]; if (!t || t.nodeType !== 3) return; const txt = t.textContent; const frag = document.createDocumentFragment(); let wd = null; [...txt].forEach((ch, k) => { const i = document.createElement('span'); i.className = 'fm-ch'; i.textContent = ch; i.style.setProperty('--c', k); if (ch === ' ') { wd = null; frag.append(i); return; } if (!wd) { wd = document.createElement('span'); wd.className = 'fm-wd'; frag.append(wd); } wd.append(i); }); sp.replaceChild(frag, t); });   // letters grouped by word: a line may wrap between words, never inside one
   split(); document.addEventListener('portfolio:language', () => setTimeout(split, 30));
   const chars = () => [...fm.querySelectorAll('.fm-ch')].filter(c => c.textContent.trim());
   const colours = ['#f59ab8', '#c7a6ff', '#ff7a59', '#7fd8aa', '#ffd166'];

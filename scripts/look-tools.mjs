@@ -45,8 +45,8 @@ export function mount() {
   // the dial and the ropes need a wide window; if the page opened narrow (a new tab or window still sizing up), add them as soon as it is wide
   let loopOn = false, ropesOn = false;
   const wide = matchMedia('(min-width: 761px)');
+  // phones too (each lays itself out for a narrow screen)
   const up = () => {
-    if (!wide.matches) return;
     if (!loopOn) { try { mountLoop(); loopOn = true; } catch (e) { console.error(e); } }
     if (!ropesOn && !calm) { try { mountThreads(root, acts); ropesOn = true; } catch (e) { console.error(e); } }
   };
@@ -219,7 +219,13 @@ function mountThreads(root, acts) {
   // where each line is at a point of the page: apart at the start, together at the knot
   const ease = t => t * t * (3 - 2 * t);
   const base = docY => {
-    const W = innerWidth, P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.15));
+    const W = innerWidth;
+    if (W < 761) {   // phones: no side margins — the ropes keep to the screen edges, clear of the text, and meet only at the end
+      const from = boxesT.length ? boxesT[boxesT.length - 1].b : knotDoc - innerHeight * .5;   // below the closing words, never across them
+      const e2 = ease(clamp((docY - from) / Math.max(40, knotDoc - from)));
+      return { u: 6 + (W * .5 - 6) * e2, c: W - 6 - (W * .5 - 6) * e2 };
+    }
+    const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.15));
     const wave = Math.sin(docY / 520) * W * .022 * (1 - e);
     return avoid(docY, { u: W * .045 + (W * .5 - W * .045) * e + wave, c: W * .955 - (W * .955 - W * .5) * e - Math.sin(docY / 520 + 1.3) * W * .022 * (1 - e) });
   };
@@ -305,6 +311,7 @@ export function mountLoop() {
     list.append(li);
   });
   ol.replaceWith(wrap); wrap.append(ol); ol.hidden = true;
+  const cap = document.createElement('p'); cap.className = 'lk-loop-cap'; cap.setAttribute('aria-hidden', 'true'); wrap.append(cap);   // phones: the step on top, in words, under the dial
   const imgs = [...wrap.querySelectorAll('.lk-ph-screen img')], arc = wrap.querySelector('.lk-loop-arc'), head = wrap.querySelector('.lk-loop-head'), glow = wrap.querySelector('.lk-loop-head-glow'), ph = wrap.querySelector('.lk-phone3d');
   const zhSrc = s => s.replace(/\/([^/]+)$/, '/zh/$1');
   const lang = () => imgs.forEach(i => { const en = i.dataset.enSrc || (i.dataset.enSrc = i.getAttribute('src')); const want = zh() ? zhSrc(en) : en; if (i.getAttribute('src') !== want) i.setAttribute('src', want); });
@@ -321,7 +328,7 @@ export function mountLoop() {
     arc.style.transform = `rotate(${(th - 90).toFixed(2)}deg)`; arc.style.strokeDashoffset = (100 - passed * 100).toFixed(2);
     [head, glow].forEach(c => { c.setAttribute('cx', 50); c.setAttribute('cy', 10); });
     const k = ((Math.round(-th / step) % N) + N) % N;
-    if (k !== cur) { if (cur >= 0) swing = 1; cur = k; items.forEach((li, j) => li.classList.toggle('is-on', j === k)); imgs.forEach((im, j) => im.classList.toggle('is-on', j === k)); }
+    if (k !== cur) { if (cur >= 0) swing = 1; cur = k; items.forEach((li, j) => li.classList.toggle('is-on', j === k)); imgs.forEach((im, j) => im.classList.toggle('is-on', j === k)); cap.innerHTML = `<b>${String(k + 1).padStart(2, '0')}</b>${items[k].querySelector('.lk-node-label')?.textContent || ''}`; }
     const t = (now || performance.now()) / 1000;
     // stands almost upright so the screen reads; leans a little towards the pointer, just enough to show the metal edge
     ph.style.transform = `rotateX(${(2 + rx * 1.3 + Math.sin(t * .8) * 1).toFixed(2)}deg) rotateY(${(ry * 1.7 + Math.sin(t * .6) * 1.5 + swing * 10).toFixed(2)}deg)`; // symmetric: straight on at rest, leans the same amount either way
@@ -332,4 +339,5 @@ export function mountLoop() {
   // keep it moving only while it is on screen
   new IntersectionObserver(es => { if (es[0].isIntersecting) go(); else { cancelAnimationFrame(raf); raf = 0; } }).observe(wrap);
   addEventListener('scroll', calc, { passive: true }); addEventListener('resize', calc); go();
+  document.addEventListener('portfolio:language', () => setTimeout(() => { cur = -1; go(); }, 60));
 }

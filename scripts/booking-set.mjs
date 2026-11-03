@@ -41,7 +41,7 @@ export function mountDesk(root) {
   jump.innerHTML = `<a class="bk-jl" target="_blank" rel="noopener"><i></i><b class="k"></b><span><b class="t"></b><em></em></span><u>↗</u></a>
     <div class="bk-jrow"><p class="bk-jk"></p><button type="button" class="bk-snd" aria-pressed="false"><i aria-hidden="true"></i><span></span></button></div><div class="bk-jg"><a data-to=".bk-quick"></a><a data-to="#overview"></a><a data-to="#interactive-demo"></a></div>`;
   ov.append(jump);
-  const snd = jump.querySelector('.bk-snd'); if (!fine) snd.remove();   // phones: no sound
+  const snd = jump.querySelector('.bk-snd');
   snd.addEventListener('click', () => { fx.on = !fx.on; snd.setAttribute('aria-pressed', String(fx.on)); snd.classList.toggle('is-on', fx.on); if (fx.on) ding(true); });
   jump.querySelectorAll('[data-to]').forEach(a => { a.href = a.dataset.to.startsWith('#') ? a.dataset.to : '#'; a.addEventListener('click', e => {
     const t = document.querySelector(a.dataset.to); if (!t) return; e.preventDefault();
@@ -291,8 +291,8 @@ export function mountDesk(root) {
   document.fonts?.ready.then(() => { dirty = true; });
   function paintIsland() { const W = sc.width; sx.fillStyle = '#000'; const iw = W * .3, ih = W * .085; sx.beginPath(); sx.roundRect((W - iw) / 2, W * .028, iw, ih, ih / 2); sx.fill(); }
   let buzz = -1e9;
-  // each message that lands: a soft chime — computers only, and only once the visitor has switched sound on. Never in
-  // the page behind the case.
+  // each message that lands: a soft chime, once the visitor has switched sound on (phones too). Never in the page behind
+  // the case.
   const fx = { on: false, ctx: null, last: 0 };
   // the message sound: an original glassy bell — a clean FM tone with a soft room around it; a second, quieter note
   // answers it on the first message only

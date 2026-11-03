@@ -143,6 +143,7 @@ export function mountDesk(root) {
   const lite = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900, CAPS = { desk: 2048, mat: 1024, notebook: 2048 };
   const tex2 = (n, tag) => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_${tag}${lite && n !== 'notebook' ? '_m' : ''}.jpg`, () => res(t), undefined, () => res(null)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = lite ? 4 : 8; });
   const GAIN = 3.0;   // the bake was made at 0.4× the Blender exposure so sunlit paper fits in 8 bits; put it back here
+  const FREED = (() => { const c = document.createElement('canvas'); c.width = c.height = 1; return c; })();
   const LIGHT_GLSL = `
     uniform sampler2D uAmb, uSun, uNight; uniform float uMix, uLit, uTime, uWind;
     varying vec2 vBUv; varying vec3 vWP;
@@ -171,9 +172,12 @@ export function mountDesk(root) {
     };
     return m;
   }
-  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`, lite ? { maxTex: CAPS[n] || 512, aniso: 4 } : {}), tex2(n, 'day2'), tex2(n, 'night')]).then(([o, sun, night]) => {
+  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`, lite ? { maxTex: CAPS[n] || 512, aniso: 4 } : {}), lite ? null : tex2(n, 'day2'), tex2(n, 'night')]).then(async ([o, sun, night]) => {
     props[n] = o; set.add(o); let amb = null;
     o.traverse(m => { if (!m.isMesh) return; if (!amb && m.material.map) amb = m.material.map; const a = m.geometry.attributes, k = ['uv3', 'uv2', 'uv1'].find(x => a[x]); m.geometry.setAttribute('bakeUv', a[k] || a.uv); });
+    // phones: one day bake instead of two (the breeze variant is a luxury), and each picture is let go from memory once
+    // it is on the graphics card — a phone browser that holds both copies of everything runs out and reloads the page
+    if (lite) { if (!amb) amb = await tex2(n, 'day2'); sun = amb; [amb, night].forEach(t => { if (t && !t._free) { t._free = true; t.onUpdate = () => { t.image = FREED; }; } }); }
     const L3 = { amb, sun, night }, mat = bakedMaterial(L3);
     const pages = { nb_page_r: bakedMaterial(L3, pageTex), nb_page_l: bakedMaterial(L3, pageTexL) };
     o.traverse(m => { if (!m.isMesh) return; m.castShadow = false; m.receiveShadow = false; const pg = Object.keys(pages).find(k => m.name === k || m.parent?.name === k); m.material = pg ? pages[pg] : mat; });
@@ -393,7 +397,7 @@ export function mountDesk(root) {
   const PT = { x: .115, z: -.025, k: .55 };
   const PR = { x: 0, y: .6, z: .085, s: 1.15 };
   const QS = [1, .82, .66, .52]; let qi = weak ? 2 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
-  const dpr = () => inBody ? (handset ? .22 : .34) : Math.min(devicePixelRatio || 1, handset ? 2.5 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
+  const dpr = () => inBody ? (handset ? .22 : .34) : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
   const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: `precision highp float;

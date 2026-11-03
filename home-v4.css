@@ -1,0 +1,115 @@
+@font-face{font-family:"Inter";src:url("assets/fonts/InterVariable.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{--ink:#1f2a24;--ink2:#4b544e;--paper:#e8ded0;--pink:#e0457f;--line:rgba(31,42,36,.18);--ease:cubic-bezier(.2,.7,.2,1)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,"PingFang SC","Noto Sans CJK SC",sans-serif;-webkit-font-smoothing:antialiased}
+body.hv{overflow-x:clip}
+a{color:inherit}
+.hv-gl{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;z-index:0}
+/* film grain over the whole picture, like a print */
+.hv-grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.07;mix-blend-mode:multiply;background-image:var(--grain);animation:hv-grain 1s steps(6) infinite}
+@keyframes hv-grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+.hv-track{height:var(--track,2000vh)}
+
+/* header: name, what I do, and the way around — set in the room like Léo's */
+.hv-head{position:fixed;z-index:20;left:0;right:0;top:0;display:grid;grid-template-columns:1fr 1.4fr auto;align-items:center;gap:20px;padding:26px clamp(18px,3vw,56px);font-size:15px;letter-spacing:-.01em;transition:color .5s}
+.hv-name{text-decoration:none;font-weight:500}
+.hv-role{margin:0;color:var(--ink)}
+.hv-nav{display:flex;align-items:center;gap:clamp(14px,1.8vw,30px)}
+.hv-nav a{text-decoration:none;position:relative}
+.hv-nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.hv-nav a:hover::after{transform:scaleX(1)}
+.hv-lang{display:flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px;background:rgba(255,255,255,.25);font:inherit;font-size:12px;color:inherit;cursor:pointer}
+.hv-lang span{padding:4px 9px;border-radius:999px}
+:lang(en) .hv-lang [data-l=en],:lang(zh) .hv-lang [data-l=zh]{background:var(--ink);color:#f6f1ea}
+
+/* the beats: what floats over the room at each point of the walk */
+.hv-beat{position:fixed;z-index:10;opacity:0;visibility:hidden;transition:opacity .7s var(--ease),transform .9s var(--ease),visibility 0s .7s;transform:translateY(16px)}
+.hv-beat.is-on{opacity:1;visibility:visible;transform:none;transition:opacity .7s var(--ease),transform .9s var(--ease),visibility 0s}
+.hv-hello{left:clamp(18px,18vw,360px);bottom:clamp(90px,17vh,210px);max-width:420px}
+.hv-statement{margin:0;font-size:clamp(26px,2.25vw,40px);line-height:1.12;letter-spacing:-.035em;font-weight:440;white-space:pre-line}
+.hv-scroll{margin:22px 0 0;font-size:15px;display:flex;align-items:center;gap:10px}
+.hv-scroll::after{content:"";width:1px;height:26px;background:currentColor;animation:hv-drip 1.8s var(--ease) infinite;transform-origin:top}
+@keyframes hv-drip{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+.hv-me{left:clamp(18px,7vw,120px);bottom:clamp(30px,9vh,110px);width:min(560px,calc(100vw - 36px))}
+.hv-card{background:rgba(246,241,234,.78);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.6);border-radius:22px;padding:clamp(22px,2.4vw,36px);box-shadow:0 30px 60px -30px rgba(60,40,20,.35)}
+.hv-card h1{margin:0;font-size:clamp(52px,6vw,96px);line-height:.9;letter-spacing:-.06em;font-weight:600}
+.hv-card-role{margin:14px 0 18px;color:var(--ink2);font-size:clamp(15px,1.15vw,18px);line-height:1.4}
+.hv-facts{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.hv-facts li{padding:11px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4;display:flex;gap:10px;align-items:baseline}
+.hv-facts b{font-weight:500;min-width:92px;color:var(--ink2);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.hv-facts .is-todo span{color:#9b6a3c;border:1px dashed #c9a27c;border-radius:6px;padding:1px 7px;font-size:13px}
+.hv-links{display:flex;flex-wrap:wrap;gap:8px 22px;margin:20px 0 0;font-size:14px}
+.hv-links a{text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:3px}
+.hv-links a:hover{border-color:currentColor}
+
+/* the museum label beside each work */
+.hv-label{position:fixed;z-index:10;left:clamp(18px,4vw,64px);bottom:clamp(28px,7vh,80px);width:min(380px,calc(100vw - 36px));padding:22px 24px 20px;background:#f7f2ea;border-radius:4px;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 20px 50px -24px rgba(50,35,20,.45);opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .5s var(--ease),transform .7s var(--ease),visibility 0s .5s}
+.hv-label.is-right{left:auto;right:clamp(70px,7vw,120px)}
+.hv-label.is-on{opacity:1;visibility:visible;transform:none;transition:opacity .5s var(--ease),transform .7s var(--ease),visibility 0s}
+.hv-label-k{margin:0 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);display:flex;justify-content:space-between;gap:10px}
+.hv-label-t{margin:0;font-size:24px;line-height:1.1;letter-spacing:-.03em;font-weight:560}
+.hv-label-s{margin:10px 0 0;font-size:14px;line-height:1.5;color:var(--ink2)}
+.hv-label-m{margin:12px 0 0;font-size:12px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:6px}
+.hv-label-m span{border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+.hv-label-a{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:10px 16px;border-radius:999px;background:var(--ink);color:#f6f1ea;text-decoration:none;font-size:14px;transition:background .25s}
+.hv-label-a:hover{background:var(--pink)}
+
+.hv-exit{left:50%;top:50%;transform:translate(-50%,-40%);text-align:center;width:min(640px,calc(100vw - 36px));padding:clamp(26px,3vw,44px);background:rgba(246,241,234,.82);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.6);border-radius:22px;box-shadow:0 30px 60px -30px rgba(60,40,20,.35)}
+.hv-exit.is-on{transform:translate(-50%,-50%)}
+.hv-exit h2{margin:0;font-size:clamp(56px,7vw,120px);letter-spacing:-.06em;line-height:.9;font-weight:600}
+.hv-exit>p:not(.hv-links){margin:16px auto 0;max-width:46ch;color:var(--ink2);font-size:16px;line-height:1.5}
+.hv-exit .hv-links{justify-content:center}
+
+/* the halls: a small map of the gallery, to jump straight to one */
+.hv-halls{position:fixed;z-index:15;right:clamp(14px,2.4vw,40px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;opacity:0;transition:opacity .5s;pointer-events:none}
+.hv-halls.is-on{opacity:1;pointer-events:auto}
+.hv-halls button{display:flex;align-items:center;justify-content:flex-end;gap:10px;border:0;background:none;font:inherit;font-size:12px;color:var(--ink);cursor:pointer;padding:4px 0;text-align:right}
+.hv-halls button span{opacity:0;transform:translateX(6px);transition:opacity .3s,transform .3s;white-space:nowrap;background:rgba(247,242,234,.85);padding:3px 8px;border-radius:999px}
+.hv-halls button i{width:22px;height:2px;background:currentColor;opacity:.35;transition:width .4s var(--ease),opacity .3s}
+.hv-halls button.is-on i{width:38px;opacity:1;background:var(--pink)}
+.hv-halls:hover button span,.hv-halls button.is-on span{opacity:1;transform:none}
+
+.hv-allbtn{position:fixed;z-index:15;right:clamp(14px,2.4vw,40px);bottom:clamp(18px,3vh,32px);border:1px solid var(--line);background:rgba(247,242,234,.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:999px;padding:10px 16px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+.hv-allbtn:hover{background:var(--ink);color:#f6f1ea}
+
+/* everything at once, for someone in a hurry */
+.hv-all{border:0;padding:0;width:min(1100px,calc(100vw - 24px));max-height:calc(100vh - 24px);border-radius:18px;background:#f7f2ea;color:var(--ink)}
+.hv-all::backdrop{background:rgba(30,24,18,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.hv-all-in{padding:24px clamp(18px,3vw,36px) 36px}
+.hv-all header{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#f7f2ea;padding:6px 0 14px;z-index:1}
+.hv-all h2{margin:0;font-size:28px;letter-spacing:-.03em}
+.hv-all-x{border:0;background:none;font-size:30px;line-height:1;cursor:pointer;color:inherit}
+.hv-all h3{margin:26px 0 12px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);font-weight:500}
+.hv-all-grid .g{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.hv-all-grid a{text-decoration:none;display:block}
+.hv-all-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:#e3d8c8;display:block}
+.hv-all-grid b{display:block;margin-top:8px;font-size:14px;font-weight:540;letter-spacing:-.01em}
+.hv-all-grid small{display:block;margin-top:2px;font-size:12px;color:var(--ink2)}
+
+.hv-loading{position:fixed;z-index:30;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);transition:opacity .6s}
+body.is-ready .hv-loading{opacity:0;pointer-events:none}
+
+@media (max-width:760px){
+  .hv-head{grid-template-columns:1fr auto;padding:16px 16px;font-size:14px}
+  .hv-role{display:none}
+  .hv-nav{gap:14px}
+  .hv-nav a[data-jump=contact]{display:none}
+  .hv-hello{left:18px;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .hv-statement{font-size:27px}
+  .hv-me{left:12px;right:12px;width:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  .hv-card{padding:20px}
+  .hv-card h1{font-size:54px}
+  .hv-facts li{font-size:14px;padding:9px 0}
+  .hv-facts b{min-width:76px}
+  .hv-label{left:12px;right:12px;width:auto;bottom:calc(64px + env(safe-area-inset-bottom,0px));padding:16px 18px}
+  .hv-label-t{font-size:20px}
+  .hv-label-s{font-size:13px}
+  .hv-halls{right:8px;top:auto;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:none;flex-direction:row;gap:4px}
+  .hv-halls button span{display:none}
+  .hv-halls button i{width:16px}
+  .hv-halls button.is-on i{width:28px}
+  .hv-allbtn{right:auto;left:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));padding:8px 13px;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){.hv-grain{animation:none}}
+@media (max-width:760px){.hv-label.is-right{left:12px;right:12px}}

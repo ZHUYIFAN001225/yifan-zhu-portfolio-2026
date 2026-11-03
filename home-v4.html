@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Yifan Zhu</title>
+<meta name="description" content="Yifan Zhu — Research-led Multidisciplinary Designer. A studio and a gallery of digital products, service design, creative technology, 3D and AI work." />
+<meta name="theme-color" content="#e8ded0" />
+<link rel="stylesheet" href="home-v4.css" />
+</head>
+<body class="hv">
+<canvas class="hv-gl" aria-hidden="true"></canvas>
+<div class="hv-grain" aria-hidden="true"></div>
+<header class="hv-head">
+  <a class="hv-name" href="home-v4.html" data-t="name"></a>
+  <p class="hv-role" data-t="role"></p>
+  <nav class="hv-nav">
+    <a href="#gallery" data-jump="gallery" data-t="nav_work"></a>
+    <a href="about.html" data-t="nav_about"></a>
+    <a href="#contact" data-jump="contact" data-t="nav_contact"></a>
+    <button type="button" class="hv-lang"><span data-l="en">EN</span><span data-l="zh">中文</span></button>
+  </nav>
+</header>
+<main id="main">
+  <section class="hv-beat hv-hello" data-beat="hello">
+    <p class="hv-statement" data-t="statement"></p>
+    <p class="hv-scroll" data-t="scroll"></p>
+  </section>
+  <section class="hv-beat hv-me" data-beat="me">
+    <div class="hv-card">
+      <h1 data-t="name"></h1>
+      <p class="hv-card-role" data-t="role_long"></p>
+      <ul class="hv-facts"></ul>
+      <p class="hv-links"><a data-t="email_label" href="mailto:zhuyifan001225@gmail.com"></a><a href="about.html" data-t="about_link"></a><a href="#all" data-all data-t="all_work"></a></p>
+    </div>
+  </section>
+  <div class="hv-label" aria-live="polite">
+    <p class="hv-label-k"></p>
+    <h2 class="hv-label-t"></h2>
+    <p class="hv-label-s"></p>
+    <p class="hv-label-m"></p>
+    <a class="hv-label-a"></a>
+  </div>
+  <section class="hv-beat hv-exit" data-beat="contact" id="contact">
+    <h2 data-t="talk"></h2>
+    <p data-t="talk_s"></p>
+    <p class="hv-links"><a href="mailto:zhuyifan001225@gmail.com">zhuyifan001225@gmail.com</a><a href="about.html" data-t="about_link"></a><a href="#all" data-all data-t="all_work"></a></p>
+  </section>
+  <div class="hv-track" aria-hidden="true"></div>
+</main>
+<nav class="hv-halls"></nav>
+<button type="button" class="hv-allbtn" data-all data-t="all_work"></button>
+<dialog class="hv-all"><div class="hv-all-in"><header><h2 data-t="all_work"></h2><button type="button" class="hv-all-x">×</button></header><div class="hv-all-grid"></div></div></dialog>
+<p class="hv-loading" data-t="loading"></p>
+<script type="module" src="scripts/home-v4.mjs"></script>
+</body>
+</html>

@@ -507,7 +507,7 @@ export function mountDesk(root) {
     nudge(dt, onDesk);
     // ---- the phone ----
     pv.position.set(lerp(SPOT.x, .015, up), lerp(SPOT.y, .47, up), lerp(SPOT.z, .05, up));   // risen: centred a little low, clear of the header and the heading
-    pv.scale.setScalar(PH_SCALE * lerp(1, 1.0, up));
+    pv.scale.setScalar(PH_SCALE * lerp(1, vw < vh ? .8 : 1, up));   // tall screens: a little smaller when it rises, so the words above and the way out below stay clear
     E.set(up * (P.y * .16 + Math.sin(now / 2600) * .04), SPOT_ROT * (1 - up) + up * P.x * .2, up * Math.sin(now / 3100) * .03, 'XYZ'); pv.rotation.copy(E);
     // when it floats it faces the camera: tilt the flat phone up
     const bz = (now - buzz) / 1000; if (bz < .35 && onDesk > .5) pv.position.x += Math.sin(bz * 90) * .0012 * (1 - bz / .35);

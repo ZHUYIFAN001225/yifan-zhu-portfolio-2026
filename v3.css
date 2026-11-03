@@ -4145,3 +4145,8 @@ html[data-body=a] .bk-day .ux-case-index.has-lumen>a.ux-index-try{position:stick
   .bk-set .bk-dk-eve{left:20px!important;right:20px!important;width:auto!important;top:auto!important;bottom:calc(200px + env(safe-area-inset-bottom,0px))!important}
   html[data-cover="desk"] .bk-cover-pin>.op{height:100svh!important}
 }
+@media (max-width:639px){
+  .bk-set .bk-dk-pw-k{top:172px!important;bottom:auto!important}
+  .bk-set .bk-dk-pw-p{top:194px!important;bottom:auto!important;font-size:13px!important;max-width:34ch}
+  .bk-set :is(.bk-dk-copy,.bk-dk-eve,.bk-dk-pw-p,.bk-dk-pw-k){text-shadow:0 1px 2px rgba(0,0,0,.85),0 0 22px rgba(0,0,0,.9)!important}
+}

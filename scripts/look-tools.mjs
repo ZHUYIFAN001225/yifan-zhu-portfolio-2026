@@ -224,9 +224,14 @@ function mountThreads(root, acts) {
   const base = docY => {
     const W = innerWidth;
     if (W < 761) {   // phones: no side margins — the ropes keep to the screen edges, clear of the text, and meet only at the end
-      const from = boxesT.length ? boxesT[boxesT.length - 1].b : knotDoc - innerHeight * .5;   // below the closing words, never across them
-      const e2 = ease(clamp((docY - from) / Math.max(40, knotDoc - from)));
-      return { u: 6 + (W * .5 - 6) * e2, c: W - 6 - (W * .5 - 6) * e2 };
+      // they drift towards each other down the whole page (behind the text, which carries its own halo), step back to the
+      // edges round the big words of every act, and meet at the knot
+      const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.35)), M = W * .5 - 6;
+      const sw = Math.sin(docY / 260) * 9 * (1 - e), sw2 = Math.sin(docY / 260 + 1.7) * 9 * (1 - e);
+      let u = 6 + M * e + sw, c = W - 6 - M * e - sw2;
+      for (const q of boxesT.slice(0, -1)) { const f = Math.min(ss(q.t - 140, q.t, docY), 1 - ss(q.b, q.b + 140, docY)); if (f > 0) { u += (6 - u) * f; c += (W - 6 - c) * f; } }
+      const last = boxesT[boxesT.length - 1]; if (last) { const f = Math.min(ss(last.t - 140, last.t, docY), 1 - ss(last.b, last.b + 60, docY)); if (f > 0) { u += (6 - u) * f; c += (W - 6 - c) * f; } }
+      return { u: Math.max(6, u), c: Math.min(W - 6, c) };
     }
     const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.15));
     const wave = Math.sin(docY / 520) * W * .022 * (1 - e);
@@ -242,13 +247,13 @@ function mountThreads(root, acts) {
 
   const BUSY = 'p,h1,h2,h3,h4,li,img,figure,dl,blockquote,a,button,article:not(.v3-product-page),.lk-fold,svg:not(.lk-threads),.lk-tag,.lk-pol,.lk-flip,.lk-loop,[class*=card],[class*=shot]';
   const clearY = (side, vh) => {
-    const w = Math.min(250, innerWidth * .7), x0 = side === 'u' ? 22 : innerWidth - 22 - w;
-    for (const f of [.42, .3, .55, .66, .24]) { const y = vh * f; let free = true;
+    const w = Math.min(250, innerWidth * .7);
+    for (const f of [.42, .3, .55, .66, .24]) { const y = vh * f, b = base(scrollY + y), x0 = side === 'u' ? Math.min(b.u + 16, innerWidth - w - 8) : Math.max(b.c - 16, w + 8) - w; let free = true;
       for (let dy = -34; dy <= 34 && free; dy += 17) for (let dx = 8; dx < w && free; dx += 40) { const el = document.elementFromPoint(x0 + dx, y + dy); if (!el || el.closest(BUSY) || el.closest('.ux-case-index,.v3-mobile-dock,.lk-rope-say')) free = false; }
       if (free) return y; }
     return null;
   };
-  let raf = 0, autoY = -1e9, autoSide = 'c';
+  let raf = 0, autoY = -1e9, autoSide = 'c', vel = 0, lastSy = scrollY, bow = 0;
   const frame = () => {
     raf = requestAnimationFrame(frame);
     const vh = innerHeight, sy = scrollY;
@@ -261,18 +266,24 @@ function mountThreads(root, acts) {
       if (pmx > -1e3 && Math.sign(pmx - at[k]) !== Math.sign(mx - at[k]) && Math.abs(mx - pmx) > 3) { ripples.push({ side: k, y: my, t: now, amp: Math.min(30, 6 + Math.abs(mx - pmx) * 1.2) }); s.v += Math.sign(mx - pmx) * 6; if (my > startY - sy && my < knotDoc - sy - 140 && (!sayAt || now - (sayAt.t || 0) > 700)) { speak(k, sy + my); sayAt.t = now; } } }
     pmx = mx; while (ripples.length && now - ripples[0].t > 2600) ripples.shift();
     const y0 = Math.max(0, startY - sy), y1 = Math.min(vh, endY - sy), yk = knotDoc - sy;
-    let dU = '', dC = '', dJ = '';
-    for (let vy = y0, i = 0; vy <= y1 + 1; vy += 10, i++) {
-      const y = Math.min(vy, y1), b = base(sy + y), g = Math.exp(-Math.pow((y - my) / 110, 2));
+    // phones: the ropes grow as you scroll — drawn down to a glowing tip that rides 70% of the way down the screen —
+    // and swing inwards with the speed of the finger, settling back when it stops
+    const mob = innerWidth < 761;
+    vel += ((sy - lastSy) - vel) * .18; lastSy = sy; bow += (Math.min(34, Math.abs(vel) * 1.6) - bow) * .12;
+    const head = mob && yk > vh * .72 ? Math.max(y0, Math.min(y1, vh * .72)) : y1;
+    let dU = '', dC = '', dJ = '', tipU = null, tipC = null;
+    for (let vy = y0, i = 0; vy <= head + 1; vy += 10, i++) {
+      const y = Math.min(vy, head), b = base(sy + y), g = Math.exp(-Math.pow((y - my) / 110, 2));
       if (y <= yk) {
         // the knot holds the ropes: the closer to it, the less they can swing
-        const hold = clamp((yk - y) / 160), gh = g * hold;
-        const u = b.u + (spring.u.a * gh + wave('u', y, now) * hold), c = b.c + (spring.c.a * gh + wave('c', y, now) * hold);
+        const hold = clamp((yk - y) / 160), gh = g * hold, sway = mob ? bow * Math.exp(-Math.pow((head - y) / 240, 2)) * hold : 0;
+        const u = b.u + (spring.u.a * gh + wave('u', y, now) * hold) + sway, c = b.c + (spring.c.a * gh + wave('c', y, now) * hold) - sway;
+        tipU = [u, y]; tipC = [c, y];
         dU += (dU ? 'L' : 'M') + u.toFixed(1) + ' ' + y.toFixed(1); dC += (dC ? 'L' : 'M') + c.toFixed(1) + ' ' + y.toFixed(1);
       } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 22, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
     }
     if (sayAt) { const y = sayAt.docY - sy, b = base(sayAt.docY), g = Math.exp(-Math.pow((y - my) / 110, 2)), side = sayAt.side, x = b[side] + spring[side].a * g + wave(side, y, now);
-      say.style.left = (side === 'u' ? x + 16 : x - 16).toFixed(1) + 'px'; say.style.top = y.toFixed(1) + 'px'; }
+      const bw = say.offsetWidth || 250; say.style.left = (innerWidth < 761 ? (side === 'u' ? Math.min(x + 16, innerWidth - bw - 8) : Math.max(x - 16, bw + 8)) : (side === 'u' ? x + 16 : x - 16)).toFixed(1) + 'px'; say.style.top = y.toFixed(1) + 'px'; }
     [[pathU, shU, twU, dU], [pathC, shC, twC, dC], [pathJ, shJ, twJ, dJ]].forEach(([a, b, c, d]) => { a.setAttribute('d', d); b.setAttribute('d', d); c.setAttribute('d', d); });
     // phones have no pointer to pluck the ropes with, so the ropes speak by themselves as you scroll past:
     // one side, then the other, a line from what that person is going through at that point of the story
@@ -283,6 +294,7 @@ function mountThreads(root, acts) {
     const mid = vh * .5, bm = base(sy + mid), gm = Math.exp(-Math.pow((mid - my) / 110, 2));
     const showDots = mid >= y0 && mid <= Math.min(y1, yk);
     [[dotU, bm.u + spring.u.a * gm], [dotC, bm.c + spring.c.a * gm]].forEach(([d, x]) => { d.setAttribute('cx', x.toFixed(1)); d.setAttribute('cy', mid); d.style.opacity = 0; });
+    if (mob && tipU && head < y1 - 2) { [[dotU, tipU], [dotC, tipC]].forEach(([d, t]) => { d.setAttribute('cx', t[0].toFixed(1)); d.setAttribute('cy', t[1].toFixed(1)); d.style.opacity = 1; }); }
     // labels once, where the lines begin
     const ls = startY - sy + 34, bl = base(startY + 34);
     labU.style.transform = `translate3d(${(bl.u + 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`; labC.style.transform = `translate3d(${(bl.c - 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`;

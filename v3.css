@@ -4438,3 +4438,8 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
   .fm .fm-phone{transition:left 1.3s var(--ease),top 1.3s var(--ease),transform 1.3s var(--ease)}
   .fm .fm-hint{display:none}
 }
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .lk-dot{transition:none}
+  .lk-dot--u{filter:drop-shadow(0 0 5px #e0457f) drop-shadow(0 0 10px rgba(224,69,127,.7))}
+  .lk-dot--c{filter:drop-shadow(0 0 5px #8a5fd6) drop-shadow(0 0 10px rgba(138,95,214,.7))}
+}

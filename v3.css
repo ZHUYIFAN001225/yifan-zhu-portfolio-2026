@@ -4192,3 +4192,5 @@ html[data-body=a] .bk-dk.is-through .bk-dk-jump{visibility:hidden!important}
 @media (max-width:639px){
   html:not(.v3-header-scrolled) body:has(.bk-day) .site-header{background:linear-gradient(180deg,rgba(14,12,10,.7),rgba(14,12,10,0))!important;box-shadow:none!important;border-color:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 }
+/* the big "One shared diary": letters must not touch (each letter fades on its own, so any overlap shows) */
+.bk-set .bk-dk-pw-h{letter-spacing:-.022em!important}

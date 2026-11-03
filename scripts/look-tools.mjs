@@ -160,6 +160,8 @@ function mountActs(root, calm) {
 // The further you read, the closer they come; under the closing words they meet and tie a knot.
 // Bring the pointer near a line and it gives way like a string, then springs back.
 function mountThreads(root, acts) {
+  // the width actually on screen (on iPhones a wide child can stretch VW() past the screen, putting the right rope outside)
+  const VW = () => innerWidth < 761 ? Math.min(innerWidth, document.documentElement.clientWidth || innerWidth, window.visualViewport?.width || innerWidth) : innerWidth;
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'lk-threads'); svg.setAttribute('aria-hidden', 'true');
   const mk = (tag, cls) => { const e = document.createElementNS(NS, tag); e.setAttribute('class', cls); svg.append(e); return e; };
@@ -196,7 +198,7 @@ function mountThreads(root, acts) {
   let sayAt = null;
   const pageText = (root.textContent || '').replace(/[“”"’']/g, '').toLowerCase();
   const shown = l => { const q = l[zh() ? 1 : 0].replace(/[“”"’'。.]/g, '').toLowerCase().trim(); return pageText.includes(q.slice(0, 28)); };
-  const speak = (side, docY) => { const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), stg = P < .38 ? 0 : P < .72 ? 1 : 2, all = SAY[side][stg], fresh = innerWidth < 761 ? all.filter(x => !shown(x)) : all; if (!fresh.length) return; const list = fresh, l = list[sayK[side][stg]++ % list.length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; sayAt = { side, docY }; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => { say.classList.remove('is-on'); setTimeout(() => { if (!say.classList.contains('is-on')) sayAt = null; }, 400); }, 3400); };
+  const speak = (side, docY) => { const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), stg = P < .38 ? 0 : P < .72 ? 1 : 2, all = SAY[side][stg], fresh = VW() < 761 ? all.filter(x => !shown(x)) : all; if (!fresh.length) return; const list = fresh, l = list[sayK[side][stg]++ % list.length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; sayAt = { side, docY }; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => { say.classList.remove('is-on'); setTimeout(() => { if (!say.classList.contains('is-on')) sayAt = null; }, 400); }, 3400); };
   const words = () => {
     labU.innerHTML = zh() ? '<strong>用户</strong>想找到做这个造型的人' : '<strong>User</strong>looking for who made a look';
     labC.innerHTML = zh() ? '<strong>Creator</strong>想让作品带来客人' : '<strong>Creator</strong>wants their work to bring customers';
@@ -222,7 +224,7 @@ function mountThreads(root, acts) {
   // where each line is at a point of the page: apart at the start, together at the knot
   const ease = t => t * t * (3 - 2 * t);
   const base = docY => {
-    const W = innerWidth;
+    const W = VW();
     if (W < 761) {   // phones: no side margins — the ropes keep to the screen edges, clear of the text, and meet only at the end
       // they keep to the side margins (clear of the text) but visibly draw in as the case goes on — from the very edge to the
       // edge of the text column — step back round the big words of every act, and only cross the page to meet at the knot
@@ -249,8 +251,8 @@ function mountThreads(root, acts) {
 
   const BUSY = 'p,h1,h2,h3,h4,li,img,figure,dl,blockquote,a,button,article:not(.v3-product-page),.lk-fold,svg:not(.lk-threads),.lk-tag,.lk-pol,.lk-flip,.lk-loop,[class*=card],[class*=shot]';
   const clearY = (side, vh) => {
-    const w = Math.min(250, innerWidth * .7);
-    for (const f of [.42, .3, .55, .66, .24]) { const y = vh * f, b = base(scrollY + y), x0 = side === 'u' ? Math.min(b.u + 16, innerWidth - w - 8) : Math.max(b.c - 16, w + 8) - w; let free = true;
+    const w = Math.min(250, VW() * .7);
+    for (const f of [.42, .3, .55, .66, .24]) { const y = vh * f, b = base(scrollY + y), x0 = side === 'u' ? Math.min(b.u + 16, VW() - w - 8) : Math.max(b.c - 16, w + 8) - w; let free = true;
       for (let dy = -34; dy <= 34 && free; dy += 17) for (let dx = 8; dx < w && free; dx += 40) { const el = document.elementFromPoint(x0 + dx, y + dy); if (!el || el.closest(BUSY) || el.closest('.ux-case-index,.v3-mobile-dock,.lk-rope-say')) free = false; }
       if (free) return y; }
     return null;
@@ -270,7 +272,7 @@ function mountThreads(root, acts) {
     const y0 = Math.max(0, startY - sy), y1 = Math.min(vh, endY - sy), yk = knotDoc - sy;
     // phones: the ropes grow as you scroll — drawn down to a glowing tip that rides 70% of the way down the screen —
     // and swing inwards with the speed of the finger, settling back when it stops
-    const mob = innerWidth < 761;
+    const mob = VW() < 761;
     vel += ((sy - lastSy) - vel) * .18; lastSy = sy; bow += (Math.min(34, Math.abs(vel) * 1.6) - bow) * .12;
     const head = mob && yk > vh * .72 ? Math.max(y0, Math.min(y1, vh * .72)) : y1;
     let dU = '', dC = '', dJ = '', tipU = null, tipC = null;
@@ -282,16 +284,16 @@ function mountThreads(root, acts) {
         const u = b.u + (spring.u.a * gh + wave('u', y, now) * hold) + sway, c = b.c + (spring.c.a * gh + wave('c', y, now) * hold) - sway;
         tipU = [u, y]; tipC = [c, y];
         dU += (dU ? 'L' : 'M') + u.toFixed(1) + ' ' + y.toFixed(1); dC += (dC ? 'L' : 'M') + c.toFixed(1) + ' ' + y.toFixed(1);
-      } else { const x = innerWidth / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 22, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
+      } else { const x = VW() / 2; if (!dJ) dJ = `M${x} ${Math.max(yk + 22, 0).toFixed(1)}`; dJ += `L${x} ${y.toFixed(1)}`; }
     }
     if (sayAt) { const y = sayAt.docY - sy, b = base(sayAt.docY), g = Math.exp(-Math.pow((y - my) / 110, 2)), side = sayAt.side, x = b[side] + spring[side].a * g + wave(side, y, now);
-      const bw = say.offsetWidth || 250; say.style.left = (innerWidth < 761 ? (side === 'u' ? Math.min(x + 16, innerWidth - bw - 8) : Math.max(x - 16, bw + 8)) : (side === 'u' ? x + 16 : x - 16)).toFixed(1) + 'px'; say.style.top = y.toFixed(1) + 'px'; }
+      const bw = say.offsetWidth || 250; say.style.left = (VW() < 761 ? (side === 'u' ? Math.min(x + 16, VW() - bw - 8) : Math.max(x - 16, bw + 8)) : (side === 'u' ? x + 16 : x - 16)).toFixed(1) + 'px'; say.style.top = y.toFixed(1) + 'px'; }
     [[pathU, shU, twU, dU], [pathC, shC, twC, dC], [pathJ, shJ, twJ, dJ]].forEach(([a, b, c, d]) => { a.setAttribute('d', d); b.setAttribute('d', d); c.setAttribute('d', d); });
     // phones have no pointer to pluck the ropes with, so the ropes speak by themselves as you scroll past:
     // one side, then the other, a line from what that person is going through at that point of the story
     // only into a clear stretch of page (never over a card or a line of text), never a line the page already shows nearby,
     // and only every couple of screens
-    if (innerWidth < 761 && !sayAt) { const midD = sy + vh * .5; if (midD > startY + vh * .6 && midD < knotDoc - vh * .5 && Math.abs(sy - autoY) > vh * 2) { const side = autoSide === 'u' ? 'c' : 'u', y = clearY(side, vh); if (y != null) { autoY = sy; autoSide = side; speak(side, sy + y); } } }
+    if (VW() < 761 && !sayAt) { const midD = sy + vh * .5; if (midD > startY + vh * .6 && midD < knotDoc - vh * .5 && Math.abs(sy - autoY) > vh * 2) { const side = autoSide === 'u' ? 'c' : 'u', y = clearY(side, vh); if (y != null) { autoY = sy; autoSide = side; speak(side, sy + y); } } }
     // a dot rides each line in the middle of the screen
     const mid = vh * .5, bm = base(sy + mid), gm = Math.exp(-Math.pow((mid - my) / 110, 2));
     const showDots = mid >= y0 && mid <= Math.min(y1, yk);
@@ -301,20 +303,20 @@ function mountThreads(root, acts) {
     const ls = startY - sy + 34, bl = base(startY + 34);
     labU.style.transform = `translate3d(${(bl.u + 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`; labC.style.transform = `translate3d(${(bl.c - 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`;
     const lv = ls > 40 && ls < vh - 60; labU.classList.toggle('is-on', lv); labC.classList.toggle('is-on', lv);
-    note.style.transform = `translate3d(${innerWidth / 2}px,${(ls + (innerWidth < 761 ? 58 : 6)).toFixed(1)}px,0)`; note.classList.toggle('is-on', lv);
+    note.style.transform = `translate3d(${VW() / 2}px,${(ls + (VW() < 761 ? 58 : 6)).toFixed(1)}px,0)`; note.classList.toggle('is-on', lv);
     // the knot where they meet
-    const kx = innerWidth / 2, kv = yk > -30 && yk < vh + 30;
+    const kx = VW() / 2, tie = mob ? clamp((vh * .72 - yk) / 80) : 1, kv = yk > -30 && yk < vh + 30 && tie > 0;
     // a real knot: two loops crossing, with the two colours twisting into one
     if (kv) {
-      const x = kx, y = yk, k = 1.7, P = (a, b) => `${(x + a * k).toFixed(1)} ${(y + b * k).toFixed(1)}`;
+      const x = kx, y = yk, k = 1.7 * (.35 + .65 * tie), P = (a, b) => `${(x + a * k).toFixed(1)} ${(y + b * k).toFixed(1)}`;
       // overhand knot woven from both ropes: lilac loop underneath, pink loop crossing over it, then lilac crosses back on top
       const dc = `M${P(3, -1)}C${P(13, -2)} ${P(12, 10)} ${P(3, 11)}C${P(-6, 12)} ${P(-9, 3)} ${P(-3, -3)}C${P(1, -7)} ${P(4, -3)} ${P(2, 3)}L${P(1, 14)}`;
       const du = `M${P(-3, -1)}C${P(-13, -2)} ${P(-12, 10)} ${P(-3, 11)}C${P(6, 12)} ${P(9, 3)} ${P(3, -3)}C${P(-1, -7)} ${P(-4, -3)} ${P(-2, 3)}L${P(-1, 14)}`;
       const over = `M${P(-6, 9)}C${P(-2, 12)} ${P(4, 12)} ${P(7, 8)}`; // the lilac strand passing over the pink at the front
       knotC.setAttribute('d', dc); knotU.setAttribute('d', du); knotCt.setAttribute('d', over); knotUt.setAttribute('d', ''); knotSh.setAttribute('d', dc + du);
     }
-    [knotC, knotCt, knotU, knotUt, knotSh].forEach(e => e.style.opacity = kv ? 1 : 0);
-    knotSay.style.transform = innerWidth < 761 ? `translate3d(${innerWidth - 20}px,${(yk + 44).toFixed(1)}px,0)` : `translate3d(${kx + 34}px,${(yk + 30).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
+    [knotC, knotCt, knotU, knotUt, knotSh].forEach(e => e.style.opacity = kv ? Math.min(1, tie * 1.6).toFixed(2) : 0);
+    knotSay.style.transform = VW() < 761 ? `translate3d(${VW() - 20}px,${(yk + 44).toFixed(1)}px,0)` : `translate3d(${kx + 34}px,${(yk + 30).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
   };
   raf = requestAnimationFrame(frame);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(frame); });

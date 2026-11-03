@@ -4443,3 +4443,5 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
   .lk-dot--u{filter:drop-shadow(0 0 5px #e0457f) drop-shadow(0 0 10px rgba(224,69,127,.7))}
   .lk-dot--c{filter:drop-shadow(0 0 5px #8a5fd6) drop-shadow(0 0 10px rgba(138,95,214,.7))}
 }
+/* LOOK phones: nothing may widen the page sideways (iOS then widens the whole layout and the right rope ends up off screen) */
+@media (max-width:760px){html:has([data-product-case=beauty]),body:has([data-product-case=beauty]){overflow-x:clip}}

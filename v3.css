@@ -4184,3 +4184,8 @@ html[data-body=a] .bk-dk.is-through .bk-dk-jump{visibility:hidden!important}
   .bk-set .bk-dk-pw-k,.bk-set .bk-dk-pw-p{display:none!important}
   .bk-set .bk-dk-tilt{position:fixed!important;top:50%!important}
 }
+@media (max-width:639px){
+  html.bk-opening body:has(.bk-day) .site-header{background:linear-gradient(180deg,rgba(14,12,10,.7),rgba(14,12,10,0))!important;box-shadow:none!important;border-color:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .bk-set .bk-dk-h{top:124px!important}
+  .bk-set .bk-dk-copy{top:calc(124px + 128px)!important}
+}

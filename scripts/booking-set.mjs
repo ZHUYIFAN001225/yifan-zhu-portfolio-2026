@@ -46,6 +46,9 @@ export function mountDesk(root) {
     const y = t.getBoundingClientRect().top + scrollY - (a.dataset.to === '#interactive-demo' ? 40 : 90);
     scrollTo({ top: y, behavior: 'instant' }); history.replaceState(null, '', a.dataset.to.startsWith('#') ? a.dataset.to : location.pathname + location.search); }); });
   op.append(ov);
+  // phones: the opening starts at the very top of the screen, under the (see-through) site bar, as Oryzo's does
+  const pullUp = () => { if (innerWidth >= 640) { holder.style.marginTop = ''; return; } holder.style.marginTop = ''; const off = holder.getBoundingClientRect().top + scrollY; holder.style.marginTop = off > 0 ? `${-off}px` : ''; };
+  pullUp(); addEventListener('resize', pullUp);
   const $ = s => ov.querySelector(s);
   const text = () => {
     $('.bk-dk-tag').textContent = L(T.tag); $('.t1').textContent = L(T.t1); $('.t2').textContent = L(T.t2); $('.t3').textContent = L(T.t3);

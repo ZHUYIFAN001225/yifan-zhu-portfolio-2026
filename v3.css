@@ -4238,3 +4238,13 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock small{color:rgba(241,231,214,.55)
 html[data-body=a]:has(.bk-day) .v3-mobile-dock svg{stroke:#f0a35e!important}
 html[data-body=a]:has(.bk-day) .v3-mobile-dock svg *{stroke:#f0a35e!important}
 html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,255,255,.12)!important}
+/* the sound switch: a small speaker in the corner of the way-out panel, off until the visitor turns it on */
+.bk-set .bk-dk-jump{position:absolute}
+.bk-set .bk-snd{flex:none;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:0;border-radius:999px;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;color:rgba(246,238,226,.7);background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.bk-set .bk-snd i{width:14px;height:12px;background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 20'><path d='M2 7h4l6-5v16l-6-5H2z' fill='black'/><path d='M16 6l6 8M22 6l-6 8' stroke='black' stroke-width='2.2' stroke-linecap='round'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 20'><path d='M2 7h4l6-5v16l-6-5H2z' fill='black'/><path d='M16 6l6 8M22 6l-6 8' stroke='black' stroke-width='2.2' stroke-linecap='round'/></svg>") center/contain no-repeat}
+.bk-set .bk-snd.is-on{color:#1a1410;background:#f0a35e;box-shadow:none}
+.bk-set .bk-snd.is-on i{-webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 20'><path d='M2 7h4l6-5v16l-6-5H2z' fill='black'/><path d='M15.5 6.5a5 5 0 0 1 0 7M18.5 3.5a9 9 0 0 1 0 13' stroke='black' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 20'><path d='M2 7h4l6-5v16l-6-5H2z' fill='black'/><path d='M15.5 6.5a5 5 0 0 1 0 7M18.5 3.5a9 9 0 0 1 0 13' stroke='black' stroke-width='2' fill='none' stroke-linecap='round'/></svg>")}
+
+.bk-set .bk-jrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 4px 6px}
+.bk-set .bk-jrow .bk-jk{margin:0!important}
+@media (max-width:639px){ .bk-set .bk-jrow{margin:8px 2px 0;justify-content:flex-end} .bk-set .bk-jrow .bk-jk{display:none!important} }

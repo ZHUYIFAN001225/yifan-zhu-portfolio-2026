@@ -39,8 +39,10 @@ export function mountDesk(root) {
   // a way out at any moment: the real site (so it can be checked), and a jump straight to the case
   const jump = document.createElement('nav'); jump.className = 'bk-dk-jump'; jump.setAttribute('aria-label', 'Skip the intro');
   jump.innerHTML = `<a class="bk-jl" target="_blank" rel="noopener"><i></i><b class="k"></b><span><b class="t"></b><em></em></span><u>↗</u></a>
-    <p class="bk-jk"></p><div class="bk-jg"><a data-to=".bk-quick"></a><a data-to="#overview"></a><a data-to="#interactive-demo"></a></div>`;
+    <div class="bk-jrow"><p class="bk-jk"></p><button type="button" class="bk-snd" aria-pressed="false"><i aria-hidden="true"></i><span></span></button></div><div class="bk-jg"><a data-to=".bk-quick"></a><a data-to="#overview"></a><a data-to="#interactive-demo"></a></div>`;
   ov.append(jump);
+  const snd = jump.querySelector('.bk-snd');
+  snd.addEventListener('click', () => { fx.on = !fx.on; snd.setAttribute('aria-pressed', String(fx.on)); snd.classList.toggle('is-on', fx.on); if (fx.on) ding(true); });
   jump.querySelectorAll('[data-to]').forEach(a => { a.href = a.dataset.to.startsWith('#') ? a.dataset.to : '#'; a.addEventListener('click', e => {
     const t = document.querySelector(a.dataset.to); if (!t) return; e.preventDefault();
     const y = t.getBoundingClientRect().top + scrollY - (a.dataset.to === '#interactive-demo' ? 40 : 90);
@@ -57,7 +59,7 @@ export function mountDesk(root) {
     $('.p1').textContent = L(T.p1); $('.p2').textContent = L(T.p2); $('.bk-dk-pw-k').textContent = L(T.p3); $('.bk-dk-pw-p').textContent = L(T.pp); $('.bk-dk-pw-q').textContent = L(T.pq);
     $('.bk-dk-eve-k').textContent = L(T.ek); $('.bk-dk-eve-p').textContent = L(T.ep);
     const jl = $('.bk-jl'); if (liveA) jl.href = zh() ? (liveA.dataset.hrefZh || liveA.href) : liveA.href; else jl.remove();
-    $('.bk-jl .k').textContent = L(T.jl); $('.bk-jl .t').textContent = L(T.jlb); $('.bk-jl em').textContent = L(T.jls); $('.bk-jk').textContent = L(T.jk);
+    $('.bk-snd span').textContent = zh() ? '声音' : 'Sound'; $('.bk-jl .k').textContent = L(T.jl); $('.bk-jl .t').textContent = L(T.jlb); $('.bk-jl em').textContent = L(T.jls); $('.bk-jk').textContent = L(T.jk);
     const ja = ov.querySelectorAll('.bk-jg a'); ja[0].textContent = L(T.j1); ja[1].textContent = L(T.j2); ja[2].textContent = L(T.j3);
   };
   text(); document.addEventListener('portfolio:language', () => setTimeout(() => { text(); splitAll(); inkNow = -1; drawLeft(); screens.load(); }, 40));
@@ -227,7 +229,7 @@ export function mountDesk(root) {
   const wxList = () => { const o = []; for (let i = 0; i < T.wx.length; i += 2) o.push([L(T.wx[i]), L(T.wx[i + 1])]); return o; };
   function syncBanners(now, count) {
     count = Math.max(0, Math.min(count, 60)); if (count === wantCount) return; const list = wxList();
-    while (banners.length < Math.min(count, 7) && wantCount < count) { const n = wantCount % list.length; banners.push({ who: list[n][0], what: list[n][1], t: now, n }); wantCount++; buzz = now; if (banners.length > (eveAmt > .5 ? 7 : 4)) banners.shift(); }
+    while (banners.length < Math.min(count, 7) && wantCount < count) { const n = wantCount % list.length; banners.push({ who: list[n][0], what: list[n][1], t: now, n }); wantCount++; buzz = now; notify(); if (banners.length > (eveAmt > .5 ? 7 : 4)) banners.shift(); }
     if (wantCount < count) { wantCount = count; buzz = now; }
     while (wantCount > count) { wantCount--; if (banners.length > 1) banners.pop(); }
     if (count === 0) banners.length = 0;
@@ -289,6 +291,21 @@ export function mountDesk(root) {
   document.fonts?.ready.then(() => { dirty = true; });
   function paintIsland() { const W = sc.width; sx.fillStyle = '#000'; const iw = W * .3, ih = W * .085; sx.beginPath(); sx.roundRect((W - iw) / 2, W * .028, iw, ih, ih / 2); sx.fill(); }
   let buzz = -1e9;
+  // each message that lands: a soft chime (only once the visitor has switched sound on) and, on Android phones, a tap
+  // of the vibration motor (iPhone browsers do not allow vibration). Never in the page behind the case.
+  const fx = { on: false, ctx: null, last: 0 };
+  function ding(first) {
+    try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; const ctx = fx.ctx || (fx.ctx = new C()); if (ctx.state === 'suspended') ctx.resume();
+      const t = ctx.currentTime + .01;
+      [[1318.5, .07, 0], [1975.5, .045, .065]].forEach(([f, g, d]) => { const o = ctx.createOscillator(), a = ctx.createGain(), s0 = t + d;
+        o.type = 'sine'; o.frequency.value = f; a.gain.setValueAtTime(0, s0); a.gain.linearRampToValueAtTime(g * (first ? .8 : 1), s0 + .006); a.gain.exponentialRampToValueAtTime(.0001, s0 + .34);
+        o.connect(a); a.connect(ctx.destination); o.start(s0); o.stop(s0 + .4); }); } catch {}
+  }
+  function notify() {
+    if (inBody) return; const t = performance.now(); if (t - fx.last < 150) return; fx.last = t;
+    if (fx.on) ding();
+    if (!fine && navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) { try { navigator.vibrate(16); } catch {} }
+  }
   const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.prev = screens.cur === 'lock' ? null : screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };
 
   // ---------- the messages, in the air ----------

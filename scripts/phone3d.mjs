@@ -181,5 +181,10 @@ export function mountPhone(host) {
 }
 
 export function mountAll(root = document) {
-  root.querySelectorAll('[data-phone3d]').forEach(h => mountPhone(h));
+  // each phone starts only when it is about to come into view — a phone that is never shown (hidden by the page's own
+  // design) never takes a graphics context, its pictures or a frame loop; on phone browsers that memory is what runs out
+  const hosts = [...root.querySelectorAll('[data-phone3d]')];
+  if (!('IntersectionObserver' in window)) { hosts.forEach(h => mountPhone(h)); return; }
+  const io = new IntersectionObserver(es => es.forEach(en => { const r = en.boundingClientRect; if (en.isIntersecting && r.width > 0 && r.height > 0) { io.unobserve(en.target); mountPhone(en.target); } }), { rootMargin: '100% 0px' });
+  hosts.forEach(h => io.observe(h));
 }

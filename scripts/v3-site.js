@@ -50,12 +50,15 @@
         if(!url){if(unavailable)unavailable.hidden=false;return;}
         // Public prototypes follow the portfolio language (they default to English).
         const withLang=(u,embed)=>{if(!stage.dataset.publicDemo&&local&&demos[key])return u;try{const x=new URL(u,location.href);x.searchParams.set('lang',(document.documentElement.lang||'en').startsWith('zh')?'zh':'en');if(embed)x.searchParams.set('embed','1');return x.href;}catch{return u;}};
-        const frame=stage.querySelector('[data-demo-frame]');frame.src=withLang(url,true);
+        const frame=stage.querySelector('[data-demo-frame]');
+        // phones: the prototype (a whole second app) loads only when its section comes near, not with the page
+        const small=matchMedia('(pointer: coarse)').matches&&Math.min(screen.width,screen.height)<900;
+        if(small&&'IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.boundingClientRect.height>0)){io.disconnect();if(!frame.getAttribute('src'))frame.src=withLang(url,true);}},{rootMargin:'150% 0px'});setTimeout(()=>io.observe(frame),2500);}   // after the opening has laid the page outelse frame.src=withLang(url,true);
         // Some prototypes refresh when their window gains focus, which swallowed the first tap.
         // Give the frame focus as the pointer arrives, so the first real click goes through.
         frame.addEventListener('pointerenter',()=>{try{if(document.activeElement!==frame)frame.contentWindow.focus();}catch{}});stage.hidden=false;if(unavailable)unavailable.hidden=true;
         const links=()=>stage.querySelectorAll('[data-demo-launch]').forEach(a=>{const name=a.dataset.demoLaunch,hosted=name===key?stage.dataset.publicDemo:name===key+'Admin'?stage.dataset.publicAdmin:'',route=hosted||(local&&demos[name]);if(route){a.href=hosted?withLang(route):route;a.hidden=false;}});links();
-        document.addEventListener('portfolio:language',()=>{const next=withLang(url,true);if(frame.src!==next)frame.src=next;links();});
+        document.addEventListener('portfolio:language',()=>{const next=withLang(url,true);if(frame.getAttribute('src')&&frame.src!==next)frame.src=next;links();});
         const note=stage.querySelector('[data-demo-local-note]');if(note)note.hidden=!(!stage.dataset.publicDemo&&local&&demos[key]);
         const cta=document.querySelector('[data-demo-cta]');
         if(cta){const label=()=>{cta.textContent=text('Try the prototype ↓','试用交互原型 ↓');};label();document.addEventListener('portfolio:language',label);}
@@ -615,7 +618,7 @@ window.addEventListener('pagereveal',event=>{
   }
   // 4) The 3D phone loads only on pages that have one, and only where WebGL works.
   if (document.querySelector('[data-phone3d]')) {
-    const ok = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } })();
+    const ok = (() => { try { const c = document.createElement('canvas'), g = c.getContext('webgl2') || c.getContext('webgl'); g?.getExtension('WEBGL_lose_context')?.loseContext(); return !!g; } catch { return false; } })();   // the test context is let go at once
     if (ok) import('./phone3d.mjs').then(m => m.mountAll()).catch(() => {});
   }
 })();

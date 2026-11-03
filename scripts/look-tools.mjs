@@ -39,6 +39,7 @@ export function mount() {
   const applyInk = () => secs.forEach(s => { s.querySelector(':scope>h2').style.color = s.dataset.lkInk; });
   applyInk(); document.addEventListener('portfolio:language', () => setTimeout(applyInk, 60));
   fold(root);
+  lumenNav(root);
   bridge(root);
   rail(root);
   const acts = mountActs(root, calm);
@@ -193,7 +194,9 @@ function mountThreads(root, acts) {
   const sayK = { u: [0, 0, 0], c: [0, 0, 0] }; let sayT = 0, touching = '';
   // the bubble grows out of the point that was plucked, points back at it, and rides along with the rope
   let sayAt = null;
-  const speak = (side, docY) => { const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), stg = P < .38 ? 0 : P < .72 ? 1 : 2, list = SAY[side][stg], l = list[sayK[side][stg]++ % list.length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; sayAt = { side, docY }; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => { say.classList.remove('is-on'); setTimeout(() => { if (!say.classList.contains('is-on')) sayAt = null; }, 400); }, 3400); };
+  const pageText = (root.textContent || '').replace(/[“”"’']/g, '').toLowerCase();
+  const shown = l => { const q = l[zh() ? 1 : 0].replace(/[“”"’'。.]/g, '').toLowerCase().trim(); return pageText.includes(q.slice(0, 28)); };
+  const speak = (side, docY) => { const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), stg = P < .38 ? 0 : P < .72 ? 1 : 2, all = SAY[side][stg], fresh = innerWidth < 761 ? all.filter(x => !shown(x)) : all; if (!fresh.length) return; const list = fresh, l = list[sayK[side][stg]++ % list.length]; say.innerHTML = `<b>${side === 'u' ? (zh() ? '用户' : 'User') : 'Creator'}</b>${l[zh() ? 1 : 0]}`; say.dataset.side = side; sayAt = { side, docY }; say.classList.remove('is-on'); void say.offsetWidth; say.classList.add('is-on'); clearTimeout(sayT); sayT = setTimeout(() => { say.classList.remove('is-on'); setTimeout(() => { if (!say.classList.contains('is-on')) sayAt = null; }, 400); }, 3400); };
   const words = () => {
     labU.innerHTML = zh() ? '<strong>用户</strong>想找到做这个造型的人' : '<strong>User</strong>looking for who made a look';
     labC.innerHTML = zh() ? '<strong>Creator</strong>想让作品带来客人' : '<strong>Creator</strong>wants their work to bring customers';
@@ -237,6 +240,14 @@ function mountThreads(root, acts) {
   addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
   document.addEventListener('pointerleave', () => { mx = my = -1e4; });
 
+  const BUSY = 'p,h1,h2,h3,h4,li,img,figure,dl,blockquote,a,button,article:not(.v3-product-page),.lk-fold,svg:not(.lk-threads),.lk-tag,.lk-pol,.lk-flip,.lk-loop,[class*=card],[class*=shot]';
+  const clearY = (side, vh) => {
+    const w = Math.min(250, innerWidth * .7), x0 = side === 'u' ? 22 : innerWidth - 22 - w;
+    for (const f of [.42, .3, .55, .66, .24]) { const y = vh * f; let free = true;
+      for (let dy = -34; dy <= 34 && free; dy += 17) for (let dx = 8; dx < w && free; dx += 40) { const el = document.elementFromPoint(x0 + dx, y + dy); if (!el || el.closest(BUSY) || el.closest('.ux-case-index,.v3-mobile-dock,.lk-rope-say')) free = false; }
+      if (free) return y; }
+    return null;
+  };
   let raf = 0, autoY = -1e9, autoSide = 'c';
   const frame = () => {
     raf = requestAnimationFrame(frame);
@@ -265,7 +276,9 @@ function mountThreads(root, acts) {
     [[pathU, shU, twU, dU], [pathC, shC, twC, dC], [pathJ, shJ, twJ, dJ]].forEach(([a, b, c, d]) => { a.setAttribute('d', d); b.setAttribute('d', d); c.setAttribute('d', d); });
     // phones have no pointer to pluck the ropes with, so the ropes speak by themselves as you scroll past:
     // one side, then the other, a line from what that person is going through at that point of the story
-    if (innerWidth < 761 && !sayAt) { const midD = sy + vh * .5; if (midD > startY + vh * .6 && midD < knotDoc - vh * .5 && Math.abs(sy - autoY) > vh * 1.05) { autoY = sy; autoSide = autoSide === 'u' ? 'c' : 'u'; speak(autoSide, sy + vh * .4); } }
+    // only into a clear stretch of page (never over a card or a line of text), never a line the page already shows nearby,
+    // and only every couple of screens
+    if (innerWidth < 761 && !sayAt) { const midD = sy + vh * .5; if (midD > startY + vh * .6 && midD < knotDoc - vh * .5 && Math.abs(sy - autoY) > vh * 2) { const side = autoSide === 'u' ? 'c' : 'u', y = clearY(side, vh); if (y != null) { autoY = sy; autoSide = side; speak(side, sy + y); } } }
     // a dot rides each line in the middle of the screen
     const mid = vh * .5, bm = base(sy + mid), gm = Math.exp(-Math.pow((mid - my) / 110, 2));
     const showDots = mid >= y0 && mid <= Math.min(y1, yk);
@@ -287,7 +300,7 @@ function mountThreads(root, acts) {
       knotC.setAttribute('d', dc); knotU.setAttribute('d', du); knotCt.setAttribute('d', over); knotUt.setAttribute('d', ''); knotSh.setAttribute('d', dc + du);
     }
     [knotC, knotCt, knotU, knotUt, knotSh].forEach(e => e.style.opacity = kv ? 1 : 0);
-    knotSay.style.transform = `translate3d(${kx + 34}px,${(yk + 30).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
+    knotSay.style.transform = innerWidth < 761 ? `translate3d(${innerWidth - 20}px,${(yk + 44).toFixed(1)}px,0)` : `translate3d(${kx + 34}px,${(yk + 30).toFixed(1)}px,0)`; knotSay.classList.toggle('is-on', kv && yk < vh - 40);
   };
   raf = requestAnimationFrame(frame);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(frame); });
@@ -343,4 +356,45 @@ export function mountLoop() {
   new IntersectionObserver(es => { if (es[0].isIntersecting) go(); else { cancelAnimationFrame(raf); raf = 0; } }).observe(wrap);
   addEventListener('scroll', calc, { passive: true }); addEventListener('resize', calc); go();
   document.addEventListener('portfolio:language', () => setTimeout(() => { cur = -1; go(); }, 60));
+}
+
+// Phones: the chapter bar along the top becomes a lit rail, the same as the salon case's but in LOOK pink — the chapters
+// already read glow along the bottom edge, and under the current one the line dips round a glass knob that slides along.
+// It only draws on a narrow screen; on a computer the bar stays exactly as it was.
+function lumenNav(root) {
+  const nav = root.querySelector('.ux-case-index'); if (!nav || nav.querySelector('.lk-lumen-h')) return;
+  const narrow = matchMedia('(max-width: 760px)'), NS = 'http://www.w3.org/2000/svg', B = 9, W2 = 34;
+  nav.classList.add('lk-lumen');
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'lk-lumen-h'); svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = '<defs><filter id="lklh-b" x="-1" y="-3" width="3" height="7"><feGaussianBlur stdDeviation="4.5"/></filter></defs><path class="t"/><path class="g"/><path class="l"/><ellipse class="halo" rx="26" ry="11"/>';
+  const knob = document.createElement('i'); knob.className = 'lk-knob-h'; knob.setAttribute('aria-hidden', 'true');
+  nav.prepend(svg); nav.append(knob);
+  const T = svg.querySelector('.t'), G = svg.querySelector('.g'), Lp = svg.querySelector('.l'), halo = svg.querySelector('.halo');
+  const links = () => [...nav.querySelectorAll('a')].filter(a => !a.matches('.ux-index-try, .ux-index-top') && a.offsetWidth);
+  let kx = null, kf = 0, sig = '', last = performance.now();
+  const path = (x0, x1, y, k, amt) => { let d = ''; for (let x = x0; x <= x1 + .01; x += 4) { const u = (x - k) / W2; d += (d ? 'L' : 'M') + x.toFixed(1) + ' ' + (y + B * amt * Math.exp(-u * u * 2.2)).toFixed(2); } return d; };
+  const tick = now => {
+    requestAnimationFrame(tick);
+    const dt = Math.min(.06, (now - last) / 1000); last = now; const E = r => 1 - Math.exp(-dt * r);
+    if (!narrow.matches) return;
+    const r = nav.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    const ls = links(); if (!ls.length) return;
+    const on = ls.find(a => a.getAttribute('aria-current') === 'location');
+    const mid = a => a.offsetLeft + a.offsetWidth / 2;
+    const want = on ? mid(on) : ls[0].offsetLeft;
+    kx = kx == null ? want : kx + (want - kx) * E(6.5); kf += ((on ? 1 : 0) - kf) * E(5);
+    const W = nav.scrollWidth, H = nav.clientHeight, y = H - 13;
+    const s2 = `${kx.toFixed(1)}|${kf.toFixed(3)}|${W}|${H}`; if (s2 === sig) return; sig = s2;   // nothing moved: leave the page alone
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.width = W + 'px'; svg.style.height = H + 'px';
+    const x0 = ls[0].offsetLeft, x1 = ls[ls.length - 1].offsetLeft + ls[ls.length - 1].offsetWidth;
+    T.setAttribute('d', path(x0, x1, y, kx, kf));
+    const lx = Math.max(x0, kx); Lp.setAttribute('d', path(x0, lx, y, kx, kf)); G.setAttribute('d', path(Math.max(x0, kx - 70), lx, y, kx, kf));
+    G.style.opacity = kf.toFixed(3);
+    halo.setAttribute('cx', kx.toFixed(1)); halo.setAttribute('cy', (y + B * kf - 1).toFixed(1)); halo.style.opacity = (kf * .85).toFixed(3);
+    knob.style.transform = `translate3d(${kx.toFixed(1)}px,${(y - 1).toFixed(1)}px,0) translate(-50%,-50%) scale(${(.55 + .45 * kf).toFixed(3)})`;
+    knob.style.opacity = (.2 + .8 * kf).toFixed(3);
+  };
+  requestAnimationFrame(tick);
+  // keep the current chapter in view inside the bar
+  let lastOn = null; setInterval(() => { if (!narrow.matches) return; const on = nav.querySelector('a[aria-current="location"]'); if (on && on !== lastOn) { lastOn = on; const l = on.offsetLeft - nav.clientWidth * .35; nav.scrollTo({ left: Math.max(0, l), behavior: 'smooth' }); } }, 400);
 }

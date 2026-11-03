@@ -4390,3 +4390,31 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
   [data-product-case=beauty] .xp-scene{align-self:stretch;display:grid;place-items:center}
   [data-product-case=beauty] .xp-phone{--dw:min(132px,16svh)}
 }
+/* LOOK phones: the chapter bar as a lit rail in dark glass (the salon case's slider, in pink); a computer never sees it */
+.lk-lumen-h,.lk-knob-h{display:none}
+@media (max-width:760px){
+  [data-product-case=beauty] .ux-case-index.lk-lumen{position:sticky;gap:0 18px;padding:0 0 12px!important;
+    background:rgba(18,13,19,.82)!important;box-shadow:0 0 0 100vmax rgba(18,13,19,.82)!important;-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3)}
+  [data-product-case=beauty] .ux-case-index.lk-lumen>a{opacity:1;color:rgba(246,232,240,.55)!important;font-weight:500;border-bottom-color:transparent!important;position:relative;z-index:1;padding:0 12px!important;margin:6px -6px 0;border-radius:12px;min-height:40px!important;display:inline-flex;align-items:center;transition:color .35s,background .35s,box-shadow .35s}
+  [data-product-case=beauty] .ux-case-index.lk-lumen>a[aria-current="location"]{color:#fff4f9!important;font-weight:600;
+    background:radial-gradient(90% 140% at 50% 120%,rgba(245,154,184,.32),rgba(245,154,184,.07) 50%,transparent 75%),linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.02) 55%,rgba(255,255,255,.04)),rgba(24,14,22,.55)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(255,180,210,.4),inset 0 0 0 1px rgba(255,255,255,.08)!important}
+  [data-product-case=beauty] .ux-case-index.lk-lumen .ux-index-top{display:none!important}
+  [data-product-case=beauty] .ux-case-index.lk-lumen>a.ux-index-try{position:sticky!important;right:0;margin-left:auto;z-index:3;font-size:0!important;width:36px;height:36px;min-width:36px;min-height:36px!important;padding:0!important;flex:0 0 36px;justify-content:center;margin-top:8px;border-radius:50%;background:#f59ab8!important;color:#1a121c!important;box-shadow:0 0 0 6px rgba(18,13,19,.9),0 4px 16px rgba(245,154,184,.45)!important}
+  [data-product-case=beauty] .ux-case-index.lk-lumen>a.ux-index-try::before{content:"▶";font-size:12px;line-height:1;margin-left:2px}
+  .ux-case-index .lk-lumen-h{display:block;position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:0}
+  .lk-lumen-h path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .lk-lumen-h .t{stroke:rgba(255,226,238,.2);stroke-width:1.4}
+  .lk-lumen-h .l{stroke:#f59ab8;stroke-width:2;filter:drop-shadow(0 0 3px rgba(245,154,184,.95))}
+  .lk-lumen-h .g{stroke:#f59ab8;stroke-width:7;filter:url(#lklh-b);opacity:0}
+  .lk-lumen-h .halo{fill:rgba(245,154,184,.55);filter:url(#lklh-b)}
+  .ux-case-index .lk-knob-h{display:block;position:absolute;left:0;top:0;width:16px;height:16px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 45%,rgba(0,0,0,.25) 100%),rgba(30,20,28,.9);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 2px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.12),0 4px 14px rgba(245,154,184,.5),0 3px 8px rgba(0,0,0,.6);will-change:transform}
+  .ux-case-index .lk-knob-h::after{content:"";position:absolute;inset:5px;border-radius:50%;background:#f59ab8;box-shadow:0 0 7px 2px rgba(245,154,184,.85)}
+}
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  /* the film's lines in full — never cut off mid-sentence; the phone makes room instead */
+  .fm .fm-body{display:block!important;-webkit-line-clamp:unset!important;overflow:visible!important;font-size:13.5px;line-height:1.42}
+  body .lk-th-note{display:none!important}
+  body .lk-knot-say{translate:-100% 0!important;white-space:normal;text-align:right;max-width:70vw}
+}
+@media (max-width:760px){[data-product-case=beauty] .ux-journey.lk-polaroids>li::after{display:none!important}}

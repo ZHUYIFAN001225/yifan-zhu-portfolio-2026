@@ -500,7 +500,7 @@ export function mountDesk(root) {
       const k = (1 - up) * (1 - .6 * kBook * kBack), d = THREE.MathUtils.degToRad(lerp(-17, 15, clamp((P.y + 1) / 2))) * k;   // top: nearly plan view; bottom: ~15° lower
       const vx = camPos.x - camLook.x, vy = camPos.y - camLook.y, vz = camPos.z - camLook.z, hz = Math.hypot(vx, vz) || 1e-6, r = Math.hypot(hz, vy), el = Math.min(Math.atan2(vy, hz) - d, THREE.MathUtils.degToRad(84));
       camPos.set(camLook.x + vx / hz * r * Math.cos(el), camLook.y + r * Math.sin(el), camLook.z + vz / hz * r * Math.cos(el)); }
-    if (camK !== 1) camPos.sub(camLook).multiplyScalar(camK).add(camLook);
+    if (camK !== 1) camPos.sub(camLook).multiplyScalar(lerp(camK, 1, up)).add(camLook);   // the step back is for the whole desk; the risen phone keeps its close framing
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
     sun.intensity = 2.2 * dayAmt; room.intensity = .45 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .2 * (1 - blackout) * (1 - nightAmt * .8);

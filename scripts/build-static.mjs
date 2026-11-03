@@ -7,7 +7,7 @@ const dist = path.join(root, "dist");
 await renderPortfolio();
 const entries = [
   "index.html",
-  "home-v4.html",
+  "home-v4.html","home-v5.html","home-v5.css","scripts/home-v5.mjs",
   "home-v4.css",
   "work.html",
   "about.html",

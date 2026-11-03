@@ -20,24 +20,27 @@ body.is-opening .h5-head{opacity:0}
 .h5-lang span{padding:3px 9px;border-radius:999px;color:var(--mist)}
 :lang(en) .h5-lang [data-l=en],:lang(zh) .h5-lang [data-l=zh]{background:var(--bone);color:var(--abyss)}
 
-/* 1 · who I am: one scene from my film, letterboxed like a cinema, opening as you scroll */
-.h5-who{position:relative;height:100vh;height:100svh;min-height:600px;overflow:hidden}
-.h5-plate{position:absolute;inset:0}
-.h5-plate-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(calc(1.06 + var(--wp,0) * .08));filter:saturate(.9) brightness(.82)}
-.h5-plate::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--abyss) 0,rgba(6,19,23,.55) 30%,rgba(6,19,23,0) 62%),linear-gradient(to right,rgba(6,19,23,.55),rgba(6,19,23,0) 55%)}
-.h5-bar{position:absolute;z-index:2;left:0;right:0;height:calc(12.5vh * (1 - var(--wp,0) * 1.4));min-height:0;background:#000;transition:height 1.6s var(--slow)}
-.h5-bar-t{top:0}.h5-bar-b{bottom:0}
-body.is-opening .h5-bar{height:50vh}
-.h5-who-in{position:absolute;z-index:3;left:var(--pad);right:var(--pad);bottom:clamp(90px,17vh,190px);max-width:1100px}
-.h5-title{margin:0;font-size:clamp(64px,11.5vw,200px);font-weight:230;letter-spacing:-.055em;line-height:.86;color:var(--bone)}
-:lang(zh) .h5-title{font-weight:300;letter-spacing:-.02em}
-.h5-line{margin:28px 0 0;max-width:33ch;font-size:clamp(18px,1.55vw,24px);line-height:1.38;color:var(--bone);font-weight:330}
-.h5-title,.h5-line{transition:opacity 1.4s var(--ease),transform 1.6s var(--ease)}
-.h5-title{transition-delay:1.1s}.h5-line{transition-delay:1.5s}
-body.is-opening .h5-title,body.is-opening .h5-line{opacity:0;transform:translateY(30px)}
-.h5-credit{position:absolute;z-index:3;right:var(--pad);bottom:calc(12.5vh + 18px);margin:0;font-size:12px;color:var(--mist);max-width:32ch;text-align:right;opacity:calc(1 - var(--wp,0) * 3)}
-.h5-cue{position:absolute;z-index:3;left:50%;bottom:calc(12.5vh + 10px);width:1px;height:46px;background:linear-gradient(var(--bone),transparent);animation:h5-cue 2.4s var(--slow) infinite;opacity:calc(1 - var(--wp,0) * 4)}
+/* 1 · who I am: my name cut out of the dark, with my film playing inside the letters.
+   Scrolling pushes the camera through one letter and into the film, where the line about what I do is waiting. */
+.h5-who{position:relative;height:340vh}
+.h5-who-pin{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#02090b}
+.h5-plate-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(var(--vs,1.3));filter:saturate(1.05) brightness(var(--vb,1));transition:opacity 1.8s var(--slow)}
+body.is-opening .h5-plate-v{opacity:0}
+.h5-cut{position:absolute;inset:0;width:100%;height:100%;transform-origin:var(--ox,50%) var(--oy,50%);transform:scale(var(--s,1));opacity:var(--co,1)}
+.h5-cut text{font-family:Inter,"PingFang SC","Noto Sans CJK SC",sans-serif;font-weight:800}
+.h5-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.h5-intro{position:absolute;z-index:3;left:var(--pad);right:var(--pad);bottom:clamp(28px,6vh,60px);display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin:0;opacity:var(--io,1);transition:opacity 1.4s 1.2s var(--ease)}
+body.is-opening .h5-intro{opacity:0}
+.h5-role{font-size:clamp(16px,1.3vw,20px);color:var(--bone);font-weight:330}
+.h5-credit{font-size:12px;color:var(--mist);max-width:32ch;text-align:right;margin:0}
+.h5-cue{position:absolute;z-index:3;left:50%;bottom:clamp(28px,6vh,60px);width:1px;height:46px;background:linear-gradient(var(--bone),transparent);animation:h5-cue 2.4s var(--slow) infinite;opacity:var(--io,1)}
 @keyframes h5-cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+/* inside the film */
+.h5-inside{position:absolute;z-index:3;left:var(--pad);right:var(--pad);bottom:clamp(60px,14vh,150px);opacity:var(--lo,0);transform:translateY(calc((1 - var(--lo,0)) * 24px))}
+.h5-line{margin:0;max-width:22ch;font-size:clamp(30px,3.6vw,62px);line-height:1.08;letter-spacing:-.035em;font-weight:300;color:var(--bone);text-shadow:0 2px 40px rgba(2,9,11,.5)}
+:lang(zh) .h5-line{letter-spacing:0;line-height:1.3;max-width:16em}
+.h5-shade{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to top,rgba(6,19,23,.85),rgba(6,19,23,0) 60%);opacity:var(--lo,0)}
+.h5-fade{position:absolute;inset:0;z-index:4;background:var(--abyss);opacity:var(--fo,0);pointer-events:none}
 
 /* 2 · how I make things: one way of working, four kinds of output — the shot changes as you scroll */
 .h5-how{position:relative;height:calc(var(--n,4) * 85vh + 100vh)}
@@ -118,7 +121,6 @@ body.is-opening .h5-title,body.is-opening .h5-line{opacity:0;transform:translate
   .h5-head{padding:16px 18px;font-size:14px}
   .h5-nav{gap:14px}
   .h5-nav a[href="#more"]{display:none}
-  .h5-who-in{bottom:calc(12.5vh + 60px)}
   .h5-credit{display:none}
 }
-@media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation:none!important}}
+@media (prefers-reduced-motion:reduce){.h5-who{height:auto}.h5-who-pin{position:relative}.h5-cut{display:none}.h5-inside{--lo:1}.h5-intro{--io:0}*{transition-duration:.01s!important;animation:none!important}}

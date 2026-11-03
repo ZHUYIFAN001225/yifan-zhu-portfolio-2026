@@ -52,6 +52,7 @@ function render() {
   $('.h5-filters').innerHTML = cats.map(c => { const n = c.id === 'all' ? work.length : work.filter(p => (p.categories || []).includes(c.id)).length; return `<button type="button" role="tab" data-f="${c.id}" aria-selected="${c.id === filter}">${L(c.label)}<sup>${n}</sup></button>`; }).join('');
   $('.h5-grid').innerHTML = work.map(p => `<a class="h5-card${wide.has(p.id) ? ' is-wide' : ''}" href="${p.href}" data-cats="${(p.categories || []).join(' ')}"><div class="h5-media"><img src="${p.cover}" alt="" loading="lazy">${p.preview ? `<video data-src="${p.preview}" muted loop playsinline preload="none"></video>` : ''}</div><div class="h5-cap"><b>${L(p.title)}</b><span>${L(p.kind)}</span></div><p>${L(p.subtitle)}</p></a>`).join('');
   applyFilter(); wireCards(); shots = $$('.h5-shot'); steps = $$('.h5-steps li');
+  cutName();
 }
 function applyFilter() {
   $$('.h5-filters button').forEach(b => b.setAttribute('aria-selected', b.dataset.f === filter));
@@ -67,19 +68,62 @@ function wireCards() {
     c.addEventListener('pointerleave', () => { v.pause(); c.classList.remove('is-playing'); }); });
 }
 
-// ---------- the opening: black, the bars part, the scene, then the name ----------
+// ---------- the opening: my name, dark, then the film fades up inside the letters ----------
 const plateV = $('.h5-plate-v');
 let opened = false; const open = () => { if (opened) return; opened = true; document.body.classList.remove('is-opening'); };
-plateV.addEventListener('canplay', () => setTimeout(open, 300), { once: true }); setTimeout(open, 2400);
+plateV.addEventListener('canplay', () => setTimeout(open, 500), { once: true }); setTimeout(open, 2600);
 if (calm) open();
+
+// ---------- the name, cut out of the dark ----------
+// The letters are holes in a dark sheet over the film. To fly through one, the sheet scales up around a point
+// that sits deep inside a letter's stroke, so that stroke grows until it is the whole screen.
+const FONT = '800 {s}px Inter, "PingFang SC", "Noto Sans CJK SC", sans-serif';
+let cut = { ox: 0, oy: 0, max: 60 };
+function cutName() {
+  const W = innerWidth, H = innerHeight, svg = $('.h5-cut'), g = $('.h5-m-t');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  $$('.h5-m-r, .h5-cut-r').forEach(r => { r.setAttribute('width', W); r.setAttribute('height', H); });
+  const name = L(T.name), lines = lang === 'zh' ? [name] : W / H < 1.1 ? name.split(' ') : [name];
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const c = cv.getContext('2d', { willReadFrequently: true });
+  c.font = FONT.replace('{s}', 100); const widest = Math.max(...lines.map(l => c.measureText(l).width));
+  const lh = .86, size = Math.min((W - 2 * Math.min(72, W * .045)) / widest * 100, H * (lines.length > 1 ? .36 : .5));
+  c.font = FONT.replace('{s}', size); c.textBaseline = 'alphabetic';
+  const x = Math.min(72, W * .045), block = size * lh * lines.length, top = (H - block) / 2 - H * .03;
+  g.innerHTML = lines.map((l, i) => `<text x="${x}" y="${top + size * lh * (i + 1) - size * .1}" font-size="${size}">${l}</text>`).join('');
+  lines.forEach((l, i) => c.fillText(l, x, top + size * lh * (i + 1) - size * .1));
+  // find the point inside a stroke that is deepest (furthest from any edge) and still near the middle
+  const d = c.getImageData(0, 0, W, H).data, on = (px, py) => px >= 0 && py >= 0 && px < W && py < H && d[(py * W + px) * 4 + 3] > 128;
+  let best = null;
+  for (let py = 0; py < H; py += 4) for (let px = 0; px < W; px += 4) {
+    if (!on(px, py)) continue;
+    let r = 1; while (r < 200 && on(px + r, py) && on(px - r, py) && on(px, py + r) && on(px, py - r) && on(px + r * .7 | 0, py + r * .7 | 0) && on(px - r * .7 | 0, py - r * .7 | 0)) r++;
+    const score = r * 3 - Math.hypot(px - W / 2, py - H / 2) * .06;
+    if (!best || score > best.score) best = { px, py, r, score };
+  }
+  if (!best) return;
+  const far = Math.max(...[[0, 0], [W, 0], [0, H], [W, H]].map(([a, b]) => Math.hypot(a - best.px, b - best.py)));
+  cut = { ox: best.px, oy: best.py, max: far / Math.max(2, best.r - 1) * 1.15 };
+  const s = $('.h5-cut').style; s.setProperty('--ox', cut.ox + 'px'); s.setProperty('--oy', cut.oy + 'px');
+  onScroll();
+}
+const smooth = t => t * t * (3 - 2 * t);
 
 // ---------- scroll ----------
 let cur = 0, shots = [], steps = [];
 const who = $('.h5-who'), how = $('.h5-how'), head = $('.h5-head');
 function onScroll() {
   const vh = innerHeight;
-  who.style.setProperty('--wp', clamp(scrollY / vh).toFixed(3));
-  head.classList.toggle('is-solid', scrollY > vh * .7);
+  // 1 · through the letter and into the film
+  const wr = who.getBoundingClientRect(), wp = clamp(-wr.top / (wr.height - vh)), a = clamp(wp / .6), ws = who.style;
+  if (!calm) {
+    ws.setProperty('--s', Math.pow(cut.max, smooth(a) ** 1.4).toFixed(4));
+    ws.setProperty('--co', (1 - clamp((a - .9) / .1)).toFixed(3));
+    ws.setProperty('--vs', (1.28 - .28 * smooth(a)).toFixed(4));
+    ws.setProperty('--io', (1 - clamp(a * 6)).toFixed(3));
+    ws.setProperty('--lo', clamp((wp - .62) / .14).toFixed(3));
+    ws.setProperty('--fo', clamp((wp - .9) / .1).toFixed(3));
+  }
+  head.classList.toggle('is-solid', wp >= 1);
   // 2 · which step is on, how far through it, and the shot follows
   if (getComputedStyle($('.h5-how-pin')).position === 'sticky') {
     const r = how.getBoundingClientRect(), span = r.height - vh, p = clamp(-r.top / span) * STEPS.length, i = Math.min(STEPS.length - 1, Math.floor(p)), f = p - i;
@@ -89,6 +133,6 @@ function onScroll() {
   }
 }
 addEventListener('scroll', () => requestAnimationFrame(onScroll), { passive: true });
-addEventListener('resize', onScroll);
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(cutName, 150); });
 
-render(); onScroll();
+document.fonts.load('800 100px Inter').then(cutName, cutName); render(); onScroll();

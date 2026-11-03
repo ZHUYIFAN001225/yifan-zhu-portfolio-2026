@@ -4164,10 +4164,10 @@ html[data-body=a] .bk-dk.is-through .bk-dk-jump{visibility:hidden!important}
 .bk-set .bk-tilt-ph{display:block;width:30px;height:50px;margin:0 auto 14px;border-radius:8px;box-shadow:inset 0 0 0 2px #f6eee2;position:relative;animation:bk-tilt 2.4s ease-in-out infinite}
 .bk-set .bk-tilt-ph b{position:absolute;left:50%;top:5px;width:9px;height:3px;margin-left:-4.5px;border-radius:2px;background:#f6eee2}
 @keyframes bk-tilt{0%,100%{transform:rotate(0)}25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
-.bk-set .bk-tilt-t{margin:0;font:700 18px/1.25 inherit;font-family:inherit}
-.bk-set .bk-tilt-s{margin:6px 0 16px;font:500 13px/1.45 inherit;font-family:inherit;color:rgba(246,238,226,.72)}
+.bk-set .bk-tilt-t{margin:0;font-size:18px;line-height:1.25;font-weight:700}
+.bk-set .bk-tilt-s{margin:6px 0 16px;font-size:13px;line-height:1.45;font-weight:500;color:rgba(246,238,226,.72)}
 .bk-set .bk-tilt-a{display:flex;gap:8px}
-.bk-set .bk-tilt-a button{flex:1;padding:12px 10px;border:0;border-radius:14px;font:700 14px/1 inherit;font-family:inherit;cursor:pointer}
+.bk-set .bk-tilt-a button{flex:1;padding:12px 10px;border:0;border-radius:14px;font-family:inherit;font-size:14px;line-height:1;font-weight:700;cursor:pointer}
 .bk-set .bk-tilt-a .on{background:#f0a35e;color:#1a1410}
 .bk-set .bk-tilt-a .no{background:rgba(255,255,255,.08);color:#f6eee2;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
 @media (max-width:639px){ .bk-set .bk-dk-eve{opacity:calc(var(--kEveT,0) * (1 - min(1, var(--kPhone,0) * 1.6)))!important} }

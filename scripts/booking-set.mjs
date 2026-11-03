@@ -352,7 +352,7 @@ export function mountDesk(root) {
   const weak = (() => { try { const g = renderer.getContext(), x = g.getExtension('WEBGL_debug_renderer_info'), n = x ? g.getParameter(x.UNMASKED_RENDERER_WEBGL) : '';
     return /swiftshader|llvmpipe|software|basic render/i.test(n) || (!matchMedia('(pointer: coarse)').matches && ((navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4)); } catch { return false; } })();
   const handset = matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700;
-  const PT = { x: .11, z: .05, k: .8 };
+  const PT = { x: .115, z: 0, k: .62 };
   const QS = [1, .82, .66, .52]; let qi = weak ? 2 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
   const dpr = () => inBody ? .34 : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
   const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },

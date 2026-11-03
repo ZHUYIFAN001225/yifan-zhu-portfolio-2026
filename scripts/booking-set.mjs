@@ -140,8 +140,8 @@ export function mountDesk(root) {
   const baked = []; const U = { uMix: { value: 0 }, uLit: { value: 1 }, uTime: { value: 0 }, uWind: { value: 1 } };
   // phones load a lighter set of bakes (desk 2048, book and mat 1024, the small things 512): the full set is ~450 MB of
   // video memory, more than a phone browser allows a page
-  const lite = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900, CAPS = { desk: 2048, mat: 1024, notebook: 1024 };
-  const tex2 = (n, tag) => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_${tag}${lite ? '_m' : ''}.jpg`, () => res(t), undefined, () => res(null)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = lite ? 4 : 8; });
+  const lite = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900, CAPS = { desk: 2048, mat: 1024, notebook: 2048 };
+  const tex2 = (n, tag) => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_${tag}${lite && n !== 'notebook' ? '_m' : ''}.jpg`, () => res(t), undefined, () => res(null)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = lite ? 4 : 8; });
   const GAIN = 3.0;   // the bake was made at 0.4× the Blender exposure so sunlit paper fits in 8 bits; put it back here
   const LIGHT_GLSL = `
     uniform sampler2D uAmb, uSun, uNight; uniform float uMix, uLit, uTime, uWind;
@@ -393,7 +393,7 @@ export function mountDesk(root) {
   const PT = { x: .115, z: -.025, k: .55 };
   const PR = { x: 0, y: .6, z: .085, s: 1.15 };
   const QS = [1, .82, .66, .52]; let qi = weak ? 2 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
-  const dpr = () => inBody ? (handset ? .22 : .34) : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
+  const dpr = () => inBody ? (handset ? .22 : .34) : Math.min(devicePixelRatio || 1, handset ? 2.5 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
   const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: `precision highp float;
@@ -608,7 +608,7 @@ export function mountDesk(root) {
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(1.1, .12, up) - (kBook * kBack) * .8; fu.uMax.value = (2.2 * (1 - up) + 7 * kBook * kBack) * dpr();
     fu.uVig.value = .25 + .55 * nightAmt - .25 * kOut; fu.uFringe.value = 0; fu.uJit.value = 1;
-    if (tall) { fu.uFocus.value = lerp(fu.uFocus.value, dPhone - .03, 1 - kBook * kBack); fu.uRange.value = Math.max(fu.uRange.value, .9 * (1 - kBook * kBack) + .12); fu.uMax.value *= .45; fu.uJit.value = 0; }   // phones: the messages float close to the lens — keep them, and the phone, sharp
+    if (tall) { fu.uMax.value = 0; fu.uJit.value = 0; }   // phones: no lens blur in the opening — the page's words and the messages stay sharp (the handover below blurs on its own)   // phones: the messages float close to the lens — keep them, and the phone, sharp
     if (bodyA()) {   // the dark case: no fade to black — the close-up drifts out of focus into the same defocus the page sits on
       fu.uMax.value = lerp(fu.uMax.value, 13 * dpr(), kOut); fu.uRange.value = lerp(fu.uRange.value, .06, kOut); fu.uFocus.value = lerp(fu.uFocus.value, cam.position.distanceTo(camLook) * .55, kOut);
       fu.uVig.value = lerp(fu.uVig.value, .85, kOut); fu.uJit.value = 1 - kOut;

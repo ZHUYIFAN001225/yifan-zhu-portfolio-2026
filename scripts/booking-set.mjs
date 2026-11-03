@@ -408,7 +408,10 @@ export function mountDesk(root) {
       const tilt = document.createElement('button'); tilt.type = 'button'; tilt.className = 'bk-dk-tilt';
       const lab = () => tilt.textContent = zh() ? '↻ 倾斜手机，换个角度看' : '↻ Tilt your phone to look around'; lab();
       document.addEventListener('portfolio:language', () => setTimeout(lab, 40));
-      tilt.addEventListener('click', () => { const done = () => { listen(); tilt.remove(); }; try { D.requestPermission().then(done, done); } catch { done(); } });
+      // the request must come from a tap: the button, or any tap on the page — whichever comes first, once
+      let asked = false;
+      const ask = () => { if (asked) return; asked = true; const done = () => { listen(); tilt.remove(); }; try { D.requestPermission().then(done, done); } catch { done(); } };
+      tilt.addEventListener('click', ask); document.addEventListener('click', ask, { once: true }); document.addEventListener('touchend', ask, { once: true, passive: true });
       ov.append(tilt);
     } else listen();
   }
@@ -513,7 +516,7 @@ export function mountDesk(root) {
     mix(camPos, V.dip.pos, dipAmt * .55 * (1 - up), camPos); mix(camLook, V.dip.look, dipAmt * .55 * (1 - up), camLook);
     mix(camPos, V.book.pos, kBook * kBack, camPos); mix(camLook, V.book.look, kBook * kBack, camLook); roll = lerp(roll, V.book.roll, kBook * kBack);
     mix(camPos, V.phone.pos, kPhone * kBack, camPos); mix(camLook, V.phone.look, kPhone * kBack, camLook); roll = lerp(roll, V.phone.roll, kPhone * kBack);
-    camPos.x += P.x * .018 * (1 - up);   // left/right: a little parallax
+    camPos.x += P.x * (fine ? .018 : .036) * (1 - up);   // left/right: a little parallax
     // phones (a tall screen): the whole desk would be tiny, so the shot closes in on the phone and its messages, with the
     // book at the left edge; the close-ups later already fit
     const tw = tall ? (1 - up) * (1 - kBook * kBack) : 0;

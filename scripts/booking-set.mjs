@@ -517,6 +517,7 @@ export function mountDesk(root) {
     // phones (a tall screen): the whole desk would be tiny, so the shot closes in on the phone and its messages, with the
     // book at the left edge; the close-ups later already fit
     const tw = tall ? (1 - up) * (1 - kBook * kBack) : 0;
+    if (tall) { const bx = (window.__bkPB ?? .07) * kBook * kBack * (1 - kPhone); camLook.x += bx; camPos.x += bx; }   // the book close-up: on the page being written, not the gutter
     if (tw > 0) { const T = window.__bkPT || PT, dx = (T.x - camLook.x) * tw; camLook.x += dx; camPos.x += dx; camLook.z += (T.z - camLook.z) * tw; camPos.z += (T.z - camLook.z) * 0; }
     { // up/down: orbit about what the camera looks at — pointer at the top ≈ straight down, at the bottom a good deal lower
       const k = (1 - up) * (1 - .6 * kBook * kBack), d = THREE.MathUtils.degToRad(lerp(-17, 15, clamp((P.y + 1) / 2))) * k;   // top: nearly plan view; bottom: ~15° lower
@@ -562,7 +563,7 @@ export function mountDesk(root) {
     sweep(GROUPS[2], lin(pr, .6, .685), lin(pr, .87, .935));
     const S = (k, v) => { const t = (+v).toFixed(3); if (svCache[k] !== t) { svCache[k] = t; ov.style.setProperty(k, t); } };   // only real changes: a write invalidates the styles of the whole page
     const jv = kOut > .6 ? 'hidden' : ''; if (jump.style.visibility !== jv) jump.style.visibility = jv;
-    S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut);
+    S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kPhone', kPhone); S('--kOut', kOut);
   }
   requestAnimationFrame(frame);
 }

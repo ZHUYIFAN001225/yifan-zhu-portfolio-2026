@@ -4127,3 +4127,21 @@ html[data-body=a] .bk-lumen-h .halo{fill:rgba(240,163,94,.55);filter:url(#bklh-b
 html[data-body=a] .ux-case-index .bk-knob-h{position:absolute;left:0;top:0;width:16px;height:16px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 45%,rgba(0,0,0,.25) 100%),rgba(28,24,20,.9);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 2px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.12),0 4px 14px rgba(240,163,94,.45),0 3px 8px rgba(0,0,0,.6);will-change:transform}
 html[data-body=a] .ux-case-index .bk-knob-h::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--x-acc);box-shadow:0 0 7px 2px rgba(240,163,94,.8)}
 html[data-body=a] .bk-day .ux-case-index.has-lumen>a.ux-index-try{position:sticky!important;right:0;margin-left:auto}
+
+/* phones: the desk opening laid out for a tall screen — title on top, the desk in the middle, the way out at the bottom
+   (above the site's Browse bar) */
+@media (max-width:639px){
+  .bk-set .bk-dk-tag{display:none!important}
+  .bk-set .bk-dk-copy{left:20px!important;right:20px!important;top:calc(41px + 128px)!important;width:auto!important;max-width:30ch;font-size:15px!important;line-height:1.4!important;text-align:left!important}
+  .bk-set .bk-dk-card,.bk-set .bk-dk-scroll{display:none!important}
+  .bk-set .bk-dk-jump{left:12px!important;right:12px!important;width:auto!important;top:auto!important;bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;padding:8px!important;border-radius:18px!important}
+  .bk-set .bk-jl{padding:8px 10px!important}
+  .bk-set .bk-jk{display:none!important}
+  .bk-set .bk-jg{margin-top:8px;gap:6px;flex-wrap:nowrap!important}
+  .bk-set .bk-jg a{flex:1;text-align:center;padding:8px 6px!important;font-size:11.5px!important}
+  .bk-set .bk-dk-pw-k{left:20px!important;right:20px!important;width:auto!important;top:auto!important;bottom:calc(270px + env(safe-area-inset-bottom,0px))!important}
+  .bk-set .bk-dk-pw-p{left:20px!important;right:20px!important;width:auto!important;top:auto!important;bottom:calc(200px + env(safe-area-inset-bottom,0px))!important;height:auto!important;font-size:14px!important;line-height:1.45!important;text-align:left!important}
+  .bk-set .bk-dk-pw-q{display:none!important}
+  .bk-set .bk-dk-eve{left:20px!important;right:20px!important;width:auto!important;top:auto!important;bottom:calc(200px + env(safe-area-inset-bottom,0px))!important}
+  html[data-cover="desk"] .bk-cover-pin>.op{height:100svh!important}
+}

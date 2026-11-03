@@ -395,6 +395,23 @@ export function mountDesk(root) {
   resize(); addEventListener('resize', resize);
   const P = { x: 0, y: 0, tx: 0, ty: 0 };
   addEventListener('pointermove', e => { if (!fine) return; const r = inBody ? { left: 0, top: 0, width: innerWidth, height: innerHeight } : op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
+  // phones: tilt instead of the pointer — tip it left/right for the parallax, forward/back for the camera's angle
+  // (as the mouse moving left/right and up/down on a computer). It re-centres slowly on however you hold the phone.
+  if (!fine && 'DeviceOrientationEvent' in window && !calm) {
+    let base = null;
+    const onTilt = e => { if (e.beta == null || e.gamma == null) return;
+      if (base == null) base = e.beta; base += (e.beta - base) * .004;
+      P.tx = clamp(e.gamma / 22, -1, 1); P.ty = clamp((e.beta - base) / 16, -1, 1); };
+    const listen = () => addEventListener('deviceorientation', onTilt, { passive: true });
+    const D = window.DeviceOrientationEvent;
+    if (typeof D.requestPermission === 'function') {   // iPhone: Safari asks once, and only after a tap
+      const tilt = document.createElement('button'); tilt.type = 'button'; tilt.className = 'bk-dk-tilt';
+      const lab = () => tilt.textContent = zh() ? '↻ 倾斜手机，换个角度看' : '↻ Tilt your phone to look around'; lab();
+      document.addEventListener('portfolio:language', () => setTimeout(lab, 40));
+      tilt.addEventListener('click', () => D.requestPermission().then(r => { if (r === 'granted') listen(); tilt.remove(); }).catch(() => tilt.remove()));
+      ov.append(tilt);
+    } else listen();
+  }
   // views (metres, y up): the Blender camera, the phone alone, the book, the phone close-up
   const V = {
     hero: { pos: new THREE.Vector3(.025, .69, .375), look: new THREE.Vector3(.025, 0, .05), roll: 0 },

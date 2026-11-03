@@ -4154,3 +4154,6 @@ html[data-body=a] .bk-day .ux-case-index.has-lumen>a.ux-index-try{position:stick
    scrolling away), and its way-out panel has done its job */
 html[data-body=a] .bk-day .op--3d:has(.bk-dk.is-through){background:transparent!important}
 html[data-body=a] .bk-dk.is-through .bk-dk-jump{visibility:hidden!important}
+/* iPhone: one tap lets the scene follow the tilt of the phone */
+.bk-set .bk-dk-tilt{position:absolute;left:20px;top:calc(41px + 205px);z-index:6;pointer-events:auto;padding:8px 14px;border:0;border-radius:999px;font:600 12px/1 "Inter Tight",Inter,system-ui,sans-serif;color:#f6eee2;background:rgba(16,13,10,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.14);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:calc(1 - var(--kText,0) * 1.4)}
+@media (min-width:640px){.bk-set .bk-dk-tilt{top:auto;bottom:24px;left:50%;transform:translateX(-50%)}}

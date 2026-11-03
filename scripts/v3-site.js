@@ -53,7 +53,7 @@
         const frame=stage.querySelector('[data-demo-frame]');
         // phones: the prototype (a whole second app) loads only when its section comes near, not with the page
         const small=matchMedia('(pointer: coarse)').matches&&Math.min(screen.width,screen.height)<900;
-        if(small&&'IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.boundingClientRect.height>0)){io.disconnect();if(!frame.getAttribute('src'))frame.src=withLang(url,true);}},{rootMargin:'150% 0px'});setTimeout(()=>io.observe(frame),2500);}   // after the opening has laid the page outelse frame.src=withLang(url,true);
+        if(small&&'IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.boundingClientRect.height>0)){io.disconnect();if(!frame.getAttribute('src'))frame.src=withLang(url,true);}},{rootMargin:'150% 0px'});setTimeout(()=>io.observe(frame),2500);}else frame.src=withLang(url,true);   // phones start watching once the opening has laid the page out
         // Some prototypes refresh when their window gains focus, which swallowed the first tap.
         // Give the frame focus as the pointer arrives, so the first real click goes through.
         frame.addEventListener('pointerenter',()=>{try{if(document.activeElement!==frame)frame.contentWindow.focus();}catch{}});stage.hidden=false;if(unavailable)unavailable.hidden=true;

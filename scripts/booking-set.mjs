@@ -294,30 +294,31 @@ export function mountDesk(root) {
   // each message that lands: a soft chime — computers only, and only once the visitor has switched sound on. Never in
   // the page behind the case.
   const fx = { on: false, ctx: null, last: 0 };
-  // the sound of a phone buzzing on a wooden desk: a low motor hum with a rattle where it touches the wood — two short
-  // buzzes for the first message, one for each after (they come quickly)
-  let lastBuzz = -1e9, noiseBuf = null;
+  // the message sound: an original glassy bell — a clean FM tone with a soft room around it; a second, quieter note
+  // answers it on the first message only
+  let lastPing = -1e9, verb = null;
   function ding(first) {
     try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; const ctx = fx.ctx || (fx.ctx = new C()); if (ctx.state === 'suspended') ctx.resume();
-      const now = ctx.currentTime, solo = first || now - lastBuzz > 2.2; lastBuzz = now;
-      const out = ctx.createGain(); out.gain.value = .32; out.connect(ctx.destination);
-      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; lp.Q.value = .8; lp.connect(out);
-      if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, ctx.sampleRate * .5, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let k = 0; k < d.length; k++) d[k] = Math.random() * 2 - 1; }
-      const pulse = (t0, dur) => {
-        const env = ctx.createGain(); env.gain.setValueAtTime(0, t0); env.gain.linearRampToValueAtTime(1, t0 + .025); env.gain.setValueAtTime(1, t0 + dur - .05); env.gain.linearRampToValueAtTime(0, t0 + dur); env.connect(lp);
-        const trem = ctx.createGain(); trem.gain.value = .6; trem.connect(env);
-        const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 31; lg.gain.value = .4; lfo.connect(lg); lg.connect(trem.gain);
-        const m = ctx.createOscillator(); m.type = 'sawtooth'; m.frequency.setValueAtTime(172, t0); m.frequency.linearRampToValueAtTime(164, t0 + dur);
-        const mg = ctx.createGain(); mg.gain.value = .5; m.connect(mg); mg.connect(trem);
-        const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = 86; const sg = ctx.createGain(); sg.gain.value = .55; sub.connect(sg); sg.connect(trem);
-        const n = ctx.createBufferSource(); n.buffer = noiseBuf; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 240; bp.Q.value = 2.5; const ng = ctx.createGain(); ng.gain.value = .55; n.connect(bp); bp.connect(ng); ng.connect(trem);
-        [lfo, m, sub, n].forEach(o => { o.start(t0); o.stop(t0 + dur + .02); });
+      const now = ctx.currentTime, pair = first || now - lastPing > 2.5; lastPing = now;
+      const out = ctx.createGain(); out.gain.value = .5; out.connect(ctx.destination);
+      if (!verb) { verb = ctx.createConvolver(); const L = ctx.sampleRate * 1.1, b = ctx.createBuffer(2, L, ctx.sampleRate);
+        for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let k = 0; k < L; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / L, 3.2); }
+        verb.buffer = b; }
+      const wet = ctx.createGain(); wet.gain.value = .22; verb.connect(wet); wet.connect(out);
+      const bell = (t0, f, g) => {
+        const car = ctx.createOscillator(), mod = ctx.createOscillator(), mg = ctx.createGain(), env = ctx.createGain();
+        car.type = 'sine'; car.frequency.value = f; mod.type = 'sine'; mod.frequency.value = f * 3.5;
+        mg.gain.setValueAtTime(f * 1.6, t0); mg.gain.exponentialRampToValueAtTime(f * .05, t0 + .5);   // the shine fades first, leaving a pure tone
+        mod.connect(mg); mg.connect(car.frequency);
+        env.gain.setValueAtTime(0, t0); env.gain.linearRampToValueAtTime(g, t0 + .004); env.gain.exponentialRampToValueAtTime(.0008, t0 + .9);
+        car.connect(env); env.connect(out); env.connect(verb);
+        [car, mod].forEach(o => { o.start(t0); o.stop(t0 + 1); });
       };
-      const t = now + .01; pulse(t, .3); if (solo) pulse(t + .44, .3);
+      const t = now + .01; bell(t, 1567.98, .16); if (pair) bell(t + .11, 2093, .09);
     } catch {}
   }
   function notify() {
-    if (inBody) return; const t = performance.now(); if (t - fx.last < 420) return; fx.last = t;
+    if (inBody) return; const t = performance.now(); if (t - fx.last < 260) return; fx.last = t;
     if (fx.on) ding();
   }
   const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.prev = screens.cur === 'lock' ? null : screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };

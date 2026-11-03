@@ -521,7 +521,7 @@ export function mountDesk(root) {
     // ---- camera ----
     mix(V.hero.pos, V.dark.pos, up, camPos); mix(V.hero.look, V.dark.look, up, camLook); let roll = lerp(V.hero.roll, V.dark.roll, up);
     // when the messages start to rise, the camera settles a little lower and stays there until the counter goes dark
-    dipAmt += ((banners.length && up < .02 && pr < .1 ? 1 : 0) - dipAmt) * (1 - Math.exp(-dt * 1.3));
+    dipAmt += (((banners.length || tall) && up < .02 && pr < .1 ? 1 : 0) - dipAmt) * (1 - Math.exp(-dt * 1.3));
     mix(camPos, V.dip.pos, dipAmt * .55 * (1 - up), camPos); mix(camLook, V.dip.look, dipAmt * .55 * (1 - up), camLook);
     mix(camPos, V.book.pos, kBook * kBack, camPos); mix(camLook, V.book.look, kBook * kBack, camLook); roll = lerp(roll, V.book.roll, kBook * kBack);
     mix(camPos, V.phone.pos, kPhone * kBack, camPos); mix(camLook, V.phone.look, kPhone * kBack, camLook); roll = lerp(roll, V.phone.roll, kPhone * kBack);

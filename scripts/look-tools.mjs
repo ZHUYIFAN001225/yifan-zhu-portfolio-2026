@@ -224,14 +224,16 @@ function mountThreads(root, acts) {
   const base = docY => {
     const W = innerWidth;
     if (W < 761) {   // phones: no side margins — the ropes keep to the screen edges, clear of the text, and meet only at the end
-      // they drift towards each other down the whole page (behind the text, which carries its own halo), step back to the
-      // edges round the big words of every act, and meet at the knot
-      const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = Math.pow(P, 1.9), M = W * .5 - 6;   // how far apart = how far through the case: wide apart early, still clearly apart in the late chapters, together only at the end
-      const sw = Math.sin(docY / 260) * 9 * (1 - e), sw2 = Math.sin(docY / 260 + 1.7) * 9 * (1 - e);
-      let u = 6 + M * e + sw, c = W - 6 - M * e - sw2;
-      for (const q of boxesT.slice(0, -1)) { const f = Math.min(ss(q.t - 140, q.t, docY), 1 - ss(q.b, q.b + 140, docY)); if (f > 0) { u += (6 - u) * f; c += (W - 6 - c) * f; } }
-      const last = boxesT[boxesT.length - 1]; if (last) { const f = Math.min(ss(last.t - 140, last.t, docY), 1 - ss(last.b, last.b + 60, docY)); if (f > 0) { u += (6 - u) * f; c += (W - 6 - c) * f; } }
-      return { u: Math.max(6, u), c: Math.min(W - 6, c) };
+      // they keep to the side margins (clear of the text) but visibly draw in as the case goes on — from the very edge to the
+      // edge of the text column — step back round the big words of every act, and only cross the page to meet at the knot
+      const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), o = 4 + 7 * Math.pow(P, 1.1);
+      const sw = Math.sin(docY / 220) * 2.5, sw2 = Math.sin(docY / 220 + 1.7) * 2.5;
+      let u = o + sw, c = W - o - sw2;
+      for (const q of boxesT.slice(0, -1)) { const f = Math.min(ss(q.t - 140, q.t, docY), 1 - ss(q.b, q.b + 140, docY)); if (f > 0) { u += (4 - u) * f; c += (W - 4 - c) * f; } }
+      const from = boxesT.length ? boxesT[boxesT.length - 1].b : knotDoc - innerHeight * .5;   // below the closing words, never across them
+      const e2 = ease(clamp((docY - from) / Math.max(40, knotDoc - from)));
+      u += (W * .5 - u) * e2; c += (W * .5 - c) * e2;
+      return { u: Math.max(4, u), c: Math.min(W - 4, c) };
     }
     const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.15));
     const wave = Math.sin(docY / 520) * W * .022 * (1 - e);

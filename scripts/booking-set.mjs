@@ -350,10 +350,10 @@ export function mountDesk(root) {
   // quality adapts to the machine: weak or software GPUs start lower, and if frames run slow it steps down (never back up,
   // so it does not flicker). The look is the same; only the number of pixels changes.
   const weak = (() => { try { const g = renderer.getContext(), x = g.getExtension('WEBGL_debug_renderer_info'), n = x ? g.getParameter(x.UNMASKED_RENDERER_WEBGL) : '';
-    return /swiftshader|llvmpipe|software|basic render/i.test(n) || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4; } catch { return false; } })();
+    return /swiftshader|llvmpipe|software|basic render/i.test(n) || (!matchMedia('(pointer: coarse)').matches && ((navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4)); } catch { return false; } })();
   const handset = matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700;
-  const QS = [1, .82, .66, .52]; let qi = weak ? 2 : handset ? 1 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
-  const dpr = () => inBody ? .34 : Math.min(devicePixelRatio || 1, 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
+  const QS = [1, .82, .66, .52]; let qi = weak ? 2 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
+  const dpr = () => inBody ? .34 : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
   const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: `precision highp float;
@@ -384,8 +384,10 @@ export function mountDesk(root) {
         gl_FragColor = vec4(col, 1.0); }` });
   post.toneMapped = false;
   const postScene = new THREE.Scene(); postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post)); const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  let inBody = false;
-  const resize = () => { vw = inBody ? innerWidth : op.clientWidth; vh = inBody ? innerHeight : op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, inBody ? 1.15 : .58, 2.2)));   // portrait phones: a taller view, so the desk still fits across cam.updateProjectionMatrix();
+  let inBody = false, camK = 1;
+  const resize = () => { vw = inBody ? innerWidth : op.clientWidth; vh = inBody ? innerHeight : op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, inBody ? 1.15 : .87, 2.2)));
+    // portrait phones: a normal lens (no wide-angle stretch), and the camera steps back instead so the desk fits across
+    camK = inBody ? 1 : Math.max(cam.aspect, .87) / Math.max(cam.aspect, .58); cam.updateProjectionMatrix();
     rt?.dispose(); const W = Math.round(vw * d), H = Math.round(vh * d); const dt = new THREE.DepthTexture(W, H, THREE.UnsignedIntType);
     rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, depthTexture: dt, depthBuffer: true, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
     post.uniforms.tCol.value = rt.texture; post.uniforms.tDep.value = dt; post.uniforms.uRes.value.set(W, H); };
@@ -498,6 +500,7 @@ export function mountDesk(root) {
       const k = (1 - up) * (1 - .6 * kBook * kBack), d = THREE.MathUtils.degToRad(lerp(-17, 15, clamp((P.y + 1) / 2))) * k;   // top: nearly plan view; bottom: ~15° lower
       const vx = camPos.x - camLook.x, vy = camPos.y - camLook.y, vz = camPos.z - camLook.z, hz = Math.hypot(vx, vz) || 1e-6, r = Math.hypot(hz, vy), el = Math.min(Math.atan2(vy, hz) - d, THREE.MathUtils.degToRad(84));
       camPos.set(camLook.x + vx / hz * r * Math.cos(el), camLook.y + r * Math.sin(el), camLook.z + vz / hz * r * Math.cos(el)); }
+    if (camK !== 1) camPos.sub(camLook).multiplyScalar(camK).add(camLook);
     cam.position.copy(camPos); cam.up.set(0, 1, 0); cam.lookAt(camLook); cam.rotateZ(THREE.MathUtils.degToRad(roll));
     // ---- light ----
     sun.intensity = 2.2 * dayAmt; room.intensity = .45 * (1 - blackout) * (1 - nightAmt * .85); sky.intensity = .2 * (1 - blackout) * (1 - nightAmt * .8);

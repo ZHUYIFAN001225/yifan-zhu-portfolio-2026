@@ -4343,3 +4343,50 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
   .fm .fm-line>span{font-size:clamp(42px,12.6vw,58px)}
   .fm:not(.is-story):not(.is-duo) .fm-phone{top:calc(100px + 6.4 * clamp(42px,12.6vw,58px) * .92 + 24px);transform:translate(-50%,0) scale(.74);transform-origin:50% 0}
 }
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  /* measured by the page: the phone fills the room between the words and the rail, and never runs under the controls */
+  .fm .fm-phone{--dw:var(--fitw,min(196px,27svh))}
+  .fm.is-story .fm-phone,.fm.is-duo .fm-phone{top:var(--fit-st,64%)}
+  .fm:not(.is-story):not(.is-duo) .fm-phone{top:var(--fit-op,60%);transform:translate(-50%,0) scale(var(--fit-os,.74))}
+}
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .v3-mobile-dock{transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .3s ease}
+  .fm-pinned .v3-mobile-dock{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}
+  .fm .fm-rail{bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+  .fm .fm-skip{bottom:calc(20px + env(safe-area-inset-bottom,0px))!important;padding:9px 14px;font-size:12px}
+  .fm .fm-line>span{font-size:clamp(34px,12.4vw,58px)}
+}
+@media (max-width:760px) and (max-height:700px) and (prefers-reduced-motion:no-preference){
+  .fm .fm-steps,.fm .fm-duo{top:9svh}
+  .fm .fm-step h2{font-size:clamp(22px,6.4vw,27px)}
+  .fm .fm-body{-webkit-line-clamp:2!important}
+}
+/* LOOK phones: the exploded phone stays pinned at the top while its lines scroll underneath it;
+   the line reaching the phone lights its layer, so words and layer are always on screen together */
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  [data-product-case=beauty] .xp-stage{display:flex;flex-direction:column;padding:28px 0 0;min-height:0}
+  [data-product-case=beauty] .xp-copy{display:contents}
+  [data-product-case=beauty] .xp-kicker{order:0}
+  [data-product-case=beauty] .xp-copy h2{order:1;font-size:clamp(28px,8.4vw,36px)}
+  [data-product-case=beauty] .xp-lead{order:2;margin-bottom:6px}
+  [data-product-case=beauty] .xp-scene{order:3;position:sticky;top:var(--xp-top,44px);z-index:3;height:44svh;min-height:0;width:auto;margin:0 -16px;overflow:hidden;
+    background:linear-gradient(to bottom,var(--lk-page,#120d13) 0,var(--lk-page,#120d13) 95%,transparent);perspective:1400px}
+  [data-product-case=beauty] .xp-phone{--dw:min(150px,19svh)}
+  [data-product-case=beauty] .xp-hint{order:4;margin:4px 0 6px;color:#f59ab8;font-size:12.5px}
+  [data-product-case=beauty] .xp-list{order:5;padding-bottom:32svh;position:relative;z-index:1}
+  [data-product-case=beauty] .xp-list li{min-height:22svh;align-content:start;padding:16px 0;opacity:.32;transition:opacity .35s ease}
+  [data-product-case=beauty] .xp-list li.is-on{opacity:1}
+  [data-product-case=beauty] .xp-list li.is-on .xp-n{color:#f59ab8}
+  [data-product-case=beauty] .xp-list li:last-child{border-bottom:0}
+}
+/* LOOK phones: the two ropes say who they are — names where they start, voices along the way, and "connected" at the knot */
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  body .lk-th-label{display:block;max-width:40vw;font-size:12px!important}
+  body .lk-knot-say{display:block}
+  body .lk-rope-say{display:block;width:min(250px,70vw);font-size:13.5px;padding:10px 12px}
+}
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  [data-product-case=beauty] .xp-stage{align-items:stretch}
+  [data-product-case=beauty] .xp-scene{align-self:stretch;display:grid;place-items:center}
+  [data-product-case=beauty] .xp-phone{--dw:min(132px,16svh)}
+}

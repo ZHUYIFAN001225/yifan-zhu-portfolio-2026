@@ -500,12 +500,25 @@ window.addEventListener('pagereveal',event=>{
   const pose = p => Object.entries(p).forEach(([k, v]) => phoneEl.style.setProperty('--' + k, v));
   const idle = () => { clearTimeout(orbitT); if (focused >= 0 || !xpVis || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(min-width: 761px)').matches) return; orbitT = setTimeout(() => { if (focused < 0) pose(wide()); idle(); }, 2800); };
   new IntersectionObserver(es => { xpVis = es[0].isIntersecting; idle(); }, { threshold: .2 }).observe(xp);
-  const focus = i => { focused = i; idle(); xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); if (i !== lastFocus) { lastFocus = i; pose(i >= 0 && matchMedia('(min-width: 761px)').matches ? close(i) : rest); } };
+  const focus = i => { focused = i; idle(); xp.classList.toggle('has-focus', i >= 0); items.forEach((li, k) => li.classList.toggle('is-on', k === i)); layers.forEach((l, k) => l.classList.toggle('is-on', k === i)); if (i !== lastFocus) { lastFocus = i; pose(i >= 0 && (matchMedia('(min-width: 761px)').matches || xp.closest('[data-product-case=beauty]')) ? close(i) : rest); } };
   items.forEach((li, k) => { li.addEventListener('pointerenter', () => focus(k)); li.addEventListener('focus', () => focus(k)); li.addEventListener('click', () => focus(k)); });
   layers.forEach((l, k) => l.addEventListener('pointerenter', () => focus(k)));
   xp.querySelector('.xp-list').addEventListener('pointerleave', () => focus(-1));
   scene.addEventListener('pointerleave', () => { focus(-1); xp.style.setProperty('--rx', 0); xp.style.setProperty('--ry', 0); });
   if (matchMedia('(hover:hover) and (pointer:fine)').matches) scene.addEventListener('pointermove', e => { const r = scene.getBoundingClientRect(); xp.style.setProperty('--rx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3)); xp.style.setProperty('--ry', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3)); });
+  // LOOK phones: no pointer to point with — scrolling does it. The line passing just under the pinned phone lights its layer.
+  if (xp.closest('[data-product-case=beauty]') && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const narrow = matchMedia('(max-width: 760px)'), hint = xp.querySelector('.xp-hint');
+    const words = () => { if (narrow.matches && hint) hint.textContent = document.documentElement.lang.startsWith('zh') ? '往下滑：每一行都会点亮手机上对应的那一层 ↓' : 'Scroll: each line lights up its layer on the phone ↓'; };
+    words(); document.addEventListener('portfolio:language', () => setTimeout(words, 40));
+    const topBar = () => { const b = document.querySelector('.ux-case-index'); xp.style.setProperty('--xp-top', ((b && getComputedStyle(b).position === 'sticky' ? b.offsetHeight : 0) + 4) + 'px'); };
+    topBar(); addEventListener('resize', topBar);
+    const seen = new Set();
+    const io2 = new IntersectionObserver(es => { if (!narrow.matches) return; es.forEach(en => { const k = +en.target.dataset.xpItem; en.isIntersecting ? seen.add(k) : seen.delete(k); }); if (seen.size) focus(Math.max(...seen)); }, { rootMargin: '-62% 0px -32% 0px' });
+    items.forEach(li => io2.observe(li));
+    // above the first line or past the last: the whole phone again
+    addEventListener('scroll', () => { if (!narrow.matches) return; const r = xp.querySelector('.xp-list').getBoundingClientRect(), y = innerHeight * .62; if (r.top > y || r.bottom - innerHeight * .32 < y - 10) { if (focused !== -1) focus(-1); } }, { passive: true });
+  }
   if (!('IntersectionObserver' in window)) { xp.classList.add('is-open'); return; }
   const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { xp.classList.add('is-open'); io.disconnect(); } }), { threshold: .35 });
   io.observe(xp); addEventListener('beforeprint', () => xp.classList.add('is-open'));
@@ -786,6 +799,29 @@ window.addEventListener('pagereveal',event=>{
     };
     // only while the stage is on screen
     new IntersectionObserver(es => { if (es[0].isIntersecting) { if (!run) run = requestAnimationFrame(tick); } else { cancelAnimationFrame(run); run = 0; } }).observe(stage);
+  }
+  // phones: size and place the phone in the room that is actually left on this screen (in-app browsers and Safari bars eat a lot),
+  // so it never runs under the rail, the skip button or the dock
+  if (!calm.matches) {
+    const fit = () => {
+      if (wide.matches) { ['--fitw', '--fit-st', '--fit-op', '--fit-os'].forEach(k => fm.style.removeProperty(k)); return; }
+      const sr = stage.getBoundingClientRect(); if (!sr.height) return;
+      const dev = phone.querySelector('.dev') || phone; set(phone, '--dw', '100px'); const ratio = (dev.offsetHeight || 205) / 100; phone.style.removeProperty('--dw');
+      const rel = el => { const r = el.getBoundingClientRect(); return [r.top - sr.top, r.bottom - sr.top]; };
+      let txt = 0; [...steps, ...fm.querySelectorAll('.fm-duo')].forEach(el => { if (el.offsetHeight) txt = Math.max(txt, rel(el)[1]); });
+      const floor = Math.min(...[fm.querySelector('.fm-rail'), stage.querySelector('.fm-skip')].filter(Boolean).map(el => rel(el)[0]), sr.height) - 14;
+      const room = Math.max(120, floor - txt - 18);
+      const w = Math.min(196, room / ratio * .92);
+      set(fm, '--fitw', w.toFixed(1) + 'px'); set(fm, '--fit-st', (txt + 10 + room / 2).toFixed(1) + 'px');
+      const lines = fm.querySelectorAll('.fm-line'); const tb = lines.length ? rel(lines[lines.length - 1])[1] : sr.height * .5;
+      const oroom = Math.max(100, floor - tb - 16);
+      set(fm, '--fit-op', (tb + 14).toFixed(1) + 'px'); set(fm, '--fit-os', Math.min(.9, oroom / (w * ratio)).toFixed(3));
+    };
+    // while the film holds the screen, the page dock steps aside so the phone gets that room
+    let pin = null; const pinCheck = () => { const r = track.getBoundingClientRect(); const on = !wide.matches && r.top <= 1 && r.bottom >= innerHeight - 1; if (on !== pin) { pin = on; document.documentElement.classList.toggle('fm-pinned', on); } };
+    addEventListener('scroll', pinCheck, { passive: true }); pinCheck();
+    let ft = 0; const later = () => { clearTimeout(ft); ft = setTimeout(fit, 120); };
+    addEventListener('resize', later); document.addEventListener('portfolio:language', later); document.fonts?.ready.then(later); addEventListener('load', later); later();
   }
   // "Which look?": click the picture, it flies away and the headline rolls to who can make it.
   const find = fm.querySelector('[data-find]');

@@ -237,7 +237,7 @@ function mountThreads(root, acts) {
   addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
   document.addEventListener('pointerleave', () => { mx = my = -1e4; });
 
-  let raf = 0;
+  let raf = 0, autoY = -1e9, autoSide = 'c';
   const frame = () => {
     raf = requestAnimationFrame(frame);
     const vh = innerHeight, sy = scrollY;
@@ -263,6 +263,9 @@ function mountThreads(root, acts) {
     if (sayAt) { const y = sayAt.docY - sy, b = base(sayAt.docY), g = Math.exp(-Math.pow((y - my) / 110, 2)), side = sayAt.side, x = b[side] + spring[side].a * g + wave(side, y, now);
       say.style.left = (side === 'u' ? x + 16 : x - 16).toFixed(1) + 'px'; say.style.top = y.toFixed(1) + 'px'; }
     [[pathU, shU, twU, dU], [pathC, shC, twC, dC], [pathJ, shJ, twJ, dJ]].forEach(([a, b, c, d]) => { a.setAttribute('d', d); b.setAttribute('d', d); c.setAttribute('d', d); });
+    // phones have no pointer to pluck the ropes with, so the ropes speak by themselves as you scroll past:
+    // one side, then the other, a line from what that person is going through at that point of the story
+    if (innerWidth < 761 && !sayAt) { const midD = sy + vh * .5; if (midD > startY + vh * .6 && midD < knotDoc - vh * .5 && Math.abs(sy - autoY) > vh * 1.05) { autoY = sy; autoSide = autoSide === 'u' ? 'c' : 'u'; speak(autoSide, sy + vh * .4); } }
     // a dot rides each line in the middle of the screen
     const mid = vh * .5, bm = base(sy + mid), gm = Math.exp(-Math.pow((mid - my) / 110, 2));
     const showDots = mid >= y0 && mid <= Math.min(y1, yk);
@@ -271,7 +274,7 @@ function mountThreads(root, acts) {
     const ls = startY - sy + 34, bl = base(startY + 34);
     labU.style.transform = `translate3d(${(bl.u + 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`; labC.style.transform = `translate3d(${(bl.c - 14).toFixed(1)}px,${ls.toFixed(1)}px,0)`;
     const lv = ls > 40 && ls < vh - 60; labU.classList.toggle('is-on', lv); labC.classList.toggle('is-on', lv);
-    note.style.transform = `translate3d(${innerWidth / 2}px,${(ls + 6).toFixed(1)}px,0)`; note.classList.toggle('is-on', lv);
+    note.style.transform = `translate3d(${innerWidth / 2}px,${(ls + (innerWidth < 761 ? 58 : 6)).toFixed(1)}px,0)`; note.classList.toggle('is-on', lv);
     // the knot where they meet
     const kx = innerWidth / 2, kv = yk > -30 && yk < vh + 30;
     // a real knot: two loops crossing, with the two colours twisting into one

@@ -4177,3 +4177,10 @@ html[data-body=a] .bk-dk.is-through .bk-dk-jump{visibility:hidden!important}
   html.bk-opening .v3-mobile-dock{transform:translateY(130%);opacity:0;pointer-events:none}
   html.bk-opening .bk-set .bk-dk-jump{bottom:calc(14px + env(safe-area-inset-bottom,0px))!important}
 }
+/* phones: the case page opens straight onto the desk — no second and third row of links above it (the site bar keeps
+   All Work; the prototype is in the panel at the bottom) */
+@media (max-width:639px){
+  body:has(.bk-day) :is(.v3-case-tools,.v3-case-categories){display:none!important}
+  .bk-set .bk-dk-pw-k,.bk-set .bk-dk-pw-p{display:none!important}
+  .bk-set .bk-dk-tilt{position:fixed!important;top:50%!important}
+}

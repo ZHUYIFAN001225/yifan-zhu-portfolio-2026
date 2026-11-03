@@ -1,12 +1,18 @@
-// Home (preview v4): the structure and motion of Léo Parpeix's portfolio, filled only with my own things.
-// A clip from my own Blender film and one line about how I work; where I come from; big words ("who is this curious
-// designer"); a photo with its story; what I make, with small pictures of my own work set into the words; what I have
-// shipped; how I work — then the work as galleries: each selected project is a row with a strip of its own pictures to
-// drag through, a full-screen pause in the middle, and the rest as a numbered archive. The little objects that jump
-// around the big words are pieces of my own projects.
-import { projects } from './portfolio-catalog.mjs';
+// Home (preview v4): Léo Parpeix's structure and motion, filled with my own things.
+//  • A loader, then the opening card (a clip of my own Blender film) grows to the whole screen and stays pinned while the
+//    page slides up over it.
+//  • Lines rise into place; the page scrolls with a little inertia on a computer.
+//  • Big words whose first line keeps changing, with my own Blender object (the scissors from my salon desk) flying after
+//    the pointer — click and it darts there and spins.
+//  • A reel card that grows as it comes in and plays full screen on a click.
+//  • Each selected project is a strip of its own pictures that slides sideways as you scroll and can be dragged, with a
+//    yellow DRAG pill as the cursor; a pinned picture of my 3D work where the words fill in; the rest as an archive whose
+//    rows open.
+import { projects, categories } from './portfolio-catalog.mjs';
 
-const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches, calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const getLang = () => { const q = new URLSearchParams(location.search).get('lang'); if (q === 'zh' || q === 'en') return q; try { return localStorage.getItem('portfolio-language') === 'zh' ? 'zh' : 'en'; } catch { return 'en'; } };
 let lang = getLang();
 const L = v => Array.isArray(v) ? v[lang === 'zh' ? 1 : 0] : v ? (v[lang] || v.en) : '';
@@ -16,108 +22,142 @@ const T = {
   nav_work: ['Work', '作品'], nav_about: ['About', '关于'], nav_contact: ['Contact', '联系'], all_work: ['All work', '全部作品'],
   statement: ['Research first.\nThen built in whatever\nmedium it needs.', '先把问题研究透，\n再用它需要的媒介\n把它做出来。'],
   scroll: ['Scroll down', '往下滑'],
-  hero_credit: ['From Living in the Shadows, my Blender film', '画面来自我的 Blender 短片 Living in the Shadows'],
-  raised: ['Raised in', '成长于'], designing: ['Designing in', '现在在'],
-  todo_place: ['[to fill in]', '[待补充]'], todo_city: ['[to fill in]', '[待补充]'],
-  where_p: ['Products, services, research, films and the odd Blender add-on. What each one taught me is in the work below.', '产品、服务、研究、短片，偶尔还有一个 Blender 插件。每一件教会了我什么，都在下面的作品里。'],
-  who1: ['Who is this', '这位'], who2: ['curious', '好奇的'], who3: ['designer', '设计师是谁'], who_s: ['(Want to know?)', '（想知道吗？）'],
-  photo_slot: ['Your photo goes here', '这里放你的照片'], todo_photo_place: ['Place — to fill in', '地点 · 待补充'], todo_photo_date: ['Date', '日期'],
-  photo_story: ['The story behind the photo — to fill in. One or two sentences: where it was taken, and why it matters to you.', '照片背后的小故事 · 待补充。一两句话：在哪拍的，为什么对你有意义。'],
-  make_lead: ['Starting from the people involved, and ending with something they can try,', '从相关的人出发，最后交出他们能亲手试的东西，'],
-  make_s: ['and sometimes the diary a real salon runs on.', '有时，还是一家真实理发店每天在用的预约本。'],
-  shipped_k: ['Things I have made and shipped', '我做出来、交出去的东西'],
-  how_big: ['How I work', '我怎么工作'],
-  how_p1: ['I use desk research, field observation, stakeholder mapping and synthesis to turn broad topics into focused design opportunities.', '我用案头研究、实地观察、利益相关者梳理和归纳，把宽泛的话题收成具体的设计机会。'],
-  how_p2: ['Then I build tangible, visual and interactive prototypes that make abstract systems easier to test, explain and discuss.', '然后做出看得见、摸得着、能操作的原型，让抽象的系统更容易被测试、解释和讨论。'],
-  type1: ['Research-led', '研究驱动的'], type2: ['multidisciplinary', '跨领域'], type3: ['designer', '设计师'],
-  toy_hint: ['(Click to shuffle my work)', '（点一下，把我的作品打乱）'],
-  selected: ['Selected work', '精选作品'], archives: ['Archives', '更多作品'],
-  inter: ['Research with people. Build for them.', '和人一起研究，为人而做。'],
+  raised: ['Raised in', '成长于'], designing: ['Designing in', '现在在'], todo: ['[to fill in]', '[待补充]'],
+  now1: ['Currently running the bookings of', '目前在做'], now_at: ['@a Glasgow salon', '@格拉斯哥一家理发店'], now2: ['live since October 2026', '每天在用的预约系统，2026 年 10 月上线'],
+  former: ['Studied:', '学历：'],
+  type2: ['UX & service', 'UX 与服务'], type3: ['designer', '设计师'],
+  toy_hint: ['(Click to make a cut)', '（点一下，剪一刀）'],
+  hello: ['Hello,\nI care about who a design is for,\na clear structure, and things\nthat actually work.', '你好，\n我在意设计是为谁做的、\n结构是不是清楚，\n以及它是不是真的能用。'],
+  hi1: ['Hi there, it looks like you have found my portfolio.', '你好，看起来你找到了我的作品集。'],
+  hi2: ['Whether you are hiring, curious or just looking around, these are the things I research, make and ship.', '不管你是在招人、好奇，还是随便逛逛，下面是我研究过、做出来、交出去的东西。'],
+  reel_w1: ['Show', '作品'], reel_w2: ['reel', '集锦'], watch_reel: ['Watch reel', '观看集锦'],
+  selected: ['Selected projects', '精选作品'], archives: ['Archives', '更多作品'],
+  inter1: ['Research', '和人一起'], inter2: ['with people,', '研究，'], inter3: ['build for them.', '为人而做。'],
   end1: ['Let’s make', '一起做点'], end2: ['something people', '大家能亲手'], end3: ['can try', '试的东西'],
-  open: ['Open the case', '查看案例'], watch: ['Watch the film', '观看短片'], live: ['Live', '已上线']
+  drag: ['Drag', '拖动'], open: ['Project link', '查看案例'], watch: ['Watch the film', '观看短片']
 };
+const CYCLE = [['Research-led', '研究驱动的'], ['Multidisciplinary', '跨领域的'], ['Hands-on', '动手型'], ['Curious', '好奇的']];
 
-// my own things: a small piece of each kind of work (they sit inside the big words, and jump around the type)
-const MINE = {
-  product: 'assets/v3/screens/look/discover.webp',
-  service: 'assets/biodiversity-clock/final-clock.jpg',
-  tool: 'assets/cyber-projection-toolkit/toolkit-interface-cyan.png',
-  film: 'assets/v3/blender-reel.jpg',
-  object: 'assets/v3/ear-shield-cover.webp',
-  research: 'assets/v3/anxiety-cover.webp'
-};
-const pic = k => `<span class="ico"><img src="${MINE[k]}" alt=""></span>`;
-const MAKE = [
-  ['I research,', '我先研究，'], ['then build', '再做出'], [`${pic('product')}products,`, `${pic('product')}产品、`], [`${pic('service')}services,`, `${pic('service')}服务、`], [`${pic('tool')}tools and`, `${pic('tool')}工具和`], [`${pic('film')}films.`, `${pic('film')}影像。`]
-];
-
-// the selected work, each with a strip of its own pictures (phone screens framed as phones)
+// the selected work: each strip is that project's own pictures (phone screens shown as phones)
 const P = id => projects.find(p => p.id === id);
 const SEL = [
-  { id: 'salon-booking', pics: ['assets/v3/products/booking-customer.jpg', 'assets/v3/products/booking-admin.jpg', '@assets/v3/screens/booking/book.webp', '@assets/v3/screens/booking/today.webp', 'assets/v3/screens/booking/zoom-durations.webp', 'assets/v3/screens/booking/zoom-day.webp', 'assets/v3/screens/booking/zoom-time-off.webp'] },
-  { id: 'beauty-marketplace', pics: ['discover', 'detail', 'make-it-real', 'matches', 'creator', 'availability', 'booked', 'c-portfolio'].map(f => `@assets/v3/screens/look/${f}.webp`) },
-  { id: 'cyber-toolkit', pics: ['>assets/v3/toolkit-preview.mp4', 'assets/cyber-projection-toolkit/toolkit-interface-cyan.png', 'assets/cyber-projection-toolkit/toolkit-interface-amber.png', 'assets/cyber-projection-toolkit/projection-source-frame.png', 'assets/cyber-projection-toolkit/video-frames/03-projection-presets.png', 'assets/cyber-projection-toolkit/video-frames/05-art-direction-controls.png'] },
-  { id: 'biodiversity-clock', pics: ['assets/biodiversity-clock/final-clock.jpg', 'assets/biodiversity-clock/burrell-collection-exterior.jpg', 'assets/biodiversity-clock/pollok-country-park.jpg', 'assets/biodiversity-clock/storyboard.jpg', 'assets/biodiversity-clock/interactive-receipt.jpg', 'assets/biodiversity-clock/seasonal-historical-time.jpg'] },
-  { id: 'ear-shield', pics: ['01', '02', '03', '04', '05', '06', '07'].map(n => `assets/portfolio-pages/page-${n}.jpg`) },
-  { id: 'blender-reel', film: true, pics: ['>assets/v3/blender-reel-preview.mp4', 'assets/v3/blender-reel.jpg', '>assets/v3/modeling-03-preview.mp4', 'assets/v3/modeling-03.jpg'] }
+  { id: 'salon-booking', pics: ['assets/v3/products/booking-customer.jpg', '@assets/v3/screens/booking/book.webp', 'assets/v3/products/booking-admin.jpg', '@assets/v3/screens/booking/today.webp', 'assets/v3/screens/booking/zoom-durations.webp', 'assets/v3/screens/booking/zoom-time-off.webp'] },
+  { id: 'beauty-marketplace', pics: ['assets/v3/look-film/w1.webp', '@assets/v3/screens/look/discover.webp', '@assets/v3/screens/look/detail.webp', '@assets/v3/screens/look/matches.webp', '@assets/v3/screens/look/booked.webp', '@assets/v3/screens/look/c-portfolio.webp'] },
+  { id: 'cyber-toolkit', pics: ['>assets/v3/toolkit-preview.mp4', 'assets/cyber-projection-toolkit/toolkit-interface-cyan.png', 'assets/cyber-projection-toolkit/projection-source-frame.png', 'assets/cyber-projection-toolkit/toolkit-interface-amber.png', 'assets/cyber-projection-toolkit/video-frames/05-art-direction-controls.png'] },
+  { id: 'biodiversity-clock', pics: ['assets/biodiversity-clock/final-clock.jpg', 'assets/biodiversity-clock/pollok-country-park.jpg', 'assets/biodiversity-clock/storyboard.jpg', 'assets/biodiversity-clock/burrell-collection-exterior.jpg', 'assets/biodiversity-clock/interactive-receipt.jpg'] },
+  { id: 'ear-shield', pics: ['01', '02', '03', '04', '05', '06'].map(n => `assets/portfolio-pages/page-${n}.jpg`) },
+  { id: 'blender-reel', film: true, pics: ['>assets/v3/blender-reel-preview.mp4', 'assets/v3/blender-reel.jpg', '>assets/v3/modeling-03-preview.mp4', 'assets/v3/modeling-03.jpg', 'assets/v3/modeling-01.jpg'] }
 ];
 const archive = projects.filter(p => !SEL.some(s => s.id === p.id));
+const REEL = ['assets/v3/blender-reel-preview.mp4', 'assets/v3/toolkit-preview.mp4', 'assets/v3/ai-video-restyle-preview.mp4', 'assets/v3/modeling-02-preview.mp4', 'assets/v3/web-prototype-preview.mp4', 'assets/v3/modeling-01-preview.mp4'];
 
+// ---------- words ----------
+const lines = (el, text) => { el.innerHTML = text.split('\n').map((l, i) => `<span class="hv-l" style="--i:${i}"><span>${l}</span></span>`).join(''); };
 function render() {
   document.documentElement.lang = lang === 'zh' ? 'zh' : 'en';
-  $$('[data-t]').forEach(el => { el.textContent = L(T[el.dataset.t]); });
+  $$('[data-t]').forEach(el => { const v = L(T[el.dataset.t]); if (el.hasAttribute('data-lines')) lines(el, v); else el.textContent = v; });
+  // big words: each line rises on its own
+  $$('[data-big]').forEach(h => [...h.children].forEach((s, i) => { if (s.classList.contains('hv-cycle')) return; const t = s.textContent; s.className = 'hv-l'; s.style.setProperty('--i', i); s.innerHTML = `<span>${t}</span>`; }));
+  $('.hv-cycle>span').textContent = L(CYCLE[ci]);
+  $$('[data-fill]>span').forEach(s => { s.innerHTML = s.textContent.split(' ').map(w => `<span class="w">${w}</span>`).join(' '); });
   $('.hv-lang').setAttribute('aria-label', lang === 'zh' ? '切换语言' : 'Language');
-  $('.hv-make').innerHTML = MAKE.map(l => `<span>${L(l)}</span>`).join('');
-  // shipped: only things that really are out in the world, plus the education line to fill in
-  const shipped = [['salon-booking', 1], ['cyber-toolkit'], ['beauty-marketplace'], ['blender-reel']].map(([id, live]) => { const p = P(id); return `<li><small>${L(p.status)}</small><div><b>${live ? `<em>${L(T.live)}</em>` : ''}${L(p.title)}</b><span>${L(p.subtitle)}</span></div></li>`; });
-  shipped.push(`<li><small class="hv-todo">${lang === 'zh' ? '待补充' : 'To fill in'}</small><div><b class="hv-todo">${lang === 'zh' ? '学历：学校 · 学位' : 'Education: school · degree'}</b></div></li>`);
-  $('.hv-list').innerHTML = shipped.join(''); $('.hv-count').textContent = `(${shipped.length})`;
-  const cols = [[['Methods', '方法'], [['Desk research', '案头研究'], ['Field observation', '实地观察'], ['Stakeholder mapping', '利益相关者梳理'], ['Service blueprinting', '服务蓝图'], ['Systems framing', '系统框架'], ['Insight synthesis', '洞察归纳'], ['Prototyping & testing', '原型与测试']]], [['Tools', '工具'], [['Blender', 'Blender'], ['Unity', 'Unity'], ['Arduino', 'Arduino'], ['TouchDesigner', 'TouchDesigner'], ['Python', 'Python'], ['AI-assisted coding', 'AI 辅助开发'], ['Web prototypes', '网页原型']]]];
-  $('.hv-cols').innerHTML = cols.map(([h, items]) => `<div><h3>${L(h)}</h3><ul>${items.map(i => `<li>${L(i)}</li>`).join('')}</ul></div>`).join('');
+  $('.hv-player-x').setAttribute('aria-label', lang === 'zh' ? '关闭' : 'Close');
   const row = (s, i) => {
     const p = P(s.id);
     const pics = s.pics.map(src => src.startsWith('>') ? `<div><video src="${src.slice(1)}" muted loop playsinline preload="none" data-play></video></div>` : src.startsWith('@') ? `<div class="is-phone"><img src="${src.slice(1)}" alt="" loading="lazy" draggable="false"></div>` : `<div><img src="${src}" alt="" loading="lazy" draggable="false"></div>`).join('');
-    return `<article class="hv-proj hv-rise"><div class="hv-strip">${pics}</div><div class="hv-meta"><span class="n">${i + 1}</span><span><b>${L(p.title)}</b><i>${L(p.kind)}</i></span><span class="s">${L(p.subtitle)}</span><a href="${p.href}">${L(s.film ? T.watch : T.open)} →</a></div></article>`;
+    return `<article class="hv-proj"><div class="hv-strip" data-strip><div class="hv-track">${pics}${pics}</div></div><div class="hv-meta" data-reveal><span class="n">${i + 1}</span><span class="t">${L(p.title)}<i>${L(categories.find(c => c.id === (p.categories || [])[0])?.label)}</i></span><span class="lk"><a href="${p.href}">${L(s.film ? T.watch : T.open)}</a></span><span class="info"><span>${L(p.kind)}</span><span>${L(p.status)}</span></span></div></article>`;
   };
-  $('.hv-projects').innerHTML = SEL.slice(0, 3).map(row).join('');
-  $('.hv-projects-2').innerHTML = SEL.slice(3).map((s, i) => row(s, i + 3)).join('');
-  $('.hv-archive').innerHTML = archive.map((p, i) => `<li><a href="${p.href}"><span>${String(SEL.length + i + 1).padStart(2, '0')}</span><span><b>${L(p.title)}</b><i>${L(p.kind)}</i></span><img src="${p.cover}" alt="" loading="lazy"></a></li>`).join('');
-  wire();
+  $('[data-set="0"]').innerHTML = SEL.slice(0, 3).map(row).join('');
+  $('[data-set="1"]').innerHTML = SEL.slice(3).map((s, i) => row(s, i + 3)).join('');
+  $('.hv-archive').innerHTML = archive.map((p, i) => `<li><button type="button" aria-expanded="false"><span>${SEL.length + i + 1}</span><span>${L(p.title)}<i>${L(p.kind)}</i></span></button><div class="hv-arch-body"><div><div class="hv-arch-in"><span></span><img src="${p.cover}" alt="" loading="lazy"><div><p>${L(p.subtitle)}</p><a href="${p.href}">${L(T.open)} ↗</a></div></div></div></div></li>`).join('');
+  $$('.hv-archive button').forEach(b => b.addEventListener('click', () => { const li = b.parentElement, o = li.classList.toggle('is-open'); b.setAttribute('aria-expanded', o); }));
+  strips = $$('[data-strip]').map(el => ({ el, track: $('.hv-track', el), off: 0, vel: 0, x: 0 }));
+  watch();
 }
 $('.hv-lang').addEventListener('click', () => { lang = lang === 'zh' ? 'en' : 'zh'; try { localStorage.setItem('portfolio-language', lang); } catch {} render(); });
 
-// big words and rows rise into place as they come into view
-const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
-// videos in the strips play only while on screen
-const vio = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause(); }), { threshold: .3 });
-function wire() {
-  $$('.hv-rise').forEach(el => io.observe(el));
+// the first line of the big words keeps changing
+let ci = 0;
+setInterval(() => {
+  if (document.hidden || calm) return; const box = $('.hv-cycle'), old = box.firstElementChild; ci = (ci + 1) % CYCLE.length;
+  const nw = document.createElement('span'); nw.className = 'is-pre'; nw.textContent = L(CYCLE[ci]); box.append(nw);
+  old.style.position = 'absolute'; old.style.left = old.style.right = '0'; old.classList.add('is-out');
+  requestAnimationFrame(() => requestAnimationFrame(() => nw.classList.remove('is-pre')));
+  setTimeout(() => old.remove(), 900);
+}, 2400);
+
+// ---------- reveals ----------
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
+const vio = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause(); }), { threshold: .2 });
+function watch() {
+  $$('[data-reveal],[data-lines],[data-big]').forEach(el => io.observe(el));
   $$('video[data-play]').forEach(v => vio.observe(v));
-  // drag a strip with the mouse (touch scrolls natively)
-  $$('.hv-strip').forEach(s => {
-    let down = false, x0 = 0, l0 = 0;
-    s.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; x0 = e.clientX; l0 = s.scrollLeft; s.classList.add('is-drag'); s.setPointerCapture(e.pointerId); });
-    s.addEventListener('pointermove', e => { if (down) s.scrollLeft = l0 - (e.clientX - x0); });
-    const up = () => { down = false; s.classList.remove('is-drag'); }; s.addEventListener('pointerup', up); s.addEventListener('pointercancel', up);
-  });
-  // archive: the cover follows the pointer
-  $$('.hv-archive a').forEach(a => { const im = a.querySelector('img'); a.addEventListener('pointermove', e => { im.style.left = e.clientX + 24 + 'px'; im.style.top = e.clientY - 100 + 'px'; }); });
 }
 
-// the toys: small pieces of my own work around the big words; click the words and they jump somewhere else
-function toys(box, keys, around) {
-  box.innerHTML = keys.map(k => `<span class="hv-toy"><img src="${MINE[k]}" alt=""></span>`).join('');
-  const n = keys.length;
-  const place = () => box.querySelectorAll('.hv-toy').forEach((t, i) => {
-    const a = (i / n) * Math.PI * 2 + Math.random() * .7;
-    const x = around ? 50 + Math.cos(a) * (34 + Math.random() * 8) : 4 + Math.random() * 86, y = around ? 50 + Math.sin(a) * (32 + Math.random() * 6) : 4 + Math.random() * 72;
-    t.style.left = x + '%'; t.style.top = y + '%'; t.style.transform = `rotate(${(Math.random() - .5) * 40}deg)`;
-  });
-  place(); return place;
+// ---------- loader → the opening card opens to the whole screen ----------
+const heroV = $('.hv-hero-v');
+const open = () => { document.body.classList.remove('is-loading'); setTimeout(() => $('.hv-hero-t').classList.add('is-in'), 900); };
+let opened = false; const go = () => { if (opened) return; opened = true; setTimeout(open, 500); };
+heroV.addEventListener('canplay', go, { once: true }); setTimeout(go, 2200);
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; scrollTo(0, 0);
+
+// ---------- scrolling with a little inertia (computers), and everything tied to it ----------
+let sy = scrollY, ty = scrollY, mine = false;
+if (fine && !calm) {
+  addEventListener('wheel', e => { if (e.ctrlKey || document.body.classList.contains('is-loading') || $('.hv-player').open) return; e.preventDefault(); ty = clamp(ty + e.deltaY * (e.deltaMode === 1 ? 40 : 1), 0, document.documentElement.scrollHeight - innerHeight); }, { passive: false });
+  addEventListener('scroll', () => { if (!mine) { ty = sy = scrollY; } mine = false; }, { passive: true });
+  document.addEventListener('click', e => { const a = e.target.closest('a[href^="#"]'); if (!a) return; const t = $(a.getAttribute('href')); if (!t) return; e.preventDefault(); ty = t.getBoundingClientRect().top + scrollY; });
 }
-const shuffle = toys($('.hv-type .hv-toys'), ['product', 'service', 'tool', 'film', 'object', 'research'], false);
-$('.hv-type').addEventListener('click', shuffle);
-const endToys = toys($('.hv-toys-end'), ['product', 'service', 'tool', 'film', 'object', 'research'], true);
-setInterval(() => { if (!document.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches) endToys(); }, 3400);
+let strips = [];
+const head = $('.hv-head'), hero = $('.hv-hero'), reelCard = $('.hv-reel-card'), inter = $('.hv-inter'), end = $('.hv-end');
+let last = performance.now();
+function tick(now) {
+  requestAnimationFrame(tick);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (fine && !calm && Math.abs(ty - sy) > .3) { sy += (ty - sy) * (1 - Math.exp(-dt * 9)); mine = true; scrollTo(0, sy); } else sy = scrollY;
+  const vh = innerHeight;
+  // the opening: darker and pushed down as the page covers it
+  const hp = clamp(sy / vh); hero.style.setProperty('--hp', hp.toFixed(3));
+  // header turns white over dark parts
+  const er = end.getBoundingClientRect(); head.classList.toggle('on-dark', hp < .55 || (er.top < 40 && er.bottom > 40));
+  // the reel card grows as it comes in
+  const rr = reelCard.getBoundingClientRect(); reelCard.style.setProperty('--rs', (.86 + .14 * clamp((vh - rr.top) / (vh * .9))).toFixed(3));
+  // the pinned pause: picture settles, words fill in one by one
+  const ir = inter.getBoundingClientRect(), ip = clamp(-ir.top / (ir.height - vh)); inter.style.setProperty('--ip', ip.toFixed(3));
+  const ws = $$('.hv-fill .w'); ws.forEach((w, i) => w.classList.toggle('is-on', ip > (i + .5) / (ws.length + 1)));
+  // strips: slide with the scroll, plus whatever was dragged, plus a little drift after a throw
+  strips.forEach(s => {
+    const r = s.el.getBoundingClientRect(); if (r.bottom < -100 || r.top > vh + 100) return;
+    const half = s.track.scrollWidth / 2;
+    if (!s.down) { s.off += s.vel * dt; s.vel *= Math.exp(-dt * 3.5); }
+    const p = (vh - r.top) / (vh + r.height);   // 0 entering, 1 leaving
+    let x = -(p * vh * .45) + s.off - (innerWidth * .07);
+    x = ((x % half) - half) % half;   // loops round: the strip holds its pictures twice
+    s.track.style.setProperty('--tx', x.toFixed(1) + 'px');
+  });
+}
+requestAnimationFrame(tick);
+
+// dragging a strip, with the yellow DRAG pill as the cursor
+const pill = $('.hv-drag');
+addEventListener('pointermove', e => { pill.style.left = e.clientX + 'px'; pill.style.top = e.clientY + 'px'; }, { passive: true });
+document.addEventListener('pointerover', e => { pill.classList.toggle('is-on', fine && !!e.target.closest('[data-strip]')); });
+document.addEventListener('pointerdown', e => {
+  const el = e.target.closest('[data-strip]'); if (!el) return; const s = strips.find(q => q.el === el); if (!s) return;
+  s.down = true; s.vel = 0; let lx = e.clientX, lt = performance.now(); el.setPointerCapture(e.pointerId);
+  const mv = ev => { const t = performance.now(), dx = ev.clientX - lx; s.off += dx; s.vel = dx / Math.max(1, t - lt) * 1000; lx = ev.clientX; lt = t; };
+  const up = () => { s.down = false; el.removeEventListener('pointermove', mv); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); };
+  el.addEventListener('pointermove', mv); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+});
+
+// the reel: the card plays a run of short clips from my work; a click plays the film full screen
+{ const v = $('[data-reel-v]'); let k = 0; const next = () => { v.src = REEL[k++ % REEL.length]; v.play().catch(() => {}); }; v.addEventListener('ended', next); v.loop = false;
+  new IntersectionObserver(es => { if (es[0].isIntersecting) { if (!v.src) next(); else v.play().catch(() => {}); } else v.pause(); }, { threshold: .2 }).observe(reelCard);
+  const dlg = $('.hv-player'), pv = $('video', dlg);
+  reelCard.addEventListener('click', () => { pv.src = 'assets/v3/blender-reel-web.mp4'; dlg.showModal(); pv.play().catch(() => {}); });
+  const close = () => { pv.pause(); dlg.close(); }; $('.hv-player-x').addEventListener('click', close); dlg.addEventListener('close', () => pv.pause()); }
+
+// ---------- my own object: the scissors from my Blender desk, flying after the pointer ----------
+import('./home-v4-toy.mjs').then(m => $$('[data-toy]').forEach(sec => m.mountToy(sec, { fine, calm }))).catch(e => console.warn('toy', e));
 
 render();

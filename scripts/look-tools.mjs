@@ -226,7 +226,7 @@ function mountThreads(root, acts) {
     if (W < 761) {   // phones: no side margins — the ropes keep to the screen edges, clear of the text, and meet only at the end
       // they drift towards each other down the whole page (behind the text, which carries its own halo), step back to the
       // edges round the big words of every act, and meet at the knot
-      const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = ease(Math.pow(P, 1.35)), M = W * .5 - 6;
+      const P = clamp((docY - startY) / Math.max(1, knotDoc - startY)), e = Math.pow(P, 1.9), M = W * .5 - 6;   // how far apart = how far through the case: wide apart early, still clearly apart in the late chapters, together only at the end
       const sw = Math.sin(docY / 260) * 9 * (1 - e), sw2 = Math.sin(docY / 260 + 1.7) * 9 * (1 - e);
       let u = 6 + M * e + sw, c = W - 6 - M * e - sw2;
       for (const q of boxesT.slice(0, -1)) { const f = Math.min(ss(q.t - 140, q.t, docY), 1 - ss(q.b, q.b + 140, docY)); if (f > 0) { u += (6 - u) * f; c += (W - 6 - c) * f; } }

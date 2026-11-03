@@ -1,13 +1,11 @@
 // Home (preview v4): Léo Parpeix's structure and motion, filled with my own things.
-//  • A loader, then the opening card (a clip of my own Blender film) grows to the whole screen and stays pinned while the
-//    page slides up over it.
+//  • A loader, then the opening card (my own desk, rendered in Blender, in afternoon light) grows to the whole screen
+//    and stays pinned while the page slides up over it.
 //  • Lines rise into place; the page scrolls with a little inertia on a computer.
 //  • Big words whose first line keeps changing, with my own Blender object (the scissors from my salon desk) flying after
 //    the pointer — click and it darts there and spins.
-//  • A reel card that grows as it comes in and plays full screen on a click.
 //  • Each selected project is a strip of its own pictures that slides sideways as you scroll and can be dragged, with a
-//    yellow DRAG pill as the cursor; a pinned picture of my 3D work where the words fill in; the rest as an archive whose
-//    rows open.
+//    yellow DRAG pill as the cursor; the rest as an archive whose rows open. Who I am, then straight into the work.
 import { projects, categories } from './portfolio-catalog.mjs';
 
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -59,9 +57,7 @@ function render() {
   // big words: each line rises on its own
   $$('[data-big]').forEach(h => [...h.children].forEach((s, i) => { if (s.classList.contains('hv-cycle')) return; const t = s.textContent; s.className = 'hv-l'; s.style.setProperty('--i', i); s.innerHTML = `<span>${t}</span>`; }));
   $('.hv-cycle>span').textContent = L(CYCLE[ci]);
-  $$('[data-fill]>span').forEach(s => { s.innerHTML = s.textContent.split(' ').map(w => `<span class="w">${w}</span>`).join(' '); });
   $('.hv-lang').setAttribute('aria-label', lang === 'zh' ? '切换语言' : 'Language');
-  $('.hv-player-x').setAttribute('aria-label', lang === 'zh' ? '关闭' : 'Close');
   const row = (s, i) => {
     const p = P(s.id);
     const pics = s.pics.map(src => src.startsWith('>') ? `<div><video src="${src.slice(1)}" muted loop playsinline preload="none" data-play></video></div>` : src.startsWith('@') ? `<div class="is-phone"><img src="${src.slice(1)}" alt="" loading="lazy" draggable="false"></div>` : `<div><img src="${src}" alt="" loading="lazy" draggable="false"></div>`).join('');
@@ -98,33 +94,31 @@ function watch() {
 const heroV = $('.hv-hero-v');
 const open = () => { document.body.classList.remove('is-loading'); setTimeout(() => $('.hv-hero-t').classList.add('is-in'), 900); };
 let opened = false; const go = () => { if (opened) return; opened = true; setTimeout(open, 500); };
-heroV.addEventListener('canplay', go, { once: true }); setTimeout(go, 2200);
+heroV.complete ? go() : heroV.addEventListener('load', go, { once: true }); setTimeout(go, 2200);
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; scrollTo(0, 0);
 
 // ---------- scrolling with a little inertia (computers), and everything tied to it ----------
 let sy = scrollY, ty = scrollY, mine = false;
 if (fine && !calm) {
-  addEventListener('wheel', e => { if (e.ctrlKey || document.body.classList.contains('is-loading') || $('.hv-player').open) return; e.preventDefault(); ty = clamp(ty + e.deltaY * (e.deltaMode === 1 ? 40 : 1), 0, document.documentElement.scrollHeight - innerHeight); }, { passive: false });
+  addEventListener('wheel', e => { if (e.ctrlKey || document.body.classList.contains('is-loading')) return; e.preventDefault(); ty = clamp(ty + e.deltaY * (e.deltaMode === 1 ? 40 : 1), 0, document.documentElement.scrollHeight - innerHeight); }, { passive: false });
   addEventListener('scroll', () => { if (!mine) { ty = sy = scrollY; } mine = false; }, { passive: true });
   document.addEventListener('click', e => { const a = e.target.closest('a[href^="#"]'); if (!a) return; const t = $(a.getAttribute('href')); if (!t) return; e.preventDefault(); ty = t.getBoundingClientRect().top + scrollY; });
 }
 let strips = [];
-const head = $('.hv-head'), hero = $('.hv-hero'), reelCard = $('.hv-reel-card'), inter = $('.hv-inter'), end = $('.hv-end');
-let last = performance.now();
+const head = $('.hv-head'), hero = $('.hv-hero'), end = $('.hv-end'), sunEl = $('.hv-sun');
+let last = performance.now(), mx = 0, my = 0, pmx = 0, pmy = 0;
+if (fine) addEventListener('pointermove', e => { mx = e.clientX / innerWidth * 2 - 1; my = e.clientY / innerHeight * 2 - 1; }, { passive: true });
 function tick(now) {
   requestAnimationFrame(tick);
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (fine && !calm && Math.abs(ty - sy) > .3) { sy += (ty - sy) * (1 - Math.exp(-dt * 9)); mine = true; scrollTo(0, sy); } else sy = scrollY;
   const vh = innerHeight;
   // the opening: darker and pushed down as the page covers it
-  const hp = clamp(sy / vh); hero.style.setProperty('--hp', hp.toFixed(3));
+  const hp = clamp(sy / vh); hero.style.setProperty('--hp', hp.toFixed(3)); pmx += (mx - pmx) * (1 - Math.exp(-dt * 3)); pmy += (my - pmy) * (1 - Math.exp(-dt * 3)); hero.style.setProperty('--mx', pmx.toFixed(3)); hero.style.setProperty('--my', pmy.toFixed(3));
   // header turns white over dark parts
   const er = end.getBoundingClientRect(); head.classList.toggle('on-dark', hp < .55 || (er.top < 40 && er.bottom > 40));
-  // the reel card grows as it comes in
-  const rr = reelCard.getBoundingClientRect(); reelCard.style.setProperty('--rs', (.86 + .14 * clamp((vh - rr.top) / (vh * .9))).toFixed(3));
-  // the pinned pause: picture settles, words fill in one by one
-  const ir = inter.getBoundingClientRect(), ip = clamp(-ir.top / (ir.height - vh)); inter.style.setProperty('--ip', ip.toFixed(3));
-  const ws = $$('.hv-fill .w'); ws.forEach((w, i) => w.classList.toggle('is-on', ip > (i + .5) / (ws.length + 1)));
+  // the patch of sun drifts slowly, and a little with the scroll
+  sunEl.style.setProperty('--sx', (innerWidth * (.2 + .25 * Math.sin(now / 9000))).toFixed(0) + 'px'); sunEl.style.setProperty('--sy2', (innerHeight * (.15 + .3 * Math.cos(now / 11000)) - (sy * .05) % (innerHeight * .4)).toFixed(0) + 'px');
   // strips: slide with the scroll, plus whatever was dragged, plus a little drift after a throw
   strips.forEach(s => {
     const r = s.el.getBoundingClientRect(); if (r.bottom < -100 || r.top > vh + 100) return;
@@ -149,13 +143,6 @@ document.addEventListener('pointerdown', e => {
   const up = () => { s.down = false; el.removeEventListener('pointermove', mv); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); };
   el.addEventListener('pointermove', mv); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
 });
-
-// the reel: the card plays a run of short clips from my work; a click plays the film full screen
-{ const v = $('[data-reel-v]'); let k = 0; const next = () => { v.src = REEL[k++ % REEL.length]; v.play().catch(() => {}); }; v.addEventListener('ended', next); v.loop = false;
-  new IntersectionObserver(es => { if (es[0].isIntersecting) { if (!v.src) next(); else v.play().catch(() => {}); } else v.pause(); }, { threshold: .2 }).observe(reelCard);
-  const dlg = $('.hv-player'), pv = $('video', dlg);
-  reelCard.addEventListener('click', () => { pv.src = 'assets/v3/blender-reel-web.mp4'; dlg.showModal(); pv.play().catch(() => {}); });
-  const close = () => { pv.pause(); dlg.close(); }; $('.hv-player-x').addEventListener('click', close); dlg.addEventListener('close', () => pv.pause()); }
 
 // ---------- my own object: the scissors from my Blender desk, flying after the pointer ----------
 import('./home-v4-toy.mjs').then(m => $$('[data-toy]').forEach(sec => m.mountToy(sec, { fine, calm }))).catch(e => console.warn('toy', e));

@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="home-v4.css" />
 </head>
 <body class="hv is-loading">
+<div class="hv-sun" aria-hidden="true"></div>
 <div class="hv-loader"><p class="hv-loader-n"><span data-t="name"></span><span data-t="role"></span></p></div>
 <header class="hv-head">
   <a class="hv-name" href="home-v4.html" data-t="name"></a>
@@ -24,7 +25,7 @@
   <section class="hv-hero">
     <div class="hv-hero-pin">
       <div class="hv-hero-card">
-        <video class="hv-hero-v" src="assets/v3/blender-reel-web.mp4" poster="assets/v3/blender-reel.jpg" muted loop playsinline autoplay></video>
+        <picture><source media="(max-width:760px)" srcset="assets/v3/desk/render/hero-m.jpg"><img class="hv-hero-v" src="assets/v3/desk/render/hero-web.jpg" alt="" fetchpriority="high"></picture><span class="hv-leaves" aria-hidden="true"></span>
         <div class="hv-hero-in">
           <p class="hv-hero-t" data-t="statement" data-lines></p>
           <p class="hv-hero-s" data-t="scroll"></p>
@@ -50,29 +51,12 @@
     <section class="hv-hello">
       <p class="hv-hello-a" data-t="hello" data-lines></p>
       <div class="hv-hello-b"><span class="hv-ast">*</span><div><p data-t="hi1" data-reveal></p><p data-t="hi2" data-reveal></p></div></div>
-    </section>
-
-    <section class="hv-reel">
-      <button type="button" class="hv-reel-card" data-reel>
-        <video muted loop playsinline preload="none" data-reel-v></video>
-        <span class="hv-reel-type" aria-hidden="true"><span data-t="reel_w1"></span><span data-t="reel_w2"></span></span>
-        <span class="hv-pill" data-t="watch_reel"></span>
-      </button>
+      <figure class="hv-hello-v" data-reveal><video src="assets/v3/modeling-02-preview.mp4" muted loop playsinline autoplay preload="none" data-play></video></figure>
     </section>
 
     <section class="hv-work" id="work">
       <h2 class="hv-work-h" data-t="selected"></h2>
       <div class="hv-projects" data-set="0"></div>
-    </section>
-
-    <section class="hv-inter">
-      <div class="hv-inter-pin">
-        <img src="assets/v3/modeling-02.jpg" alt="" loading="lazy" />
-        <h2 class="hv-big hv-fill" data-fill><span data-t="inter1"></span><span data-t="inter2"></span><span data-t="inter3"></span></h2>
-      </div>
-    </section>
-
-    <section class="hv-work">
       <div class="hv-projects" data-set="1"></div>
       <h2 class="hv-work-h hv-arch-h" data-t="archives"></h2>
       <ol class="hv-archive"></ol>
@@ -87,7 +71,6 @@
   </div>
 </main>
 <div class="hv-drag" aria-hidden="true" data-t="drag"></div>
-<dialog class="hv-player"><button type="button" class="hv-player-x">×</button><video controls playsinline preload="none"></video></dialog>
 <script type="module" src="scripts/home-v4.mjs"></script>
 </body>
 </html>

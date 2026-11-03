@@ -4113,3 +4113,16 @@ html[data-body=a] .bk-day .op-copy .op-btn--main{background:#f0a35e!important;co
 /* phones: the summary cards keep inside the screen (a long word or link must not widen the column) */
 @media (max-width:899px){.bk-day .bk-quick-in{grid-template-columns:minmax(0,1fr)}}
 .bk-day .bk-quick :is(.bk-receipt,.bk-minute){min-width:0;overflow-wrap:anywhere}
+
+/* A · the chapter bar as a lit rail (the same slider as the chapter list, on its side) */
+html[data-body=a] .bk-day .ux-case-index.has-lumen{position:sticky;padding-bottom:12px!important}
+html[data-body=a] .bk-day .ux-case-index.has-lumen>a{border-bottom-color:transparent!important;position:relative;z-index:1;padding:0 12px!important;margin:6px -6px 0;border-radius:12px;min-height:40px!important;display:inline-flex;align-items:center;transition:color .35s,background .35s,box-shadow .35s}
+html[data-body=a] .bk-day .ux-case-index.has-lumen>a[aria-current="location"]{background:radial-gradient(90% 140% at 50% 120%,rgba(240,163,94,.3),rgba(240,163,94,.06) 50%,transparent 75%),linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.02) 55%,rgba(255,255,255,.04)),rgba(20,16,12,.55)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(255,200,150,.35),inset 0 0 0 1px rgba(255,255,255,.08)!important}
+html[data-body=a] .bk-day .ux-case-index.has-lumen .ux-index-try{z-index:3;margin-top:6px;padding:9px 16px!important}
+html[data-body=a] .ux-case-index .bk-lumen-h{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:0}
+html[data-body=a] .bk-lumen-h .t{stroke:rgba(255,236,210,.2);stroke-width:1.4}
+html[data-body=a] .bk-lumen-h .l{stroke:var(--x-acc);stroke-width:2;filter:drop-shadow(0 0 3px rgba(240,163,94,.9))}
+html[data-body=a] .bk-lumen-h .g{stroke:var(--x-acc);stroke-width:7;filter:url(#bklh-b);opacity:0}
+html[data-body=a] .bk-lumen-h .halo{fill:rgba(240,163,94,.55);filter:url(#bklh-b)}
+html[data-body=a] .ux-case-index .bk-knob-h{position:absolute;left:0;top:0;width:16px;height:16px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 45%,rgba(0,0,0,.25) 100%),rgba(28,24,20,.9);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 2px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.12),0 4px 14px rgba(240,163,94,.45),0 3px 8px rgba(0,0,0,.6);will-change:transform}
+html[data-body=a] .ux-case-index .bk-knob-h::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--x-acc);box-shadow:0 0 7px 2px rgba(240,163,94,.8)}

@@ -11,7 +11,7 @@ export function mountBody() {
   const html = document.documentElement; html.dataset.body = v;
   const day = document.querySelector('.bk-day'); if (!day) return;
 
-  if (v === 'a') { glassLight(day); lumen(day); }
+  if (v === 'a') { glassLight(day); lumen(day); lumenBar(day); }
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const HEAD = '.v3-product-section.ux-section>h2, .ux-question, .ux-subhead, .bk-moment-kicker, .bk-moment-line, .bk-receipt-t, .bk-minute h3, .bk-minute .bk-receipt-k, .bk-receipt>.bk-receipt-k';
   const COPY = '.bk-moment-cap';
@@ -100,4 +100,43 @@ function lumen(day) {
     }
   };
   requestAnimationFrame(tick);
+}
+
+// A: the chapter bar along the top gets the same lit rail, lying on its side — the chapters already read glow along the
+// bottom edge, and under the current one the line dips away around a glass knob that slides along as you read
+function lumenBar(day) {
+  const nav = day.querySelector('.ux-case-index'); if (!nav || nav.querySelector('.bk-lumen-h')) return;
+  const NS = 'http://www.w3.org/2000/svg', B = 9, W2 = 34;
+  nav.classList.add('has-lumen');
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'bk-lumen bk-lumen-h'); svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = '<defs><filter id="bklh-b" x="-1" y="-3" width="3" height="7"><feGaussianBlur stdDeviation="4.5"/></filter></defs><path class="t"/><path class="g"/><path class="l"/><ellipse class="halo" rx="26" ry="11"/>';
+  const knob = document.createElement('i'); knob.className = 'bk-knob bk-knob-h'; knob.setAttribute('aria-hidden', 'true');
+  nav.prepend(svg); nav.append(knob);
+  const T = svg.querySelector('.t'), G = svg.querySelector('.g'), Lp = svg.querySelector('.l'), halo = svg.querySelector('.halo');
+  const links = () => [...nav.querySelectorAll('a')].filter(a => !a.matches('.ux-index-try, .ux-index-top') && a.offsetWidth);
+  let kx = null, kf = 0, sig = '', last = performance.now();
+  const path = (x0, x1, y, k, amt) => { let d = ''; for (let x = x0; x <= x1 + .01; x += 4) { const u = (x - k) / W2; d += (d ? 'L' : 'M') + x.toFixed(1) + ' ' + (y + B * amt * Math.exp(-u * u * 2.2)).toFixed(2); } return d; };
+  const tick = now => {
+    requestAnimationFrame(tick);
+    const dt = Math.min(.06, (now - last) / 1000); last = now; const E = r => 1 - Math.exp(-dt * r);
+    const r = nav.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    const ls = links(); if (!ls.length) return;
+    const on = ls.find(a => a.getAttribute('aria-current') === 'location');
+    const mid = a => a.offsetLeft + a.offsetWidth / 2;
+    const want = on ? mid(on) : ls[0].offsetLeft;
+    kx = kx == null ? want : kx + (want - kx) * E(6.5); kf += ((on ? 1 : 0) - kf) * E(5);
+    const W = nav.scrollWidth, H = nav.clientHeight, y = H - 13;
+    const s2 = `${kx.toFixed(1)}|${kf.toFixed(3)}|${W}|${H}`; if (s2 === sig) return; sig = s2;   // nothing moved: leave the page alone
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.width = W + 'px'; svg.style.height = H + 'px';
+    const x0 = ls[0].offsetLeft, x1 = ls[ls.length - 1].offsetLeft + ls[ls.length - 1].offsetWidth;
+    T.setAttribute('d', path(x0, x1, y, kx, kf));
+    const lx = Math.max(x0, kx); Lp.setAttribute('d', path(x0, lx, y, kx, kf)); G.setAttribute('d', path(Math.max(x0, kx - 70), lx, y, kx, kf));
+    G.style.opacity = kf.toFixed(3);
+    halo.setAttribute('cx', kx.toFixed(1)); halo.setAttribute('cy', (y + B * kf - 1).toFixed(1)); halo.style.opacity = (kf * .85).toFixed(3);
+    knob.style.transform = `translate3d(${kx.toFixed(1)}px,${(y - 1).toFixed(1)}px,0) translate(-50%,-50%) scale(${(.55 + .45 * kf).toFixed(3)})`;
+    knob.style.opacity = (.2 + .8 * kf).toFixed(3);
+  };
+  requestAnimationFrame(tick);
+  // keep the current chapter in view inside the bar
+  let lastOn = null; setInterval(() => { const on = nav.querySelector('a[aria-current="location"]'); if (on && on !== lastOn) { lastOn = on; const l = on.offsetLeft - nav.clientWidth * .35; nav.scrollTo({ left: Math.max(0, l), behavior: 'smooth' }); } }, 400);
 }

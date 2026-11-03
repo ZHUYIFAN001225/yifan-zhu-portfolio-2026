@@ -408,7 +408,7 @@ export function mountDesk(root) {
       const tilt = document.createElement('button'); tilt.type = 'button'; tilt.className = 'bk-dk-tilt';
       const lab = () => tilt.textContent = zh() ? '↻ 倾斜手机，换个角度看' : '↻ Tilt your phone to look around'; lab();
       document.addEventListener('portfolio:language', () => setTimeout(lab, 40));
-      tilt.addEventListener('click', () => D.requestPermission().then(r => { if (r === 'granted') listen(); tilt.remove(); }).catch(() => tilt.remove()));
+      tilt.addEventListener('click', () => { const done = () => { listen(); tilt.remove(); }; try { D.requestPermission().then(done, done); } catch { done(); } });
       ov.append(tilt);
     } else listen();
   }

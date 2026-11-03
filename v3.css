@@ -4088,3 +4088,9 @@ html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 680vh)}
 html[data-body=a] .bk-day :is(.is-glass,.bk-dom-card,.bk-dom-slip,.ux-pains>div.bk-sticky,.bk-ledger.is-after,.bk-minute-viz i,.ux-bp-row>span,.ux-blueprint,.ux-bp-lane,.ux-bp-stage,.ux-iterations .ux-before-after p,.bk-ledger-list>li,.bk-ask-h b,.bk-dom-hint button){-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html[data-body=a]{--glass-fill:linear-gradient(135deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.02) 38%,rgba(255,255,255,0) 70%,rgba(255,255,255,.03) 100%),rgba(17,14,11,.66)}
 .bk-dk-grain{inset:-8%}
+.bk-set .bk-dk-jump{display:block!important;flex-direction:column}
+.bk-set .bk-dk-jump>.bk-jl{display:grid!important;width:auto}
+.bk-set .bk-dk-jump>.bk-jk{display:block;writing-mode:horizontal-tb;width:auto}
+.bk-set .bk-dk-jump>.bk-jg{display:flex!important;flex-direction:row;flex-wrap:wrap}
+.bk-set .bk-dk-jump a{white-space:nowrap}
+.bk-set .bk-jl span{white-space:normal}

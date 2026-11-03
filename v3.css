@@ -4150,3 +4150,7 @@ html[data-body=a] .bk-day .ux-case-index.has-lumen>a.ux-index-try{position:stick
   .bk-set .bk-dk-pw-p{top:194px!important;bottom:auto!important;font-size:13px!important;max-width:34ch}
   .bk-set :is(.bk-dk-copy,.bk-dk-eve,.bk-dk-pw-p,.bk-dk-pw-k){text-shadow:0 1px 2px rgba(0,0,0,.85),0 0 22px rgba(0,0,0,.9)!important}
 }
+/* the handover: once the desk has gone behind the page, the opening's own frame is see-through too (no dark band
+   scrolling away), and its way-out panel has done its job */
+html[data-body=a] .bk-day .op--3d:has(.bk-dk.is-through){background:transparent!important}
+html[data-body=a] .bk-dk.is-through .bk-dk-jump{visibility:hidden!important}

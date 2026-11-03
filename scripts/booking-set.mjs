@@ -138,7 +138,10 @@ export function mountDesk(root) {
   // traced towards the sun onto a virtual canopy above the desk, and the canopy moves a little in the wind.
   const set = new THREE.Group(); scene.add(set); const props = {}; let ready = false;
   const baked = []; const U = { uMix: { value: 0 }, uLit: { value: 1 }, uTime: { value: 0 }, uWind: { value: 1 } };
-  const tex2 = (n, tag) => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_${tag}.jpg`, () => res(t), undefined, () => res(null)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; });
+  // phones load a lighter set of bakes (desk 2048, book and mat 1024, the small things 512): the full set is ~450 MB of
+  // video memory, more than a phone browser allows a page
+  const lite = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900, CAPS = { desk: 2048, mat: 1024, notebook: 1024 };
+  const tex2 = (n, tag) => new Promise(res => { const t = new THREE.TextureLoader().load(`${MODELS}bake_${n}_${tag}${lite ? '_m' : ''}.jpg`, () => res(t), undefined, () => res(null)); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = lite ? 4 : 8; });
   const GAIN = 3.0;   // the bake was made at 0.4× the Blender exposure so sunlit paper fits in 8 bits; put it back here
   const LIGHT_GLSL = `
     uniform sampler2D uAmb, uSun, uNight; uniform float uMix, uLit, uTime, uWind;
@@ -168,7 +171,7 @@ export function mountDesk(root) {
     };
     return m;
   }
-  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`), tex2(n, 'day2'), tex2(n, 'night')]).then(([o, sun, night]) => {
+  Promise.all(['desk', 'mat', 'notebook', 'pencil', 'pen', 'eraser', 'comb', 'scissors', 'clips', 'binder'].map(n => Promise.all([loadGLB(`${MODELS}${n}.glb`, lite ? { maxTex: CAPS[n] || 512, aniso: 4 } : {}), tex2(n, 'day2'), tex2(n, 'night')]).then(([o, sun, night]) => {
     props[n] = o; set.add(o); let amb = null;
     o.traverse(m => { if (!m.isMesh) return; if (!amb && m.material.map) amb = m.material.map; const a = m.geometry.attributes, k = ['uv3', 'uv2', 'uv1'].find(x => a[x]); m.geometry.setAttribute('bakeUv', a[k] || a.uv); });
     const L3 = { amb, sun, night }, mat = bakedMaterial(L3);

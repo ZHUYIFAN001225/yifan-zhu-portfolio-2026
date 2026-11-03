@@ -5,7 +5,7 @@ import * as THREE from '../assets/v3/lib/three/three.module.min.js';
 const COMP = { 5120: Int8Array, 5121: Uint8Array, 5122: Int16Array, 5123: Uint16Array, 5125: Uint32Array, 5126: Float32Array };
 const SIZE = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT4: 16 };
 
-export async function loadGLB(url, { envMap = null, envMapIntensity = 1, onMaterial = null } = {}) {
+export async function loadGLB(url, { envMap = null, envMapIntensity = 1, onMaterial = null, maxTex = 0, aniso = 8 } = {}) {
   const buf = await (await fetch(url)).arrayBuffer();
   const dv = new DataView(buf);
   if (dv.getUint32(0, true) !== 0x46546C67) throw new Error('not a glb: ' + url);
@@ -33,8 +33,12 @@ export async function loadGLB(url, { envMap = null, envMapIntensity = 1, onMater
     if (texCache.has(ti)) return texCache.get(ti);
     const t = g.textures[ti], im = g.images[t.source], bv = view(im.bufferView);
     const blob = new Blob([bv.bytes], { type: im.mimeType || 'image/png' }), url = URL.createObjectURL(blob);
-    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
-    const tex = new THREE.Texture(img); tex.flipY = false; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; tex.needsUpdate = true;
+    let img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    URL.revokeObjectURL(url);
+    // phones: a smaller copy goes to the GPU (a 4096² texture and its mipmaps alone is ~90 MB of video memory)
+    if (maxTex && Math.max(img.width, img.height) > maxTex) { const k = maxTex / Math.max(img.width, img.height), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, c.width, c.height); img.src = ''; img = c; }
+    const tex = new THREE.Texture(img); tex.flipY = false; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = aniso; tex.needsUpdate = true;
     const s = g.samplers?.[t.sampler]; if (s) { tex.wrapS = s.wrapS === 33071 ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping; tex.wrapT = s.wrapT === 33071 ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping; }
     texCache.set(ti, tex); return tex;
   };

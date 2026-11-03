@@ -247,7 +247,7 @@ export function mountStage(root) {
         if (e.dataset.act !== '3') return;
         // act 3: the phone takes over from the paper diary
         phoneOn = true; f = 'schedule';
-        if (m) { const sp = e.querySelector('.bk-hand-space') || e, t2 = docY(sp), h2 = sp.offsetHeight; push(t2 - vh * .45, { kind: 'off', q: off(1), f }); push(t2 + h2 * .5, { kind: 'hand', q: P6([.5, .5, .5, .03, -.2, 0]), f, spot: SPOT.schedule }); story = true; return; }
+        if (m) return;   // phones: the diary is read on its own (a phone flying in below it, with an arrow down, read as a strange stack)
         // it rises in from below on its own side with a small turn, settles, then stays put while the page reads
         // (the pointer tilts it); when the page moves on it lifts away upward
         const rest = P6([.78, .52, .64, .04, -.12, 0]), lab = ['Owner · the diary keeps itself', '店主 · 预约本自己记'];

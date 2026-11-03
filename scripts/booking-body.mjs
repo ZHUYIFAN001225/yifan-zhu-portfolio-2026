@@ -53,7 +53,10 @@ function glassLight(day) {
     }
   });
   const hover = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  scan(); [800, 2000, 4500].forEach(t => setTimeout(scan, t));
+  // a slip only a line tall has no room for the inner edge: it keeps the outer lit rim only, or the lines run through its words
+  const ro = 'ResizeObserver' in window ? new ResizeObserver(es => es.forEach(e => e.target.classList.toggle('is-thin', e.target.offsetHeight < 72))) : null;
+  const watch = () => day.querySelectorAll('.is-glass').forEach(el => { if (!el._ro && ro) { el._ro = true; ro.observe(el); } });
+  scan(); watch(); [800, 2000, 4500].forEach(t => setTimeout(() => { scan(); watch(); }, t));
 }
 
 // A: the chapter list's rail as a lit slider — the part already read glows lamp-amber, and the line bends away around the

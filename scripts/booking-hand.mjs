@@ -134,6 +134,7 @@ export function mountHand(root, extra = '') {
           it.noteEl.textContent = it.note[zh() ? 1 : 0]; it.noteEl.style.left = (Math.max(f.x + f.w, t.x + t.w) + 24) + 'px'; it.noteEl.style.top = (t.y - 2) + 'px';
         }
         if (it.kind === 'handoff') {
+          if (innerWidth < 1000) { it.paths = []; return; }   // narrow screens: no phone beside the page to point at
           // from the right edge of the page towards where the phone stands
           const sr = a.sheet.getBoundingClientRect(), k = sr.width / W || 1, wide = innerWidth >= 1000;
           const tx = wide ? (innerWidth * .67 - sr.left) / k : W * .5, ty = wide ? H * .45 : H + 120 / k;

@@ -4194,3 +4194,32 @@ html[data-body=a] .bk-dk.is-through .bk-dk-jump{visibility:hidden!important}
 }
 /* the big "One shared diary": letters must not touch (each letter fades on its own, so any overlap shows) */
 .bk-set .bk-dk-pw-h{letter-spacing:-.022em!important}
+
+/* thin panes (a slip one line tall): the outer lit edge only — no inner line, no bevel band, no hover glow band */
+html[data-body=a] .is-thin>.bk-rim>:is(.v,.i){display:none}
+html[data-body=a] .bk-day .is-glass.is-thin{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 1px 0 -.5px rgba(255,255,255,.1),0 3px 0 -1px rgba(20,16,12,.9),0 14px 30px -18px rgba(0,0,0,.85)!important}
+
+/* phones: the swipe cards in the dark glass of the rest of the page (they were still on the old white) */
+@media (max-width:899px){
+  html[data-body=a] .bk-day .bk-swipe>*{background:var(--glass-fill)!important;color:var(--x-ink)!important;border:0!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.12),0 24px 50px -24px rgba(0,0,0,.85)!important}
+  html[data-body=a] .bk-day .bk-swipe>* :is(h3,h4,p,li,span,b,dt,dd,small,em,strong){color:inherit!important}
+  html[data-body=a] .bk-day .bk-swipe>* :is(p,li,dd,small){color:var(--x-ink2)!important}
+  html[data-body=a] .bk-day .bk-swipe>* :is(.ux-before-after p,[class*=before],[class*=after]){background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.1)!important}
+}
+
+/* phones: the chapter bar keeps its chapters in view — "Try the prototype" becomes a small round play button */
+@media (max-width:639px){
+  html[data-body=a] .bk-day .ux-case-index.has-lumen .ux-index-try{font-size:0!important;width:38px;height:38px;min-width:38px;padding:0!important;display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 38px;margin-top:4px}
+  html[data-body=a] .bk-day .ux-case-index.has-lumen .ux-index-try::before{content:"▶";font-size:13px;line-height:1;margin-left:2px}
+  html[data-body=a] .bk-day .ux-case-index.has-lumen .ux-index-top{display:none!important}
+}
+
+/* phones: the site bar sits at the very top of this page only — it does not drop back in when you scroll up (the
+   Browse bar at the bottom carries the navigation) */
+@media (max-width:639px){
+  body:has(.bk-day) .site-header{position:absolute!important;left:0;right:0;top:0;transform:none!important}
+  html.v3-header-hidden body:has(.bk-day) .site-header{transform:none!important}
+  body:has(.bk-day) .ux-case-index{top:0!important}
+}
+@media (max-width:999px){ .bk-hand[data-act="3"] .bk-hand-space{display:none!important} }
+@media (max-width:639px){ .bk-dk-grain{display:none!important} }   /* phones: no film grain over the desk — at this size it read as a haze */

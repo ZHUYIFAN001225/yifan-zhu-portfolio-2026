@@ -358,7 +358,7 @@ export function mountDesk(root) {
   const PT = { x: .115, z: -.025, k: .55 };
   const PR = { x: 0, y: .6, z: .085, s: 1.15 };
   const QS = [1, .82, .66, .52]; let qi = weak ? 2 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
-  const dpr = () => inBody ? .34 : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
+  const dpr = () => inBody ? (handset ? .6 : .34) : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
   const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: `precision highp float;
@@ -481,7 +481,7 @@ export function mountDesk(root) {
     const y0 = shots[i].el.getBoundingClientRect().top - H, n = shots[i + 1];
     if (n) { const y1 = n.el.getBoundingClientRect().top - H; t = clamp(-y0 / Math.max(1, y1 - y0)); t = t * t * t * (t * (t * 6 - 15) + 10); }
     tPos.lerpVectors(shots[i].p, (n || shots[i]).p, t); tLook.lerpVectors(shots[i].l, (n || shots[i]).l, t);
-    tPos.x += Math.sin(now * .00013) * .008 + P.x * .012; tPos.y += Math.sin(now * .0001 + 1) * .005 - P.y * .008;   // it breathes, and leans a little with the pointer
+    if (!handset) { tPos.x += Math.sin(now * .00013) * .008 + P.x * .012; tPos.y += Math.sin(now * .0001 + 1) * .005 - P.y * .008; }   // it breathes, and leans a little with the pointer
     const k = 1 - Math.exp(-dt * 1.6); bPos.lerp(tPos, k); bLook.lerp(tLook, k);
     cam.position.copy(bPos); cam.up.set(0, 1, 0); cam.lookAt(bLook);
     sun.intensity = 0; room.intensity = .06; sky.intensity = .03; lamp.intensity = .5; rim.intensity = 0; edge.intensity = 0;
@@ -495,7 +495,7 @@ export function mountDesk(root) {
     const moved = cam.position.distanceToSquared(lastPos) + bLook.distanceToSquared(lastLook);
     if (now - lastDraw < (moved > 4e-8 ? 31 : 95) && !dirtyBody) { { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } } return; }
     lastDraw = now; lastPos.copy(cam.position); lastLook.copy(bLook); dirtyBody = false;
-    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
+    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = handset ? 8 : 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } }
   }
@@ -511,7 +511,7 @@ export function mountDesk(root) {
     if (bodyA() && ready && r.bottom < innerHeight * .995) { if (opFlag) { opFlag = false; document.documentElement.classList.remove('bk-opening'); } moveCanvas(true); bodyFrame(now, dt, 1); return; }
     moveCanvas(false);
     if (r.bottom < -100 || r.top > innerHeight + 100) return;
-    if (warm < 1.2) warm += dt; else { ema += (dt - ema) * .08; if (ema > 1 / 38) { slowFor += dt; if (slowFor > .9 && qi < QS.length - 1) { qi++; slowFor = 0; ema = 1 / 60; warm = .6; resize(); } } else slowFor = Math.max(0, slowFor - dt); }
+    if (warm < 1.2) warm += dt; else { ema += (dt - ema) * .08; if (ema > 1 / 38) { slowFor += dt; if (slowFor > .9 && qi < (handset ? 1 : QS.length - 1)) { qi++; slowFor = 0; ema = 1 / 60; warm = .6; resize(); } } else slowFor = Math.max(0, slowFor - dt); }
     const pmove = Math.abs(P.tx - P.x) + Math.abs(P.ty - P.y); if (scrollY !== lastSY || pmove > .002 || dirty) { lastSY = scrollY; still = 0; } else still += dt;
     if (still > .6 && now - lastDraw < 31) return; lastDraw = now;
     const pr = clamp(-r.top / Math.max(1, r.height - op.offsetHeight), -.2, 1.2);
@@ -568,6 +568,7 @@ export function mountDesk(root) {
     const dPhone = cam.position.distanceTo(pv.position), dLook = cam.position.distanceTo(camLook), fu = post.uniforms;
     fu.uFocus.value = lerp(dLook, dPhone, up + kPhone * kBack); fu.uRange.value = lerp(1.1, .12, up) - (kBook * kBack) * .8; fu.uMax.value = (2.2 * (1 - up) + 7 * kBook * kBack) * dpr();
     fu.uVig.value = .25 + .55 * nightAmt - .25 * kOut; fu.uFringe.value = 0; fu.uJit.value = 1;
+    if (tall) { fu.uFocus.value = lerp(fu.uFocus.value, dPhone - .03, 1 - kBook * kBack); fu.uRange.value = Math.max(fu.uRange.value, .9 * (1 - kBook * kBack) + .12); fu.uMax.value *= .45; fu.uJit.value = 0; }   // phones: the messages float close to the lens — keep them, and the phone, sharp
     if (bodyA()) {   // the dark case: no fade to black — the close-up drifts out of focus into the same defocus the page sits on
       fu.uMax.value = lerp(fu.uMax.value, 13 * dpr(), kOut); fu.uRange.value = lerp(fu.uRange.value, .06, kOut); fu.uFocus.value = lerp(fu.uFocus.value, cam.position.distanceTo(camLook) * .55, kOut);
       fu.uVig.value = lerp(fu.uVig.value, .85, kOut); fu.uJit.value = 1 - kOut;

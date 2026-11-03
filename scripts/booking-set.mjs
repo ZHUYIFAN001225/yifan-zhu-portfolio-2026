@@ -401,7 +401,9 @@ export function mountDesk(root) {
   addEventListener('pointermove', e => { if (!fine) return; const r = inBody ? { left: 0, top: 0, width: innerWidth, height: innerHeight } : op.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * 2 - 1; P.ty = (e.clientY - r.top) / r.height * 2 - 1; }, { passive: true });
   // phones: tilt instead of the pointer — tip it left/right for the parallax, forward/back for the camera's angle
   // (as the mouse moving left/right and up/down on a computer). It re-centres slowly on however you hold the phone.
-  if (!fine && 'DeviceOrientationEvent' in window && !calm) {
+  // only real phones and tablets: a touch screen, no hover, a small screen — a computer keeps the mouse
+  const tiltable = matchMedia('(pointer: coarse) and (hover: none)').matches && Math.min(screen.width, screen.height) < 900;
+  if (tiltable && 'DeviceOrientationEvent' in window && !calm) {
     let base = null;
     const onTilt = e => { if (e.beta == null || e.gamma == null) return;
       if (base == null) base = e.beta; base += (e.beta - base) * .004;

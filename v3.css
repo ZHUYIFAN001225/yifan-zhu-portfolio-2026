@@ -4110,3 +4110,6 @@ html[data-body=a] .bk-day .op-copy .op-live{color:rgba(200,240,215,.85)!importan
 html[data-body=a] .bk-day .op-copy .op-url{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.16)!important}
 html[data-body=a] .bk-day .op-copy .op-btn:not(.op-btn--main){color:#f1e7d6!important;border-color:rgba(255,255,255,.35)!important;background:transparent!important}
 html[data-body=a] .bk-day .op-copy .op-btn--main{background:#f0a35e!important;color:#1a1410!important;border-color:transparent!important}
+/* phones: the summary cards keep inside the screen (a long word or link must not widen the column) */
+@media (max-width:899px){.bk-day .bk-quick-in{grid-template-columns:minmax(0,1fr)}}
+.bk-day .bk-quick :is(.bk-receipt,.bk-minute){min-width:0;overflow-wrap:anywhere}

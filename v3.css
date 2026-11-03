@@ -4094,3 +4094,11 @@ html[data-body=a]{--glass-fill:linear-gradient(135deg,rgba(255,255,255,.075) 0%,
 .bk-set .bk-dk-jump>.bk-jg{display:flex!important;flex-direction:row;flex-wrap:wrap}
 .bk-set .bk-dk-jump a{white-space:nowrap}
 .bk-set .bk-jl span{white-space:normal}
+
+/* the chapter bar: you can see where you are, and "Try the prototype" is never cut off */
+html[data-body=a] .bk-day .ux-case-index{gap:0 22px}
+html[data-body=a] .bk-day .ux-case-index a{text-decoration:none!important;border-bottom:2px solid transparent!important;color:rgba(241,231,214,.55)!important;font-weight:500}
+html[data-body=a] .bk-day .ux-case-index a:hover{color:#fff7ea!important}
+html[data-body=a] .bk-day .ux-case-index a[aria-current="location"]{color:#fff7ea!important;border-bottom-color:var(--x-acc)!important;font-weight:600}
+html[data-body=a] .bk-day .ux-case-index .ux-index-try{position:sticky;right:0;margin-left:auto;align-self:center;min-height:0!important;padding:8px 14px!important;border:0!important;border-radius:999px;color:#1a1410!important;background:var(--x-acc)!important;font-weight:700!important;box-shadow:-24px 0 18px -6px rgba(14,12,10,.95)}
+html[data-body=a] .bk-day .ux-case-index .ux-index-try:hover{background:#ffbf85!important}

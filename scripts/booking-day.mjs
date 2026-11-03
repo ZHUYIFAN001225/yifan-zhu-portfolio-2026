@@ -21,9 +21,9 @@ export function mount() {
   slips(root, calm);
   // (the margin time line is gone: the clock chapters already carry the time of day, and it ran over wide content)
   mobileLite(root);
-  // the cover holds still (sticky) while the phone introduces the product; on phones it just scrolls
+  // the cover holds still (sticky) while the desk opening plays
   { const op = document.querySelector('[data-opening]');
-    if (op && !op.parentElement.matches('.bk-cover-pin') && matchMedia('(min-width: 640px)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (op && !op.parentElement.matches('.bk-cover-pin') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {   // phones too: the desk opening runs everywhere
       const pin = document.createElement('div'); pin.className = 'bk-cover-pin'; op.before(pin); pin.append(op); } }
   Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs'), import('./booking-map.mjs'), import('./booking-try.mjs'), import('./booking-set.mjs'), import('./booking-feel.mjs'), import('./booking-body.mjs')]).then(([h, d, c, mp, tr, cv, feel, body]) => { tr.mountTry(root); cv.mountDesk(root); feel.mountFeel(); body.mountBody(); h.mountHand(root, d.CHARS() + c.CHARS() + mp.CHARS() + tr.CHARS() + cv.CHARS()); d.mountDomino(root); c.mountChair(root); mp.mountMap(root); }).catch(e => console.error(e));
   stage(root, calm);

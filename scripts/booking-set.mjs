@@ -351,7 +351,8 @@ export function mountDesk(root) {
   // so it does not flicker). The look is the same; only the number of pixels changes.
   const weak = (() => { try { const g = renderer.getContext(), x = g.getExtension('WEBGL_debug_renderer_info'), n = x ? g.getParameter(x.UNMASKED_RENDERER_WEBGL) : '';
     return /swiftshader|llvmpipe|software|basic render/i.test(n) || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4; } catch { return false; } })();
-  const QS = [1, .82, .66, .52]; let qi = weak ? 2 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
+  const handset = matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700;
+  const QS = [1, .82, .66, .52]; let qi = weak ? 2 : handset ? 1 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
   const dpr = () => inBody ? .34 : Math.min(devicePixelRatio || 1, 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
   const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
@@ -384,7 +385,7 @@ export function mountDesk(root) {
   post.toneMapped = false;
   const postScene = new THREE.Scene(); postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post)); const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   let inBody = false;
-  const resize = () => { vw = inBody ? innerWidth : op.clientWidth; vh = inBody ? innerHeight : op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, 1.15, 2.2))); cam.updateProjectionMatrix();
+  const resize = () => { vw = inBody ? innerWidth : op.clientWidth; vh = inBody ? innerHeight : op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, inBody ? 1.15 : .58, 2.2)));   // portrait phones: a taller view, so the desk still fits across cam.updateProjectionMatrix();
     rt?.dispose(); const W = Math.round(vw * d), H = Math.round(vh * d); const dt = new THREE.DepthTexture(W, H, THREE.UnsignedIntType);
     rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, depthTexture: dt, depthBuffer: true, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
     post.uniforms.tCol.value = rt.texture; post.uniforms.tDep.value = dt; post.uniforms.uRes.value.set(W, H); };

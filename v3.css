@@ -4059,3 +4059,32 @@ html[data-body=a] .is-lit>.bk-rim>s>b{opacity:1}
 html[data-body=a]{--glass-glow:255,238,218}
 html[data-body=a] .bk-rim>.h{background:radial-gradient(circle 170px at var(--mx,50%) var(--my,50%),rgba(255,255,255,1),rgba(255,244,230,.9) 22%,rgba(255,238,218,.3) 55%,rgba(255,238,218,0) 80%)}
 html[data-body=a] .bk-rim>s>b{background:radial-gradient(circle 180px at calc(var(--mx,50%) + 5px) calc(var(--my,50%) + 5px),rgba(255,226,190,.75),rgba(255,214,170,.22) 50%,rgba(255,214,170,0) 80%)}
+
+/* opening: the way out — the real site, and a jump to the case — always at hand, top right */
+.bk-set .bk-dk-jump{position:absolute;right:clamp(16px,2.6vw,40px);top:clamp(84px,11vh,112px);z-index:6;width:min(300px,30vw);padding:12px;border-radius:20px;pointer-events:auto;
+  background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 50%,rgba(255,255,255,.06)),rgba(16,13,10,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.1),0 18px 40px -18px rgba(0,0,0,.7);
+  font-family:"Inter Tight",Inter,system-ui,sans-serif;color:#f6eee2;opacity:calc(1 - var(--kOut,0) * 1.6);transition:opacity .3s}
+.bk-set .bk-dk-jump a{color:inherit;text-decoration:none}
+.bk-set .bk-jl{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 10px;padding:10px 12px;border-radius:13px;background:rgba(80,200,140,.1);box-shadow:inset 0 0 0 1px rgba(120,230,170,.22);transition:background .25s}
+.bk-set .bk-jl:hover{background:rgba(80,200,140,.2)}
+.bk-set .bk-jl i{grid-row:span 2;width:9px;height:9px;border-radius:50%;background:#46d48c;box-shadow:0 0 0 0 rgba(70,212,140,.6);animation:bk-live 2s ease-out infinite}
+@keyframes bk-live{0%{box-shadow:0 0 0 0 rgba(70,212,140,.55)}70%,100%{box-shadow:0 0 0 9px rgba(70,212,140,0)}}
+.bk-set .bk-jl .k{display:none}
+.bk-set .bk-jl span{display:grid;gap:2px}.bk-set .bk-jl span b{font:600 13.5px/1.2 inherit;font-family:inherit}.bk-set .bk-jl em{font:500 11px/1.2 inherit;font-family:inherit;font-style:normal;color:rgba(200,240,215,.75)}
+.bk-set .bk-jl u{grid-row:span 2;text-decoration:none;font-size:15px;opacity:.85}
+.bk-set .bk-jk{margin:12px 4px 6px;font:700 9.5px/1 inherit;font-family:inherit;letter-spacing:.16em;text-transform:uppercase;color:rgba(246,238,226,.55)}
+.bk-set .bk-jg{display:flex;flex-wrap:wrap;gap:6px}
+.bk-set .bk-jg a{padding:7px 10px;border-radius:999px;font:600 12px/1 inherit;font-family:inherit;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);transition:background .2s}
+.bk-set .bk-jg a:hover{background:rgba(255,255,255,.16)}
+.bk-set .bk-jg a:focus-visible,.bk-set .bk-jl:focus-visible{outline:2px solid #f0a35e;outline-offset:2px}
+@media (max-width:999px){.bk-set .bk-dk-jump{width:auto;left:16px;right:16px;top:auto;bottom:16px}.bk-set .bk-jk{display:none}.bk-set .bk-jg{margin-top:8px}}
+
+/* the opening, a third shorter: the same beats, reached sooner */
+html[data-cover="desk"] .bk-cover-pin{height:calc(100vh + 680vh)}
+
+/* performance: the page sits on a desk that is already rendered out of focus, so the panes do not need to blur what is
+   behind them again — the live blur on dozens of large panes was the heaviest thing on the page. Their fill stays. */
+html[data-body=a] .bk-day :is(.is-glass,.bk-dom-card,.bk-dom-slip,.ux-pains>div.bk-sticky,.bk-ledger.is-after,.bk-minute-viz i,.ux-bp-row>span,.ux-blueprint,.ux-bp-lane,.ux-bp-stage,.ux-iterations .ux-before-after p,.bk-ledger-list>li,.bk-ask-h b,.bk-dom-hint button){-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html[data-body=a]{--glass-fill:linear-gradient(135deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.02) 38%,rgba(255,255,255,0) 70%,rgba(255,255,255,.03) 100%),rgba(17,14,11,.66)}
+.bk-dk-grain{inset:-8%}

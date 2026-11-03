@@ -333,7 +333,7 @@ export function mountStage(root) {
 
   // ---------- the loop ----------
   let idleDrawn = false, sideVal = -1, vw = 0, vh = 0, mx = 0, my = 0, pmx = 0, pmy = 0, sy = scrollY, last = performance.now(), t0 = last, fadeAmt = 1;
-  const resize = () => { vw = innerWidth; vh = innerHeight; renderer.setPixelRatio(Math.min(vw < 1000 ? 1.5 : 2, devicePixelRatio || 1)); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix(); build(); };
+  const resize = () => { vw = innerWidth; vh = innerHeight; renderer.setPixelRatio(Math.min(1.5, devicePixelRatio || 1)); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix(); build(); };
   addEventListener('resize', resize); resize(); setInterval(build, 1600);
   addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
   document.addEventListener('portfolio:language', () => { P.file = ''; P.spotKey = ''; });

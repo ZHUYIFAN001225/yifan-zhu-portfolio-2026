@@ -32,6 +32,9 @@ export const T = {
   try: ['Try the demo ↓', '试用演示版 ↓'],
   ek: ['AFTER CLOSING', '打烊之后'], ep: ['The day gets written up by hand. Who came, who moved, who never showed — and the messages keep coming until she has checked every one.', '一天的账要手写补完：谁来了、谁改了、谁没来——消息还在不停进来，她得一条条核对到很晚。'],
   wx: [['Emma', 'Emma'], ['Running 20 min late, sorry!!', '我要晚 20 分钟，不好意思！！'], ['Mrs Li', '李阿姨'], ['Can I move to 3 o’clock?', '能改到三点吗？'], ['Zhou', '周先生'], ['Are you open Sunday?', '周日开门吗？'], ['Mr He', '何先生'], ['What time was I booked again?', '我约的是几点来着？'], ['+44 7700 900…', '+44 7700 900…'], ['Missed call', '未接来电'], ['Sun', '孙小姐'], ['Still have 11:30?', '11:30 还有吗？']],
-  now: ['now', '现在'], wxk: ['WeChat', '微信']
+  now: ['now', '现在'], wxk: ['WeChat', '微信'],
+  // the way out of the opening: the real site, and a jump to the case
+  jl: ['LIVE', '已上线'], jlb: ['Open the real booking site', '打开真实的预约网站'], jls: ['used by real customers', '真实顾客正在使用'],
+  jk: ['Skip the intro', '跳过开场'], j1: ['1-min summary', '一分钟概览'], j2: ['The problem', '问题'], j3: ['Try the demo', '试用 Demo']
 };
 export const CHARS = () => [...Object.values(T).flat(3)].join('') + '0123456789:′→✗✆';

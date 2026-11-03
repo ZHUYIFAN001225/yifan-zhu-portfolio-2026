@@ -493,7 +493,7 @@ export function mountDesk(root) {
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } }
   }
-  const svCache = {};
+  const svCache = {}; let opFlag = false;
   let last = performance.now(), lastDraw = 0, dirtyBody = true, lastSY = -1, still = 0; const lastPos = v3(0, 0, 0), lastLook = v3(0, 0, 0);
   addEventListener('resize', () => { dirtyBody = true; });
   function frame(now) {
@@ -502,7 +502,7 @@ export function mountDesk(root) {
     const r = holder.getBoundingClientRect();
     const dt = clamp((now - last) / 1000, 0, .05); last = now;
     // the case body under way (and the trial is on): the desk goes behind the page, fading in out of the black
-    if (bodyA() && ready && r.bottom < innerHeight * .995) { moveCanvas(true); bodyFrame(now, dt, 1); return; }
+    if (bodyA() && ready && r.bottom < innerHeight * .995) { if (opFlag) { opFlag = false; document.documentElement.classList.remove('bk-opening'); } moveCanvas(true); bodyFrame(now, dt, 1); return; }
     moveCanvas(false);
     if (r.bottom < -100 || r.top > innerHeight + 100) return;
     if (warm < 1.2) warm += dt; else { ema += (dt - ema) * .08; if (ema > 1 / 38) { slowFor += dt; if (slowFor > .9 && qi < QS.length - 1) { qi++; slowFor = 0; ema = 1 / 60; warm = .6; resize(); } } else slowFor = Math.max(0, slowFor - dt); }
@@ -573,6 +573,7 @@ export function mountDesk(root) {
     sweep(GROUPS[1], lin(pr, .235, .325), lin(pr, .395, .465));
     sweep(GROUPS[2], lin(pr, .6, .685), lin(pr, .87, .935));
     const S = (k, v) => { const t = (+v).toFixed(3); if (svCache[k] !== t) { svCache[k] = t; ov.style.setProperty(k, t); } };   // only real changes: a write invalidates the styles of the whole page
+    { const inOp = r.top < innerHeight * .5 && kOut < .6; if (inOp !== opFlag) { opFlag = inOp; document.documentElement.classList.toggle('bk-opening', inOp); } }   // phones: the site's own bottom bar steps aside while the opening plays
     const jv = kOut > .6 ? 'hidden' : ''; if (jump.style.visibility !== jv) jump.style.visibility = jv;
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kPhone', kPhone); S('--kOut', kOut);
   }

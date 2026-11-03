@@ -4248,3 +4248,5 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
 .bk-set .bk-jrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 4px 6px}
 .bk-set .bk-jrow .bk-jk{margin:0!important}
 @media (max-width:639px){ .bk-set .bk-jrow{margin:8px 2px 0;justify-content:flex-end} .bk-set .bk-jrow .bk-jk{display:none!important} }
+/* phones: the desk behind the page as one soft, even blur */
+.bk-backdrop.is-soft canvas{filter:blur(14px) saturate(1.05);transform:scale(1.12);transform-origin:50% 50%}

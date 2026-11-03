@@ -389,7 +389,7 @@ export function mountDesk(root) {
   const PT = { x: .115, z: -.025, k: .55 };
   const PR = { x: 0, y: .6, z: .085, s: 1.15 };
   const QS = [1, .82, .66, .52]; let qi = weak ? 2 : 0, slowFor = 0, ema = 1 / 60, warm = 0;
-  const dpr = () => inBody ? (handset ? .6 : .34) : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
+  const dpr = () => inBody ? (handset ? .22 : .34) : Math.min(devicePixelRatio || 1, handset ? 2 : 1.5) * QS[qi];   // behind the text: a small image, blurred, then scaled up — a smooth defocus, and cheap
   const post = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { toneMappingExposure: { value: 1 }, tCol: { value: null }, tDep: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: cam.near }, uFar: { value: cam.far }, uFocus: { value: 13 }, uJit: { value: 1 }, uRange: { value: 4 }, uMax: { value: 12 }, uVig: { value: .55 }, uFringe: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: `precision highp float;
@@ -482,7 +482,10 @@ export function mountDesk(root) {
   // ---------- after the opening: the same desk, at night, out of focus behind the case (trial: ?body=a) ----------
   // The canvas moves out of the opening into a fixed layer behind the page; the camera rests on a different thing on
   // the desk for each chapter and drifts between them as you read. Everything is lamp-lit and far out of focus.
-  const backdrop = document.createElement('div'); backdrop.className = 'bk-backdrop'; backdrop.setAttribute('aria-hidden', 'true');
+  const backdrop = document.createElement('div'); backdrop.className = 'bk-backdrop';
+  // phones: the defocus is one soft layer — a tiny image, smoothly blurred by the browser — instead of the lens gather, whose
+  // separate taps showed as stacked copies at this size
+  if (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700) backdrop.classList.add('is-soft'); backdrop.setAttribute('aria-hidden', 'true');
   const v3 = (x, y, z) => new THREE.Vector3(x, y, z);
   const SHOTS = [
     ['.bk-quick', v3(-.05, .4, .42), v3(-.04, 0, .03)],      // the whole desk under the lamp
@@ -526,7 +529,7 @@ export function mountDesk(root) {
     const moved = cam.position.distanceToSquared(lastPos) + bLook.distanceToSquared(lastLook);
     if (now - lastDraw < (moved > 4e-8 ? 31 : 95) && !dirtyBody) { { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } } return; }
     lastDraw = now; lastPos.copy(cam.position); lastLook.copy(bLook); dirtyBody = false;
-    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = handset ? 13 : 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
+    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = handset ? 0 : 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } }
   }

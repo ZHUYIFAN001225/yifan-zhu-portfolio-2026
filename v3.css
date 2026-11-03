@@ -4418,3 +4418,9 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
   body .lk-knot-say{translate:-100% 0!important;white-space:normal;text-align:right;max-width:70vw}
 }
 @media (max-width:760px){[data-product-case=beauty] .ux-journey.lk-polaroids>li::after{display:none!important}}
+/* phones: the tools sit where the page measured free room for them, in pixels; they still drift with the stage */
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .fm .fm-prop{left:var(--mlx,50%);top:var(--mly,50%);transform:translate(-50%,-50%) translate(calc(var(--mx,0) * -14px),calc(var(--my,0) * -10px)) rotate(var(--r));transition:opacity 1s ease,background .3s}
+  .fm.is-story .fm-prop,.fm.is-duo .fm-prop{transform:translate(-50%,-50%) rotate(var(--r)) scale(.6);opacity:0;pointer-events:none}
+}
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){.fm .fm-prop{width:50px;padding:8px;border-radius:17px}}

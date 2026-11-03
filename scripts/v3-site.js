@@ -795,7 +795,7 @@ window.addEventListener('pagereveal',event=>{
       const t = now / 1000, touch = fx != null && now - fT < 1600 ? 1 - Math.max(0, (now - fT - 900) / 700) : 0;
       const ax = Math.sin(t * .55) * .55 + Math.sin(t * 1.3) * .12, ay = Math.cos(t * .42) * .45;   // the breath
       const tx = (touch > 0 ? fx * touch + ax * (1 - touch) : ax) * .8 + gx * .6, ty = (touch > 0 ? fy * touch + ay * (1 - touch) : ay) * .8 + gy * .5;
-      cx += (tx - cx) * .12; cy += (ty - cy) * .12;
+      cx += (tx - cx) * .12; cy += (ty - cy) * .12; if (!Number.isFinite(cx) || !Number.isFinite(cy)) { cx = cy = 0; fx = fy = null; }
       const k = `${cx.toFixed(2)}|${cy.toFixed(2)}`; if (k === last) return; last = k;
       set(fm, '--mx', cx.toFixed(3)); set(fm, '--my', cy.toFixed(3)); set(stage, '--px', cx.toFixed(3)); set(phone, '--mrx', (cx * .8).toFixed(3)); set(phone, '--mry', (cy * .6).toFixed(3));
     };
@@ -817,7 +817,19 @@ window.addEventListener('pagereveal',event=>{
       set(fm, '--fitw', w.toFixed(1) + 'px'); set(fm, '--fit-st', (txt + 10 + room / 2).toFixed(1) + 'px');
       const lines = fm.querySelectorAll('.fm-line'); const tb = lines.length ? rel(lines[lines.length - 1])[1] : sr.height * .5;
       const oroom = Math.max(100, floor - tb - 16);
-      set(fm, '--fit-op', (tb + 14).toFixed(1) + 'px'); set(fm, '--fit-os', Math.min(.9, oroom / (w * ratio)).toFixed(3));
+      const os = Math.min(.9, oroom / (w * ratio));
+      set(fm, '--fit-op', (tb + 14).toFixed(1) + 'px'); set(fm, '--fit-os', os.toFixed(3));
+      // the five tools, placed in real pixels into the clear spaces of this screen: beside the right-aligned lines of the
+      // title and either side of the phone (laid out from the centre with vw they piled up in the middle on some iPhones)
+      const W = sr.width, pw = w * os, ph = w * ratio * os, pt = tb + 14, side = Math.max(34, (W - pw) / 2 / 2), sz = 50;
+      // the title's visual rows, from layout positions (the letters may still be sliding in, so no bounding boxes)
+      const offs = el => { let x = 0, y = 0, e = el; while (e && e !== stage) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; } return [x, y]; };
+      const rows = []; fm.querySelectorAll('.fm-type .fm-wd').forEach(wd => { const [x, y] = offs(wd), r = rows.find(q => Math.abs(q.y - y) < wd.offsetHeight * .5); if (r) { r.l = Math.min(r.l, x); r.r = Math.max(r.r, x + wd.offsetWidth); } else rows.push({ y, h: wd.offsetHeight, l: x, r: x + wd.offsetWidth }); });
+      const gaps = rows.map(q => ({ room: q.l, y: q.y + q.h * .42 })).filter(q => q.room > sz + 10).sort((a, b) => b.room - a.room);
+      const inGap = (g, k) => [Math.max(sz / 2 + 6, Math.min(g.room - sz / 2 - 6, g.room * .5)), g.y];
+      const at = { scissors: gaps[0] ? inGap(gaps[0], 0) : [side, pt - 40], polish: [W - side, pt + ph * .14],
+        comb: [side, pt + ph * .3], lipstick: [side + 6, pt + ph * .72], dryer: [W - side, pt + ph * .6] };
+      fm.querySelectorAll('[data-prop]').forEach(b => { const q = at[b.dataset.prop]; if (!q) return; set(b, '--mlx', Math.min(W - sz / 2 - 4, q[0]).toFixed(1) + 'px'); set(b, '--mly', Math.min(floor - sz / 2, q[1]).toFixed(1) + 'px'); });
     };
     // while the film holds the screen, the page dock steps aside so the phone gets that room
     let pin = null; const pinCheck = () => { const r = track.getBoundingClientRect(); const on = !wide.matches && r.top <= 1 && r.bottom >= innerHeight - 1; if (on !== pin) { pin = on; document.documentElement.classList.toggle('fm-pinned', on); } };

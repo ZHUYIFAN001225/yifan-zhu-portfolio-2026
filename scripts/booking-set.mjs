@@ -294,15 +294,30 @@ export function mountDesk(root) {
   // each message that lands: a soft chime — computers only, and only once the visitor has switched sound on. Never in
   // the page behind the case.
   const fx = { on: false, ctx: null, last: 0 };
+  // the sound of a phone buzzing on a wooden desk: a low motor hum with a rattle where it touches the wood — two short
+  // buzzes for the first message, one for each after (they come quickly)
+  let lastBuzz = -1e9, noiseBuf = null;
   function ding(first) {
     try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; const ctx = fx.ctx || (fx.ctx = new C()); if (ctx.state === 'suspended') ctx.resume();
-      const t = ctx.currentTime + .01;
-      [[1318.5, .07, 0], [1975.5, .045, .065]].forEach(([f, g, d]) => { const o = ctx.createOscillator(), a = ctx.createGain(), s0 = t + d;
-        o.type = 'sine'; o.frequency.value = f; a.gain.setValueAtTime(0, s0); a.gain.linearRampToValueAtTime(g * (first ? .8 : 1), s0 + .006); a.gain.exponentialRampToValueAtTime(.0001, s0 + .34);
-        o.connect(a); a.connect(ctx.destination); o.start(s0); o.stop(s0 + .4); }); } catch {}
+      const now = ctx.currentTime, solo = first || now - lastBuzz > 2.2; lastBuzz = now;
+      const out = ctx.createGain(); out.gain.value = .32; out.connect(ctx.destination);
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; lp.Q.value = .8; lp.connect(out);
+      if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, ctx.sampleRate * .5, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let k = 0; k < d.length; k++) d[k] = Math.random() * 2 - 1; }
+      const pulse = (t0, dur) => {
+        const env = ctx.createGain(); env.gain.setValueAtTime(0, t0); env.gain.linearRampToValueAtTime(1, t0 + .025); env.gain.setValueAtTime(1, t0 + dur - .05); env.gain.linearRampToValueAtTime(0, t0 + dur); env.connect(lp);
+        const trem = ctx.createGain(); trem.gain.value = .6; trem.connect(env);
+        const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 31; lg.gain.value = .4; lfo.connect(lg); lg.connect(trem.gain);
+        const m = ctx.createOscillator(); m.type = 'sawtooth'; m.frequency.setValueAtTime(172, t0); m.frequency.linearRampToValueAtTime(164, t0 + dur);
+        const mg = ctx.createGain(); mg.gain.value = .5; m.connect(mg); mg.connect(trem);
+        const sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = 86; const sg = ctx.createGain(); sg.gain.value = .55; sub.connect(sg); sg.connect(trem);
+        const n = ctx.createBufferSource(); n.buffer = noiseBuf; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 240; bp.Q.value = 2.5; const ng = ctx.createGain(); ng.gain.value = .55; n.connect(bp); bp.connect(ng); ng.connect(trem);
+        [lfo, m, sub, n].forEach(o => { o.start(t0); o.stop(t0 + dur + .02); });
+      };
+      const t = now + .01; pulse(t, .3); if (solo) pulse(t + .44, .3);
+    } catch {}
   }
   function notify() {
-    if (inBody) return; const t = performance.now(); if (t - fx.last < 150) return; fx.last = t;
+    if (inBody) return; const t = performance.now(); if (t - fx.last < 420) return; fx.last = t;
     if (fx.on) ding();
   }
   const showScreen = n => { if (screens.cur === n || (n !== 'lock' && !screens.imgs[n])) return; screens.prev = screens.cur === 'lock' ? null : screens.imgs[screens.cur]; screens.cur = n; screens.fade = 0; dirty = true; };

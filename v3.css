@@ -4102,3 +4102,11 @@ html[data-body=a] .bk-day .ux-case-index a:hover{color:#fff7ea!important}
 html[data-body=a] .bk-day .ux-case-index a[aria-current="location"]{color:#fff7ea!important;border-bottom-color:var(--x-acc)!important;font-weight:600}
 html[data-body=a] .bk-day .ux-case-index .ux-index-try{position:sticky;right:0;margin-left:auto;align-self:center;min-height:0!important;padding:8px 14px!important;border:0!important;border-radius:999px;color:#1a1410!important;background:var(--x-acc)!important;font-weight:700!important;box-shadow:-24px 0 18px -6px rgba(14,12,10,.95)}
 html[data-body=a] .bk-day .ux-case-index .ux-index-try:hover{background:#ffbf85!important}
+
+/* phones (no desk opening): the title card in the same dark glass as the page, so the light text reads */
+html[data-body=a] .bk-day .op-copy{background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02) 50%,rgba(255,255,255,.05)),rgba(16,13,10,.8)!important;color:#f1e7d6!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.12),0 24px 50px -24px rgba(0,0,0,.8)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+html[data-body=a] .bk-day .op-copy :is(.op-sub,.op-live,.op-live b,.op-url,.op-url span,.op-url em){color:#f1e7d6!important}
+html[data-body=a] .bk-day .op-copy .op-live{color:rgba(200,240,215,.85)!important;margin-top:8px}
+html[data-body=a] .bk-day .op-copy .op-url{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.16)!important}
+html[data-body=a] .bk-day .op-copy .op-btn:not(.op-btn--main){color:#f1e7d6!important;border-color:rgba(255,255,255,.35)!important;background:transparent!important}
+html[data-body=a] .bk-day .op-copy .op-btn--main{background:#f0a35e!important;color:#1a1410!important;border-color:transparent!important}

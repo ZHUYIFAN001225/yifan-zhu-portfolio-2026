@@ -5,11 +5,11 @@ export const productCases=[{
   id:'beauty',slug:'beauty-marketplace',file:'project-beauty-marketplace.html',pdf:'LOOK',
   // full-screen type between the main parts of the case; every line comes from the content of the part it opens
   acts:{
-    overview:{style:'gather',kicker:p('Next: the problem','接下来：问题'),lines:[p('I love it.','我喜欢它。'),p('Who made it?','是谁做的？')],cap:p('Every search starts with a picture, not a service name.','每一次寻找，都从一张图开始，而不是一个服务名称。')},
-    system:{style:'split',kicker:p('Next: how the system works','接下来：系统如何运转'),lines:[p('One picture.','一张图，'),p('Two people.','两种人。')],cap:p('Inspiration for the user. A portfolio piece for the Creator.','对用户是灵感，对 Creator 是作品。'),pic:'w1'},
-    explode:{style:'pass',kicker:p('Next: the product, taken apart','接下来：把产品拆开看'),lines:[p('Picture','图片'),p('Person','人'),p('A booking','一次预约')],arrows:true,cap:p('The whole journey, in three words.','整段旅程，就这三个词。'),screen:'discover'},
-    build:{style:'hollow',kicker:p('Next: how it was built, and what is still unproven','接下来：怎么做出来的，还有什么没被证明'),lines:[p('Built.','做出来了。'),p('Not yet proven.','还没被证明。')],cap:p('A working prototype. Real people come next.','原型已经能用，下一步是真实的人。')},
-    end:{style:'meet',kicker:p('Two sides, one connection','两端，一次连接'),lines:[p('See the work.','先看作品，'),p('Book the person','再预约'),p('who made it.','做出它的人。')],cap:p('Thanks for reading.','谢谢你看到这里。')}
+    overview:{style:'gather',kicker:p('Next: the problem','接下来：问题'),lines:[p('I love it.','好喜欢这个。'),p('Who made it?','是谁做的？')],cap:p('Every search starts with a picture, not a service name.','每一次寻找，都从一张图开始，而不是一个服务名称。')},
+    system:{style:'split',kicker:p('Next: how the system works','接下来：系统如何运转'),lines:[p('One picture.','一张图，'),p('Two people.','两个人。')],cap:p('Inspiration for the user. A portfolio piece for the Creator.','对用户，它是灵感；对 Creator，它是作品集里的一件作品。'),pic:'w1'},
+    explode:{style:'pass',kicker:p('Next: the product, taken apart','接下来：把产品拆开看'),lines:[p('Picture','一张图'),p('Person','一个人'),p('A booking','一次预约')],arrows:true,cap:p('The whole journey, in three words.','整个流程，三个词就说完了。'),screen:'discover'},
+    build:{style:'hollow',kicker:p('Next: how it was built, and what is still unproven','接下来：怎么做出来的，还有哪些尚未验证'),lines:[p('Built.','已经做出来，'),p('Not yet proven.','还没被验证。')],cap:p('A working prototype. Real people come next.','原型已经能跑通，下一步交给真实的人来检验。')},
+    end:{style:'meet',kicker:p('Two sides, one connection','两边的人，连在一起'),lines:[p('See the work.','先看作品，'),p('Book the person','再预约'),p('who made it.','做出它的人。')],cap:p('Thanks for reading.','谢谢你看到这里。')}
   },
   title:p('LOOK — Beauty Marketplace','LOOK 见己 · 美容服务平台'),
   subtitle:p('See the work first. Book the person who made it.','先看作品，再预约做出它的人。'),
@@ -26,7 +26,7 @@ export const productCases=[{
     {quote:p('“I have to pick a salon before I see the work.”','“我得先选店，才能看到作品。”'),body:p('Shops and stars come first; the person’s skill comes last.','先看店铺和评分，最后才看到人的手艺。')},
     {quote:p('“Instagram gives me likes, not bookings.”','“Instagram 给我点赞，不给我预约。”'),body:p('Real work, every day — but few new customers.','每天发真实作品，却很少带来新客户。')}
   ],
-  evidence:p('Built from my product outlines, a whole-product interactive demo and a Glasgow logic and business review. Interviews and field testing come next; accounts, Creators, prices and distances in the demo are simulated.','依据我的产品大纲、完整产品交互 Demo 和格拉斯哥逻辑与商业复审。访谈和实地测试是下一步；Demo 中的账号、Creator、价格和距离均为模拟。'),
+  evidence:p('Built from my product outlines, a whole-product interactive demo and a Glasgow logic and business review. Interviews and field testing come next; accounts, Creators, prices and distances in the demo are simulated.','依据我的产品大纲、一个完整产品的交互 Demo，以及针对格拉斯哥市场的逻辑与商业模式复盘。访谈和实地测试是下一步；Demo 中的账号、Creator、价格和距离均为模拟。'),
   objectives:[p('Let people start from a picture, not a service name.','让用户从图片出发，而不是从服务名称出发。'),p('Show who made the work, then where, how much and when.','先看到作品是谁做的，再看到在哪里、多少钱、什么时候。'),p('Give each Creator a portfolio that belongs to them and brings them new customers.','给每位 Creator 一个属于自己、能带来新客户的作品集。')],
   audience:[
     {title:p('User','用户'),body:p('Browse real work, save what they like, find who made it, compare and book.','浏览真实作品，收藏喜欢的，找到作者，比较后预约。')},
@@ -36,10 +36,10 @@ export const productCases=[{
   system:{
     kind:'bridge',
     title:p('Two sides, one feed of real work','两端用户，共享一个真实作品 Feed'),
-    lead:p('One picture, two meanings: a portfolio piece for the Creator, inspiration for the user.','同一张图，两种意义：对 Creator 是作品集，对用户是灵感。'),
-    left:{title:p('Users','用户'),question:p('Who can do this look?','谁能做这个造型？'),items:[p('Browse real work','浏览真实作品'),p('Work first, Creator after','先看作品，再看作者'),p('Save · taste learns','收藏 · 学习审美'),p('Match a screenshot','以图匹配'),p('Area · price · time','区域 · 价格 · 时间'),p('Book this look','预约这个造型')]},
+    lead:p('One picture, two meanings: a portfolio piece for the Creator, inspiration for the user.','同一张图，两种意义：对 Creator 是作品集里的一件作品，对用户是灵感。'),
+    left:{title:p('Users','用户'),question:p('Who can do this look?','谁能做这个造型？'),items:[p('Browse real work','浏览真实作品'),p('Work first, Creator after','先看作品，再看作者'),p('Save · taste learns','收藏 · 越用越懂你'),p('Match a screenshot','截图找同款'),p('Area · price · time','区域 · 价格 · 时间'),p('Book this look','预约这个造型')]},
     bridge:p('Real work','真实作品'),
-    right:{title:p('Creators','Creator'),question:p('How does my work bring customers?','作品怎样带来客户？'),items:[p('Upload original work','上传原创作品'),p('Auto-tagged by style','按风格自动标签'),p('Services · prices · diary','服务 · 价格 · 日程'),p('Requests & bookings','请求与预约'),p('See what people want','了解用户需求'),p('Portable identity','口碑随人走')]}
+    right:{title:p('Creators','Creator'),question:p('How does my work bring customers?','我的作品怎样带来客人？'),items:[p('Upload original work','上传原创作品'),p('Auto-tagged by style','按风格自动标签'),p('Services · prices · diary','服务 · 价格 · 日程'),p('Requests & bookings','请求与预约'),p('See what people want','了解用户需求'),p('Portable identity','口碑随人走')]}
   },
   flywheel:{
     title:p('The loop that makes it grow','让平台成长的闭环'),
@@ -50,7 +50,7 @@ export const productCases=[{
     title:p('Starting a real-work marketplace','如何启动一个真实作品平台'),
     lead:p('No Creators, no real work, no feed — so supply comes first.','没有 Creator 就没有作品，也就没有 Feed——所以先建立供给。'),
     phases:[
-      {tag:p('01','01'),title:p('One city, Creators who already post','一个城市，从已经在发作品的人开始'),body:p('Glasgow stylists already on Instagram.','格拉斯哥已在 Instagram 发作品的人。')},
+      {tag:p('01','01'),title:p('One city, Creators who already post','一个城市，从已经在发作品的人开始'),body:p('Glasgow stylists already on Instagram.','已经在 Instagram 上发作品的格拉斯哥造型师。')},
       {tag:p('02','02'),title:p('Make joining effortless','让入驻几乎没有门槛'),body:p('Import and auto-tag their work. Likes → bookings.','导入并自动标签作品。点赞 → 预约。')},
       {tag:p('03','03'),title:p('A feed that is real from day one','从第一天起就是真实的 Feed'),body:p('Users browse and match local work.','用户浏览并匹配本地作品。')},
       {tag:p('04','04'),title:p('Booking, then results flow back','预约，再让结果回流'),body:p('New results return to the feed.','新作品回流到 Feed。')}
@@ -58,9 +58,9 @@ export const productCases=[{
     northStar:p('Trust: original work and client consent confirmed; user uploads stay private.','信任规则：确认原创与客户授权；用户上传仅作私人参考。'),
     business:{title:p('Proposed business model','拟定商业模式'),items:[
       {title:p('First-customer fee','首次获客费'),body:p('Only for new customers — no reason to bypass.','只对新客户收费，没有绕开平台的理由。')},
-      {title:p('Creator Pro','Creator Pro'),body:p('Insights, diary, richer portfolio.','数据、日程与作品集工具。')},
-      {title:p('User premium','用户高级功能'),body:p('Image match & AI preview; core stays free.','以图匹配与 AI 预览；核心免费。')},
-      {title:p('Sponsored, later','后期推广'),body:p('Labelled promotion at scale.','规模化后的标注推广。')}
+      {title:p('Creator Pro','Creator Pro'),body:p('Insights, diary, richer portfolio.','数据洞察、日程，以及更完整的作品集。')},
+      {title:p('User premium','用户高级功能'),body:p('Image match & AI preview; core stays free.','以图匹配与 AI 预览；核心功能保持免费。')},
+      {title:p('Sponsored, later','赞助推广（后期）'),body:p('Labelled promotion at scale.','规模起来之后，再做明确标注的推广。')}
     ],note:p('A proposal to test, not validated revenue.','这是待验证的方案，不是已实现的收入。')}
   },
   explode:{
@@ -82,16 +82,16 @@ export const productCases=[{
     lead:p('Scroll to follow one picture all the way to a booking. The phone shows the real prototype; the frame marks what each step is about.','往下滚，跟着一张图片一路走到预约。手机里是真实原型，框出来的就是每一步在讲的地方。'),
     steps:[
       {file:'discover',parts:[[14,5,p('Pick a kind of look','选一类造型')],[19.8,34,p('Real work, not stock','真实作品，不是图库')],[54,28.5,p('Keep scrolling, keep saving','继续刷，继续收藏')]],spot:'1,18,44,33',tap:'22,32',label:p('Real work, not stock','真实作品，不是图库'),title:p('It starts with a picture','从一张图片开始'),body:p('The feed is only real work by local Creators. You don’t need to know what the style is called.','信息流里全是本地 Creator 的真实作品。不需要知道这个造型叫什么。')},
-      {file:'detail',parts:[[4.5,59,p('The picture you liked','你喜欢的那张图')],[64,18.5,p('Who made it, and its style','谁做的、什么风格')],[83,9.5,p('Make it real','把它变成现实')]],spot:'2,57,96,24',tap:'50,77',label:p('Who made it, and its style','谁做的、什么风格'),title:p('Who made it is right there','作者就在图下面'),body:p('Every picture names its maker and is tagged by style, so “I like this” becomes something searchable.','每张图都写明作者，并按风格打上标签，“我喜欢这个”就变成了可以搜索的东西。')},
-      {file:'make-it-real',parts:[[4.5,47,p('Your reference','你的参考图')],[61,29,p('Find people nearby','找附近的人')]],spot:'2,55,96,32',tap:'50,72',label:p('Make it real','把它变成现实'),title:p('Make it real','把它变成现实'),body:p('One button turns inspiration into a search for people nearby who can actually do it.','一个按钮，把灵感变成“附近谁真的能做”的搜索。')},
+      {file:'detail',parts:[[4.5,59,p('The picture you liked','你喜欢的那张图')],[64,18.5,p('Who made it, and its style','谁做的、什么风格')],[83,9.5,p('Make it real','找人把它做出来')]],spot:'2,57,96,24',tap:'50,77',label:p('Who made it, and its style','谁做的、什么风格'),title:p('Who made it is right there','作者就在图下面'),body:p('Every picture names its maker and is tagged by style, so “I like this” becomes something searchable.','每张图都写明作者，并按风格打上标签，“我喜欢这个”就变成了可以搜索的东西。')},
+      {file:'make-it-real',parts:[[4.5,47,p('Your reference','你的参考图')],[61,29,p('Find people nearby','找附近的人')]],spot:'2,55,96,32',tap:'50,72',label:p('Make it real','找人把它做出来'),title:p('Make it real','找人把它做出来'),body:p('One button turns inspiration into a search for people nearby who can actually do it.','一个按钮，把灵感变成“附近谁真的能做”的搜索。')},
       {file:'matches',parts:[[11.5,15,p('Your picture','你的图片')],[31,37,p('Who nearby can do it','附近谁能做')],[69,11,p('More Creators','更多 Creator')]],spot:'2,30,96,34',tap:'50,32',label:p('Who nearby can do it','附近谁能做'),title:p('Matched by their work, not their shop','按作品匹配，而不是按店铺'),body:p('Creators are ranked by how close their own work is to your picture, with distance and price beside it.','按 Creator 自己的作品与你的图片有多像来排序，旁边写着距离和价格。')},
       {file:'creator',parts:[[12.5,32,p('Who she is','她是谁')],[45.5,29,p('Proof they can do it','能做到的证据')],[82,7,p('Check availability','查看空位')]],spot:'2,45,96,30',tap:'66,76',label:p('Proof they can do it','能做到的证据'),title:p('Proof before you book','预约前先看证据'),body:p('Their similar work sits next to your reference, so trust comes from results, not stars.','和你的参考图相似的作品摆在一起，信任来自结果，而不是星级。')},
-      {file:'availability',parts:[[17,25,p('Service and length','服务和时长')],[45,40.5,p('A real time that fits','一个放得下的真实时间')],[92.5,6.5,p('Review booking','确认预约')]],spot:'2,40,96,42',tap:'82,64',label:p('A real time that fits','一个放得下的真实时间'),title:p('A real time, then book','选一个真实的时间'),body:p('Service, length and free times come from the Creator’s own diary. Your picture is attached automatically.','服务、时长和空位都来自 Creator 自己的日程，你的参考图会自动附上。')},
+      {file:'availability',parts:[[17,25,p('Service and length','服务和时长')],[45,40.5,p('A real time that fits','真正约得上的时间')],[92.5,6.5,p('Review booking','确认预约')]],spot:'2,40,96,42',tap:'82,64',label:p('A real time that fits','真正约得上的时间'),title:p('A real time, then book','选一个真正约得上的时间'),body:p('Service, length and free times come from the Creator’s own diary. Your picture is attached automatically.','服务、时长和空位都来自 Creator 自己的日程，你的参考图会自动附上。')},
       {file:'booked',parts:[[15,32,p('Booked, picture attached','约好了，图也带上了')],[47.5,36,p('Time, price, place','时间、价格、地点')]],spot:'2,15,96,32',label:p('Booked, picture attached','约好了，图也带上了'),title:p('Booked, with the look attached','约好了，造型图一起带上'),body:p('The Creator sees exactly what you want before you sit down. No more explaining with a blurry screenshot.','坐下之前，Creator 就知道你想要什么，不用再拿模糊截图解释。')},
     ],
     creator:[
-      {file:'c-home',parts:[[13,18.5,p('Today at a glance','今天一览')],[33,28.5,p('Her tools','她的工具')],[61.5,22.5,p('A new booking, from a picture','一笔来自图片的新预约')]],spot:'2,62,96,20',label:p('A new booking, from a picture','一笔来自图片的新预约'),title:p('The same booking, from her side','同一笔预约，在她那一端'),body:p('Amy opens her workbench. The customer’s reference picture is already attached to the booking.','Amy 打开工作台，顾客的参考图已经附在这笔预约上。')},
-      {file:'c-requests',parts:[[5.5,7.5,p('Style requests','造型请求')],[15,24,p('A request with a picture','带图的请求')]],spot:'3,15,92,23',tap:'20,32',label:p('A request with a picture','带图的请求'),title:p('Requests arrive as pictures','请求是以图片的形式来的'),body:p('Before booking, people can ask “can you do this?”. She answers with one tap, or says it is not her style.','预约之前，顾客可以先问“你能做这个吗？”。她点一下就能答应，或者说明这不是她的风格。')},
+      {file:'c-home',parts:[[13,18.5,p('Today at a glance','今日概览')],[33,28.5,p('Her tools','她的工具')],[61.5,22.5,p('A new booking, from a picture','一笔来自图片的新预约')]],spot:'2,62,96,20',label:p('A new booking, from a picture','一笔来自图片的新预约'),title:p('The same booking, from her side','同一笔预约，在她那一端'),body:p('Amy opens her workbench. The customer’s reference picture is already attached to the booking.','Amy 打开工作台，顾客的参考图已经附在这笔预约上。')},
+      {file:'c-requests',parts:[[5.5,7.5,p('Style requests','造型请求')],[15,24,p('A request with a picture','带图的请求')]],spot:'3,15,92,23',tap:'20,32',label:p('A request with a picture','带图的请求'),title:p('Requests arrive as pictures','请求直接带着图片来'),body:p('Before booking, people can ask “can you do this?”. She answers with one tap, or says it is not her style.','预约之前，顾客可以先问“你能做这个吗？”。她点一下就能答应，或者说明这不是她的风格。')},
       {file:'c-respond',parts:[[15,24,p('The request','这条请求')],[40,30.8,p('Answer with her own work','用自己的作品回答')]],spot:'3,40,94,30',tap:'29,55',label:p('Answer with her own work','用自己的作品回答'),title:p('She answers with her own work','她用自己的作品来回答'),body:p('Instead of typing, she picks her closest real result. The customer sees proof, not promises.','不用打字解释，她挑一张最接近的真实作品。顾客看到的是证据，而不是承诺。')},
       {file:'c-calendar',parts:[[17,11.5,p('Pick a day','选一天')],[43,43,p('Her diary, her rules','她的日程，她说了算')]],spot:'2,44,96,40',label:p('Her diary, her rules','她的日程，她说了算'),title:p('Her diary decides what can be booked','她的日程决定能约什么'),body:p('Available, break or holiday, set once. Only these times ever appear to customers.','可约、休息、假期，设置一次就好。顾客只会看到这些时间。')},
       {file:'c-portfolio',parts:[[19,7,p('Upload or connect Instagram','上传或连接 Instagram')],[34,34.5,p('Her work is her profile','作品就是她的主页')]],spot:'2,18,96,48',tap:'22,22',label:p('Her work is her profile','作品就是她的主页'),title:p('Her work is her shop window','作品就是她的橱窗'),body:p('Every new result she uploads goes back into the feed, and the next customer finds her the same way.','她上传的每一个新作品都会回到信息流里，下一位顾客也会这样找到她。')}
@@ -99,13 +99,13 @@ export const productCases=[{
     duo:{title:p('One app. Two perspectives.','一个 App，两种视角。'),body:p('Keep scrolling: the same phone switches from the person looking for a style to the Creator who gets booked.','继续往下滚：同一部手机，从找造型的人，切换到被预约的 Creator。'),left:p('User · finds a look','用户 · 找造型'),right:p('Creator · gets booked','Creator · 被预约'),from:'discover',to:'c-home'},
     find:{title:p('Which look?','哪个造型？'),hint:p('Click the picture to find who can make it','点一下图片，找到谁能做'),note:p('Names, places and prices are demo data from the prototype.','名字、地点和价格是原型里的演示数据。'),
       items:[
-        {img:'w1',style:p('Soft balayage bob','柔和挑染短发'),who:p('Amy Chen · 0.9 mi','Amy Chen · 0.9 英里')},
+        {img:'w1',style:p('Soft balayage bob','柔和手刷挑染波波头'),who:p('Amy Chen · 0.9 mi','Amy Chen · 0.9 英里')},
         {img:'w3',style:p('Chrome French tips','镜面法式美甲'),who:p('3 nail artists nearby','附近 3 位美甲师')},
-        {img:'w2',style:p('Effortless French bob','法式慵懒短发'),who:p('Alex Morgan · city centre','Alex Morgan · 市中心')},
-        {img:'w4',style:p('Natural glam','自然妆容'),who:p('2 makeup artists nearby','附近 2 位化妆师')},
-        {img:'w5',style:p('Textured bob','纹理感短发'),who:p('Oliver James · Finnieston','Oliver James · Finnieston')}
+        {img:'w2',style:p('Effortless French bob','法式慵懒波波头'),who:p('Alex Morgan · city centre','Alex Morgan · 市中心')},
+        {img:'w4',style:p('Natural glam','自然精致妆'),who:p('2 makeup artists nearby','附近 2 位化妆师')},
+        {img:'w5',style:p('Textured bob','纹理感波波头'),who:p('Oliver James · Finnieston','Oliver James · Finnieston')}
       ]},
-    cta:p('Now use it yourself','现在你自己用一用')
+    cta:p('Now use it yourself','现在，亲自试一试')
   },
   // Screen map: every screen is a real capture from the running prototype, grouped by navigation level.
   facts:[
@@ -119,7 +119,7 @@ export const productCases=[{
       {title:p('Specification','产品规格'),body:p('One written spec covers both roles: feed, matching, booking, payment rules, cancellation and privacy.','一份规格覆盖两种身份：信息流、匹配、预约、付款、取消与隐私规则。')},
       {title:p('Prototype','原型实现'),body:p('A mobile web app with about 40 routes across both roles. Data stays in the browser, on one demo clock in Europe/London time.','移动网页应用，两种身份共约 40 个路由；数据保存在浏览器中，统一使用伦敦时区的演示时钟。')},
       {title:p('Rules in code','规则落到代码'),body:p('Search radius is a hard limit, a declined Creator is not shown again, pending requests expire, and the home address stays hidden until confirmed.','搜索半径是硬限制；拒绝过的 Creator 不再推荐；待确认请求会过期；家庭工作室地址确认前不公开。')},
-      {title:p('Checks','检查'),body:p('Automated checks run every main flow and edge case, and render every route in both roles.','自动检查覆盖每条主流程与边界情况，并在两种身份下渲染全部路由。')}
+      {title:p('Checks','自动化检查'),body:p('Automated checks run every main flow and edge case, and render every route in both roles.','自动检查覆盖每条主流程与边界情况，并在两种身份下渲染全部路由。')}
     ],
     stats:[{value:51,label:p('main-flow interaction checks','项主流程交互检查')},{value:56,label:p('edge-case checks','项边界检查')},{value:80,label:p('route renders across both roles','次双身份路由渲染')}],
     note:p('Checks ran on a virtual DOM; the prototype has not yet been tested on real phones with real users.','检查在虚拟 DOM 中进行；尚未在真实手机上与真实用户测试。')
@@ -128,7 +128,7 @@ export const productCases=[{
     hard:[
       {title:p('Cold start is a supply problem','冷启动首先是供给问题'),body:p('The feed only works if there are local Creators with real work nearby. A beautiful feed means nothing if no one in range can do the look.','只有附近有真实作品的 Creator，信息流才有意义；图片再好看，范围内没人能做也没有用。')},
       {title:p('Similar is not the same as possible','相似不等于能做到'),body:p('A picture cannot show hair condition, time or materials, so a consultation or quote step is still needed before booking.','图片看不出发质、耗时与材料，预约前仍需要咨询或报价。')},
-      {title:p('Image rights and consent','图片授权与同意'),body:p('“Real work” must be the Creator’s own, with client consent. The prototype still uses reference images collected for research; before any pilot they must be replaced with consented work from real Creators.','“真实作品”必须是 Creator 本人的，并获得客户同意。原型目前仍使用调研时收集的参考图；任何试点前，都必须换成真实 Creator 经同意提供的作品。')}
+      {title:p('Image rights and consent','图片版权与授权'),body:p('“Real work” must be the Creator’s own, with client consent. The prototype still uses reference images collected for research; before any pilot they must be replaced with consented work from real Creators.','“真实作品”必须是 Creator 本人的，并获得客户同意。原型目前仍使用调研时收集的参考图；任何试点前，都必须换成真实 Creator 经同意提供的作品。')}
     ],
     gaps:[p('Real accounts, payments and notifications','真实账号、付款与通知'),p('Postcode geocoding and travel time','邮编定位与路程时间'),p('Real image matching (scores are demo values)','真实图像匹配（评分为演示值）'),p('Testing with Glasgow Creators and users','与格拉斯哥 Creator 和用户的测试')],
     opportunities:[
@@ -136,7 +136,7 @@ export const productCases=[{
       {title:p('Local demand insight','本地需求洞察'),body:p('Requests show what people nearby are looking for, which Creators can act on.','需求数据显示附近的人在找什么，Creator 可以据此调整作品与服务。')},
       {title:p('Personal preview, if proven','个人预览（需验证）'),body:p('An AI preview on your own photo could be a paid feature, once quality, speed and cost are tested.','在本人照片上的 AI 预览可成为付费功能，前提是质量、速度与成本经过验证。')}
     ],
-    success:[p('Searches with similar work in range','范围内能找到相似作品的搜索比例'),p('Match → message → booking conversion','匹配 → 咨询 → 预约的转化'),p('Creator reply time','Creator 回复时长'),p('Repeat bookings and shared results','复购与结果分享')]
+    success:[p('Searches with similar work in range','范围内能找到相似作品的搜索比例'),p('Match → message → booking conversion','匹配 → 咨询 → 预约的转化'),p('Creator reply time','Creator 回复时长'),p('Repeat bookings and shared results','回头客预约与成品分享')]
   },
   screenMap:{
     dir:'look',
@@ -148,7 +148,7 @@ export const productCases=[{
         {from:p('Discover → the core journey: from a picture to a booking','发现 → 核心路径：从一张图片到一次预约'),key:true,steps:[
           {file:'detail',level:2,title:p('Real work, with its maker','真实作品与作者')},
           {file:'make-it-real',level:'sheet',title:p('Make It Real','Make It Real')},
-          {file:'matches',level:3,title:p('Matches near you','附近匹配')},
+          {file:'matches',level:3,title:p('Matches near you','附近能做的人')},
           {file:'creator',level:4,title:p('Creator portfolio','Creator 作品集')},
           {file:'availability',level:'sheet',title:p('Pick a time','选择时间')},
           {file:'summary',level:'sheet',title:p('Booking summary','预约摘要')},
@@ -161,7 +161,7 @@ export const productCases=[{
           {file:'notifications',level:2,title:p('Notifications','通知')}]},
         {from:p('Search & Build','搜索与搭配'),steps:[
           {file:'creator-search',level:2,title:p('Search Creators','搜索 Creator')},
-          {file:'preview',level:2,title:p('Style preview','整体预览')}]},
+          {file:'preview',level:2,title:p('Style preview','造型预览')}]},
         {from:p('Profile','我的'),steps:[
           {file:'saved',level:2,title:p('Saved','收藏')},
           {file:'taste',level:2,title:p('My taste','我的审美')},
@@ -169,11 +169,11 @@ export const productCases=[{
           {file:'plus',level:2,title:p('LOOK Plus studio','LOOK Plus 造型室')},
           {file:'settings',level:2,title:p('Settings & area','设置与区域')}]}]},
       {id:'creator',label:p('Creator side','Creator 端'),
-       note:p('Discover and Search are shared with the user side; Creators see the same feed of real work.','发现与搜索与用户端共用；Creator 看到的是同一个真实作品流。'),
+       note:p('Discover and Search are shared with the user side; Creators see the same feed of real work.','「发现」和「搜索」与用户端共用；Creator 看到的是同一个真实作品 Feed。'),
        tabs:[{file:'c-home',title:p('Workbench','工作台')},{file:'c-messages',title:p('Messages','消息')},{file:'c-profile',title:p('Profile','我的')}],
        paths:[
         {from:p('Workbench → turn demand into bookings','工作台 → 把需求变成预约'),key:true,steps:[
-          {file:'c-requests',level:2,title:p('Style requests','风格需求')},
+          {file:'c-requests',level:2,title:p('Style requests','造型请求')},
           {file:'c-respond',level:'sheet',title:p('Answer with real work','用真实作品回应')},
           {file:'c-calendar',level:2,title:p('Calendar','日程')},
           {file:'c-bookings',level:2,title:p('Bookings','客户预约')},
@@ -182,7 +182,7 @@ export const productCases=[{
           {file:'c-portfolio',level:2,title:p('Portfolio','作品集')},
           {file:'c-upload',level:3,title:p('Upload work','上传作品')}]},
         {from:p('Profile → business set-up','我的 → 经营设置'),steps:[
-          {file:'c-setup',level:2,title:p('Creator profile','职业档案')},
+          {file:'c-setup',level:2,title:p('Creator profile','Creator 主页')},
           {file:'c-services',level:2,title:p('Services & prices','服务与价格')},
           {file:'c-rules',level:2,title:p('Booking rules','预约规则')}]}]}
     ]
@@ -195,25 +195,25 @@ export const productCases=[{
     {file:'zoom-calendar',title:p('One calendar, three states','一个日程，三种状态'),body:p('Available, holiday and time off are set per day; breaks stay visible so the Creator sees the shape of the day at a glance.','按天设置可约、休假与临时休息；休息时段保留可见，一眼看清当天安排。')}
   ],
   ia:[
-    {title:p('Consumer navigation','消费者导航'),levels:[p('L1 · Discover / Search / Build / Messages / Profile','一级 · 发现 / 搜索 / 组合造型 / 消息 / 个人'),p('L2 · Look detail / saved board / matches / Creator profile / conversations','二级 · 造型详情 / 收藏板 / 匹配结果 / Creator 主页 / 会话'),p('L3 · Add to Look / edit tags / choose service and time / booking actions','三级 · 加入造型 / 编辑标签 / 选择服务与时间 / 订单操作')]},
-    {title:p('Creator navigation','Creator 导航'),levels:[p('L1 · Home / Portfolio / Calendar / Messages / Profile','一级 · 首页 / 作品 / 日历 / 消息 / 个人'),p('L2 · Requests / work details / appointments / service settings','二级 · 客户请求 / 作品详情 / 预约 / 服务设置'),p('L3 · Reply / confirm or decline / update availability / publish work','三级 · 回复 / 确认或拒绝 / 调整空档 / 发布作品')]}
+    {title:p('Consumer navigation','用户端导航'),levels:[p('L1 · Discover / Search / Build / Messages / Profile','一级 · 发现 / 搜索 / 搭配 / 消息 / 我的'),p('L2 · Look detail / saved board / matches / Creator profile / conversations','二级 · 造型详情 / 收藏板 / 匹配结果 / Creator 主页 / 会话'),p('L3 · Add to Look / edit tags / choose service and time / booking actions','三级 · 加入造型 / 编辑标签 / 选择服务与时间 / 预约操作')]},
+    {title:p('Creator navigation','Creator 导航'),levels:[p('L1 · Home / Portfolio / Calendar / Messages / Profile','一级 · 首页 / 作品 / 日历 / 消息 / 我的'),p('L2 · Requests / work details / appointments / service settings','二级 · 客户请求 / 作品详情 / 预约 / 服务设置'),p('L3 · Reply / confirm or decline / update availability / publish work','三级 · 回复 / 确认或拒绝 / 调整空档 / 发布作品')]}
   ],
   iaNote:p('One app with two roles sharing one feed of real work. For users the feed is inspiration; for Creators it is their shop window.','一个 App，两种身份，共享一个真实作品 Feed。对用户，Feed 是灵感；对 Creator，Feed 是自己的橱窗。'),
   journey:[
     {title:p('Discover','发现'),body:p('Browse a feed of real local work and save what you like.','浏览本地真实作品 Feed，收藏喜欢的。')},
-    {title:p('Reveal','揭晓'),body:p('Open the work to see who made it, the service and the price.','点开作品，看到是谁做的、什么服务、多少钱。')},
+    {title:p('Reveal','揭晓作者'),body:p('Open the work to see who made it, the service and the price.','点开作品，看到是谁做的、什么服务、多少钱。')},
     {title:p('Compare','比较'),body:p('Similar work from nearby Creators, filtered by area first.','先按区域筛选，再比较附近 Creator 的相似作品。')},
     {title:p('Book this look','预约这个造型'),body:p('Pick a service and time; the Creator receives the same request.','选择服务和时间，Creator 收到同一个请求。')},
-    {title:p('Back to the feed','回到 Feed'),body:p('The finished result can join the Creator’s portfolio.','完成后的结果可以加入 Creator 的作品集。')}
+    {title:p('Back to the feed','回到 Feed'),body:p('The finished result can join the Creator’s portfolio.','做好的成品可以加入 Creator 的作品集。')}
   ],
   journeyNote:p('No suitable Creator nearby? The user can widen the area or leave a style request, which shows the platform where to recruit next.','附近没有合适的 Creator？用户可以扩大范围或留下造型需求，这也告诉平台下一步该在哪里招募 Creator。'),
   screens:[
     {file:'beauty-discover',title:p('01 / Visual discovery','01 / 视觉发现'),body:p('Pictures lead, like Pinterest. Creator work always carries who made it; anything without a real Creator behind it is labelled differently, so it is never presented as bookable proof.','像 Pinterest 一样由图片引导。Creator 的作品始终标明作者；没有真实 Creator 的图片会另行标注，不会被当成可预约的能力证明。')},
-    {file:'beauty-detail',ext:'png',title:p('02 / A reference with context','02 / 带上下文的参考'),body:p('Save, Similar, Add to Look and Make It Real serve different intentions. Work attribution stays visible before the user moves towards a service.','收藏、找相似、加入造型与 Make It Real 对应不同意图；在进入服务前保留作品归属与上下文。')},
+    {file:'beauty-detail',ext:'png',title:p('02 / A reference with context','02 / 有出处的参考图'),body:p('Save, Similar, Add to Look and Make It Real serve different intentions. Work attribution stays visible before the user moves towards a service.','收藏、找相似、加入造型与 Make It Real 对应不同意图；在进入服务前保留作品归属与上下文。')},
     {file:'beauty-matches',ext:'png',title:p('03 / Compare local evidence','03 / 比较本地作品'),body:p('Relevant work, area, indicative price and availability appear together. “Similar work” and “Same category” are labelled differently, so a loose match is never presented as proof of skill.','把相关作品、区域、参考价格与可约时间放在一起；「相似作品」和「同类服务」分开标注，不把宽泛匹配当成能力证明。')},
     {file:'beauty-build',ext:'png',title:p('04 / Express a complete look','04 / 表达完整造型'),body:p('A personal board brings hair, makeup, clothing and accessories together. The preview is a collage, positioned as a style check rather than a prediction of the final result.','个人造型板把发型、妆容、服装与配饰放在一起。预览以拼贴呈现，定位是判断整体是否协调，而不是预测最终效果。')},
     {file:'beauty-creator',title:p('05 / The other side of the service','05 / 服务的另一端'),body:p('The Creator side is their portfolio and business in one: work, services, requests and calendar, plus the same feed to see what people want.','Creator 端把作品集和生意合在一起：作品、服务、请求和日历，还能浏览同一个 Feed，了解用户想要什么。')},
-    {file:'beauty-booking',title:p('06 / A traceable booking','06 / 可跟进的预约'),body:p('The booking keeps the chosen look, service and Creator together, and the Creator sees the same request on their side.','预约把所选造型、服务和 Creator 关联在一起，Creator 端能看到同一个请求。')}
+    {file:'beauty-booking',title:p('06 / A traceable booking','06 / 有据可查的预约'),body:p('The booking keeps the chosen look, service and Creator together, and the Creator sees the same request on their side.','预约把所选造型、服务和 Creator 关联在一起，Creator 端能看到同一个请求。')}
   ],
   decisions:[
     {title:p('Location before ranking','先筛区域，再做排序'),why:p('An attractive match outside the chosen area cannot solve a local service need.','超出所选范围的漂亮结果，无法解决本地服务需求。'),how:p('Apply the distance filter before tag-based ranking; offer an editable area when location access is unavailable.','先应用距离筛选，再按标签排序；无法使用定位时，允许编辑区域。'),test:p('Check whether participants understand the area limit and find relevant options.','验证参与者能否理解范围限制，并找到相关选择。')},
@@ -223,13 +223,13 @@ export const productCases=[{
   demo:p('Choose the Consumer role and a preset demo name. Open a look → Make It Real → nearby Creators → service and availability. Switch to the matching Creator from Profile to inspect the same request. No real phone number or payment is needed.','选择消费者身份与预设演示称呼。打开造型 → Make It Real → 附近 Creator → 服务与空档。在个人页切换到对应 Creator，可查看同一请求。无需真实手机号或支付。'),
   // Built prototype served with the portfolio (demos/look); source stays in its own project.
   publicDemo:'demos/look/index.html',
-  boundary:p('Creator identities, reviews, distances, payments and messages are simulated. Matching uses tags and rules; style preview is a collage. Browser storage does not provide production authentication or cross-device sync. A separate, narrower V1 includes persistent APIs and an iOS source project, but is not a launched product.','Creator 身份、评价、距离、支付与消息均为模拟。匹配基于标签与规则；造型预览为拼贴。浏览器存储不等于生产身份认证或跨设备同步。另有范围更小的 V1，包含持久化 API 与 iOS 源码，但尚未上线。'),
+  boundary:p('Creator identities, reviews, distances, payments and messages are simulated. Matching uses tags and rules; style preview is a collage. Browser storage does not provide production authentication or cross-device sync. A separate, narrower V1 includes persistent APIs and an iOS source project, but is not a launched product.','Creator 身份、评价、距离、支付与消息均为模拟。匹配基于标签与规则；造型预览为拼贴。数据只存在浏览器里，不具备正式上线所需的身份认证和跨设备同步。另有一个范围更小的 V1，包含持久化 API 与 iOS 源码工程，但并未上线。'),
   research:[
     {title:p('Explore the real journey','了解真实服务旅程'),body:p('Ask consumers how they collect references, explain a look and decide whom to trust. Capture consented journey notes and anonymised examples.','了解消费者如何收集参考、表达造型并判断可信服务者；记录经同意的旅程笔记与匿名例子。')},
     {title:p('Observe provider work','观察服务者工作'),body:p('Discuss consultation, feasible requests, pricing and diary management with local providers. Record actual constraints before narrowing the pilot.','与本地服务者讨论咨询、需求可行性、报价与排期；依据真实限制收敛试点范围。')},
     {title:p('Test one complete task','测试完整任务'),body:p('Ask a participant to turn a chosen look into a suitable service request. Record completion, hesitation, misunderstood labels and recovery from no matches.','请参与者把喜欢的造型转成合适的服务请求；记录完成情况、犹豫点、标签误解与无结果时的恢复方式。')}
   ],
-  roadmap:[p('Now · connected whole-product mobile demo','现在 · 完整移动产品交互 Demo'),p('Next · interviews, observation and task-based testing','下一步 · 访谈、观察与任务测试'),p('Then · refine a limited local provider pilot','之后 · 收敛本地小范围商家试点'),p('Before release · real identity, provider onboarding, privacy, payments and notifications','发布前 · 真实身份、商家接入、隐私、支付与通知')],
+  roadmap:[p('Now · connected whole-product mobile demo','现在 · 双端打通的完整移动端 Demo'),p('Next · interviews, observation and task-based testing','下一步 · 访谈、观察与任务测试'),p('Then · refine a limited local provider pilot','之后 · 打磨一个小范围的本地服务者试点'),p('Before release · real identity, provider onboarding, privacy, payments and notifications','发布前 · 真实身份、服务者入驻、隐私、支付与通知')],
   evidenceItems:[],
   sourceDocs:['look-demo/README.md','look-demo/格拉斯哥逻辑与商业复审.md','look-demo/design-qa.md']
 },{
@@ -373,7 +373,7 @@ export const productCases=[{
     lead:p('Scroll through an ordinary day. Each moment shows the real screen the customer or the owner sees at that point.','往下滚，走过普通的一天。每一刻都对应顾客或店主那时看到的真实界面。'),
     cta:p('Now try it yourself','现在你自己试试'),
     steps:[
-      {side:'owner',time:'08:50',file:'today',spot:'2,22,96,28',label:p('Today at a glance','今天一览'),title:p('Before opening, one look','开门前，看一眼就够'),body:p('Four customers, the next free gap, one person to rebook. The owner sees her day without scrolling through chats.','四位客人、下一个空档、一位要改期的顾客。店主不用翻聊天记录，就知道今天怎么安排。')},
+      {side:'owner',time:'08:50',file:'today',spot:'2,22,96,28',label:p('Today at a glance','今日概览'),title:p('Before opening, one look','开门前，看一眼就够'),body:p('Four customers, the next free gap, one person to rebook. The owner sees her day without scrolling through chats.','四位客人、下一个空档、一位要改期的顾客。店主不用翻聊天记录，就知道今天怎么安排。')},
       {side:'customer',time:'12:10',file:'book',tap:'9,60',spot:'2,19,96,13',label:p('Service + length','服务和时长'),title:p('At lunch, a customer picks a service and a day','午休时，顾客选服务、选日期'),body:p('The service comes first, with its length, because the length decides which days and times can fit.','先选服务、看时长，因为时长决定了哪些日子、哪些时间放得下。')},
       {side:'customer',time:'12:11',file:'day',tap:'72,36',spot:'2,31,96,28',label:p('Only times that fit','只列放得下的时间'),title:p('Only times that fit are offered','只给放得下的时间'),body:p('No “are you free at 2?” messages. Every time shown can actually take a 30-minute haircut.','不用再问“两点有空吗”。列出来的每个时间，都真的放得下 30 分钟的剪发。')},
       {side:'customer',time:'12:12',file:'confirm',tap:'50,69',spot:'2,27,96,24',label:p('Check, add a phone','核对、留电话'),title:p('One check, then book','核对一次，就约好了'),body:p('Date, time and length in one place, plus an optional phone number in case plans change.','日期、时间、时长放在一起核对，可以留个电话，计划有变时店里能联系到。')},

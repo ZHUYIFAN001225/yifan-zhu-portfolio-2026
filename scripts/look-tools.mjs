@@ -188,8 +188,8 @@ function mountThreads(root, acts) {
       [['“Found her. Booked for Wednesday, 2pm.”', '“找到她了，约在周三下午两点。”'], ['“She already had my picture when I sat down.”', '“我一坐下，她已经看过我的参考图了。”'], ['“It came out exactly like the photo.”', '“做出来和照片一模一样。”']]
     ],
     c: [
-      [['“Instagram gives me likes, not bookings.”', '“Instagram 给我点赞，不给我预约。”'], ['“I post real work every day, but few new customers find me.”', '“我每天发真实作品，却很少带来新客户。”'], ['“My work should be my shop window.”', '“我的作品，就该是我的橱窗。”']],
-      [['“My work is tagged by style now.”', '“我的作品按风格被标好了。”'], ['“Someone nearby asked: can you do this?”', '“附近有人问我：这个你能做吗？”'], ['“I answered with my own picture, not a promise.”', '“我用自己的作品回答，而不是一句保证。”']],
+      [['“Instagram gives me likes, not bookings.”', '“Instagram 给我点赞，不给我预约。”'], ['“I post real work every day, but few new customers find me.”', '“我每天都发真实作品，可很少有新客人找到我。”'], ['“My work should be my shop window.”', '“我的作品，就该是我的橱窗。”']],
+      [['“My work is tagged by style now.”', '“现在我的作品都按风格打好了标签。”'], ['“Someone nearby asked: can you do this?”', '“附近有人问我：这个你能做吗？”'], ['“I answered with my own picture, not a promise.”', '“我用自己的作品回答，而不是一句保证。”']],
       [['“A new customer, from one picture.”', '“一张图，带来一位新客人。”'], ['“The booking came with her reference attached.”', '“预约里直接附上了她的参考图。”'], ['“Her result is now in my portfolio too.”', '“她的成品也进了我的作品集。”']]
     ]
   };

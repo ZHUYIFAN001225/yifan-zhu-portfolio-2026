@@ -349,6 +349,10 @@ export function mountStage(root) {
   bub.innerHTML = '<i aria-hidden="true"></i><div><b></b><span></span></div>'; document.body.append(bub);
   const bubT = bub.querySelector('b'), bubB = bub.querySelector('span');
   const e2b = (a, b) => a.st === b.st || !b.st.bub || a.st.bub === b.st.bub;
+  // write to the page only when a value really changes: every write invalidates the styles of the whole (long) page,
+  // and the next measurement then pays for a full recalculation
+  const setV = (el, k, v) => { const c = el._sv || (el._sv = {}); if (c[k] === v) return; c[k] = v; el.style.setProperty(k, v); };
+  const setT = (el, v) => { if (el && el.textContent !== v) el.textContent = v; };
   function frame(now) {
     requestAnimationFrame(frame);
     if (document.hidden || !keys.length) return;
@@ -406,11 +410,11 @@ export function mountStage(root) {
       for (const k in tq) { camV[k] += ((tq[k] - camQ[k]) * W * W - 2 * W * camV[k]) * d; camQ[k] += camV[k] * d; }
       cov = { q: { ...camQ }, f: tf, spot: tspot, bub: tbub };
       // the type behind the phone: each shot's word slides through, against the camera's direction
-      document.querySelector('[data-opening]')?.style.setProperty('--sp', clamp(pr / .035).toFixed(3));
-      const c = cover.cap; c.style.setProperty('--u', u.toFixed(4)); c.style.setProperty('--end', clamp((u - (N - .35)) / .75).toFixed(3));
+      const opEl = document.querySelector('[data-opening]'); if (opEl) setV(opEl, '--sp', clamp(pr / .035).toFixed(3));
+      const c = cover.cap; setV(c, '--u', u.toFixed(4)); setV(c, '--end', clamp((u - (N - .35)) / .75).toFixed(3));
       const side = c._side(Math.max(0, Math.min(N - 1, Math.round(u))));
-      const tag = c.querySelector('.bk-cap-tag'); if (tag) { tag.querySelector('span').textContent = side[zh() ? 1 : 0]; tag.querySelector('b').textContent = `${String(Math.max(1, Math.min(N, Math.round(u) + 1))).padStart(2, '0')} / ${String(N).padStart(2, '0')}`; tag.style.opacity = u > -.4 && u < N - .6 ? 1 : 0; }
-    } else { camQ = null; if (cover) { const top = y < vh * .6; cover.cap.style.setProperty('--u', top ? '-1' : String(cover.shots.length + 1)); cover.cap.style.setProperty('--end', top ? '0' : '1'); } }
+      const tag = c.querySelector('.bk-cap-tag'); if (tag) { setT(tag.querySelector('span'), side[zh() ? 1 : 0]); setT(tag.querySelector('b'), `${String(Math.max(1, Math.min(N, Math.round(u) + 1))).padStart(2, '0')} / ${String(N).padStart(2, '0')}`); setV(tag, 'opacity', u > -.4 && u < N - .6 ? '1' : '0'); }
+    } else { camQ = null; if (cover) { const top = y < vh * .6; setV(cover.cap, '--u', top ? '-1' : String(cover.shots.length + 1)); setV(cover.cap, '--end', top ? '0' : '1'); } }
     let file = st.f, rect = hold || pair ? st.spot : null;
     if (cov) { file = cov.f; rect = cov.spot; }
     if (hv) { file = hv.file; rect = hv.rect; }
@@ -468,8 +472,8 @@ export function mountStage(root) {
       else if (C.V === 'mix' && pr < C.S * .6) hide = true; }
     fadeAmt += ((hide ? 0 : 1) - fadeAmt) * E(hide ? 4.5 : 3.2);
     const sl = fadeAmt < .5 ? 4 * fadeAmt ** 3 : 1 - (-2 * fadeAmt + 2) ** 3 / 2, off = (1 - sl) * Math.min(vw * .62, 820);
-    cv.style.transform = sl > .999 ? '' : `translate3d(${off.toFixed(1)}px,0,0)`;
-    cv.style.opacity = fadeAmt < .004 ? '0' : '';
+    { const tf = sl > .999 ? '' : `translate3d(${off.toFixed(1)}px,0,0)`, op = fadeAmt < .004 ? '0' : '';
+      if (cv._tf !== tf) { cv._tf = tf; cv.style.transform = tf; } if (cv._op !== op) { cv._op = op; cv.style.opacity = op; } }
     // the canvas comes in front of the dark opening and of a tapped preview; otherwise it stays behind the text
     cv.classList.toggle('is-front', (!mcv && (a.st.kind === 'hero' || b.st.kind === 'dock' || a.st.kind === 'dock')) || peekAmt > .03);
     document.body.classList.toggle('bk-hero-handover', !m);
@@ -479,7 +483,7 @@ export function mountStage(root) {
     const lab = st.label && !pk ? st.label[zh() ? 1 : 0] : '';
     if (!m && lab && hold) {
       tmpV.set(0, -.92, 0); phone.localToWorld(tmpV); tmpV.project(cam);
-      tag.style.transform = `translate3d(${((tmpV.x + 1) / 2 * vw).toFixed(1)}px,${((1 - tmpV.y) / 2 * vh + 14).toFixed(1)}px,0) translateX(-50%)`;
+      setV(tag, 'transform', `translate3d(${((tmpV.x + 1) / 2 * vw).toFixed(1)}px,${((1 - tmpV.y) / 2 * vh + 14).toFixed(1)}px,0) translateX(-50%)`);
       if (tagTxt.textContent !== lab) { tagTxt.textContent = lab; tag.dataset.who = st.who === 'o' ? 'owner' : 'customer'; }
       tag.classList.toggle('is-on', !hv);
     } else tag.classList.remove('is-on');
@@ -489,7 +493,7 @@ export function mountStage(root) {
       const bb = bbSrc, yy = slot(bb.spot)[1], xx = (bb.side === 'r' ? 1 : -1) * SW / 2;
       tmpV.set(xx, yy, .06); phone.localToWorld(tmpV); tmpV.project(cam);
       const px = (tmpV.x + 1) / 2 * vw, py = (1 - tmpV.y) / 2 * vh;
-      bub.style.transform = `translate3d(${px.toFixed(1)}px,${py.toFixed(1)}px,0)`; bub.dataset.side = bb.side;
+      setV(bub, 'transform', `translate3d(${px.toFixed(1)}px,${py.toFixed(1)}px,0)`); if (bub.dataset.side !== bb.side) bub.dataset.side = bb.side;
       const key = bb.t1[0]; if (bub.dataset.key !== key || bub.dataset.lang !== String(zh())) { bub.dataset.key = key; bub.dataset.lang = String(zh()); bubT.textContent = bb.t1[zh() ? 1 : 0]; bubB.textContent = bb.t2[zh() ? 1 : 0]; bub.classList.remove('is-on'); void bub.offsetWidth; }
       bub.classList.add('is-on');
     } else bub.classList.remove('is-on');

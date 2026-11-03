@@ -88,6 +88,7 @@ function lumen(day) {
       const want = on ? mid(on) : mid(lis[0]);
       R.ky = R.ky == null ? want : R.ky + (want - R.ky) * E(7);
       R.kf += ((on ? 1 : 0) - R.kf) * E(5);
+      const sig = `${R.ky.toFixed(1)}|${R.kf.toFixed(3)}|${R.ol.offsetHeight}`; if (sig === R.sig) continue; R.sig = sig;   // nothing moved: leave the page alone
       const H = R.ol.offsetHeight, y0 = mid(lis[0]) - 8, y1 = mid(lis[lis.length - 1]) + 8;
       R.svg.setAttribute('viewBox', `0 0 44 ${H}`); R.svg.style.height = H + 'px';
       R.t.setAttribute('d', path(y0, y1, R.ky, R.kf));

@@ -455,12 +455,13 @@ export function mountDesk(root) {
     wake += (1 - wake) * (1 - Math.exp(-dt * 6)); if (screens.fade < 1) { screens.fade = Math.min(1, screens.fade + dt * 3); dirty = true; }
     if (dirty) { drawScreen(now, wake); dirty = false; }
     const moved = cam.position.distanceToSquared(lastPos) + bLook.distanceToSquared(lastLook);
-    if (now - lastDraw < (moved > 4e-8 ? 31 : 95) && !dirtyBody) { backdrop.style.opacity = fade.toFixed(3); return; }
+    if (now - lastDraw < (moved > 4e-8 ? 31 : 95) && !dirtyBody) { { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } } return; }
     lastDraw = now; lastPos.copy(cam.position); lastLook.copy(bLook); dirtyBody = false;
     const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
-    backdrop.style.opacity = fade.toFixed(3);
+    { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } }
   }
+  const svCache = {};
   let last = performance.now(), lastDraw = 0, dirtyBody = true, lastSY = -1, still = 0; const lastPos = v3(0, 0, 0), lastLook = v3(0, 0, 0);
   addEventListener('resize', () => { dirtyBody = true; });
   function frame(now) {
@@ -533,7 +534,7 @@ export function mountDesk(root) {
     sweep(GROUPS[0], calm ? 1 : tHero, lin(pr, .004, .085));
     sweep(GROUPS[1], lin(pr, .235, .325), lin(pr, .395, .465));
     sweep(GROUPS[2], lin(pr, .6, .685), lin(pr, .87, .935));
-    const S = (k, v) => ov.style.setProperty(k, (+v).toFixed(3));
+    const S = (k, v) => { const t = (+v).toFixed(3); if (svCache[k] !== t) { svCache[k] = t; ov.style.setProperty(k, t); } };   // only real changes: a write invalidates the styles of the whole page
     const jv = kOut > .6 ? 'hidden' : ''; if (jump.style.visibility !== jv) jump.style.visibility = jv;
     S('--kText', kText); S('--kDark', kDark); S('--kUp', kUp); S('--kPw', kPw); S('--kEve', kEve); S('--kEveT', kEveT); S('--kOut', kOut);
   }

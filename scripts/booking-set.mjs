@@ -558,9 +558,10 @@ export function mountDesk(root) {
     edge.position.set(pv.position.x + P.x * .075, pv.position.y + .012 + up * .02, pv.position.z + P.y * .13 * (1 - up) + P.y * .1 * up);
     edge.intensity = fine ? (.08 * (1 - up) * (1 - kOut) + .5 * up) : 0;
     // ---- the screen ----
-    const heroMsgs = Math.floor(clamp(pr, 0, .085) / .0107), eveMsgs = Math.floor(clamp(pr - .6, 0, .3) / .022);
+    // phones: the messages come quicker and clear sooner — on a small screen they stand in front of the words
+    const heroMsgs = tall ? Math.floor(clamp(pr, 0, .05) / .0063) : Math.floor(clamp(pr, 0, .085) / .0107), eveMsgs = tall ? Math.floor(clamp(pr - .6, 0, .15) / .011) : Math.floor(clamp(pr - .6, 0, .3) / .022);
     syncBanners(now, up > .05 ? 0 : heroMsgs + eveMsgs); showScreen(up > .05 ? 'cover-book' : 'lock');
-    updateHolo(now, dt, (up < .05 && kOut < .3 && kBook * kBack < .6 + kPhone) ? 1 : 0);
+    updateHolo(now, dt, (up < .05 && kOut < .3 && kBook * kBack < .6 + kPhone && !(tall && ((pr > .068 && pr < .5) || pr > .8))) ? 1 : 0);
     const litTarget = (up > .05 || wantCount > 0) ? 1 : 0; wake += (litTarget - wake) * (1 - Math.exp(-dt * 6)); if (Math.abs(litTarget - wake) > .002) dirty = true;
     if (screens.fade < 1) { screens.fade = Math.min(1, screens.fade + dt * 3); dirty = true; }
     if (dirty) { drawScreen(now, wake); dirty = banners.some(b => now - b.t < 600) || screens.fade < 1; }

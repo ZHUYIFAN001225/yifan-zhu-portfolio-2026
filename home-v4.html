@@ -4,54 +4,92 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Yifan Zhu</title>
-<meta name="description" content="Yifan Zhu — Research-led Multidisciplinary Designer. A studio and a gallery of digital products, service design, creative technology, 3D and AI work." />
-<meta name="theme-color" content="#e8ded0" />
+<meta name="description" content="Yifan Zhu — Research-led Multidisciplinary Designer." />
+<meta name="theme-color" content="#f6f3ee" />
 <link rel="stylesheet" href="home-v4.css" />
 </head>
 <body class="hv">
-<canvas class="hv-gl" aria-hidden="true"></canvas>
-<div class="hv-grain" aria-hidden="true"></div>
 <header class="hv-head">
   <a class="hv-name" href="home-v4.html" data-t="name"></a>
   <p class="hv-role" data-t="role"></p>
   <nav class="hv-nav">
-    <a href="#gallery" data-jump="gallery" data-t="nav_work"></a>
+    <a href="#work" data-t="nav_work"></a>
     <a href="about.html" data-t="nav_about"></a>
-    <a href="#contact" data-jump="contact" data-t="nav_contact"></a>
+    <a href="#contact" data-t="nav_contact"></a>
     <button type="button" class="hv-lang"><span data-l="en">EN</span><span data-l="zh">中文</span></button>
   </nav>
 </header>
 <main id="main">
-  <section class="hv-beat hv-hello" data-beat="hello">
-    <p class="hv-statement" data-t="statement"></p>
-    <p class="hv-scroll" data-t="scroll"></p>
+  <section class="hv-hero">
+    <video class="hv-hero-v" src="assets/v3/blender-reel-preview.mp4" poster="assets/v3/blender-reel.jpg" muted loop playsinline autoplay></video>
+    <div class="hv-hero-in">
+      <p class="hv-hero-t" data-t="statement"></p>
+      <p class="hv-hero-s" data-t="scroll"></p>
+    </div>
+    <p class="hv-hero-c" data-t="hero_credit"></p>
   </section>
-  <section class="hv-beat hv-me" data-beat="me">
+
+  <section class="hv-where">
+    <p class="hv-where-a"><span data-t="raised"></span> <b class="hv-todo" data-t="todo_place"></b></p>
+    <p class="hv-where-p" data-t="where_p"></p>
+    <p class="hv-where-b"><span data-t="designing"></span> <b class="hv-todo" data-t="todo_city"></b></p>
+  </section>
+
+  <section class="hv-dark hv-who">
+    <h2 class="hv-big hv-rise"><span data-t="who1"></span><span data-t="who2"></span><span data-t="who3"></span></h2>
+    <p class="hv-small" data-t="who_s"></p>
+    <figure class="hv-photo hv-rise">
+      <div class="hv-photo-slot"><span data-t="photo_slot"></span></div>
+      <figcaption><span class="hv-todo" data-t="todo_photo_place"></span><span class="hv-todo" data-t="todo_photo_date"></span></figcaption>
+    </figure>
+    <div class="hv-story">
+      <p class="hv-todo-block" data-t="photo_story"></p>
+    </div>
+    <p class="hv-star">*</p>
+    <p class="hv-lead" data-t="make_lead"></p>
+    <h2 class="hv-big hv-left hv-make"></h2>
+    <p class="hv-small hv-left" data-t="make_s"></p>
+  </section>
+
+  <section class="hv-shipped">
     <div class="hv-card">
-      <h1 data-t="name"></h1>
-      <p class="hv-card-role" data-t="role_long"></p>
-      <ul class="hv-facts"></ul>
-      <p class="hv-links"><a data-t="email_label" href="mailto:zhuyifan001225@gmail.com"></a><a href="about.html" data-t="about_link"></a><a href="#all" data-all data-t="all_work"></a></p>
+      <p class="hv-card-k"><span data-t="shipped_k"></span><span class="hv-count"></span></p>
+      <ol class="hv-list"></ol>
     </div>
   </section>
-  <div class="hv-label" aria-live="polite">
-    <p class="hv-label-k"></p>
-    <h2 class="hv-label-t"></h2>
-    <p class="hv-label-s"></p>
-    <p class="hv-label-m"></p>
-    <a class="hv-label-a"></a>
-  </div>
-  <section class="hv-beat hv-exit" data-beat="contact" id="contact">
-    <h2 data-t="talk"></h2>
-    <p data-t="talk_s"></p>
-    <p class="hv-links"><a href="mailto:zhuyifan001225@gmail.com">zhuyifan001225@gmail.com</a><a href="about.html" data-t="about_link"></a><a href="#all" data-all data-t="all_work"></a></p>
+
+  <section class="hv-dark hv-how">
+    <h2 class="hv-big hv-left hv-rise" data-t="how_big"></h2>
+    <div class="hv-how-grid">
+      <div class="hv-how-intro"><p data-t="how_p1"></p><p data-t="how_p2"></p></div>
+      <div class="hv-cols"></div>
+    </div>
   </section>
-  <div class="hv-track" aria-hidden="true"></div>
+
+  <section class="hv-work" id="work">
+    <div class="hv-type">
+      <h2 class="hv-big hv-ink hv-rise" data-type><span data-t="type1"></span><span data-t="type2"></span><span data-t="type3"></span></h2>
+      <div class="hv-toys" aria-hidden="true"></div>
+      <p class="hv-small hv-ink" data-t="toy_hint"></p>
+    </div>
+    <p class="hv-work-k" data-t="selected"></p>
+    <div class="hv-projects"></div>
+    <section class="hv-inter">
+      <img src="assets/v3/modeling-02.jpg" alt="" loading="lazy" />
+      <h2 class="hv-big" data-t="inter"></h2>
+    </section>
+    <div class="hv-projects hv-projects-2"></div>
+    <p class="hv-work-k" data-t="archives"></p>
+    <ol class="hv-archive"></ol>
+  </section>
+
+  <section class="hv-dark hv-end" id="contact">
+    <div class="hv-toys hv-toys-end" aria-hidden="true"></div>
+    <h2 class="hv-big hv-rise"><span data-t="end1"></span><span data-t="end2"></span><span data-t="end3"></span></h2>
+    <p class="hv-end-links"><a href="mailto:zhuyifan001225@gmail.com">zhuyifan001225@gmail.com</a><a href="about.html" data-t="nav_about"></a><a href="work.html" data-t="all_work"></a></p>
+    <p class="hv-foot"><span>© 2026</span><span data-t="name"></span></p>
+  </section>
 </main>
-<nav class="hv-halls"></nav>
-<button type="button" class="hv-allbtn" data-all data-t="all_work"></button>
-<dialog class="hv-all"><div class="hv-all-in"><header><h2 data-t="all_work"></h2><button type="button" class="hv-all-x">×</button></header><div class="hv-all-grid"></div></div></dialog>
-<p class="hv-loading" data-t="loading"></p>
 <script type="module" src="scripts/home-v4.mjs"></script>
 </body>
 </html>

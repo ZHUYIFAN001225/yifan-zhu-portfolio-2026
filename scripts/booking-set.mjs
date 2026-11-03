@@ -495,7 +495,7 @@ export function mountDesk(root) {
     const moved = cam.position.distanceToSquared(lastPos) + bLook.distanceToSquared(lastLook);
     if (now - lastDraw < (moved > 4e-8 ? 31 : 95) && !dirtyBody) { { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } } return; }
     lastDraw = now; lastPos.copy(cam.position); lastLook.copy(bLook); dirtyBody = false;
-    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = handset ? 8 : 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
+    const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = handset ? 13 : 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } }
   }

@@ -4223,3 +4223,5 @@ html[data-body=a] .bk-day .is-glass.is-thin{box-shadow:inset 0 1px 0 rgba(255,25
 }
 @media (max-width:999px){ .bk-hand[data-act="3"] .bk-hand-space{display:none!important} }
 @media (max-width:639px){ .bk-dk-grain{display:none!important} }   /* phones: no film grain over the desk — at this size it read as a haze */
+/* the "…" that opens a clamped paragraph: no cream fade behind it on the dark page */
+html[data-body=a] .bk-day .bk-clamp:not(.is-open)::after{background:none!important;color:var(--x-acc)!important;padding-left:6px}

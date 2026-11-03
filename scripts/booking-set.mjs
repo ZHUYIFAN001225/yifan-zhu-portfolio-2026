@@ -387,7 +387,7 @@ export function mountDesk(root) {
   let inBody = false, camK = 1;
   const resize = () => { vw = inBody ? innerWidth : op.clientWidth; vh = inBody ? innerHeight : op.clientHeight; const d = dpr(); renderer.setPixelRatio(d); renderer.setSize(vw, vh, false); cam.aspect = vw / vh; cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(.5 / clamp(cam.aspect, inBody ? 1.15 : .87, 2.2)));
     // portrait phones: a normal lens (no wide-angle stretch), and the camera steps back instead so the desk fits across
-    camK = inBody ? 1 : Math.max(cam.aspect, .87) / Math.max(cam.aspect, .58); cam.updateProjectionMatrix();
+    camK = inBody ? 1 : Math.max(cam.aspect, .87) / Math.max(cam.aspect, .68); cam.updateProjectionMatrix();
     rt?.dispose(); const W = Math.round(vw * d), H = Math.round(vh * d); const dt = new THREE.DepthTexture(W, H, THREE.UnsignedIntType);
     rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, depthTexture: dt, depthBuffer: true, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
     post.uniforms.tCol.value = rt.texture; post.uniforms.tDep.value = dt; post.uniforms.uRes.value.set(W, H); };

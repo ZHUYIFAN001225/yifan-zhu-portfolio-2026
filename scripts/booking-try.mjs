@@ -8,7 +8,7 @@ const L = a => a[zh() ? 1 : 0];
 const T = {
   k: ['Try it here', '在这里试一试'],
   t: ['Book as a customer. Then look at her side.', '先当一次顾客预约，再切到店主那边看看。'],
-  sub: ['The same rules as the live site, on sample data — nothing you do here is real.', '和真实网站同一套规则，用的是示例数据——你在这里做的一切都不是真的。'],
+  sub: ['The same rules as the live site, on sample data — nothing you do here is real.', '和真实网站同一套规则，用的是示例数据——你在这里的操作不会产生真实预约。'],
   cust: ['Customer', '顾客'], shop: ['Shop', '店主'],
   full: ['Open full screen ↗', '全屏打开 ↗'], pdf: ['Download case PDF ↓', '下载案例 PDF ↓']
 };

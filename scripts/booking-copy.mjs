@@ -1,6 +1,6 @@
 // Glasgow Salon Booking — the words of the opening (English / 中文), shared by the cover script.
 export const T = {
-  tag: ['MADE FOR ONE OWNER. BUILT FOR HER WHOLE DAY.', '为一位店主而做。为她的一整天而建。'],
+  tag: ['MADE FOR ONE OWNER. BUILT FOR HER WHOLE DAY.', '为一位店主而做，撑起她的一整天。'],
   t1: ['GLASGOW', '格拉斯哥'], t2: ['SALON', '理发店'], t3: ['BOOKING', '预约系统'],
   copy: ['Customers book themselves. The owner sees her whole day. Nobody is deleted when plans change.', '顾客自己预约，店主一眼看完一天，计划变了也没有人被删掉。'],
   ck: ['DESIGNED AND BUILT FOR A ONE-CHAIR SALON IN GLASGOW.', '为格拉斯哥一家只有一把椅子的理发店设计并实现。'],
@@ -8,7 +8,7 @@ export const T = {
   live: ['Live since 21 Oct 2026 ↗', '2026 年 10 月 21 日上线 ↗'], scroll: ['SCROLL TO CONTINUE', '向下滚动'],
   // 2 — the phone alone
   p1: ['One shared', '一本共享的'], p2: ['diary', '预约本'], p3: ['GLASGOW SALON BOOKING · v1', '格拉斯哥理发店预约 · v1'],
-  pp: ['The paper book, the WeChat messages and the missed calls — folded into one screen both sides can trust.', '那本纸质预约本、微信里的消息和没接到的电话——折进一块两边都信得过的屏幕里。'],
+  pp: ['The paper book, the WeChat messages and the missed calls — folded into one screen both sides can trust.', '那本纸质预约本、微信里的消息和没接到的电话——收进一块两边都信得过的屏幕里。'],
   pq: ['* Every screen here is the real product.', '* 这里的每一屏都是真实产品。'],
   // 3 — fits
   a_k: ['ONLY TIMES THAT FIT', '只给放得下的时间'],
@@ -19,7 +19,7 @@ export const T = {
   // 4 — moved, not lost
   b_k: ['MOVED, NEVER DELETED', '只会挪动，不会删除'],
   b_p: ['When she closes a few hours, the bookings inside them are lifted out and parked, not erased. Every customer keeps a place.', '她临时关掉几个小时，里面的预约会被整个抬出来放在一边，而不是被抹掉。每位顾客都还有位置。'],
-  b_big1: ['NOW 0 BOOKINGS', '现在 0 个预约'], b_big2: ['LOST', '丢失'],
+  b_big1: ['NOW 0 BOOKINGS', '现在 0 个预约'], b_big2: ['LOST', '被弄丢'],
   b_f: ['RE-SLOTTING (circle = kept)', '重新排位（圈住 = 保留）'], b_f2: ['move(t) → t′, never delete(t)', 'move(t) → t′，而不是 delete(t)'],
   // 5 — record
   c_k: ['RULES & RECORD', '规则与记录'], c_m: ['LIVE SINCE 21 OCT 2026', '2026 年 10 月 21 日上线'], c_r: ['REAL SCREENS', '真实界面'],

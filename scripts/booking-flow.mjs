@@ -23,7 +23,7 @@ const DAY = [
 ];
 const GAPS = [690, 870, 960, 1050]; // free starts that fit 30 minutes
 const STEPS = [
-  { t: ['She picks a service first.', '她先选服务。'], b: ['Only the gaps that fit 30 minutes light up in the diary.', '日程里只有放得下 30 分钟的空当会亮起来。'] },
+  { t: ['She picks a service first.', '她先选服务。'], b: ['Only the gaps that fit 30 minutes light up in the diary.', '日程里只有放得下 30 分钟的空档会亮起来。'] },
   { t: ['She taps 11:30.', '她点了 11:30。'], b: ['The booking goes straight into the shared diary, at its real length.', '预约直接进入共享日程，按真实时长占位。'] },
   { t: ['The owner does nothing.', '店主什么都不用做。'], b: ['It is already in her day. No message, nothing to copy into a book.', '它已经在她的一天里了。不用回消息，也不用抄进本子。'] },
   { t: ['She closes 16:00–18:00.', '她临时关掉 16:00–18:00。'], b: ['Li’s booking is lifted out of the diary, not deleted.', '李的预约被移出日程，而不是删除。'] },

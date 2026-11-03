@@ -194,7 +194,7 @@ export function mountDesk(root) {
   }
   const hand = (x, txt, X, y, size, col, rot) => { x.save(); x.translate(X, y); x.rotate(rot); x.fillStyle = col; x.font = `italic 600 ${Math.round(size)}px ${HAND}`; x.fillText(txt, 0, 0); x.restore(); };
   // the left page: yesterday, already done — ticked off, one no-show, a cash note
-  const LEFT = [[0, ['9:00 Mrs Li — trim ✓', '9:00 李太太 — 修剪 ✓']], [2, ['10:00 Sun — cut + wash ✓', '10:00 孙先生 — 剪+洗 ✓']], [4, ['11:00 Emma ✓', '11:00 Emma ✓']], [7, ['12:30 Zhou — no show', '12:30 周先生 — 没来']], [10, ['2:00 colour (Anna) ✓', '2:00 染发（Anna）✓']], [13, ['3:30 walk-in, paid cash', '3:30 散客，现金']], [15, ['£ count: 6', '今天：6 位']]];
+  const LEFT = [[0, ['9:00 Mrs Li — trim ✓', '9:00 李阿姨 — 修剪 ✓']], [2, ['10:00 Sun — cut + wash ✓', '10:00 孙小姐 — 剪+洗 ✓']], [4, ['11:00 Emma ✓', '11:00 Emma ✓']], [7, ['12:30 Zhou — no show', '12:30 周先生 — 没来']], [10, ['2:00 colour (Anna) ✓', '2:00 染发（Anna）✓']], [13, ['3:30 walk-in, paid cash', '3:30 散客，现金']], [15, ['£ count: 6', '收款：6 笔']]];
   function drawLeft() {
     const w = 900, h = 1240, r = seed(11); ruled(pl, zh() ? '周四 5 日' : 'THURSDAY 5');
     LEFT.forEach(([row, t], i) => hand(pl, L(t), w * .22, rowY(h, row) - h * .006, h * .029 + r() * 2, i === 3 ? '#6b6f7a' : '#15171c', (r() - .5) * .035));

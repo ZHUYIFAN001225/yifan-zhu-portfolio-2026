@@ -503,6 +503,7 @@ export function mountDesk(root) {
   const bodyA = () => document.documentElement.dataset.body === 'a';
   function moveCanvas(toBody) {
     if (toBody === inBody) return; inBody = toBody; dirtyBody = true; ov.classList.toggle('is-through', toBody);   // the opening turns see-through: the same desk carries on behind it
+    cv.style.filter = ''; cv._f = '';
     if (toBody) { if (!backdrop.isConnected) document.body.prepend(backdrop); backdrop.append(cv); bPos.copy(cam.position); bLook.copy(camLook); }
     else ov.prepend(cv);
     resize();
@@ -607,6 +608,7 @@ export function mountDesk(root) {
     if (bodyA()) {   // the dark case: no fade to black — the close-up drifts out of focus into the same defocus the page sits on
       fu.uMax.value = lerp(fu.uMax.value, 13 * dpr(), kOut); fu.uRange.value = lerp(fu.uRange.value, .06, kOut); fu.uFocus.value = lerp(fu.uFocus.value, cam.position.distanceTo(camLook) * .55, kOut);
       fu.uVig.value = lerp(fu.uVig.value, .85, kOut); fu.uJit.value = 1 - kOut;
+      if (backdrop.classList.contains('is-soft')) { fu.uMax.value = Math.min(fu.uMax.value, 2 * dpr()); const f = kOut > .002 ? `blur(${(kOut * 14).toFixed(1)}px)` : ''; if (cv._f !== f) { cv._f = f; cv.style.filter = f; } }   // phones: the same soft blur as behind the page
     }
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
     // the words

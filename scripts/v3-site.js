@@ -765,6 +765,28 @@ window.addEventListener('pagereveal',event=>{
     stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); const mx = (e.clientX - r.left) / r.width * 2 - 1, my = (e.clientY - r.top) / r.height * 2 - 1; set(fm, '--mx', mx.toFixed(3)); set(fm, '--my', my.toFixed(3)); set(stage, '--px', mx.toFixed(3)); });
     fm.querySelectorAll('.fm-photo').forEach(ph => { ph.addEventListener('pointermove', e => { const r = ph.getBoundingClientRect(); set(ph, '--ptilt', (((e.clientX - r.left) / r.width - .5) * 14).toFixed(1) + 'deg'); }); ph.addEventListener('pointerleave', () => set(ph, '--ptilt', '0deg')); });
   }
+  // phones have no pointer to follow: the stage breathes on its own (a slow drift), leans after a finger dragged across it
+  // and, where the browser allows it without asking, after the tilt of the phone — the same variables the mouse drives
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches && !calm.matches) {
+    let fx = null, fy = null, fT = 0, gx = 0, gy = 0, cx = 0, cy = 0, run = 0, last = '';
+    stage.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') return; const r = stage.getBoundingClientRect(); fx = (e.clientX - r.left) / r.width * 2 - 1; fy = (e.clientY - r.top) / r.height * 2 - 1; fT = performance.now(); }, { passive: true });
+    stage.addEventListener('pointerdown', e => { const r = stage.getBoundingClientRect(); fx = (e.clientX - r.left) / r.width * 2 - 1; fy = (e.clientY - r.top) / r.height * 2 - 1; fT = performance.now(); }, { passive: true });
+    if ('DeviceOrientationEvent' in window && typeof DeviceOrientationEvent.requestPermission !== 'function') {
+      let b0 = null; addEventListener('deviceorientation', e => { if (e.gamma == null) return; if (b0 == null) b0 = e.beta; b0 += (e.beta - b0) * .01; gx = Math.max(-1, Math.min(1, e.gamma / 25)); gy = Math.max(-1, Math.min(1, (e.beta - b0) / 20)); }, { passive: true });
+    }
+    let lastT = 0;
+    const tick = now => {
+      run = requestAnimationFrame(tick); if (now - lastT < 33) return; lastT = now;
+      const t = now / 1000, touch = fx != null && now - fT < 1600 ? 1 - Math.max(0, (now - fT - 900) / 700) : 0;
+      const ax = Math.sin(t * .55) * .55 + Math.sin(t * 1.3) * .12, ay = Math.cos(t * .42) * .45;   // the breath
+      const tx = (touch > 0 ? fx * touch + ax * (1 - touch) : ax) * .8 + gx * .6, ty = (touch > 0 ? fy * touch + ay * (1 - touch) : ay) * .8 + gy * .5;
+      cx += (tx - cx) * .12; cy += (ty - cy) * .12;
+      const k = `${cx.toFixed(2)}|${cy.toFixed(2)}`; if (k === last) return; last = k;
+      set(fm, '--mx', cx.toFixed(3)); set(fm, '--my', cy.toFixed(3)); set(stage, '--px', cx.toFixed(3)); set(phone, '--mrx', (cx * .8).toFixed(3)); set(phone, '--mry', (cy * .6).toFixed(3));
+    };
+    // only while the stage is on screen
+    new IntersectionObserver(es => { if (es[0].isIntersecting) { if (!run) run = requestAnimationFrame(tick); } else { cancelAnimationFrame(run); run = 0; } }).observe(stage);
+  }
   // "Which look?": click the picture, it flies away and the headline rolls to who can make it.
   const find = fm.querySelector('[data-find]');
   if (find) {
@@ -901,7 +923,7 @@ window.addEventListener('pagereveal',event=>{
 
 // Parallax rhythm for the case content below the film: cards in a row drift at different speeds.
 (() => {
-  if (!document.querySelector('[data-film]') || matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(max-width: 760px)').matches) return;
+  if (!document.querySelector('[data-film]') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;   // phones too
   const beauty = !!document.querySelector('[data-product-case=beauty]');
   const els = [...document.querySelectorAll(beauty ? '.ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*, .ux-research-plan>div, .ux-decisions article' : '.ux-decisions article, .ux-details figure, .ux-principles>div, .ux-pains>div, .ux-build>li, .ux-journey>li, .ux-phases>li, .ux-challenge-grid>*')];
   // LOOK: stronger depth — each card in a group sits on its own layer (near cards move more, far ones less and are a touch smaller)

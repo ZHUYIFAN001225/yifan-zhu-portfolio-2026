@@ -4424,3 +4424,17 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
   .fm.is-story .fm-prop,.fm.is-duo .fm-prop{transform:translate(-50%,-50%) rotate(var(--r)) scale(.6);opacity:0;pointer-events:none}
 }
 @media (max-width:760px) and (prefers-reduced-motion:no-preference){.fm .fm-prop{width:50px;padding:8px;border-radius:17px}}
+/* phones: while the finger pulls the opening apart, everything follows --sc (0 = the title, 1 = the first step) directly */
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .fm.is-scrub .fm-line>span{transition:none!important;transform:translate3d(calc(var(--sc) * var(--dx) * 60vw),0,0)!important;opacity:calc(1 - var(--sc) * 1.15)!important}
+  .fm.is-scrub .fm-prop{transition:none!important;animation:none!important;pointer-events:none;opacity:calc(1 - var(--sc) * 1.6)!important;
+    transform:translate(-50%,-50%) translateY(calc(var(--sc) * -70px)) rotate(calc(var(--r) * (1 + var(--sc) * 2))) scale(calc(1 - var(--sc) * .4))!important}
+  .fm.is-scrub .fm-kicker,.fm.is-scrub .fm-toyhint{opacity:calc(1 - var(--sc) * 2)!important;transition:none!important}
+  .fm.is-scrub .fm-phone{transition:none!important;transform-origin:50% 50%!important;
+    top:calc(var(--fit-oc) + (var(--fit-st) - var(--fit-oc)) * var(--sc))!important;
+    transform:translate(-50%,calc(var(--sc) * -50%)) rotateX(calc(var(--sc) * 8deg)) rotateY(calc(var(--sc) * -12deg)) rotateZ(calc(var(--sc) * 2deg)) scale(calc(var(--fit-os) + (1 - var(--fit-os)) * var(--sc)))!important}
+}
+@media (max-width:760px) and (prefers-reduced-motion:no-preference){
+  .fm .fm-phone{transition:left 1.3s var(--ease),top 1.3s var(--ease),transform 1.3s var(--ease)}
+  .fm .fm-hint{display:none}
+}

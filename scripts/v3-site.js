@@ -768,6 +768,22 @@ window.addEventListener('pagereveal',event=>{
   let st = 0; addEventListener('scroll', () => { if (calm.matches || jumping) return; clearTimeout(st); st = setTimeout(() => { if (inside()) show(nearest()); else { const r = track.getBoundingClientRect(); show(r.top > 0 ? 0 : M - 1); } }, 60); }, { passive: true });
   document.addEventListener('portfolio:language', () => { const m = cur; cur = -1; curStep = -2; show(m < 0 ? 0 : m); });
   show(nearest());
+  // phones: the finger pulls the opening apart, as the wheel does on a computer — the two lines slide off left and right,
+  // the tools drift away and the phone rises, all following the finger; let go halfway and it settles to the nearer end
+  if (!calm.matches) {
+    let sq = 0, scrubbing = false, settleT = 0;
+    const prog = () => { const r = track.getBoundingClientRect(), u = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight))) * U2; return Math.min(1, Math.max(0, (u - unitOf(0)) / (unitOf(1) - unitOf(0)))); };
+    const scrub = () => {
+      sq = 0; if (wide.matches) { if (scrubbing) { scrubbing = false; fm.classList.remove('is-scrub'); } return; }
+      const p = prog(), on = p > .004 && p < .97;
+      if (on !== scrubbing) { scrubbing = on; fm.classList.toggle('is-scrub', on); }
+      if (on) { set(fm, '--sc', p.toFixed(3)); const want = p > .5 ? 1 : 0; if (cur !== want && (cur <= 1)) show(want); }
+      else if (p >= .97 && cur === 0) show(1);
+      clearTimeout(settleT);
+      if (on && !jumping) settleT = setTimeout(() => { if (!scrubbing || jumping) return; const q = prog(); if (q > .004 && q < .97) glideTo(yOf(q > .4 ? 1 : 0), 420); }, 160);
+    };
+    addEventListener('scroll', () => { if (!sq) sq = requestAnimationFrame(scrub); }, { passive: true });
+  }
   // the phone leans toward the pointer anywhere on the stage
   if (matchMedia('(hover:hover) and (pointer:fine)').matches && !calm.matches) {
     const card0 = fm.querySelector('.fm-lift-img');
@@ -818,7 +834,7 @@ window.addEventListener('pagereveal',event=>{
       const lines = fm.querySelectorAll('.fm-line'); const tb = lines.length ? rel(lines[lines.length - 1])[1] : sr.height * .5;
       const oroom = Math.max(100, floor - tb - 16);
       const os = Math.min(.9, oroom / (w * ratio));
-      set(fm, '--fit-op', (tb + 14).toFixed(1) + 'px'); set(fm, '--fit-os', os.toFixed(3));
+      set(fm, '--fit-op', (tb + 14).toFixed(1) + 'px'); set(fm, '--fit-os', os.toFixed(3)); set(fm, '--fit-oc', (tb + 14 - w * ratio * (1 - os) / 2).toFixed(1) + 'px');
       // the five tools, placed in real pixels into the clear spaces of this screen: beside the right-aligned lines of the
       // title and either side of the phone (laid out from the centre with vw they piled up in the middle on some iPhones)
       const W = sr.width, pw = w * os, ph = w * ratio * os, pt = tb + 14, side = Math.max(34, (W - pw) / 2 / 2), sz = 50;

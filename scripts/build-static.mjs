@@ -22,6 +22,7 @@ const entries = [
   "project-scone-through-time.html",
   "project-seedwalkers.html",
   "project-anxiety-market.html",
+  "project-idea-to-edit.html",
   "project-beauty-marketplace.html",
   "project-glasgow-booking.html",
   "scripts/language.js",

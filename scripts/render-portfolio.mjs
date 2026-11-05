@@ -4,6 +4,7 @@ import { categories, projects, forthcoming, caseHighlights, orderedProjects, fea
 import {renderProductDemos} from './product-demos.mjs';
 import {productCases} from './product-case-data.mjs';
 import {renderVisualWork,resourceCopy} from './render-visual-work.mjs';
+import {renderIdeaToEdit} from './render-idea-to-edit.mjs';
 
 const dictionary = {};
 const esc = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -203,6 +204,7 @@ export async function renderPortfolio() {
   await fs.writeFile('practice.html',renderVisualWork(t,document,projects));
   await fs.writeFile('work.html',document('Yifan Zhu | All Work',work+gallery(),'v3-index'));
   await fs.writeFile('project-anxiety-market.html',anxiety());
+  await fs.writeFile('project-idea-to-edit.html',renderIdeaToEdit(t,document));
   for(const [file,html] of renderProductDemos(t,document))await fs.writeFile(file,html);
   // Register the strings used by the dynamic collection title and media dialog.
   t('Visual practice. Creative tools.','视觉实践与创意工具。');t('Original Blender visual practice','原创 Blender 视觉实践');

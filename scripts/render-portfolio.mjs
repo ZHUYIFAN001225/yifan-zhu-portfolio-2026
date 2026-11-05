@@ -168,19 +168,14 @@ const showcase = () => {
   };
   const actions=p=>`<a class="sc-btn" href="${p.href}">${t('View the case','查看案例')} <span aria-hidden="true">→</span></a>${p.demo?`<a class="sc-btn" href="${p.href}#interactive-demo">${t('Try the prototype','试用原型')} <span aria-hidden="true">↗</span></a>`:''}${p.video&&!p.demo?`<a class="sc-btn" href="${p.href}">${t('Watch the film','观看短片')} <span aria-hidden="true">▶</span></a>`:''}`;
   const live=p=>p.status.en.startsWith('Live')?`<p class="sc-live"><i aria-hidden="true"></i>${pair(p.status)}</p>`:'';
-  // Scene 0 answers "who is this" before any project: name, what I do in one concrete line, and the hardest evidence.
-  // Behind it, a scene from my own Blender film — the one thing on the page nobody else has.
-  const intro=`<article class="sc-scene sc-scene--intro is-active" data-sc-scene="0" style="--tone:#d6d2cc;--ink:#2f2e2c">
-        <span class="sc-visual sc-visual--intro" aria-hidden="true"><span class="sc-film"><img src="assets/v3/blender-reel.jpg" alt="" decoding="async" /><video data-sc-video muted loop playsinline preload="none" tabindex="-1" data-src="assets/v3/blender-reel-preview.mp4"></video></span></span>
-      </article>`;
-  const scenes=intro+list.map((p,k)=>{const i=k+1,tone=tones[p.id]||['#ddd9d0','#34363b'];
-    return `<article class="sc-scene" data-sc-scene="${i}" style="--tone:${tone[0]};--ink:${tone[1]}">
-        <p class="sc-mh"><span>${String(i).padStart(2,'0')}</span>${pair(p.title)}<small>${pair(p.kind)}</small></p>
+  const scenes=list.map((p,i)=>{const tone=tones[p.id]||['#ddd9d0','#34363b'];
+    return `<article class="sc-scene${i?'':' is-active'}" data-sc-scene="${i}" style="--tone:${tone[0]};--ink:${tone[1]}">
+        <p class="sc-mh"><span>${String(i+1).padStart(2,'0')}</span>${pair(p.title)}<small>${pair(p.kind)}</small></p>
         <a class="sc-visual" href="${p.href}" data-cursor="${p.demo?'try':p.video?'play':'view'}" aria-label="${pair(p.title)}">${scene(p)}</a>
         <div class="sc-m">${live(p)}<p class="sc-ml">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>
       </article>`;}).join('');
-  const captions=`<div class="sc-caption sc-caption--intro is-active" data-sc-caption="0"><p class="sc-line">${t('Three pieces of work first. Everything else is below.','先看三件作品，其余都在下面。')}</p></div>`+list.map((p,k)=>`<div class="sc-caption" data-sc-caption="${k+1}">${live(p)}<p class="sc-line">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>`).join('');
-  return `<section class="sc" data-showcase data-active="0" aria-label="${t('Featured work','精选作品')}" style="--count:${list.length+1}"><div class="sc-track"><div class="sc-stage">
+  const captions=list.map((p,i)=>`<div class="sc-caption${i?'':' is-active'}" data-sc-caption="${i}">${live(p)}<p class="sc-line">${t(...lines[p.id])}</p><div class="sc-actions">${actions(p)}</div></div>`).join('');
+  return `<section class="sc" data-showcase aria-label="${t('Featured work','精选作品')}" style="--count:${list.length}"><div class="sc-track"><div class="sc-stage">
     <div class="sc-scenes">${scenes}</div>
     <div class="sc-shade" aria-hidden="true"></div>
     <div class="sc-ui">
@@ -189,7 +184,7 @@ const showcase = () => {
           <ul class="sc-who-proof"><li><b>${t('Live','已上线')}</b>${t('a booking system a Glasgow salon runs on','一家格拉斯哥理发店正在用的预约系统')}</li><li><b>${t('Released','已发布')}</b>${t('a Blender add-on, with a public release','一个公开发布的 Blender 插件')}</li><li><b>${t('MDes','硕士研究')}</b>${t('service research tested over two rounds','经过两轮测试的服务设计研究')}</li></ul>
           <p class="sc-who-credit">${t('Behind this: a scene from Living in the Shadows, my own Blender film.','背景：我的 Blender 短片 Living in the Shadows 中的一个场景。')}</p></div>
       <div class="sc-side"><p class="sc-intro">${t('Selected work','精选作品')}</p><p class="sc-count" aria-hidden="true"><span data-sc-current>01</span> / ${n}</p>
-        <ol class="sc-list">${list.map((p,k)=>`<li><a href="${p.href}" data-sc-go="${k+1}"><span class="sc-name">${pair(p.title)}</span><span class="sc-kind">${pair(p.kind)}</span></a></li>`).join('')}</ol></div>
+        <ol class="sc-list">${list.map((p,i)=>`<li><a href="${p.href}" data-sc-go="${i}"${i?'':' aria-current="true"'}><span class="sc-name">${pair(p.title)}</span><span class="sc-kind">${pair(p.kind)}</span></a></li>`).join('')}</ol></div>
       <div class="sc-captions">${captions}</div>
     </div>
     <p class="sc-hint"><span aria-hidden="true" class="sc-mouse"></span>${t('Scroll','向下滚动')}</p>
@@ -201,8 +196,14 @@ export async function renderPortfolio() {
   const home = `<section class="v3-hero"><div><p class="v3-eyebrow">${t('Research-led Multidisciplinary Designer','研究驱动的跨领域设计师')}</p><h1>${t('Research-led.','以研究为起点。')}<br><span>${t('Made tangible.','让想法可体验。')}</span></h1></div><div class="v3-hero-note"><p>${t('I turn complex questions into experiences you can see, use and test.','我将复杂的问题转化为可看见、可使用、可测试的体验。')}</p><span>${t('Products. Moving images. Systems.','产品、动态影像与系统。')}</span></div></section>`;
   const work = `<section class="v3-hero v3-hero--work"><div><p class="v3-eyebrow">${t('The work of Yifan Zhu','朱异凡的设计实践')}</p><h1>${t('Different disciplines.','跨越不同领域。')}<br><span>${t('One curious mind.','始于同一份好奇。')}</span></h1></div><div class="v3-hero-note"><p>${t('Find the perspective that fits your team.','找到适合你的团队的设计视角。')}</p><span>${t('Explore a collection. Open the full story.','按方向浏览，深入完整案例。')}</span></div></section>`;
   // The homepage opens straight on the collection, so a reviewer can pick a discipline in one click.
+  // A short "about me" of its own, after the cover and before the work: name, what I do, the hardest evidence, a way to the full story.
+  const homeAbout = `<section class="v3-me" id="me" aria-label="${t('About me','关于我')}"><div class="v3-me-in">
+    <div class="v3-me-who"><p class="v3-me-k">${t('About me','关于我')}</p><h2>${t('Yifan Zhu','朱异凡')}</h2><p class="v3-me-role">${t('Research-led multidisciplinary designer · MDes, Glasgow','研究驱动的跨领域设计师 · 格拉斯哥 MDes')}</p></div>
+    <div class="v3-me-say"><p>${t('I design products and services that real people use, and build in 3D, film and AI workflows when an idea needs to be felt rather than explained. I start from research, make things quickly, and test them with the people they are for.','我做真实的人在用的产品和服务；当一个想法需要被感受而不是被解释时，我用 3D、影像和 AI 工作流把它做出来。我从调研开始，快速做出来，再和它真正的使用者一起测试。')}</p>
+      <ul class="v3-me-proof"><li><b>${t('Live','已上线')}</b>${t('a booking system a Glasgow salon runs on','一家格拉斯哥理发店正在用的预约系统')}</li><li><b>${t('Released','已发布')}</b>${t('a Blender add-on with a public release','一个公开发布的 Blender 插件')}</li><li><b>${t('Research','研究')}</b>${t('a service study tested over two rounds','经过两轮测试的服务设计研究')}</li><li><b>${t('AI × Video','AI × 视频')}</b>${t('three October pieces: a product concept, a ComfyUI effect, an agent workflow','10 月的三件作品：产品概念、ComfyUI 特效、Agent 工作流')}</li></ul>
+      <p class="v3-me-links"><a href="about.html">${t('More about me','更多关于我')} <span aria-hidden="true">→</span></a><a href="mailto:zhuyifan001225@gmail.com">zhuyifan001225@gmail.com</a></p></div></div></section>`;
   const homeWork = `<section class="v3-hero v3-hero--work v3-hero--all"><div><p class="v3-eyebrow">${t('All work','全部作品')}</p><h1>${t('18 projects, four disciplines.','18 个项目，四个方向。')}</h1></div><div class="v3-hero-note"><p>${t('Pick the discipline closest to your team; most projects sit in more than one.','选离你团队最近的方向；大多数项目同时属于不止一个。')}</p></div></section>`;
-  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',showcase()+homeWork+gallery(),'v3-index'));
+  await fs.writeFile('index.html',document('Yifan Zhu | Research-led Multidisciplinary Designer',showcase()+homeAbout+homeWork+gallery(),'v3-index'));
   await fs.writeFile('practice.html',renderVisualWork(t,document,projects));
   await fs.writeFile('work.html',document('Yifan Zhu | All Work',work+gallery(),'v3-index'));
   await fs.writeFile('project-anxiety-market.html',anxiety());

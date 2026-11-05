@@ -1,5 +1,5 @@
-// Idea to Edit / 灵感成片 — a feature concept for CapCut (剪映), done solo in five days for a short-video platform's
-// design challenge. English copy follows the English case study; the Chinese is condensed from the 26-page planning
+// Idea to Edit / 灵感成片 — a feature concept for CapCut (剪映), done solo in five days: one of three October pieces on
+// AI × video (product, creative technology, agent workflow). English copy follows the English case study; the Chinese is condensed from the 26-page planning
 // document along the same structure. Screenshots switch with the language (the zh/ twins), so do the film and the demo.
 const A = 'assets/projects/idea-to-edit/';
 const DEMO_ZH = 'https://zhuyifan001225.github.io/jianying-inspiration-demo/';
@@ -24,7 +24,7 @@ export function renderIdeaToEdit(t, document) {
 
     <section class="am-tldr" aria-label="${t('In 30 seconds', '30 秒速读')}"><p class="am-tldr-title">${t('In 30 seconds', '30 秒速读')}</p><dl>
       <div><dt>${t('My role', '我的角色')}</dt><dd>${t('Solo, 5 days: research, strategy, interaction design, interactive prototype, demo film', '独立完成，5 天：调研、策略、交互设计、可交互原型、演示视频')}</dd></div>
-      <div><dt>${t('The brief', '题目')}</dt><dd>${t('A design challenge from a short-video platform: turn an idea into a finished piece in one step', '一家头部短视频平台的设计挑战：让灵感一键变成动态作品')}</dd></div>
+      <div><dt>${t('The question', '问题')}</dt><dd>${t('How should AI video generation live inside an editor people already use? Starting point: one idea in, a finished piece out', 'AI 视频生成应该怎样长在一个大家已经在用的剪辑器里？起点：一句想法进去，一支成片出来')}</dd></div>
       <div><dt>${t('The reframe', '我的判断')}</dt><dd>${t('“One-click video” already exists. People give up after generation, when fixing one part means regenerating everything.', '“一键出片”已经不稀缺。人们放弃是在生成之后：改一处就得整片重来。')}</dd></div>
       <div><dt>${t('The answer', '方案')}</dt><dd>${t('Generate straight into an editable timeline; revise by emotion node or by marking clips; every version kept', '直接生成到可编辑的时间线；按情绪节点或标记片段局部返工；每个版本都保留')}</dd></div></dl>
       <ul class="am-skills" aria-label="${t('Skills shown', '体现的能力')}">${[['Product strategy', '产品策略'], ['Journey mapping', '用户旅程'], ['Interaction design', '交互设计'], ['AI product design', 'AI 产品设计'], ['Prototyping', '原型制作'], ['Feasibility & metrics', '可行性与指标']].map(k => `<li>${t(...k)}</li>`).join('')}</ul></section>
@@ -66,7 +66,7 @@ export function renderIdeaToEdit(t, document) {
       ${p('Mapping existing tools by “how much expertise you need to start” and “can you edit the result locally” shows a gap. Tools that are easy to start produce a single, uneditable video; tools that are editable need professional skills. The top-right — start with one sentence, and still edit any part — wasn’t well served.', '把现有产品放在“起步门槛”和“结果能不能局部修改”两个维度上，空白很明显：起步容易的产品，结果是一整条改不动的视频；改得动的工具，起步需要专业知识。右上角——一句话就能开始，而且结果可以局部修改——还没有被很好地满足。')}
       ${h3('Three candidates, I chose the first', '三个候选，我选了第一个')}
       <ol class="i2e-options">
-        <li><b>${t('Emotion director', '情绪导演')}</b><span>${t('Turn the emotional arc into editable timeline nodes. Chosen: closest to the brief, serves all three user types, and targets the lowest point of the journey directly.', '把情绪走向变成时间线上可调整的节点。选它：最贴合题目，能同时服务三类用户，直接对准旅程的最低点。')}</span><em>${t('Chosen', '已选')}</em></li>
+        <li><b>${t('Emotion director', '情绪导演')}</b><span>${t('Turn the emotional arc into editable timeline nodes. Chosen: closest to the core question, serves all three user types, and targets the lowest point of the journey directly.', '把情绪走向变成时间线上可调整的节点。选它：最贴合核心问题，能同时服务三类用户，直接对准旅程的最低点。')}</span><em>${t('Chosen', '已选')}</em></li>
         <li><b>${t('Layout guardian', '版式守护')}</b><span>${t('Protect text, logos and subjects when designers animate posters. Kept as a principle inside the photo entry rather than a separate feature.', '设计师把海报做成动态时，保护文字、Logo 和主体。它的核心被放进了图片入口，而不是单独做一个功能。')}</span></li>
         <li><b>${t('Reference calibration', '参考风格校准')}</b><span>${t('Explain why a result doesn’t match a reference. Valuable, but narrower, and close to what reference-based generation already does.', '生成结果不像参考图时，告诉系统哪里不像。有价值，但人群更窄，也和现有的“参考图生成＋指令编辑”重合太多。')}</span></li></ol>
       ${h3('Principles I set for myself', '我给自己定的几条规矩')}
@@ -142,7 +142,7 @@ export function renderIdeaToEdit(t, document) {
       <ul class="i2e-list">
         <li><b>${t('The most useful reframe was moving from “generate better” to “edit better”.', '最有用的转向是从“生成得更好”到“改得动”。')}</b>${t('It changed the success metric from first-draft quality to how quickly someone reaches a version they’re happy with.', '它把成功的标准从初稿质量，换成了用户多快能改到满意。')}</li>
         <li><b>${t('Emotion is the layer users can say least but care about most.', '情绪是用户最说不清、却最在意的一层。')}</b>${t('Making it an object on the timeline was the bridge between vague adjectives and concrete changes.', '把它变成时间线上的对象，是模糊的形容词和具体修改之间的桥。')}</li>
-        <li><b>${t('What’s still untested:', '还没有验证的：')}</b>${t('the personas and journey are based on the brief, public sources and product analysis, not interviews. The next step is the concept test above, especially whether emotion nodes are understood without onboarding.', '用户画像和旅程基于题目设定、公开资料与产品推演，没有做过访谈。下一步是上面的概念测试，尤其是不经讲解时情绪节点能不能被理解。')}</li></ul>`)}
+        <li><b>${t('What’s still untested:', '还没有验证的：')}</b>${t('the personas and journey are based on public sources and product analysis, not interviews. The next step is the concept test above, especially whether emotion nodes are understood without onboarding.', '用户画像和旅程基于公开资料与产品推演，没有做过访谈。下一步是上面的概念测试，尤其是不经讲解时情绪节点能不能被理解。')}</li></ul>`)}
     <nav class="project-nav"><a href="project-beauty-marketplace.html">${t('LOOK — Beauty Marketplace', 'LOOK 见己 · 美容服务平台')}</a><a class="back-link" href="work.html">${t('Back to All Work', '返回全部作品')}</a></nav></article>
   <script>
   // the film and the prototype follow the page language

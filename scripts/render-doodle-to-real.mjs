@@ -1,5 +1,5 @@
 // Doodle to Real / 手绘入画 — a ComfyUI stop-motion effect: every object first appears as a marker doodle in its final
-// position, then snaps into the real thing. Built solo in three days for a short-video platform's creative-packaging
+// position, then snaps into the real thing. Built solo in three days  the creative-technology piece of three October works on AI × video; originally a creative-packaging
 // challenge. The nine result clips have no text, so both languages share them; the figures are the English set.
 const A = 'assets/projects/doodle-to-real/';
 
@@ -10,7 +10,7 @@ export function renderDoodleToReal(t, document) {
   const h3 = (en, zh, id = '') => `<h3${id ? ` id="${id}"` : ''}>${t(en, zh)}</h3>`;
   const p = (en, zh) => `<p>${t(en, zh)}</p>`;
   const clip = (f, label, mode) => `<figure class="dr-clip"><video src="${A}${f}.mp4" poster="${A}${f}.jpg" muted loop playsinline autoplay preload="metadata" aria-label="${t(...label)}"></video><figcaption><b>${mode}</b>${t(...label)}</figcaption></figure>`;
-  const note = t('Unofficial work for a design challenge. Not affiliated with ByteDance or CapCut. The four test photos (portrait, food, group, pets) were provided with the brief and are not mine; the landscape is a CC BY 2.5 image from Wikimedia Commons.', '设计挑战的非官方作业，与字节跳动 / 剪映无关。人像、美食、合照、宠物四张原图由题目提供，不是我的照片；风景图来自 Wikimedia Commons（CC BY 2.5）。');
+  const note = t('Independent study. The portrait, food, group and pet photos are supplied stock images, not mine; the landscape is a CC BY 2.5 image from Wikimedia Commons.', '独立研究项目。人像、美食、合照、宠物四张原图为外部提供的素材图，不是我的照片；风景图来自 Wikimedia Commons（CC BY 2.5）。');
   const idx = [['results', ['Results', '成片']], ['effect', ['The effect', '玩法拆解']], ['modes', ['Two modes', '两种模式']], ['mode-a', ['Mode A', '模式 A']], ['mode-b', ['Mode B', '模式 B']], ['checks', ['Checks', '自动检查']], ['limits', ['Limits', '边界']], ['reflect', ['Reflection', '反思']]];
 
   const body = `<article class="full-case single-project am-case dr"><a class="back-link" href="work.html">${t('Back to All Work', '返回全部作品')}</a>
@@ -22,7 +22,7 @@ export function renderDoodleToReal(t, document) {
 
     <section class="am-tldr" aria-label="${t('In 30 seconds', '30 秒速读')}"><p class="am-tldr-title">${t('In 30 seconds', '30 秒速读')}</p><dl>
       <div><dt>${t('My role', '我的角色')}</dt><dd>${t('Solo, 3 days: effect analysis, workflow design, custom ComfyUI nodes, explainer film', '独立完成，3 天：玩法拆解、工作流设计、自定义 ComfyUI 节点、讲解视频')}</dd></div>
-      <div><dt>${t('The brief', '题目')}</dt><dd>${t('Recreate a target video effect as a reproducible AI workflow, across a portrait, food, pets and a group photo', '把一个目标视频特效做成可复现的 AI 工作流，覆盖人像、美食、宠物、合照四张图')}</dd></div>
+      <div><dt>${t('The goal', '目标')}</dt><dd>${t('Rebuild a real stop-motion effect as a reproducible AI workflow that works on very different photos: a portrait, food, pets, a group', '把一个真实的定格特效做成可复现的 AI 工作流，而且要在差异很大的照片上都成立：人像、美食、宠物、合照')}</dd></div>
       <div><dt>${t('The constraint', '难点')}</dt><dd>${t('The reference was shot by placing real objects one at a time. We only get one finished photo.', '参考视频是把实物一件件摆上去拍的，而我们只有一张拍好的照片。')}</dd></div>
       <div><dt>${t('The answer', '方案')}</dt><dd>${t('Reverse the process: AI removes the objects, then draws them back. The last frame equals the original photo, pixel for pixel.', '把过程倒过来：AI 先把东西拿掉，再一件件画回来。最后一帧逐像素等于原图。')}</dd></div></dl>
       <ul class="am-skills" aria-label="${t('Skills shown', '体现的能力')}">${[['Effect analysis', '特效拆解'], ['ComfyUI', 'ComfyUI'], ['Custom Python nodes', '自定义 Python 节点'], ['Segmentation & inpainting', '分割与补全'], ['Image editing models', '图像编辑模型'], ['Reproducible pipelines', '可复现流程']].map(k => `<li>${t(...k)}</li>`).join('')}</ul></section>

@@ -1,0 +1,73 @@
+WEBVTT
+
+1
+00:00:00.500 --> 00:00:11.839
+This is the video direction of the creative packaging task. We recreate the reference effect: each object first appears as a marker doodle, then hard-cuts to the real thing, one by one.
+
+2
+00:00:12.189 --> 00:00:21.943
+I built two modes that share the same doodle and stop-motion nodes. Mode A takes things apart and puts them back. Mode B adds new things onto the original photo.
+
+3
+00:00:22.293 --> 00:00:31.976
+The reference is real stop-motion. We only have one photo, so Mode A first uses AI to remove the objects, then draws them back in, one at a time.
+
+4
+00:00:32.326 --> 00:00:42.847
+Let's start with Mode A, using the hot pot photo. The workflow runs left to right: load the image, read the build plan, pass through four custom nodes, and save the video.
+
+5
+00:00:43.197 --> 00:00:50.268
+The build plan is a JSON file. It lists what to draw, in what order, plus a box and prompt points for each object.
+
+6
+00:00:50.618 --> 00:00:57.991
+The first AI node is SAM 2. It uses the boxes and points to cut out each element: the tray, the beef, the meatballs.
+
+7
+00:00:58.341 --> 00:01:07.774
+The second AI node is LaMa. Starting from the last object, it erases them one by one and fills in the table, giving an empty scene for every step.
+
+8
+00:01:08.124 --> 00:01:15.980
+The third node draws marker doodles along each outline, in three slightly different versions that alternate, to mimic stop-motion jitter.
+
+9
+00:01:16.330 --> 00:01:24.970
+The last node builds the stop-motion: empty first, then the doodle appears, and in under half a second it hard-cuts to the real beef from the photo.
+
+10
+00:01:25.320 --> 00:01:36.835
+Other scenes only change the plan. For the dogs, the outfits come off and go back on, with a protected zone on their faces. Portraits, group shots and landscapes start from white paper.
+
+11
+00:01:37.185 --> 00:01:45.960
+Mode B is a new twist. The original photo stays untouched, and we add things that were never in it, still turning doodles into real objects.
+
+12
+00:01:46.310 --> 00:01:55.317
+Each object starts as a doodle from the plan. Then the area around it goes to Qwen Image Edit, which turns the doodle into a real object in place.
+
+13
+00:01:55.667 --> 00:02:04.370
+Next we align the image, cut out the complete new object with SAM 2, paste it back with its shadow, and add grain to match the photo, so it blends in.
+
+14
+00:02:04.720 --> 00:02:14.685
+The pipeline checks itself. If an object is cut off, if AI changed something else, or if a doodle didn't become real, it stops with an error instead of exporting.
+
+15
+00:02:15.035 --> 00:02:21.526
+The dogs get a balloon, a bow, and a cake with a lit candle. The hot pot table gets shrimp, rice and greens.
+
+16
+00:02:21.876 --> 00:02:32.806
+The portrait gets a distant hot air balloon, butterflies and a red bow tie for the puppy. The group shot only gets heart balloons and party hats, with hands and faces untouched.
+
+17
+00:02:33.156 --> 00:02:40.575
+In both modes, a new photo needs no node changes, only a new build plan. Mode B also lists what to add and where.
+
+18
+00:02:40.925 --> 00:02:50.531
+Every result was actually generated in ComfyUI on my own machine. The workflows, plans, source code and run logs are all in the delivery package.

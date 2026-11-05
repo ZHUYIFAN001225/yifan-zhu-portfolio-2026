@@ -1,0 +1,161 @@
+WEBVTT
+
+1
+00:00:00.150 --> 00:00:03.717
+This is a run of my video planning and storyboard Skill.
+
+2
+00:00:03.717 --> 00:00:12.508
+With three methods, brand film, IP drama and science explainer, it turns one request into an outline, shot sketches and an overview board.
+
+3
+00:00:14.640 --> 00:00:18.790
+Codex calls the Skill, reads the run guide, and checks image credits.
+
+4
+00:00:20.630 --> 00:00:22.676
+The brief goes in word for word.
+
+5
+00:00:22.676 --> 00:00:24.913
+It's open, so the Skill asks first.
+
+6
+00:00:24.913 --> 00:00:26.256
+Brand film is picked.
+
+7
+00:00:28.340 --> 00:00:30.731
+The idea must pass a specificity test:
+
+8
+00:00:30.731 --> 00:00:35.701
+AI repairs an old photo, but the daughter keeps her father's gap-toothed smile.
+
+9
+00:00:36.840 --> 00:00:40.414
+A tone frame comes first, setting light, colour and cast.
+
+10
+00:00:40.414 --> 00:00:42.922
+Shot sketches start only after approval.
+
+11
+00:00:46.520 --> 00:00:47.926
+Every image is checked.
+
+12
+00:00:47.926 --> 00:00:53.427
+In shot one the hand misses the gap, so only that shot is redone, and the old one is kept.
+
+13
+00:00:56.430 --> 00:00:59.789
+Once the key shot passes, the rest generate in parallel.
+
+14
+00:00:59.789 --> 00:01:00.569
+Sped up here.
+
+15
+00:01:04.440 --> 00:01:07.214
+Codex's self-review flags four more shots.
+
+16
+00:01:07.214 --> 00:01:09.789
+Each is redone, with the reason logged.
+
+17
+00:01:12.750 --> 00:01:15.832
+Validation passes, and the overview board is built:
+
+18
+00:01:15.832 --> 00:01:18.371
+eight shots, thirty-two seconds, vertical.
+
+19
+00:01:21.740 --> 00:01:23.127
+Task two, same brief.
+
+20
+00:01:23.127 --> 00:01:26.627
+The Skill asks again, and this time it's an IP drama.
+
+21
+00:01:32.130 --> 00:01:35.552
+Azhi, a virtual girl, has a pocket that's only a texture.
+
+22
+00:01:35.552 --> 00:01:38.134
+Keys slip through, so she wants a real one.
+
+23
+00:01:40.640 --> 00:01:44.426
+After the tone frame, the identity reference drew a real pocket.
+
+24
+00:01:44.426 --> 00:01:46.970
+That contradicts the story, so it's redone.
+
+25
+00:01:48.540 --> 00:01:50.868
+Key shot first, the rest in parallel.
+
+26
+00:01:50.868 --> 00:01:52.566
+All ten images pass review.
+
+27
+00:01:56.730 --> 00:01:57.894
+Validation passes:
+
+28
+00:01:57.894 --> 00:02:01.773
+eight shots, forty seconds, characters and props consistent.
+
+29
+00:02:05.540 --> 00:02:07.588
+Task three is a science explainer.
+
+30
+00:02:07.588 --> 00:02:11.503
+The question is clear, so the Skill classifies it without asking.
+
+31
+00:02:14.540 --> 00:02:15.308
+Facts first:
+
+32
+00:02:15.308 --> 00:02:19.020
+this is enzymatic browning, and every claim gets a source.
+
+33
+00:02:22.840 --> 00:02:25.591
+The tone frame uses real kitchen objects.
+
+34
+00:02:25.591 --> 00:02:26.530
+Clarity first.
+
+35
+00:02:30.640 --> 00:02:34.243
+The mechanism is labelled illustrative, not a micrograph.
+
+36
+00:02:34.243 --> 00:02:35.949
+Lemon juice is the control.
+
+37
+00:02:38.530 --> 00:02:39.729
+Validation passes:
+
+38
+00:02:39.729 --> 00:02:42.859
+four shots, thirty-two seconds, facts verified.
+
+39
+00:02:47.540 --> 00:02:51.066
+All thirty-three sketches were made with GPT Image 2.
+
+40
+00:02:51.066 --> 00:02:55.589
+Each task delivered an outline, shot sketches and an overview board.

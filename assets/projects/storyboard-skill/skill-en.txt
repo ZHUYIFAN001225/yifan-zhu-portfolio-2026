@@ -1,0 +1,70 @@
+---
+name: exam-storyboard
+description: Video planning and storyboard design. Turns one natural-language request into a production-ready "storyboard outline + per-shot sketches + storyboard overview board", using a different method for brand films, IP dramas and science explainers, with layered quality checks. Also revises selected shots of an existing storyboard. Does not produce the final video.
+---
+
+# Video Planning & Storyboard Skill
+
+Version 1.0. One agent takes on the director, cinematographer and asset-manager roles in turn; no multi-agent setup is required. Method sources: THIRD_PARTY_NOTICES.md.
+*(English translation of the original Chinese skill.md.)*
+
+## 1. When to use
+
+Use when the user asks for a video idea, script, storyboard, shot sketches or storyboard board, or wants to change some shots in an existing storyboard.
+Also read the cinematography and realism standard (references/cinematic-look-and-premium.md) when the request includes words like "premium", "cinematic", "filmic", "real", "textured" or "go viral".
+Don't use for feasibility-only discussions, final video generation, editing or film analysis, or changes to this skill.
+
+## 2. Decide the type, read its method
+
+| Type | Choose when | Read |
+|---|---|---|
+| Brand film | Viewers should remember a brand, product or stance | references/brand-method.md |
+| IP drama | Viewers should remember a character and their story, possibly as a series | references/ip-drama-method.md |
+| Science explainer | Viewers should understand the answer to a question | references/science-method.md |
+
+The topic alone can't decide the type. If the request doesn't say, ask one direction-setting question (e.g. "Should viewers remember a brand, or a character?"). If you can't ask, pick a route and record the reason as an assumption, never as user-confirmed. Shared creative and shot methods: references/creative-and-shot-design.md.
+
+## 3. Steps
+
+1. **Record the request** verbatim; separate user constraints, working assumptions and creative proposals.
+2. **Thesis and core frame**: write the most representative frame and pass three specificity tests: Swap (does it still work for another topic?), Truth (what real situation does it reveal?), Shootable (can real people in a real place film it?). If it fails, go back; don't start the storyboard.
+3. **Write the `look`**: medium, aspect, focal length, light source, palette and the single strong colour, texture, composition principles, banned items. All image prompts derive from it.
+4. **Script and beats by type**: brand → promise and proof; drama → goal, obstacle, causality, information gaps; science → question, fact table, explanation chain. Estimate timing from action and dialogue.
+5. **References**: only for people, places and props that repeat across shots and need consistency; reuse existing shots as references where possible.
+6. **Shot groups**: purpose, subject, action, shot size, camera position, composition, motion, light and colour, continuity, sound, transition, plus a `motion_brief` for video production.
+7. **Tone frames**: for realism or cinematic requests, one tone frame per main scene, approved by the user before per-shot sketches.
+8. **Generate**: first confirm which image tools and models are actually available. Write `image-tasks.json` in dependency order; pick the generation ratio closest to the target aspect; generate key shots first and batch only after they pass. Save originals in `raw/`, graded versions with the same name in `graded/`, then ingest. Without an image tool, deliver the task package for another executor. Never use blank images, code-drawn diagrams or unrelated pictures as sketches.
+9. **Review and revise** per references/quality-review.md; redo only failed shots and keep old versions.
+10. **Lay out and deliver** the storyboard Markdown, overview board and read-only viewer per references/output-contract.md.
+
+## 4. Professional rules (summary)
+
+- "Premium" becomes checkable decisions: motivated light, restrained colour with at most one strong colour, real materials, intentional space, and a reason for every element in frame.
+- Clichés (glowing brains, blue-purple particles, holograms, neon, catwalk hair flips) need a film-specific reason or get replaced.
+- Axis, eyelines, movement direction, prop ownership and light direction must connect across cuts.
+- The image model never renders text; captions and brand type are added in post.
+- "Go viral" is written only as viewing mechanisms (hook, participation, payoff, screenshot frame), marked as an assumption, with no promise of reach.
+- Every science fact needs a source and a verified flag; analogies state their limits.
+
+## 5. Output
+
+One folder per task: `brief.md`, `storyboard.json`, `storyboard.md`, `image-tasks.json`, `refs/`, `sketches/`, `storyboard-overview.png`, `index.html`, `generation-ledger.json`, `review.md`. Field definitions: references/output-contract.md.
+
+## 6. Quality standard
+
+Report each layer separately, never as one "pass": technical structure (script), creative and type method, shot design, image quality, user acceptance. The script checks structure only, not taste; a structural pass doesn't mean the work is good. See references/quality-review.md.
+
+## 7. Scripts
+
+Requires Python, Pillow and numpy (`pip install -r scripts/requirements.txt`). Paths are relative to the skill folder.
+
+```text
+python scripts/validate_storyboard.py <task> --plan-only   # planning: structure, timing, type fields, image dependencies
+python scripts/film_grade.py raw/T-S01.png graded/T-S01.png --preset muted|muted_grey
+python scripts/ingest_images.py ingest <task> <task>/graded   # ingest by task id, crop to aspect, archive old versions, write ledger
+python scripts/ingest_images.py review <task> <shot> accepted|needs_revision "reason"
+python scripts/validate_storyboard.py <task>               # full delivery: also checks images exist, aspect, no reuse
+python scripts/render_storyboard.py <task> [--font <font>] # storyboard.md, overview board, viewer
+```
+
+Final video, paid services and publishing are never implicit actions of this skill.

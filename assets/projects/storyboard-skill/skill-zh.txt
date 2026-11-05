@@ -1,0 +1,69 @@
+---
+name: exam-storyboard
+description: 视频策划与分镜设计。按品牌创意宣传片、IP 向短剧、知识类科普三种不同方法，把一句自然语言需求转成可直接进入制作的“分镜大纲＋逐镜头草图＋Storyboard 总览图”，并逐层检查质量；支持对已有分镜做局部修订。不负责生成最终成片。
+---
+
+# 视频策划与分镜设计 Skill
+
+版本 1.0。导演、摄影、资产管理三种职责由同一个 Agent 依次承担，不要求启动多个 Agent。方法来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+## 1. 触发条件
+
+使用：用户提出视频创意、脚本、分镜、逐镜头草图、Storyboard，或要求修改已有分镜中的部分镜头。
+额外读取 [摄影与真实感标准](references/cinematic-look-and-premium.md)：需求含“高级感、电影感、影视化、真实、质感、要能火”等审美或传播形容词时。
+不使用：只讨论可行性；要求生成最终成片、剪辑或拉片分析；要求修改本 Skill。
+
+## 2. 判断类型并读取对应方法
+
+| 类型 | 何时选 | 读取 |
+| --- | --- | --- |
+| 品牌创意宣传片 | 目标是让观众记住一个品牌、产品或主张 | [brand-method.md](references/brand-method.md) |
+| IP 向短剧 | 目标是让观众记住一个角色和 ta 的故事，可延续成系列 | [ip-drama-method.md](references/ip-drama-method.md) |
+| 知识类科普 | 目标是让观众弄懂一个问题的答案 | [science-method.md](references/science-method.md) |
+
+主题词不能单独决定类型：同一个主题可以拍成三种片。需求没有说明时，向用户提一个影响方向的问题（例如“想让观众记住一个品牌，还是一个角色？”）；无法询问时，选一条路线并把理由写进假设，不写成用户已确认。共同的创意与镜头方法见 [creative-and-shot-design.md](references/creative-and-shot-design.md)。
+
+## 3. 执行步骤
+
+1. **记录需求**：原句一字不改记下；区分用户约束、工作假设和创作提议。
+2. **定命题与核心画面**：写出全片最有代表性的一帧，通过三项具体性测试——替换测试（换个主题还成立吗）、真相测试（揭示了这个主题的什么真实处境）、可拍测试（能否用真实的人和地方拍出来）。不通过就回到构思，不进入分镜。
+3. **写摄影规范 `look`**：媒介、画幅、焦段、光源、色彩与唯一强色、质感、构图原则、禁止项。所有出图提示词都从它派生。
+4. **按类型写脚本与段落**：品牌写主张与证据，短剧写目标、阻力、因果与信息差，科普写问题、事实表与解释链。根据动作和台词估算时长。
+5. **拆参考**：只为跨镜头重复、且一致性重要的人物、场景、道具建参考；能用已有镜头当参考就不重复生成。
+6. **设计镜头组**：每镜写目的、主体、动作、景别、机位、构图、运镜、光色、连续性、声音、衔接，以及给视频制作的交接说明 `motion_brief`。
+7. **定调图**：要求真实感或电影感时，先为每个主场景出一张定调图，交用户确认后再出逐镜图。
+8. **出图**：先确认当前环境实际可用的出图工具和型号。按依赖顺序写 `image-tasks.json`；按目标画幅选最接近的生成比例（竖屏出竖图，横屏出横图），避免大幅裁切；先出代表镜头，看图通过再批量。原图存 `raw/`，调色后同名存 `graded/`，再回填。没有出图工具时交付任务包，由有工具的执行方生成后回填。不得用空白图、代码绘制的示意或无关图片充当草图。
+9. **看图检查与局部修订**：按 [quality-review.md](references/quality-review.md) 逐层检查；不合格只重做该镜，旧版保留。
+10. **排版交付**：生成分镜 Markdown、Storyboard 总览图和只读查看页，按 [output-contract.md](references/output-contract.md) 交付。
+
+## 4. 专业规则（摘要）
+
+- “高级感”落成可检查的决定：光有来源，颜色克制，最多一个强色，材质真实，留白有意图，每个元素说得出为什么在画面里。
+- 常见套路（发光大脑、蓝紫粒子、全息界面、霓虹、走秀甩发等）出现时必须写出本片专属理由，否则替换。
+- 镜头之间的轴线、视线、运动方向、道具归属、光源方向必须能接上。
+- 不让图像模型生成文字；字幕和品牌字后期添加。
+- “要能火”只写成观看机制（钩子、参与、回报、截图帧），并标注为假设，不承诺流量。
+- 科普的每个事实必须有出处并标注已核实；类比要写清适用边界。
+
+## 5. 输出格式
+
+每个任务一个目录：`brief.md`、`storyboard.json`、`storyboard.md`、`image-tasks.json`、`refs/`、`sketches/`、`storyboard-overview.png`、`index.html`、`generation-ledger.json`、`review.md`。字段定义见 [output-contract.md](references/output-contract.md)。
+
+## 6. 质量检查标准
+
+分层记录，不合并成一个“通过”：技术结构（脚本自动校验）、创意与类型方法、镜头组、摄影质感、用户接受。脚本只检查结构，不判断审美；结构通过不等于创作达标。详见 [quality-review.md](references/quality-review.md)。
+
+## 7. 脚本
+
+依赖 Python、Pillow 与 numpy（`pip install -r scripts/requirements.txt`）。脚本路径相对本 Skill 目录；排版会自动查找 Windows／macOS／Linux 的系统中文字体，找不到时用 `--font` 指定。
+
+```text
+python scripts/validate_storyboard.py <任务目录> --plan-only   # 计划阶段：结构、时间、类型专属字段、出图任务依赖
+python scripts/film_grade.py raw/T-S01.png graded/T-S01.png --preset muted|muted_grey   # 统一调色，原图保留在 raw/
+python scripts/ingest_images.py ingest <任务目录> <任务目录>/graded   # 按任务 id 回填、裁成目标画幅、旧版移入 iterations、写账本
+python scripts/ingest_images.py review <任务目录> <镜号> accepted|needs_revision "看图依据"
+python scripts/validate_storyboard.py <任务目录>               # 完整交付：另查图片存在、画幅、不重复使用
+python scripts/render_storyboard.py <任务目录> [--font <中文字体>]  # 生成 storyboard.md、总览图、查看页
+```
+
+最终成片、购买付费服务、对外发布都不是本 Skill 的隐含动作。

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="description" content="Yifan Zhu — Research-led Multidisciplinary Designer. Explore digital products, UX, 3D, AI, motion, creative technology and service design." /><title>Yifan Zhu | Storyboard Skill</title><meta name="theme-color" content="#f6f5f1" /><script src="scripts/theme.js"></script><link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="v3.css" /><link rel="stylesheet" href="themes.css" /></head><body class=""><a class="v3-skip" href="#main">Skip to content</a>
+  <header class="site-header v3-header"><a class="brand" href="index.html">Yifan Zhu<span class="v3-brand-dot" aria-hidden="true"></span></a>
+    <nav aria-label="Primary navigation"><a href="work.html">All Work</a><a href="practice.html">Films &amp; Tools</a><a href="about.html">About</a><a class="v3-contact-link" href="mailto:zhuyifan001225@gmail.com" aria-label="Email Yifan Zhu"><span class="v3-contact-label">Let’s talk</span><svg class="v3-mail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5"/></svg></a><button class="v3-theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode"><span class="v3-theme-label">Dark</span></button></nav></header><main id="main"><article class="full-case single-project am-case sb"><a class="back-link" href="work.html">Back to All Work</a>
+    <section class="case-head am-head"><div><p class="eyebrow">AI agent workflow · Skill design · Creative methods · Oct 2026</p>
+      <h1>Storyboard Skill</h1>
+      <p>An agent skill that turns one sentence into a production-ready storyboard: an outline, per-shot sketches and an overview board. It decides what kind of film the request is, applies a different creative method for brand films, IP dramas and science explainers, and checks its own work layer by layer.</p>
+      <p class="i2e-note">Unofficial work for a design challenge. Not affiliated with ByteDance or CapCut. The two task prompts were set by the brief; nothing here was published or measured.</p></div>
+      <figure class="am-hero sb-hero" data-zoom="assets/projects/storyboard-skill/overview-01-large.webp"><img data-i18n-img src="assets/projects/storyboard-skill/cover.webp" alt="Overview board for Task 1, Keep This Tooth: the first row of shots" loading="lazy" decoding="async" /><figcaption>Task 1 overview board. Composition sketches, not final shots. Click to read it.</figcaption></figure></section>
+
+    <section class="am-tldr" aria-label="In 30 seconds"><p class="am-tldr-title">In 30 seconds</p><dl>
+      <div><dt>My role</dt><dd>Solo, 3 days: skill design, creative methods, quality system, scripts, run recording</dd></div>
+      <div><dt>The brief</dt><dd>A skill an AI agent can call and run reliably, with different methods for three kinds of video; two fixed test prompts</dd></div>
+      <div><dt>The idea</dt><dd>Behave like a director: decide what kind of film it is, find one specific idea worth filming, check the work before handing over</dd></div>
+      <div><dt>Output</dt><dd>Three films from three prompts, 33 sketches, every redo logged; validation enforced in code</dd></div></dl>
+      <ul class="am-skills" aria-label="Skills shown"><li>Agent &amp; skill design</li><li>Creative direction</li><li>Storyboarding</li><li>Prompt systems</li><li>Quality frameworks</li><li>Python tooling</li></ul></section>
+    <nav class="ux-case-index" aria-label="Case contents" data-case-index><a href="#run">The run</a><a href="#problem">The problem</a><a href="#methods">Three methods</a><a href="#how">How it runs</a><a href="#quality">Quality</a><a href="#task1">Task 1</a><a href="#task2">Task 2</a><a href="#task3">Extra case</a><a href="#tools">Tools &amp; limits</a><a href="#reflect">Reflection</a><a class="ux-index-top" href="#main">↑ Top</a></nav>
+
+    <section class="case-section" id="run"><div class="case-label">The run</div><div class="case-content"><h2>Watch the agent run it</h2>
+      <figure class="i2e-video"><video controls preload="none" playsinline poster="assets/projects/storyboard-skill/poster-en.jpg" data-i2e-video data-en="assets/projects/storyboard-skill/recording-en.mp4" data-zh="assets/projects/storyboard-skill/recording-zh.mp4" data-poster-en="assets/projects/storyboard-skill/poster-en.jpg" data-poster-zh="assets/projects/storyboard-skill/poster-zh.jpg"><source src="assets/projects/storyboard-skill/recording-en.mp4" type="video/mp4" /><track kind="subtitles" src="assets/projects/storyboard-skill/recording-en.vtt" srclang="en" label="English" /></video><figcaption>2 min 56 s, edited from a real run of about two hours; waiting for images is sped up, with the speed shown top right. Codex calls the skill → the brief goes in verbatim → the skill asks to decide the type → thesis and specificity test → tone frame approval → generation and per-image review → only failed shots redone → validation → overview board, for all three tasks.</figcaption></figure>
+      <div class="i2e-actions"><a class="i2e-btn" data-i2e-demo data-en="assets/projects/storyboard-skill/skill-en.txt" data-zh="assets/projects/storyboard-skill/skill-zh.txt" href="assets/projects/storyboard-skill/skill-en.txt" target="_blank" rel="noopener">Read the skill file <span aria-hidden="true">↗</span></a><span class="i2e-actions-note">SKILL.md: triggers, steps, rules, output contract and quality checks. Opens in a new tab.</span></div></div></section>
+
+    <section class="case-section" id="problem"><div class="case-label">The problem</div><div class="case-content"><h2>“One prompt, one storyboard” says nothing</h2>
+      <p>Generic storyboard prompts treat every request the same way: pick a topic, list some shots, generate pretty frames. The result usually looks expensive and says nothing. “A premium AI video” becomes glowing brains and blue particles. “Virtual fashion” becomes a catwalk.</p>
+      <p>I wanted the skill to behave more like a director: decide what kind of film this is, find one specific idea worth filming, and check its own work before handing it over.</p></div></section>
+
+    <section class="case-section" id="methods"><div class="case-label">Three methods</div><div class="case-content"><h2>Three video types, three methods</h2>
+      <p>The topic alone can’t decide the type: the same topic can be a brand film, a drama or an explainer. When a request is open, the skill asks one question that changes the direction: “Do you want viewers to remember a brand, a character, or understand a question?” If it can’t ask, it picks a route and writes the reason down as an assumption, never as something the user confirmed.</p>
+      <table class="i2e-metrics sb-table"><thead><tr><th></th><th>Brand film</th><th>IP drama</th><th>Science explainer</th></tr></thead><tbody>
+        <tr><td>Goal</td><td>Remember a brand or a stance</td><td>Remember a character and their story</td><td>Understand one question</td></tr>
+        <tr><td>Answer first</td><td>Audience, goal, single promise</td><td>Who the character is, goal and obstacle</td><td>The exact question, what viewers already believe</td></tr>
+        <tr><td>Structure</td><td>Hook → visible proof → brand link</td><td>Action → consequence → new choice → change</td><td>Phenomenon → mechanism → evidence → limits</td></tr>
+        <tr><td>Must check</td><td>Is the benefit shown, or only claimed in voiceover?</td><td>Does every choice have a reason? Who knows what?</td><td>Does every fact have a source? Does the analogy overreach?</td></tr>
+        <tr><td>Required fields</td><td><code>single_promise · benefit_proof · creative_device · viewing_mechanism</code></td><td><code>character_sheet · causal_beats · knowledge_states · ending_change</code></td><td><code>question · claim_evidence_map · explanation_steps · analogy_limits</code></td></tr></tbody></table>
+      <p>The validation script enforces the type-specific fields: relabelling a brand film as a drama fails, and a science fact without a source, or not marked as verified, fails.</p></div></section>
+
+    <section class="case-section" id="how"><div class="case-label">How it runs</div><div class="case-content"><h2>Ten steps, from the sentence to the board</h2>
+      <ol class="sb-steps">
+        <li><b>Record the brief</b>word for word; separate user constraints, working assumptions and creative proposals.</li>
+        <li><b>Thesis and core frame</b>Write the single most representative frame and pass three specificity tests: Swap (would it still work for another topic?), Truth (what real situation does it reveal?), Shootable (could real people in a real place film it?). Fail → back to ideation.</li>
+        <li><b>Cinematography spec</b>medium, aspect, focal length, light source, palette with only one strong colour, texture, composition rules, banned clichés. Every image prompt derives from it.</li>
+        <li><b>Script by type</b>promise and proof, or goal, obstacle and cause, or question, fact table and explanation chain.</li>
+        <li><b>References</b>only for people, places and props that repeat across shots.</li>
+        <li><b>Shot groups</b>purpose, action, shot size, camera, motion, light, continuity, sound, transition, plus a motion brief for video production.</li>
+        <li><b>Tone frame → user approval</b>before any shot sketches.</li>
+        <li><b>Generate</b>key shot first; batch only after it passes. Raw and graded images kept separately.</li>
+        <li><b>Review every image</b>redo only the failed shot and keep the old version.</li>
+        <li><b>Validate and lay out</b>the outline, overview board and a read-only viewer.</li></ol>
+      <h3>Rules that make “premium” checkable</h3>
+      <ul class="i2e-list">
+        <li>Light has a source; colour is restrained, with at most one strong colour; materials are real; empty space is intentional.</li>
+        <li>Six documentary-cinema rules: people are busy, not posing; a specific place with lived-in clutter; light through air; one consistent grade; observe through things; imperfection allowed.</li>
+        <li>Clichés (glowing brains, blue-purple particles, holograms, neon, hair-flip catwalks) need a film-specific reason, or they’re replaced.</li>
+        <li>Continuity of axis, eyelines, direction of movement, props and light. No text from the image model; captions and logos are added in post.</li>
+        <li>“Make it go viral” becomes viewing mechanisms (hook, participation, payoff, screenshot frame), marked as an assumption, never a promise of reach.</li></ul></div></section>
+
+    <section class="case-section" id="quality"><div class="case-label">Quality</div><div class="case-content"><h2>Quality is layered, never one “pass”</h2>
+      <table class="i2e-metrics"><thead><tr><th>Layer</th><th>What’s checked</th><th>Who judges</th></tr></thead><tbody>
+        <tr><td>Technical structure</td><td>Continuous timing, required fields, type fields, image dependencies, files and aspect, no reuse</td><td>Script</td></tr>
+        <tr><td>Creative method</td><td>Specificity tests; brand proof, drama causality, science sources and limits</td><td>Agent, then user</td></tr>
+        <tr><td>Shot design</td><td>What each shot changes, and why the cut works</td><td>Agent</td></tr>
+        <tr><td>Image quality</td><td>Light, material, people, space, text, clichés, the six documentary rules</td><td>Agent, confirmed by designer</td></tr>
+        <tr><td>User acceptance</td><td>Does it match what they wanted?</td><td>User</td></tr></tbody></table>
+      <figure class="sb-board sb-board--redo" data-zoom><img src="assets/projects/storyboard-skill/redo-compare.webp" alt="Before and after a redo, with the review note" loading="lazy" decoding="async" /><figcaption>Every redo keeps the old version and the reason. Task 1 was redone seven times across five shots.</figcaption></figure></div></section>
+
+    <section class="case-section" id="task1"><div class="case-label">Task 1</div><div class="case-content"><h2>“Make me a premium AI video that can go viral”</h2>
+      <dl class="sb-facts">
+        <div><dt>Type</dt><dd>The skill asked whether viewers should remember a stance, a character or an answer; the user chose a stance about AI → brand film.</dd></div>
+        <div><dt>Film</dt><dd>Keep This Tooth · vertical 9:16 · 32 s · 8 shots</dd></div>
+        <div><dt>Thesis</dt><dd>Repair the damage, keep the truth. AI’s ability follows a person’s choice, and never rewrites a memory on its own.</dd></div>
+        <div><dt>Story</dt><dd>In an old photo studio, a daughter asks a retoucher to restore her father’s photo with AI, but insists: “Don’t fix this tooth.” Only the torn corner is repaired; her father’s gap-toothed smile stays.</dd></div>
+        <div><dt>“Premium”, made concrete</dt><dd>Documentary cinema: observed through door frames and glass, a real old shop, low sunlight through dust, one cool grey-green grade, and a single strong colour, the daughter’s dark vermilion bag.</dd></div>
+        <div><dt>“Go viral”, as mechanisms</dt><dd>Unverified: “Don’t fix this tooth” raises a question in the first two seconds; S07 puts old and new side by side for pausing; “Which imperfection would you keep?” invites comments.</dd></div></dl>
+      <figure class="sb-board" data-zoom="assets/projects/storyboard-skill/overview-01-large.webp"><img data-i18n-img src="assets/projects/storyboard-skill/overview-01.webp" alt="Overview board, Task 1: Keep This Tooth" loading="lazy" decoding="async" /><figcaption>Overview board, Task 1: Keep This Tooth<span>Click to read it at full size</span></figcaption></figure>
+      <div class="sb-sketches"><figure class="sb-sketch" data-zoom><img src="assets/projects/storyboard-skill/sketch-brand-s01.webp" alt="S01 · Her finger stops at the gap: “Don’t fix this tooth”" loading="lazy" decoding="async" /><figcaption>S01 · Her finger stops at the gap: “Don’t fix this tooth”</figcaption></figure><figure class="sb-sketch" data-zoom><img src="assets/projects/storyboard-skill/sketch-brand-s04.webp" alt="S04 · Only this corner: the retoucher points at the tear" loading="lazy" decoding="async" /><figcaption>S04 · Only this corner: the retoucher points at the tear</figcaption></figure></div>
+      <p>Redo log: the agent reviewed every image and redid seven times (S01, S03, S05, S06 once each; S04 three times), all logged with old versions kept. S04’s third version still had the fingertip about 1 cm off the tear: the agent marked it as not fully met, the user accepted it as “composition intent readable”, and both conclusions were recorded separately.</p></div></section>
+
+    <section class="case-section" id="task2"><div class="case-label">Task 2</div><div class="case-content"><h2>“Design a cinematic storyboard for a Virtual Fashion video”</h2>
+      <dl class="sb-facts">
+        <div><dt>Type</dt><dd>After the question, the user chose to remember a virtual character’s story → IP drama.</dd></div>
+        <div><dt>Film</dt><dd>Give Me a Pocket · landscape 16:9 · 40 s · 8 shots</dd></div>
+        <div><dt>Thesis</dt><dd>Azhi, a virtual character, stops asking whether clothes look good. She wants a pocket that can carry her keys: from wearing looks others designed to deciding for her own life.</dd></div>
+        <div><dt>Story</dt><dd>The pocket on Azhi’s jacket is only a texture, so her keys fall straight through. She refuses “a nicer outfit”, sews a square of brick-red cloth into a real pocket herself, and the keys finally stay.</dd></div>
+        <div><dt>IP elements</dt><dd>A recognisable character (silver lock at the left temple, dark grey jacket), goal and obstacle, causal beats, an ending change, and a series hook: “Tomorrow: shoes I can run in.”</dd></div>
+        <div><dt>“Cinematic”, made concrete</dt><dd>A real garment workshop, high-window light through dust and iron steam, observed through hanging cloth and racks, and one strong colour: the brick-red pocket.</dd></div></dl>
+      <figure class="sb-board" data-zoom="assets/projects/storyboard-skill/overview-02-large.webp"><img data-i18n-img src="assets/projects/storyboard-skill/overview-02.webp" alt="Overview board, Task 2: Give Me a Pocket" loading="lazy" decoding="async" /><figcaption>Overview board, Task 2: Give Me a Pocket<span>Click to read it at full size</span></figcaption></figure>
+      <div class="sb-sketches sb-sketches--wide"><figure class="sb-sketch" data-zoom><img src="assets/projects/storyboard-skill/sketch-drama-s03.webp" alt="S03 · The keys fall straight through the painted pocket" loading="lazy" decoding="async" /><figcaption>S03 · The keys fall straight through the painted pocket</figcaption></figure><figure class="sb-sketch" data-zoom><img src="assets/projects/storyboard-skill/sketch-drama-s06.webp" alt="S06 · She sews the brick-red cloth into a real pocket" loading="lazy" decoding="async" /><figcaption>S06 · She sews the brick-red cloth into a real pocket</figcaption></figure></div>
+      <p>Redo log: the first identity reference drew a real pocket, contradicting the “it’s only a texture” premise, so it was redone; S06 was redone once.</p></div></section>
+
+    <section class="case-section" id="task3"><div class="case-label">Extra case</div><div class="case-content"><h2>“Why does a peeled apple turn brown after a while?”</h2>
+      <p>Added to test the science method on its own. The question is clear, so the skill classified it as a science explainer without asking.</p>
+      <dl class="sb-facts">
+        <div><dt>Film</dt><dd>Why Do Apples Turn Brown? · 16:9 · 32 s · 4 shots</dd></div>
+        <div><dt>Explanation chain</dt><dd>Phenomenon (the flesh browns) → condition (peeling breaks cell compartments, so PPO meets phenols and oxygen) → mechanism (phenols oxidise to quinones, which form brown pigments) → control (lemon juice’s acidity slows it).</dd></div>
+        <div><dt>Fact check</dt><dd>All four facts marked verified, with sources: University of Wisconsin–Madison; Science Buddies; American Chemical Society.</dd></div>
+        <div><dt>Analogy limits</dt><dd>The mechanism diagrams are labelled “illustrative, not a micrograph”; shapes and colours are only reading aids and arrows don’t imply quantities.</dd></div></dl>
+      <figure class="sb-board" data-zoom="assets/projects/storyboard-skill/overview-03-large.webp"><img data-i18n-img src="assets/projects/storyboard-skill/overview-03.webp" alt="Overview board, extra case: Why Do Apples Turn Brown?" loading="lazy" decoding="async" /><figcaption>Overview board, extra case: Why Do Apples Turn Brown?<span>Click to read it at full size</span></figcaption></figure>
+      <div class="sb-sketches sb-sketches--wide"><figure class="sb-sketch" data-zoom><img src="assets/projects/storyboard-skill/sketch-science-s01.webp" alt="S01 · The phenomenon: a peeled apple, browning" loading="lazy" decoding="async" /><figcaption>S01 · The phenomenon: a peeled apple, browning</figcaption></figure><figure class="sb-sketch" data-zoom><img src="assets/projects/storyboard-skill/sketch-science-s04.webp" alt="S04 · The control: lemon juice slows it (labels from the original Chinese run)" loading="lazy" decoding="async" /><figcaption>S04 · The control: lemon juice slows it (labels from the original Chinese run)</figcaption></figure></div></div></section>
+
+    <section class="case-section" id="tools"><div class="case-label">Tools &amp; limits</div><div class="case-content"><h2>Tools, honestly</h2>
+      <ul class="i2e-list">
+        <li>All 33 sketches were made with Higgsfield gpt_image_2 (1k, high). Every image has a task ID, and the model field was checked from the task record.</li>
+        <li>The skill isn’t tied to one image platform: step 8 first confirms which tools and models are actually available. Without one, it delivers a task package for someone else to generate and fill back in.</li>
+        <li>The validation script only proves structure: continuous timing, complete fields, type fields, images present at the right aspect. It doesn’t replace looking at the images or human judgement.</li>
+        <li>Method sources: director, storyboard and asset-management methods adapted from Alianess/minimax-h3-director-prompts (MIT); brand shot grammar references whystrohm/shotkit (Apache-2.0). The three creative methods, cinematography standard, output contract, quality review and all scripts are original.</li>
+        <li>Limits: the sketches are composition frames, not final shots; some science diagrams carry Chinese labels because the original run was in Chinese; “viral” mechanisms are assumptions; the user-acceptance layer was me, so it isn’t independent review.</li></ul></div></section>
+
+    <section class="case-section" id="reflect"><div class="case-label">Reflection</div><div class="case-content"><h2>What I’d take forward</h2>
+      <p>The most useful decision was refusing to let the topic choose the method. Asking one direction-setting question, then enforcing type-specific fields in code, is what made three very different films come out of the same skill. The second was separating “the structure is valid” from “the film is good”: the script can prove the first, but only looking at every frame, and logging every redo, gets you near the second.</p>
+      <p class="i2e-note">Unofficial work for a design challenge. Not affiliated with ByteDance or CapCut. The two task prompts were set by the brief; nothing here was published or measured.</p></div></section>
+    <nav class="project-nav"><a href="project-doodle-to-real.html">Doodle to Real</a><a class="back-link" href="work.html">Back to All Work</a></nav></article>
+  <script>
+  (()=>{const v=document.querySelector('[data-i2e-video]'),a=document.querySelector('[data-i2e-demo]');
+    const apply=()=>{const zh=document.documentElement.lang.startsWith('zh');
+      if(v){const want=zh?v.dataset.zh:v.dataset.en,s=v.querySelector('source');if(s.getAttribute('src')!==want){const playing=!v.paused;v.pause();s.setAttribute('src',want);v.setAttribute('poster',zh?v.dataset.posterZh:v.dataset.posterEn);const tr=v.querySelector('track');if(tr){if(zh)tr.remove();}v.load();if(playing)v.play().catch(()=>{});}}
+      if(a)a.setAttribute('href',zh?a.dataset.zh:a.dataset.en);};
+    apply();document.addEventListener('portfolio:language',apply);})();
+  </script><script src="scripts/case-lightbox.js" defer></script></main><footer class="site-footer v3-footer"><div><a href="index.html">Yifan Zhu</a><p>Research-led Multidisciplinary Designer</p></div><a href="mailto:zhuyifan001225@gmail.com">zhuyifan001225@gmail.com</a><div class="v3-footer-social"><a href="https://www.douyin.com/user/MS4wLjABAAAA_lHmWTuM_a1k_09EF1ewxBH9vU3K2tYWuNJe-Mk7H_0" target="_blank" rel="noopener noreferrer">Douyin</a><a href="https://xhslink.com/m/AZhAMj7fpc7" target="_blank" rel="noopener noreferrer">Xiaohongshu / RED</a><a href="https://b23.tv/DQqusXX" target="_blank" rel="noopener noreferrer">Bilibili</a><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener noreferrer">Resource Website</a></div></footer><script src="scripts/language.js" defer></script><script src="scripts/v3-site.js" defer></script></body></html>

@@ -425,8 +425,9 @@ window.addEventListener('pagereveal',event=>{
     active = i;
     scenes.forEach((s, k) => { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); });
     captions.forEach((c, k) => c.classList.toggle('is-active', k === i));
-    links.forEach((a, k) => { if (k === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
-    counter.textContent = String(i + 1).padStart(2, '0');
+    links.forEach(a => { if (+a.dataset.scGo === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    sc.dataset.active = i;
+    const first = +(links[0]?.dataset.scGo || 0); counter.textContent = String(Math.max(1, i - first + 1)).padStart(2, '0');
     const cs = scenes[i].style; sc.style.setProperty('--tone', cs.getPropertyValue('--tone')); sc.style.setProperty('--ink', cs.getPropertyValue('--ink'));
     scenes.forEach((s, k) => { const v = s.querySelector('video[data-sc-video]'); if (!v) return;
       if (k === i && !calm.matches) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); });
@@ -448,7 +449,7 @@ window.addEventListener('pagereveal',event=>{
   links.forEach((a, k) => a.addEventListener('click', e => {
     if (!wide.matches) return;
     e.preventDefault();
-    const y = scrollY + track.getBoundingClientRect().top + span() * (k + 0.5) / scenes.length;
+    const y = scrollY + track.getBoundingClientRect().top + span() * ((+a.dataset.scGo || k) + 0.5) / scenes.length;
     scrollTo({ top: y, behavior: calm.matches ? 'auto' : 'smooth' });
   }));
   // Gentle tilt and depth that follow the pointer over the stage.

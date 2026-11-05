@@ -4465,3 +4465,60 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
 .sc-devices--one .dev--front,.sc-scene.is-active .sc-devices--one .dev--front{transform:rotateY(calc(-10deg + var(--mx) * 8deg)) rotateX(calc(4deg - var(--my) * 5deg));filter:drop-shadow(0 50px 50px rgba(0,0,0,.4))}
 .sc-devices--one .sc-3d{left:-10%;top:-4%;width:120%;height:108%;filter:drop-shadow(0 50px 50px rgba(0,0,0,.35))}
 @media(max-width:760px){.sc-devices--one .dev--front,.sc-scene.is-active .sc-devices--one .dev--front{transform:rotateY(-8deg)}.sc-devices--one{--dw:min(170px,42vw)}}
+
+/* ---- homepage, after the review: who I am first, three projects, one quiet list, calmer cards ---- */
+/* scene 0: the intro. The film sits behind; the words sit where the project list will be. */
+.sc-visual--intro{pointer-events:none;cursor:default}
+.sc-scene--intro .sc-film img,.sc-scene--intro .sc-film video{filter:brightness(.9)}
+.sc-who{position:absolute;z-index:3;left:var(--v3-gutter);right:var(--v3-gutter);bottom:clamp(60px,11vh,120px);max-width:760px;color:#f4f3ee;pointer-events:none}
+.sc-who-name{text-transform:none}
+.sc[data-active="0"] .sc-captions{opacity:1}
+.sc-who-name{margin:0;font-size:clamp(56px,7.2vw,124px);font-weight:500;letter-spacing:-.05em;line-height:.92}
+.sc-who-line{margin:26px 0 0;max-width:34ch;font-size:clamp(18px,1.5vw,24px);line-height:1.4;letter-spacing:-.01em;color:#f4f3ee}
+.sc-who-proof{list-style:none;margin:30px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 34px;font-size:14px;color:rgba(244,243,238,.78)}
+.sc-who-proof b{display:inline-block;margin-right:9px;padding:3px 8px;border-radius:999px;border:1px solid rgba(244,243,238,.35);font-weight:500;font-size:11px;letter-spacing:.02em;color:#f4f3ee}
+.sc-who-credit{margin:36px 0 0;font-size:12px;color:rgba(244,243,238,.55)}
+.sc-who>*{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .9s var(--m-ease)}
+.sc[data-active="0"] .sc-who>*{opacity:1;transform:none}
+.sc[data-active="0"] .sc-who>:nth-child(2){transition-delay:.12s}.sc[data-active="0"] .sc-who>:nth-child(3){transition-delay:.24s}.sc[data-active="0"] .sc-who>:nth-child(4){transition-delay:.36s}
+.sc:not([data-active="0"]) .sc-who{transition:opacity .4s ease;opacity:0}
+/* while the intro is up, the project list waits; the stage keeps its full-width shade so the words read over the film */
+.sc[data-active="0"] .sc-side{opacity:0;pointer-events:none}
+.sc-side{transition:opacity .5s ease}
+.sc-caption--intro .sc-line{color:rgba(244,243,238,.6);font-size:15px}
+/* one quiet list: the current project is the only big thing; the others are a menu, not rival headlines */
+.sc-intro{margin-bottom:6px}
+.sc-list a{padding:clamp(5px,1vh,10px) 0}
+.sc-name{font-size:clamp(18px,1.4vw,24px);font-weight:450;letter-spacing:-.02em;transition:font-size .45s var(--m-ease),transform .55s var(--m-ease),letter-spacing .45s var(--m-ease)}
+.sc-list a[aria-current] .sc-name{font-size:clamp(30px,3vw,52px);font-weight:500;letter-spacing:-.04em;transform:none}
+.sc-list a{opacity:.42}
+.sc-hint{font-size:11px;color:rgba(244,243,238,.42)}
+/* the second heading: no two-colour trick */
+.v3-hero--all h1{font-size:clamp(36px,3.6vw,56px);letter-spacing:-.045em}
+.v3-hero--all .v3-hero-note p{margin-bottom:0}
+/* the cards: one background, fewer voices. Title, one line, kind — the rest waits for the case page */
+.v3-index .v3-card-tags,.v3-index .v3-demo-card-link,.v3-index .v3-media-arrow,.v3-index .v3-hover-summary{display:none}
+.v3-index .v3-product-cover-stack,.v3-index .v3-card--product .v3-media{background:#1b1c1e}
+.v3-index .v3-card-status{font-size:10px;color:#8e8c85}
+
+/* phones: the intro is a plain block above the list — the film as a short strip, the words under it in the page's own colours */
+@media(max-width:639px){
+  .sc-scene--intro{border-top:0;padding-top:0;margin-bottom:34px}
+  .sc-scene--intro .sc-visual--intro{aspect-ratio:16/9;border-radius:14px}
+  .sc-ui{display:block;position:static;padding:0 var(--v3-gutter)}
+  .sc-side,.sc-captions{display:none}
+  .sc-who{position:static;margin:-18px 0 30px;max-width:none;color:var(--text);pointer-events:auto}
+  .sc-who>*{opacity:1!important;transform:none!important}
+  .sc-who-name{font-size:44px}
+  .sc-who-line{color:var(--text);font-size:17px;margin-top:16px}
+  .sc-who-proof{gap:8px 18px;font-size:13px;color:var(--muted);margin-top:18px}
+  .sc-who-proof b{color:var(--text);border-color:var(--line)}
+  .sc-who-credit{color:var(--muted);margin-top:18px}
+}
+@media(max-width:639px){
+  .sc-stage{display:flex;flex-direction:column}
+  .sc-ui{order:-1;display:block!important;padding-top:18px}
+  .sc-scene--intro{display:none}
+  .sc-who{margin:0 0 6px}
+  .sc-who-credit{display:none}
+}

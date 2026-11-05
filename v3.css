@@ -4445,3 +4445,9 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
 }
 /* LOOK phones: nothing may widen the page sideways (iOS then widens the whole layout and the right rope ends up off screen) */
 @media (max-width:760px){html:has([data-product-case=beauty]),body:has([data-product-case=beauty]){overflow-x:clip}}
+
+/* homepage showcase: each product sits in front of its own world, drifting slowly so it feels alive */
+.sc-bg{position:absolute;inset:0;overflow:hidden}
+.sc-bg img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;transform:translate3d(calc(var(--mx) * -14px),calc(var(--local) * -26px + var(--my) * -8px),0) scale(1.08);transition:transform 1.6s var(--m-ease);filter:brightness(.92) saturate(1)}
+.sc-scene.is-active .sc-bg img{transform:translate3d(calc(var(--mx) * -14px),calc(var(--local) * -26px + var(--my) * -8px),0) scale(1)}
+.sc-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 70% at 66% 50%,rgba(10,11,10,0),rgba(10,11,10,.35))}

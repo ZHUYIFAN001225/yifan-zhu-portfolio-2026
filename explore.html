@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Yifan Zhu</title>
+<meta name="description" content="Yifan Zhu, research-led multidisciplinary designer. Scroll through the work by discipline." />
+<meta name="theme-color" content="#0b0c0d" />
+<link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="explore.css" />
+</head>
+<body class="ex">
+<div class="ex-bg" aria-hidden="true"></div>
+<div class="ex-shade" aria-hidden="true"></div>
+
+<header class="ex-card">
+  <a class="ex-name" href="explore.html" data-t="name"></a>
+  <p class="ex-role" data-t="role"></p>
+</header>
+<div class="ex-util">
+  <a class="ex-index" href="work.html" data-t="index"></a>
+  <button type="button" class="ex-lang" data-lang-toggle><span data-l="en">EN</span><span data-l="zh">中文</span></button>
+</div>
+
+<main id="main" class="ex-nav">
+  <svg class="ex-arcs" aria-hidden="true"><path class="ex-arc ex-arc--d" /><path class="ex-arc ex-arc--p" /><line class="ex-tie" /></svg>
+  <span class="ex-dot ex-dot--d" aria-hidden="true"></span>
+  <span class="ex-dot ex-dot--p" aria-hidden="true"></span>
+  <nav class="ex-domains" data-domains></nav>
+  <ol class="ex-projects" data-projects></ol>
+</main>
+
+<aside class="ex-info" aria-live="polite">
+  <p class="ex-count"><span data-current>01</span><span class="ex-count-sep">/</span><span data-total>00</span></p>
+  <p class="ex-kind" data-kind></p>
+  <p class="ex-line" data-line></p>
+  <a class="ex-open" data-open href="#"><span data-t="open"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6" /></svg></a>
+</aside>
+
+<nav class="ex-dock" data-dock>
+  <a class="ex-icon" href="about.html" data-tip="about"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6" /><path d="M5 20c.6-3.7 3.4-6 7-6s6.4 2.3 7 6" /></svg><span class="ex-tip" data-t="about"></span></a>
+  <a class="ex-icon" href="mailto:zhuyifan001225@gmail.com" data-tip="contact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8c4.8 0 8.4 3.3 8.4 7.6S16.8 19 12 19c-1 0-2-.1-2.9-.4L4.6 20.2l1.3-3.6C4.5 15.3 3.6 13.5 3.6 11.4 3.6 7.1 7.2 3.8 12 3.8Z" /><circle cx="8.6" cy="11.4" r=".9" /><circle cx="12" cy="11.4" r=".9" /><circle cx="15.4" cy="11.4" r=".9" /></svg><span class="ex-tip" data-t="contact"></span></a>
+</nav>
+
+<p class="ex-hint" data-hint></p>
+<script type="module" src="scripts/explore.mjs"></script>
+</body>
+</html>

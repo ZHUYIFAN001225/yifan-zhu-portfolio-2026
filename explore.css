@@ -1,0 +1,115 @@
+/* Explore — the portfolio as one scrolling scene.
+   A name card at the top, About and Contact at the bottom, two arcs on the left (disciplines, then that discipline's
+   projects). The project resting by the glowing dot fills the screen behind everything. */
+@font-face{font-family:"Inter";src:url("assets/fonts/InterVariable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+:root{
+  --ink:#0b0c0d; --text:#f3f2ee; --soft:rgba(243,242,238,.62); --faint:rgba(243,242,238,.34); --line:rgba(243,242,238,.16);
+  --glass:rgba(22,23,25,.46); --glass-line:rgba(243,242,238,.14); --glow:#fff6e6;
+  --ease:cubic-bezier(.22,.8,.24,1); --pad:clamp(20px,3vw,48px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--text);overflow:hidden;overscroll-behavior:none}
+body{font-family:Inter,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;touch-action:none}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--glow);outline-offset:3px;border-radius:6px}
+
+/* ---- the scene behind everything ---- */
+.ex-bg{position:fixed;inset:0;cursor:pointer;background:var(--ink)}
+.ex-scene{position:absolute;inset:0;opacity:0;transition:opacity .9s var(--ease);overflow:hidden}
+.ex-scene.is-on{opacity:1}
+.ex-scene>img,.ex-scene>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.07);transition:transform 9s cubic-bezier(.2,.6,.3,1)}
+.ex-scene.is-on>img,.ex-scene.is-on>video{transform:scale(1)}
+.ex-scene--soft>img{filter:blur(14px) brightness(.7) saturate(1.1);transform:scale(1.12)}
+.ex-scene--soft.is-on>img{transform:scale(1.08)}
+.ex-phone{position:absolute;right:clamp(40px,14vw,260px);top:50%;width:clamp(200px,18vw,300px);aspect-ratio:9/19.5;transform:translateY(-46%);border-radius:34px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.12);transition:transform 1.2s var(--ease)}
+.ex-phone img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.ex-scene.is-on .ex-phone{transform:translateY(-50%)}
+.ex-shade{position:fixed;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(8,9,10,.86) 0%,rgba(8,9,10,.6) 26%,rgba(8,9,10,.12) 52%,rgba(8,9,10,0) 70%),
+    radial-gradient(60% 55% at 100% 100%,rgba(8,9,10,.7),rgba(8,9,10,0) 70%),
+    linear-gradient(180deg,rgba(8,9,10,.62) 0%,rgba(8,9,10,0) 22%,rgba(8,9,10,0) 64%,rgba(8,9,10,.8) 100%)}
+
+/* ---- name card ---- */
+.ex-card{position:fixed;top:clamp(22px,4vh,40px);left:50%;transform:translateX(-50%);text-align:center;z-index:5;pointer-events:none}
+.ex-name{pointer-events:auto;display:block;text-decoration:none;font-size:clamp(20px,1.7vw,26px);font-weight:560;letter-spacing:-.025em;line-height:1.1}
+.ex-role{margin:4px 0 0;font-size:clamp(14px,1.15vw,18px);font-weight:450;letter-spacing:-.015em;color:var(--faint);white-space:nowrap}
+.ex-util{position:fixed;top:clamp(22px,4vh,40px);right:var(--pad);z-index:5;display:flex;align-items:center;gap:18px;font-size:12.5px}
+.ex-index{text-decoration:none;color:var(--soft)}.ex-index:hover{color:var(--text)}
+.ex-lang{display:flex;gap:2px;padding:3px;border:1px solid var(--glass-line);border-radius:999px;background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
+.ex-lang span{padding:5px 10px;border-radius:999px;color:var(--soft);font-size:12px;line-height:1}
+html[lang=en] .ex-lang [data-l=en],html[lang^=zh] .ex-lang [data-l=zh]{background:var(--text);color:var(--ink)}
+
+/* ---- the two arcs ---- */
+.ex-nav{position:fixed;inset:0;z-index:4;pointer-events:none}
+.ex-arcs{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ex-arc{fill:none;stroke:var(--line);stroke-width:1}
+.ex-arc--d{stroke:rgba(243,242,238,.1)}
+.ex-tie{stroke:rgba(255,246,230,.45);stroke-width:1}
+.ex-dot{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none}
+.ex-dot--p{width:9px;height:9px;margin:-4.5px 0 0 -4.5px;background:var(--glow);box-shadow:0 0 0 4px rgba(255,246,230,.12),0 0 18px 4px rgba(255,236,200,.55),0 0 46px 10px rgba(255,226,180,.18);animation:ex-breathe 3.6s ease-in-out infinite}
+.ex-dot--d{width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border:1px solid rgba(255,246,230,.75);background:transparent}
+@keyframes ex-breathe{50%{box-shadow:0 0 0 6px rgba(255,246,230,.08),0 0 22px 6px rgba(255,236,200,.62),0 0 56px 14px rgba(255,226,180,.2)}}
+
+.ex-domains,.ex-projects{position:absolute;inset:0;margin:0;padding:0;list-style:none}
+.ex-dom,.ex-proj{position:absolute;left:0;top:0;pointer-events:auto;white-space:nowrap;will-change:transform,opacity}
+.ex-dom{transform-origin:100% 50%;background:none;border:0;padding:6px 0;cursor:pointer;text-align:right;font-size:14px;font-weight:450;letter-spacing:.005em;color:var(--faint);transition:color .4s}
+.ex-dom:hover{color:var(--soft)}
+.ex-dom.is-on{color:var(--text)}
+.ex-dom small{display:block;margin-top:2px;font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.ex-proj a{display:block;text-decoration:none;transform-origin:0 50%;padding:4px 0;font-weight:430;letter-spacing:-.02em;line-height:1.05;color:var(--soft)}
+.ex-proj a:hover{color:var(--text)}
+.ex-proj.is-on a{color:var(--text);font-weight:520}
+
+/* ---- what this is, and how to get in ---- */
+.ex-info{position:fixed;right:var(--pad);bottom:clamp(26px,6vh,64px);z-index:5;width:min(380px,30vw);pointer-events:none}
+.ex-info>*{margin:0}
+.ex-count{font-size:11px;letter-spacing:.06em;color:var(--faint);font-variant-numeric:tabular-nums}
+.ex-count-sep{margin:0 6px}
+.ex-kind{margin-top:14px !important;font-size:12px;color:var(--soft)}
+.ex-line{margin-top:6px !important;font-size:clamp(15px,1.15vw,18px);line-height:1.45;letter-spacing:-.01em;color:var(--text)}
+.ex-open{pointer-events:auto;display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:10px 16px 10px 18px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);text-decoration:none;font-size:13px;font-weight:500;transition:background .3s,color .3s}
+.ex-open svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.6;transition:transform .35s var(--ease)}
+.ex-open:hover{background:var(--text);color:var(--ink)}.ex-open:hover svg{transform:translate(2px,-2px)}
+.ex-info .is-swap{animation:ex-in .6s var(--ease) both}
+@keyframes ex-in{from{opacity:0;transform:translateY(6px)}}
+
+/* ---- About and Contact ---- */
+.ex-dock{position:fixed;left:50%;bottom:clamp(22px,4vh,40px);transform:translateX(-50%);z-index:6;display:flex;gap:10px}
+.ex-icon{position:relative;display:grid;place-items:center;width:56px;height:56px;border-radius:17px;background:var(--glass);border:1px solid var(--glass-line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:background .3s,transform .35s var(--ease)}
+.ex-icon svg{width:22px;height:22px;fill:none;stroke:var(--text);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ex-icon circle[r=".9"]{fill:var(--text);stroke:none}
+.ex-icon:hover{background:rgba(243,242,238,.16);transform:translateY(-2px)}
+.ex-tip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translate(-50%,4px);padding:5px 9px;border-radius:7px;background:var(--text);color:var(--ink);font-size:11.5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s,transform .3s var(--ease)}
+.ex-icon:hover .ex-tip,.ex-icon:focus-visible .ex-tip{opacity:1;transform:translate(-50%,0)}
+
+.ex-hint{position:fixed;left:var(--pad);bottom:clamp(30px,5vh,52px);z-index:5;margin:0;font-size:11.5px;color:var(--faint);transition:opacity .8s}
+.ex-hint.is-gone{opacity:0}
+
+/* ---- phones ---- */
+@media (max-width:760px){
+  .ex-card{top:calc(env(safe-area-inset-top) + 18px)}
+  .ex-role{font-size:12.5px;white-space:normal;max-width:70vw;margin-inline:auto}
+  .ex-util{top:auto;bottom:calc(env(safe-area-inset-bottom) + 30px);right:16px;gap:10px}
+  .ex-index{display:none}
+  .ex-domains{inset:auto 0 auto 0;top:calc(env(safe-area-inset-top) + 82px);height:40px;display:flex;gap:6px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+  .ex-domains::-webkit-scrollbar{display:none}
+  .ex-dom{position:static;transform:none!important;opacity:1!important;flex:none;padding:7px 12px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:12px;text-align:left}
+  .ex-dom small{display:none}
+  .ex-dom.is-on{background:var(--text);color:var(--ink);border-color:transparent}
+  .ex-arc--d,.ex-dot--d,.ex-tie{display:none}
+  .ex-info{left:16px;right:16px;width:auto;bottom:calc(env(safe-area-inset-bottom) + 100px)}
+  .ex-line{font-size:14.5px}
+  .ex-open{padding:9px 14px}
+  .ex-dock{left:16px;transform:none;bottom:calc(env(safe-area-inset-bottom) + 24px)}
+  .ex-icon{width:50px;height:50px;border-radius:15px}
+  .ex-hint{display:none}
+  .ex-phone{right:6vw;width:44vw;top:44%}
+  .ex-shade{background:linear-gradient(90deg,rgba(8,9,10,.78) 0%,rgba(8,9,10,.3) 55%,rgba(8,9,10,.05) 100%),linear-gradient(180deg,rgba(8,9,10,.7) 0%,rgba(8,9,10,0) 26%,rgba(8,9,10,0) 50%,rgba(8,9,10,.9) 100%)}
+}
+@media (prefers-reduced-motion:reduce){
+  .ex-scene,.ex-scene>img,.ex-scene>video,.ex-phone{transition:opacity .3s}
+  .ex-scene>img,.ex-scene>video,.ex-scene.is-on>img{transform:none}
+  .ex-dot--p{animation:none}
+}

@@ -7,12 +7,12 @@
   const zh = () => document.documentElement.lang.startsWith('zh');
   let on = true; try { on = localStorage.getItem(K.on) !== 'off'; } catch {}
   const a = new Audio(); a.loop = true; a.preload = 'auto'; a.volume = 0; a.src = SRC;
-  let ok = false, ducked = false, fadeT = null, started = false;
+  let ok = false, failed = false, ducked = false, fadeT = null, started = false;
   const fadeTo = (v, ms = 900) => { clearInterval(fadeT); const from = a.volume, t0 = performance.now(); fadeT = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); a.volume = from + (v - from) * k; if (k >= 1) { clearInterval(fadeT); if (v === 0 && !on) a.pause(); } }, 40); };
   const want = () => on && !ducked && !document.hidden;
   const update = () => { if (!ok) return; if (want()) { if (a.paused) a.play().then(() => { started = true; fadeTo(LEVEL); }).catch(() => {}); else fadeTo(LEVEL); } else fadeTo(0, 600); btn?.setAttribute('aria-pressed', on); };
   a.addEventListener('canplay', () => { ok = true; try { const t = +sessionStorage.getItem(K.t); if (t > 0 && t < a.duration - 2) a.currentTime = t; } catch {} if (btn?.classList.contains('site-music')) btn.removeAttribute('hidden'); update(); }, { once: true });
-  a.addEventListener('error', () => { ok = false; if (btn?.classList.contains('site-music')) btn.setAttribute('hidden', ''); });
+  a.addEventListener('error', () => { ok = false; failed = true; if (btn?.classList.contains('site-music')) btn.setAttribute('hidden', ''); window.dispatchEvent(new Event('portfolio:music-missing')); });
   // remember where we are, so the next page carries on from here
   setInterval(() => { if (started && !a.paused) try { sessionStorage.setItem(K.t, a.currentTime); } catch {} }, 1000);
   addEventListener('pagehide', () => { try { sessionStorage.setItem(K.t, a.currentTime); } catch {} });
@@ -37,5 +37,5 @@
   label(); document.addEventListener('portfolio:language', label);
   btn.setAttribute('aria-pressed', on);
   btn.addEventListener('click', () => { on = !on; try { localStorage.setItem(K.on, on ? 'on' : 'off'); } catch {} update(); window.dispatchEvent(new CustomEvent('portfolio:music', { detail: { on } })); });
-  window.siteMusic = { get ready() { return ok; }, get on() { return on; }, get volume() { return a.volume; } };
+  window.siteMusic = { get ready() { return ok; }, get failed() { return failed; }, get on() { return on; }, get volume() { return a.volume; } };
 })();

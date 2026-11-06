@@ -276,8 +276,10 @@ let music = null;
 function wake() {
   if (!soundOn) return;
   try { ac ||= new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch { return; }
-  if (!music && !window.siteMusic?.ready) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'deep');
+  // the real track (site-audio.js) carries the music; the synthesised score only steps in if that file is missing
+  if (!music && (!window.siteMusic || window.siteMusic.failed)) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'deep');
 }
+addEventListener('portfolio:music-missing', () => { if (soundOn && ac && !music) music = startMusic(ac, 'deep'); });
 addEventListener('portfolio:music', e => { soundOn = e.detail.on; soundBtn.setAttribute('aria-pressed', soundOn); try { localStorage.setItem('explore-sound', soundOn ? 'on' : 'off'); } catch {} if (!soundOn && music) { music.stop(); music = null; } });
 document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else if (soundOn) ac.resume(); });
 ['pointerdown', 'keydown', 'touchend'].forEach(t => addEventListener(t, wake, { passive: true }));

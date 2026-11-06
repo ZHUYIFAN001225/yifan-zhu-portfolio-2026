@@ -3,7 +3,7 @@
 // Works on phones too: iOS ignores <audio>.volume and won't load audio before a tap, so the first tap builds a
 // small Web Audio graph (element → gain → analyser → speakers) and every fade goes through that gain.
 (() => {
-  const SRC = 'assets/audio/theme.mp3', LEVEL = 0.35;
+  const SRC = 'assets/audio/theme.mp3?v=2', LEVEL = 0.35;
   const K = { on: 'portfolio-music', t: 'portfolio-music-t' };
   const zh = () => document.documentElement.lang.startsWith('zh');
   let on = true; try { on = localStorage.getItem(K.on) !== 'off'; } catch {}

@@ -24,7 +24,7 @@ export function renderVisualWork(t,document,projects){
   };
   return document('Yifan Zhu | Films & Creative Tools',`
     <section class="practice-hero">
-      <a class="back-link" href="explore.html">${t('Home / Films & Tools','首页 / 影像与工具')}</a>
+      <a class="back-link" href="index.html">${t('Home / Films & Tools','首页 / 影像与工具')}</a>
       <p class="eyebrow">${t('3D Environments / AI Video / Motion / Creative Technology','3D 环境设计 / AI 视频 / 动态影像 / 创意技术')}</p>
       <h1>${t('Worlds in motion. Tools for creation.','构建视觉世界，拓展创作方式。')}</h1>
       <p>${t('Original 3D environments, cinematic sequences, AI video and digital experiences. My work combines modelling, materials, lighting and camera design with AI-assisted production and reusable creative tools.','从原创三维场景、动画镜头、AI 视频到数字体验，将建模、材质、灯光与镜头设计，连接 AI 辅助制作和可复用的创作工具。')}</p>

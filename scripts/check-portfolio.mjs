@@ -31,7 +31,7 @@ for(const project of projects){
     if(anchor)assert.ok(fs.readFileSync(file,'utf8').includes(`id="${anchor}"`),`Missing section: ${link}`);
   }
 }
-for(const page of ['index.html','work.html']){
+for(const page of ['home-classic.html','work.html']){
   const html=fs.readFileSync(page,'utf8');
   assert.equal([...html.matchAll(/data-project="/g)].length,projects.length);
   for(const c of categories)assert.ok(html.includes(`href="work.html?filter=${c.id}"`));

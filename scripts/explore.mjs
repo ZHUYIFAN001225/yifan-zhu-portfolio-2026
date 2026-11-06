@@ -13,7 +13,7 @@ let lang = getLang();
 const L = v => Array.isArray(v) ? v[lang === 'zh' ? 1 : 0] : v ? (v[lang] || v.en || '') : '';
 
 const T = {
-  name: ['Yifan Zhu', '朱异凡'], role: ['Research-led Multidisciplinary Designer', '研究驱动的跨领域设计师'],
+  name: ['Yifan Zhu', '朱异凡'], role: ['AI Product Designer · From research to launch', 'AI 产品设计 · 从调研到上线'],
   index: ['All work', '全部作品'], about: ['About', '关于我'], contact: ['Contact', '联系我'], open: ['View the case', '查看案例'],
   hint: ['Scroll to browse. Click the picture to open the case.', '滚动浏览，点击画面进入案例。'],
   domains: ['Disciplines', '设计领域'], works: ['Projects', '项目'], lang: ['Language', '切换语言'],
@@ -24,14 +24,33 @@ const MAIL = 'zhuyifan001225@gmail.com';
 const SOCIAL = [[['Bilibili', 'B 站'], 'https://b23.tv/DQqusXX'], [['RED', '小红书'], 'https://xhslink.com/m/AZhAMj7fpc7'], [['Douyin', '抖音'], 'https://www.douyin.com/user/MS4wLjABAAAA_lHmWTuM_a1k_09EF1ewxBH9vU3K2tYWuNJe-Mk7H_0']];
 const linksHTML = () => `<a class="ex-icon" href="mailto:${MAIL}" aria-label="${L(['Email', '邮件'])}: ${MAIL}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" /><path d="m4.5 7.5 7.5 5.5 7.5-5.5" /></svg><span class="ex-tip">${MAIL}</span></a>` +
   SOCIAL.map(([n, u]) => `<a class="ex-icon" href="${u}" target="_blank" rel="noopener">${L(n)}</a>`).join('');
+const CV = 'assets/cv/Yifan_Zhu_AI_Product_Designer_CV.pdf';
 const aboutHTML = () => `<figure class="ex-me"><img src="assets/v3/me.webp" alt="${L(['Yifan Zhu in the studio', '朱异凡在工作室'])}" width="880" height="1100" decoding="async"></figure><div class="ex-about-text">` + L([
-  `<p><b>Research-led multidisciplinary designer</b>, turning messy problems, real users and new tools into products, services and films people actually use.</p>
-   <p>Trained at <b>Glasgow (MDes)</b>, I have shipped <b>a booking system a local barbershop in Glasgow, UK runs on</b>, released <b>a Blender add-on</b>, tested <b>a service study</b> over two rounds, and made <b>AI × Video</b> pieces with ComfyUI and agent workflows.</p>
-   <p>I work in <b>Figma, Blender, ComfyUI, Unity and TouchDesigner</b>, and pick whichever makes an idea testable fastest.</p>`,
-  `<p><b>研究驱动的跨领域设计师</b>，把复杂的问题、真实的用户和新的工具，变成人真正会用的产品、服务和影像。</p>
-   <p>我在<b>格拉斯哥读 MDes</b>，做过<b>一家英国格拉斯哥本地理发店正在用的预约系统</b>，发布过<b>一个 Blender 插件</b>，做过<b>两轮测试的服务设计研究</b>，也用 ComfyUI 和 Agent 工作流做了 <b>AI × 视频</b>作品。</p>
-   <p>常用 <b>Figma、Blender、ComfyUI、Unity、TouchDesigner</b>，哪个能最快把想法做成可测试的东西，就用哪个。</p>`]) +
-  `<ul><li><a href="about.html"><span>${L(['Full profile, skills and CV', '完整介绍、技能与简历'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}"><span>${L(['Request my CV', '索取简历'])}</span><span>${MAIL}</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul></div>`;
+  `<p><b>I design AI products, build them myself with AI, and put them in front of real people.</b></p>
+   <ul class="ex-wins">
+     <li>Took a booking system from research to launch with AI coding. <b>A local barbershop in Glasgow, UK runs on it</b>; the shop handles 90–120 appointments a week.</li>
+     <li>Designed <b>Idea to Edit</b>, an AI feature concept for CapCut, and built a <b>storyboard skill</b> that AI agents can call.</li>
+     <li>Developed and released <b>a Blender add-on</b>; my resource catalogue reaches <b>600+ users and 2,000+ downloads</b>.</li>
+   </ul>
+   <dl class="ex-facts">
+     <dt>Based</dt><dd>UK · Open to relocation</dd>
+     <dt>Study</dt><dd>MDes Design Innovation and Transformation, The Glasgow School of Art</dd>
+     <dt>Focus</dt><dd>AI product design · AI experience design · Design engineering</dd>
+     <dt>Tools</dt><dd>AI coding (Codex, Claude Code) · Figma · ComfyUI · Blender</dd>
+   </dl>`,
+  `<p><b>我设计 AI 产品，并用 AI 把它亲手做出来，交给真实的人去用。</b></p>
+   <ul class="ex-wins">
+     <li>用 AI 编程把一套预约系统从调研做到上线，<b>英国格拉斯哥一家本地理发店正在使用</b>，这家店每周约有 90–120 个预约。</li>
+     <li>为剪映策划 AI 新功能<b>「灵感成片」</b>，并做了一个能让 AI Agent 调用的<b>分镜 Skill</b>。</li>
+     <li>开发并发布了<b>一个 Blender 插件</b>；我的数字资源覆盖 <b>600+ 位用户、2,000+ 次下载</b>。</li>
+   </ul>
+   <dl class="ex-facts">
+     <dt>现居</dt><dd>英国 · 可前往其他国家工作</dd>
+     <dt>学历</dt><dd>格拉斯哥艺术学院 MDes 设计创新与转型</dd>
+     <dt>方向</dt><dd>AI 产品设计 · AI 体验设计 · 设计工程</dd>
+     <dt>工具</dt><dd>AI 编程（Codex、Claude Code）· Figma · ComfyUI · Blender</dd>
+   </dl>`]) +
+  `<ul><li><a href="${CV}" target="_blank" rel="noopener"><span>${L(['Download CV (PDF)', '下载简历（PDF）'])}</span><span aria-hidden="true">↓</span></a></li><li><a href="mailto:${MAIL}"><span>${L(['Email', '邮箱'])}</span><span>${MAIL}</span></a></li><li><a href="about.html"><span>${L(['Full profile and skills', '完整介绍与技能'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul></div>`;
 
 // Each project's own scene: a film loop where there is one, otherwise its strongest real photograph.
 import { SCENE } from './scenes.mjs';

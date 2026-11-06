@@ -2,7 +2,6 @@
 // A full-screen cover made from the project's own scene, the title set large over it, one accent colour per
 // project, and a quiet blurred wash of the scene behind the reading column.
 import { SCENE, ACCENT } from './scenes.mjs';
-import { rippleAll } from './ripple.mjs';
 
 const zh = () => document.documentElement.lang.startsWith('zh');
 const L = v => (v ? (zh() ? v.zh : v.en) || v.en || '' : '');
@@ -47,6 +46,26 @@ export function mount(project) {
   render(); document.addEventListener('portfolio:language', render);
   cover.querySelector('.cs-down').addEventListener('click', e => { e.preventDefault(); main.scrollIntoView({ behavior: 'smooth' }); });
   const v = cover.querySelector('video'); if (v) { v.play?.().catch(() => {}); new IntersectionObserver(([en]) => en.isIntersecting ? v.play().catch(() => {}) : v.pause()).observe(cover); }
-  // pictures answer the pointer
-  requestAnimationFrame(() => setTimeout(() => rippleAll(), 400));
+  requestAnimationFrame(() => setTimeout(glassAll, 300));
+}
+
+// Glass: every picture and panel sits in a frosted frame. Under the pointer the frame's edge lights up,
+// a soft blue glow that follows the cursor around the border.
+function glassAll() {
+  if (matchMedia('(hover: none)').matches) return;
+  const main = document.querySelector('main');
+  const pics = [...main.querySelectorAll('img, video')].filter(el => !el.closest('.gl,.v3-card,.lb') && el.getBoundingClientRect().width > 200);
+  pics.forEach(el => {
+    const host = el.closest('figure, picture, a') || el;
+    if (host.closest('.gl')) return;
+    const box = document.createElement('div'); box.className = 'gl';
+    host.replaceWith(box); box.append(host);
+  });
+  [...main.querySelectorAll('.am-tldr, .case-support, .v3-deep-dive, .am-scope > div')].forEach(p => p.classList.add('gl', 'gl--panel'));
+  main.addEventListener('pointermove', e => {
+    const g = e.target.closest?.('.gl'); if (!g) return;
+    const r = g.getBoundingClientRect();
+    g.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(2) + '%');
+    g.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(2) + '%');
+  }, { passive: true });
 }

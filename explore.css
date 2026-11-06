@@ -40,7 +40,7 @@ button{font:inherit;color:inherit}
 .ex-lang{display:flex;gap:2px;padding:3px;border:1px solid var(--glass-line);border-radius:999px;background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
 .ex-lang span{padding:5px 10px;border-radius:999px;color:var(--soft);font-size:12px;line-height:1}
 html[lang=en] .ex-lang [data-l=en],html[lang^=zh] .ex-lang [data-l=zh]{background:var(--text);color:var(--ink)}
-.ex-sound{display:grid;place-items:center;width:32px;height:32px;padding:0;border-radius:50%;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
+.ex-sound{display:grid;place-items:center;width:36px;height:36px;padding:0;border-radius:50%;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
 .ex-sound svg{width:16px;height:16px;fill:none;stroke:var(--soft);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .ex-sound[aria-pressed=true] .off,.ex-sound[aria-pressed=false] .on{display:none}
 .ex-sound:hover svg{stroke:var(--text)}

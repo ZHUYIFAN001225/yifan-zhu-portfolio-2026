@@ -98,7 +98,7 @@ html[lang=en] .ex-lang [data-l=en],html[lang^=zh] .ex-lang [data-l=zh]{backgroun
 .ex-links:empty,.ex-dock:not(.is-open):not(.is-about) .ex-links{position:absolute;left:100%;margin-left:8px}
 
 /* About: the scene steps back and the page becomes type */
-.ex-about{position:fixed;inset:0;z-index:7;overflow:hidden;background:rgba(9,10,11,.5);-webkit-backdrop-filter:blur(30px) saturate(1.15) brightness(.8);backdrop-filter:blur(30px) saturate(1.15) brightness(.8);opacity:0;visibility:hidden;transition:opacity .6s var(--ease),visibility 0s .6s;touch-action:pan-y}
+.ex-about{position:fixed;inset:0;z-index:7;overflow:hidden;background:linear-gradient(90deg,rgba(9,10,11,.55),rgba(9,10,11,.25) 70%);-webkit-backdrop-filter:blur(9px) brightness(.82);backdrop-filter:blur(9px) brightness(.82);opacity:0;visibility:hidden;transition:opacity .6s var(--ease),visibility 0s .6s;touch-action:pan-y}
 body.is-about .ex-about{opacity:1;visibility:visible;transition:opacity .6s var(--ease)}
 body.is-about .ex-nav,body.is-about .ex-info,body.is-about .ex-hint{opacity:0;pointer-events:none}
 .ex-nav,.ex-info,.ex-hint{transition:opacity .5s var(--ease)}

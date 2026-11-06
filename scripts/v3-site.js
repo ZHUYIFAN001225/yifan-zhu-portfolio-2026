@@ -7,6 +7,7 @@
     import('./portfolio-catalog.mjs').then(({projects,categories,normalizeCategory,caseHighlights})=>{
       const page=location.pathname.split('/').pop();const project=projects.find(p=>p.href===page+location.hash)||projects.find(p=>p.href.split('#')[0]===page);
       if(!project)return;
+      if(!['beauty-marketplace','salon-booking'].includes(project.id)&&page!=='practice.html')import('./case-shell.mjs').then(m=>m.mount(project));
       const from=normalizeCategory(new URL(location.href).searchParams.get('from'));
       const tools=document.createElement('nav');tools.className='v3-case-tools';tools.setAttribute('aria-label',text('Project navigation','项目导航'));
       const back=document.createElement('a');back.className='v3-collection-back';tools.append(back);

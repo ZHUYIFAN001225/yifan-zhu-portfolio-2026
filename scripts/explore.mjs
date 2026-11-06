@@ -26,40 +26,15 @@ const linksHTML = () => `<a class="ex-icon" href="mailto:${MAIL}" aria-label="${
   SOCIAL.map(([n, u]) => `<a class="ex-icon" href="${u}" target="_blank" rel="noopener">${L(n)}</a>`).join('');
 const aboutHTML = () => `<figure class="ex-me"><img src="assets/v3/me.webp" alt="${L(['Yifan Zhu in the studio', '朱异凡在工作室'])}" width="880" height="1100" decoding="async"></figure><div class="ex-about-text">` + L([
   `<p><b>Research-led multidisciplinary designer</b>, turning messy problems, real users and new tools into products, services and films people actually use.</p>
-   <p>Trained at <b>Glasgow (MDes)</b>, I have shipped <b>a booking system a salon runs on</b>, released <b>a Blender add-on</b>, tested <b>a service study</b> over two rounds, and made <b>AI × Video</b> pieces with ComfyUI and agent workflows.</p>
+   <p>Trained at <b>Glasgow (MDes)</b>, I have shipped <b>a booking system a local barbershop in Glasgow, UK runs on</b>, released <b>a Blender add-on</b>, tested <b>a service study</b> over two rounds, and made <b>AI × Video</b> pieces with ComfyUI and agent workflows.</p>
    <p>I work in <b>Figma, Blender, ComfyUI, Unity and TouchDesigner</b>, and pick whichever makes an idea testable fastest.</p>`,
   `<p><b>研究驱动的跨领域设计师</b>，把复杂的问题、真实的用户和新的工具，变成人真正会用的产品、服务和影像。</p>
-   <p>我在<b>格拉斯哥读 MDes</b>，做过<b>一家理发店正在用的预约系统</b>，发布过<b>一个 Blender 插件</b>，做过<b>两轮测试的服务设计研究</b>，也用 ComfyUI 和 Agent 工作流做了 <b>AI × 视频</b>作品。</p>
+   <p>我在<b>格拉斯哥读 MDes</b>，做过<b>一家英国格拉斯哥本地理发店正在用的预约系统</b>，发布过<b>一个 Blender 插件</b>，做过<b>两轮测试的服务设计研究</b>，也用 ComfyUI 和 Agent 工作流做了 <b>AI × 视频</b>作品。</p>
    <p>常用 <b>Figma、Blender、ComfyUI、Unity、TouchDesigner</b>，哪个能最快把想法做成可测试的东西，就用哪个。</p>`]) +
   `<ul><li><a href="about.html"><span>${L(['Full profile, skills and CV', '完整介绍、技能与简历'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}"><span>${L(['Request my CV', '索取简历'])}</span><span>${MAIL}</span></a></li><li><a href="work.html"><span>${L(['All work as a list', '以列表查看全部作品'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul></div>`;
 
 // Each project's own scene: a film loop where there is one, otherwise its strongest real photograph.
-const S = 'assets/v3/scenes/';
-// Sources big enough to fill a screen sharply run full-bleed. Smaller or upright ones sit crisp in a frame,
-// over a blurred wash of themselves, so nothing is ever stretched past its own resolution.
-const SCENE = {
-  'salon-booking': { video: S + 'salon-loop.mp4', poster: S + 'salon-loop.jpg' },
-  'beauty-marketplace': { wall: [['discover', 'detail', 'make-it-real', 'matches', 'creator'], ['booked', 'similar', 'c-home', 'taste', 'saved'], ['c-portfolio', 'availability', 'search', 'chat', 'profile'], ['matches-map', 'c-requests', 'discover', 'summary', 'c-calendar'], ['detail', 'creator-search', 'booked', 'c-respond', 'work-info'], ['make-it-real', 'messages', 'c-home', 'preview', 'matches']] },
-  'idea-to-edit': { video: S + 'idea-to-edit.mp4', poster: S + 'idea-to-edit.jpg' },
-  'doodle-to-real': { video: 'assets/projects/doodle-to-real/a-05-landscape.mp4', poster: 'assets/projects/doodle-to-real/a-05-landscape.jpg' },
-  'storyboard-skill': { img: 'assets/projects/storyboard-skill/sketch-drama-s06.webp', grain: true },
-  'cyber-toolkit': { video: S + 'cyber-toolkit.mp4', poster: S + 'cyber-toolkit.jpg', scan: true },
-  'blender-reel': { video: S + 'blender-loop.mp4', poster: S + 'blender-loop.jpg' },
-  'ai-video-restyle': { video: S + 'poker-loop.mp4', poster: S + 'poker-loop.jpg' },
-  'web-prototype': { video: S + 'naturalis-loop.mp4', poster: S + 'naturalis-loop.jpg', grain: true },
-  'ai-motion': { video: S + 'ai-motion.mp4', poster: S + 'ai-motion.jpg', grain: true },
-  'modeling-01': { video: S + 'modeling-01.mp4', poster: S + 'modeling-01.jpg' },
-  'modeling-02': { video: S + 'modeling-02.mp4', poster: S + 'modeling-02.jpg', grain: true },
-  'modeling-03': { video: S + 'modeling-03.mp4', poster: S + 'modeling-03.jpg' },
-  'ear-shield': { img: S + 'ear-shield.webp', grain: true },
-  'anxiety-market': { img: S + 'anxiety-market.webp', grain: true },
-  'biodiversity-clock': { img: S + 'biodiversity-clock-hd.webp' },
-  'seedwalkers': { img: S + 'seedwalkers.webp', grain: true },
-  'machine-mapping': { img: S + 'machine-mapping.webp' },
-  'scone': { img: S + 'scone-hd.webp' },
-  'cross-culture': { img: S + 'cross-culture.webp', grain: true },
-  'resource-platform': { video: S + 'city-loop.mp4', poster: S + 'city-loop.jpg' }
-};
+import { SCENE } from './scenes.mjs';
 const sceneOf = p => SCENE[p.id] || { img: p.cover };
 
 const DOMAINS = categories.filter(c => c.id !== 'all');

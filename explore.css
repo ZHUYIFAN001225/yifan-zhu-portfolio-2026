@@ -178,7 +178,7 @@ body.is-about .ex-icon--contact{display:none}
 .ex-scene--frame.is-on>.ex-wash{transform:scale(1.18)}
 .ex-frame{position:absolute;right:clamp(40px,9vw,170px);top:42%;transform:translateY(-46%) scale(.97);border-radius:18px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1);opacity:.9;transition:transform 1.2s var(--ease),opacity 1s}
 .ex-scene.is-on .ex-frame{transform:translateY(-50%);opacity:1}
-.ex-frame>img,.ex-frame>video{display:block;width:auto;height:auto;max-width:min(42vw,960px);max-height:min(56vh,calc(100vh - 380px));position:static;transform:none!important;object-fit:contain}
+.ex-frame>img,.ex-frame>video{display:block;width:auto;height:auto;max-width:min(42vw,960px);max-height:min(56vh,calc(100vh - 380px));position:static;transform:none;object-fit:contain}
 /* the hologram keeps its blue, with fine scan lines so the softness reads as projection */
 .ex-scene--scan::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(4,10,20,.32) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:multiply}
 .ex-scene--scan>video{filter:contrast(1.06) saturate(1.1)}
@@ -187,3 +187,22 @@ body.is-about .ex-icon--contact{display:none}
   .ex-scene.is-on .ex-frame{transform:translate(50%,-50%)}
   .ex-frame>img,.ex-frame>video{max-width:72vw;max-height:42vh}
 }
+/* stills never sit dead: a slow, continuous drift */
+@keyframes ex-drift{0%{transform:scale(1.04) translate(-1.2%,.8%)}100%{transform:scale(1.11) translate(1.2%,-.8%)}}
+@keyframes ex-breath{0%{transform:scale(1)}100%{transform:scale(1.07)}}
+.ex-scene--still.is-on>img:not(.ex-wash){animation:ex-drift 18s ease-in-out infinite alternate}
+.ex-scene--soft.is-on>img{animation:none}
+.ex-scene--frame.is-on .ex-frame>img{animation:ex-breath 14s ease-in-out infinite alternate;transform-origin:50% 40%}
+.ex-scene--frame.is-on>.ex-wash{animation:ex-wash 20s ease-in-out infinite alternate}
+@keyframes ex-wash{0%{transform:scale(1.22) translate(-2%,1%)}100%{transform:scale(1.3) translate(2%,-1%)}}
+.ex-scene--frame>.ex-wash{filter:blur(46px) brightness(.5) saturate(1.25)}
+@media (prefers-reduced-motion:reduce){.ex-scene.is-on img{animation:none!important}}
+/* LOOK: the phone flips through the real screens */
+.ex-phone{background:#111}
+.ex-phone img{position:absolute;inset:0;opacity:0}
+.ex-phone img:first-child{opacity:1}
+.ex-scene.is-on .ex-phone img{animation:ex-cycle 12s infinite both}
+@keyframes ex-cycle{0%{opacity:0;transform:translateY(2%)}4%{opacity:1;transform:none}25%{opacity:1}30%{opacity:0}100%{opacity:0}}
+.ex-scene.is-on .ex-phone img:first-child{animation-name:ex-cycle-first}
+@keyframes ex-cycle-first{0%{opacity:1}25%{opacity:1}30%{opacity:0}96%{opacity:0;transform:translateY(2%)}100%{opacity:1;transform:none}}
+@media (min-width:761px){.ex-phone{top:43%;width:clamp(180px,15vw,250px);max-height:calc(100vh - 400px);aspect-ratio:auto;height:min(calc(clamp(180px,15vw,250px)*2.17),calc(100vh - 400px))}}

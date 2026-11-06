@@ -37,15 +37,15 @@ const S = 'assets/v3/scenes/';
 // Sources big enough to fill a screen sharply run full-bleed. Smaller or upright ones sit crisp in a frame,
 // over a blurred wash of themselves, so nothing is ever stretched past its own resolution.
 const SCENE = {
-  'salon-booking': { video: 'assets/v3/desk/salon-counter.mp4', poster: 'assets/v3/desk/salon-counter.jpg' },
-  'beauty-marketplace': { img: 'assets/v3/look-film/wall.webp', soft: true, phone: 'assets/v3/screens/look/discover.webp' },
+  'salon-booking': { video: S + 'salon-loop.mp4', poster: S + 'salon-loop.jpg' },
+  'beauty-marketplace': { img: 'assets/v3/look-film/wall.webp', soft: true, phone: ['discover', 'detail', 'matches', 'booked'].map(n => `assets/v3/screens/look/${n}.webp`) },
   'idea-to-edit': { video: S + 'idea-to-edit.mp4', poster: S + 'idea-to-edit.jpg' },
   'doodle-to-real': { video: 'assets/projects/doodle-to-real/a-05-landscape.mp4', poster: 'assets/projects/doodle-to-real/a-05-landscape.jpg' },
-  'storyboard-skill': { img: 'assets/projects/storyboard-skill/sketch-brand-s04.webp', frame: true },
+  'storyboard-skill': { video: S + 'story-loop.mp4', poster: S + 'story-loop.jpg', frame: true },
   'cyber-toolkit': { video: S + 'cyber-toolkit.mp4', poster: S + 'cyber-toolkit.jpg', scan: true },
-  'blender-reel': { video: 'assets/v3/blender-reel-web.mp4', poster: 'assets/v3/blender-reel.jpg' },
-  'ai-video-restyle': { video: S + 'ai-video-restyle.mp4', poster: 'assets/v3/ai-video-restyle.jpg' },
-  'web-prototype': { video: S + 'web-prototype.mp4', poster: 'assets/v3/web-prototype.jpg' },
+  'blender-reel': { video: S + 'blender-loop.mp4', poster: S + 'blender-loop.jpg' },
+  'ai-video-restyle': { video: S + 'poker-loop.mp4', poster: S + 'poker-loop.jpg' },
+  'web-prototype': { video: S + 'naturalis-loop.mp4', poster: S + 'naturalis-loop.jpg', frame: true },
   'ai-motion': { video: S + 'ai-motion.mp4', poster: S + 'ai-motion.jpg', frame: true },
   'modeling-01': { video: S + 'modeling-01.mp4', poster: S + 'modeling-01.jpg' },
   'modeling-02': { video: S + 'modeling-02.mp4', poster: S + 'modeling-02.jpg', frame: true },
@@ -56,7 +56,8 @@ const SCENE = {
   'seedwalkers': { img: S + 'seedwalkers.webp', frame: true },
   'machine-mapping': { img: S + 'machine-mapping.webp' },
   'scone': { img: S + 'scone-hd.webp' },
-  'cross-culture': { img: S + 'cross-culture.webp', frame: true }
+  'cross-culture': { img: S + 'cross-culture.webp', frame: true },
+  'resource-platform': { video: S + 'city-loop.mp4', poster: S + 'city-loop.jpg' }
 };
 const sceneOf = p => SCENE[p.id] || { img: p.cover };
 
@@ -112,11 +113,11 @@ const scenes = new Map();
 function sceneEl(p) {
   if (scenes.has(p.id)) return scenes.get(p.id);
   const s = sceneOf(p), el = document.createElement('div');
-  el.className = 'ex-scene' + (s.soft ? ' ex-scene--soft' : '') + (s.frame ? ' ex-scene--frame' : '') + (s.scan ? ' ex-scene--scan' : '');
+  el.className = 'ex-scene' + (s.soft ? ' ex-scene--soft' : '') + (s.frame ? ' ex-scene--frame' : '') + (s.scan ? ' ex-scene--scan' : '') + (s.video ? '' : ' ex-scene--still');
   const still = lang === 'zh' && s.zh ? s.zh : s.img;
   const media = s.video ? `<video muted loop playsinline preload="none" poster="${s.poster}" data-src="${s.video}"></video>` : `<img src="${still}" alt="" decoding="async">`;
   el.innerHTML = s.frame ? `<img class="ex-wash" src="${s.poster || still}" alt="" decoding="async"><div class="ex-frame">${media}</div>` : media;
-  if (s.phone) el.insertAdjacentHTML('beforeend', `<div class="ex-phone"><img src="${s.phone}" alt="" decoding="async"></div>`);
+  if (s.phone) el.insertAdjacentHTML('beforeend', `<div class="ex-phone">${[].concat(s.phone).map((u, i) => `<img src="${u}" alt="" decoding="async" style="animation-delay:${i * 3}s">`).join('')}</div>`);
   bg.append(el); scenes.set(p.id, el); return el;
 }
 let swapT;

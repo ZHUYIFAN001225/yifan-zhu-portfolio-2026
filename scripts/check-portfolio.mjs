@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {categories,projects,normalizeCategory,collectionOrder,orderedProjects,forthcoming,caseHighlights,featured} from './portfolio-catalog.mjs';
 assert.ok(featured.every(id=>projects.some(p=>p.id===id)),'Unknown featured project');
 
-assert.equal(categories.length,5);
+assert.equal(categories.length,6);
 assert.equal(new Set(projects.map(p=>p.id)).size,projects.length);
 for(const category of categories){
   assert.equal(normalizeCategory(category.id),category.id);

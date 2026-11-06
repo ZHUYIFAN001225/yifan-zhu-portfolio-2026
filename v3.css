@@ -4596,3 +4596,4 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
 .dr-chain li.is-mine{color:var(--text);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
 .dr-chain li:not(:last-child)::after{content:'→';position:absolute;right:-9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);background:var(--bg,#111);padding:0 1px}
 .dr-chain-note{font-size:13px;color:var(--muted);margin:14px 0 6px}
+.v3-card-tool{display:inline-block;margin:-2px 0 8px;padding:3px 8px;border-radius:999px;background:var(--line);font-size:9.5px;letter-spacing:.02em;color:var(--ink,inherit)}

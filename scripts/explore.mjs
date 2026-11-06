@@ -17,7 +17,7 @@ const T = {
   hint: ['Scroll to browse. Click the picture to open the case.', '滚动浏览，点击画面进入案例。'],
   domains: ['Disciplines', '设计领域'], works: ['Projects', '项目'], lang: ['Language', '切换语言'],
   intro: ['I turn research into products, tools and films people actually use.', '把调研做成人真正会用的产品、工具和影像。'],
-  sound: ['Sound', '音效'], close: ['Close', '关闭']
+  sound: ['Sound', '音效'], close: ['Close', '关闭'], tools: ['Made with', '制作工具：']
 };
 const MAIL = 'zhuyifan001225@gmail.com';
 const SOCIAL = [[['Bilibili', 'B 站'], 'https://b23.tv/DQqusXX'], [['RED', '小红书'], 'https://xhslink.com/m/AZhAMj7fpc7'], [['Douyin', '抖音'], 'https://www.douyin.com/user/MS4wLjABAAAA_lHmWTuM_a1k_09EF1ewxBH9vU3K2tYWuNJe-Mk7H_0']];
@@ -41,22 +41,22 @@ const SCENE = {
   'beauty-marketplace': { img: 'assets/v3/look-film/wall.webp', soft: true, phone: ['discover', 'detail', 'matches', 'booked'].map(n => `assets/v3/screens/look/${n}.webp`) },
   'idea-to-edit': { video: S + 'idea-to-edit.mp4', poster: S + 'idea-to-edit.jpg' },
   'doodle-to-real': { video: 'assets/projects/doodle-to-real/a-05-landscape.mp4', poster: 'assets/projects/doodle-to-real/a-05-landscape.jpg' },
-  'storyboard-skill': { video: S + 'story-loop.mp4', poster: S + 'story-loop.jpg', frame: true },
+  'storyboard-skill': { img: 'assets/projects/storyboard-skill/sketch-drama-s06.webp', grain: true },
   'cyber-toolkit': { video: S + 'cyber-toolkit.mp4', poster: S + 'cyber-toolkit.jpg', scan: true },
   'blender-reel': { video: S + 'blender-loop.mp4', poster: S + 'blender-loop.jpg' },
   'ai-video-restyle': { video: S + 'poker-loop.mp4', poster: S + 'poker-loop.jpg' },
-  'web-prototype': { video: S + 'naturalis-loop.mp4', poster: S + 'naturalis-loop.jpg', frame: true },
-  'ai-motion': { video: S + 'ai-motion.mp4', poster: S + 'ai-motion.jpg', frame: true },
+  'web-prototype': { video: S + 'naturalis-loop.mp4', poster: S + 'naturalis-loop.jpg', grain: true },
+  'ai-motion': { video: S + 'ai-motion.mp4', poster: S + 'ai-motion.jpg', grain: true },
   'modeling-01': { video: S + 'modeling-01.mp4', poster: S + 'modeling-01.jpg' },
-  'modeling-02': { video: S + 'modeling-02.mp4', poster: S + 'modeling-02.jpg', frame: true },
+  'modeling-02': { video: S + 'modeling-02.mp4', poster: S + 'modeling-02.jpg', grain: true },
   'modeling-03': { video: S + 'modeling-03.mp4', poster: S + 'modeling-03.jpg' },
-  'ear-shield': { img: S + 'ear-shield.webp', frame: true },
-  'anxiety-market': { img: S + 'anxiety-market.webp', frame: true },
+  'ear-shield': { img: S + 'ear-shield.webp', grain: true },
+  'anxiety-market': { img: S + 'anxiety-market.webp', grain: true },
   'biodiversity-clock': { img: S + 'biodiversity-clock-hd.webp' },
-  'seedwalkers': { img: S + 'seedwalkers.webp', frame: true },
+  'seedwalkers': { img: S + 'seedwalkers.webp', grain: true },
   'machine-mapping': { img: S + 'machine-mapping.webp' },
   'scone': { img: S + 'scone-hd.webp' },
-  'cross-culture': { img: S + 'cross-culture.webp', frame: true },
+  'cross-culture': { img: S + 'cross-culture.webp', grain: true },
   'resource-platform': { video: S + 'city-loop.mp4', poster: S + 'city-loop.jpg' }
 };
 const sceneOf = p => SCENE[p.id] || { img: p.cover };
@@ -103,7 +103,10 @@ function renderInfo(force) {
   const p = list[active]; if (!p) return;
   $('[data-current]').textContent = String(active + 1).padStart(2, '0');
   const kind = $('[data-kind]'), line = $('[data-line]'), open = $('[data-open]');
-  kind.textContent = L(p.kind); line.textContent = L(p.subtitle); open.href = p.href;
+  kind.innerHTML = '';
+  kind.append(L(p.kind));
+  if (p.tools) { const t = document.createElement('span'); t.className = 'ex-tool'; t.textContent = `${L(T.tools)} ${L(p.tools)}`; kind.append(t); }
+  line.textContent = L(p.subtitle); open.href = p.href;
   open.setAttribute('aria-label', `${L(T.open)}: ${L(p.title)}`);
   if (!force) [kind, line, open].forEach(el => { el.classList.remove('is-swap'); void el.offsetWidth; el.classList.add('is-swap'); });
 }
@@ -113,7 +116,7 @@ const scenes = new Map();
 function sceneEl(p) {
   if (scenes.has(p.id)) return scenes.get(p.id);
   const s = sceneOf(p), el = document.createElement('div');
-  el.className = 'ex-scene' + (s.soft ? ' ex-scene--soft' : '') + (s.frame ? ' ex-scene--frame' : '') + (s.scan ? ' ex-scene--scan' : '') + (s.video ? '' : ' ex-scene--still');
+  el.className = 'ex-scene' + (s.soft ? ' ex-scene--soft' : '') + (s.frame ? ' ex-scene--frame' : '') + (s.scan ? ' ex-scene--scan' : '') + (s.video ? '' : ' ex-scene--still') + (s.grain ? ' ex-scene--grain' : '') + (s.pan ? ' ex-scene--pan' : '');
   const still = lang === 'zh' && s.zh ? s.zh : s.img;
   const media = s.video ? `<video muted loop playsinline preload="none" poster="${s.poster}" data-src="${s.video}"></video>` : `<img src="${still}" alt="" decoding="async">`;
   el.innerHTML = s.frame ? `<img class="ex-wash" src="${s.poster || still}" alt="" decoding="async"><div class="ex-frame">${media}</div>` : media;

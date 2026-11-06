@@ -51,24 +51,28 @@ html:not([data-theme="light"]) body.cs :is(.ux-case-index,.case-map nav) a{borde
 html:not([data-theme="light"]) body.cs :is(.ux-case-index,.case-map nav) a:is(:hover,[aria-current],.is-active){color:var(--cs-text)!important}
 @media (prefers-reduced-motion:reduce){.cs-media,.cs-grain,.cs-down svg{animation:none}}
 
-/* ---- glass frames ---- */
-.gl{position:relative;isolation:isolate;border-radius:22px;padding:10px;background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.025) 45%,rgba(255,255,255,.05));
-  -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);
-  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 -1px 0 rgba(0,0,0,.3) inset,0 24px 60px rgba(0,0,0,.35);
-  --mx:50%;--my:50%;--glow:#79c7ff;transition:transform .5s cubic-bezier(.22,.8,.24,1),box-shadow .5s}
-.gl::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
-  background:radial-gradient(300px circle at var(--mx) var(--my),#bfe6ff,var(--glow) 18%,rgba(121,199,255,.3) 40%,rgba(255,255,255,.08) 60%,rgba(255,255,255,.06));
+/* ---- glass frames: a frosted pane around every picture; under the pointer only the EDGE lights up (no glow around the cursor itself) ---- */
+.gl{position:relative;isolation:isolate;border-radius:24px;padding:12px;--mx:50%;--my:50%;--glow:#8fd0ff;
+  background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.035) 40%,rgba(255,255,255,.07));
+  -webkit-backdrop-filter:blur(20px) saturate(1.25);backdrop-filter:blur(20px) saturate(1.25);
+  box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 -1px 0 rgba(0,0,0,.35) inset,0 24px 60px rgba(0,0,0,.4);
+  transition:transform .55s cubic-bezier(.22,.8,.24,1),box-shadow .55s}
+/* resting edge: a quiet 1px line */
+.gl::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:3;
+  background:linear-gradient(160deg,rgba(255,255,255,.32),rgba(255,255,255,.08) 40%,rgba(255,255,255,.16));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+/* hover edge: blue light that runs along the border, centred where the pointer is */
+.gl::after{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:2px;pointer-events:none;z-index:4;opacity:0;transition:opacity .35s;
+  background:radial-gradient(340px circle at var(--mx) var(--my),#dff3ff 0%,var(--glow) 14%,rgba(143,208,255,.45) 34%,rgba(143,208,255,0) 62%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
-  opacity:.55;transition:opacity .4s}
-.gl::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;z-index:1;opacity:0;transition:opacity .45s;
-  background:radial-gradient(360px circle at var(--mx) var(--my),rgba(121,199,255,.32),transparent 60%)}
-.gl:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 -1px 0 rgba(0,0,0,.3) inset,0 30px 80px rgba(0,0,0,.45),0 0 60px -10px rgba(121,199,255,.35)}
-.gl:hover::before{opacity:1}.gl:hover::after{opacity:1}
+  filter:drop-shadow(0 0 6px rgba(143,208,255,.9))}
+.gl:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 -1px 0 rgba(0,0,0,.35) inset,0 30px 80px rgba(0,0,0,.5),0 0 70px -14px rgba(143,208,255,.45)}
+.gl:hover::after{opacity:1}
 .gl>*{position:relative;z-index:1}
-.gl :is(img,video){display:block;width:100%;height:auto;border-radius:13px;margin:0}
+.gl :is(img,video){display:block;width:100%;height:auto;border-radius:14px;margin:0}
 .gl figure{margin:0}.gl figcaption{padding:10px 6px 2px;font-size:12.5px;color:var(--cs-faint)}
 .gl--panel{padding:clamp(18px,2.4vw,30px)}
-html:not([data-theme="light"]) body.cs main .gl--panel{background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02) 45%,rgba(255,255,255,.04))!important;border:0!important}
+html:not([data-theme="light"]) body.cs main .gl--panel{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.03) 45%,rgba(255,255,255,.05))!important;border:0!important}
 html:not([data-theme="light"]) body.cs main :is(.am-tldr,[class*="card"],.am-scope>div,.case-support,.v3-deep-dive,.insight,.hmw):not(.gl){background:rgba(255,255,255,.035)!important}
-@media (prefers-reduced-motion:reduce){.gl,.gl::before,.gl::after{transition:none}.gl:hover{transform:none}}
-@media (max-width:760px){.gl{padding:6px;border-radius:16px}.gl :is(img,video){border-radius:11px}}
+@media (prefers-reduced-motion:reduce){.gl,.gl::after{transition:none}.gl:hover{transform:none}}
+@media (max-width:760px){.gl{padding:7px;border-radius:16px}.gl :is(img,video){border-radius:11px}}

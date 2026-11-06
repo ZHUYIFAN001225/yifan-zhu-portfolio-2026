@@ -47,7 +47,7 @@
   addEventListener('pagehide', () => { try { sessionStorage.setItem(K.t, a.currentTime); } catch {} });
   // browsers (iOS above all) only let sound start inside a tap or click
   const gesture = e => { if (e.target.closest?.('.sm')) return; if (want() && a.paused) update(true); };
-  ['click', 'touchend', 'keydown'].forEach(t => addEventListener(t, gesture, { passive: true, capture: true }));
+  ['pointerdown', 'click', 'touchend', 'keydown'].forEach(t => addEventListener(t, gesture, { passive: true, capture: true }));
   document.addEventListener('visibilitychange', () => update(false));
   // any site video with sound takes over; muted loops (backgrounds, previews) don't count
   const check = () => { const loud = [...document.querySelectorAll('video')].some(x => !x.paused && !x.ended && !x.muted && x.volume > 0); if (loud !== ducked) { ducked = loud; update(false); } };
@@ -94,5 +94,7 @@ html[data-theme=light] .site-music{background:rgba(255,255,255,.75);color:#111;b
     paint(); label(); window.dispatchEvent(new CustomEvent('portfolio:music', { detail: { on } }));
   });
   paint();
+  // carry straight on when the page opens; browsers that need a tap first start on the first tap instead
+  if (want()) update(false);
   window.siteMusic = { get ready() { return !failed; }, get failed() { return failed; }, get on() { return on; }, get volume() { return level; } };
 })();

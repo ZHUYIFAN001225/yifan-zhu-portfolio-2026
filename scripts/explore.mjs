@@ -300,7 +300,7 @@ let music = null;
 function wake() {
   if (!soundOn) return;
   try { ac ||= new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch { return; }
-  if (!music) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'tech');
+  if (!music) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'deep');
 }
 document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else if (soundOn) ac.resume(); });
 ['pointerdown', 'keydown', 'touchend'].forEach(t => addEventListener(t, wake, { passive: true }));

@@ -24,6 +24,7 @@ function impulse(ac, seconds, decay) {
 
 export function startMusic(ac, styleName = 'kalimba', level = 0.42, opts = {}) {
   if (styleName === 'tech' || styleName === 'tech-ambient') return startTech(ac, styleName === 'tech', level, opts);
+  if (styleName === 'deep') return startDeep(ac, level, opts);
   const { offline = false, seconds = 0 } = opts;
   const st = STYLES[styleName] || STYLES.kalimba;
   const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
@@ -156,5 +157,65 @@ function startTech(ac, drums, level, { offline = false, seconds = 0 } = {}) {
   return {
     stop() { alive = false; clearTimeout(timer); master.gain.cancelScheduledValues(ac.currentTime); master.gain.setTargetAtTime(0, ac.currentTime, 0.4); setTimeout(() => { try { sweep.stop(); master.disconnect(); } catch {} }, 3000); },
     duck(on) { master.gain.setTargetAtTime(on ? level * 0.45 : level, ac.currentTime, 0.4); }
+  };
+}
+
+// ---- deep: slow, spacious and cinematic. A pipe-organ voice built from stacked harmonics, a low drone,
+// a patient ostinato that gathers layer by layer, a faint clock tick, and a very long hall. Original material in A minor.
+function startDeep(ac, level, { offline = false, seconds = 0 } = {}) {
+  const bpm = 66, beat = 60 / bpm, barLen = beat * 4;
+  const CH = [[45, 57, 60, 64, 71], [41, 57, 60, 64, 69], [36, 55, 60, 64, 67], [43, 55, 59, 62, 67]]; // Am(add9)  Fmaj7  C  G
+  const LINE = [[76, 74], [72, 76], [79, 76], [74, 71]];   // two long notes per bar, high
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+  master.gain.setTargetAtTime(level, ac.currentTime, 3);
+  const comp = ac.createDynamicsCompressor(); comp.threshold.value = -22; comp.ratio.value = 3; comp.connect(master);
+  const hall = ac.createConvolver(); hall.buffer = impulse(ac, 7, 2.2); const wet = ac.createGain(); wet.gain.value = 0.9; hall.connect(wet).connect(comp);
+  const dry = ac.createGain(); dry.gain.value = 0.35; dry.connect(comp);
+  const body = ac.createBiquadFilter(); body.type = 'lowpass'; body.frequency.value = 2600; body.connect(dry); body.connect(hall);
+  // tremulant: a slow shared vibrato, like air moving through pipes
+  const trem = ac.createOscillator(), tremAmt = ac.createGain(); trem.frequency.value = 4.8; tremAmt.gain.value = 3; trem.connect(tremAmt); trem.start();
+  const STOPS = [[1, 1], [2, 0.5], [3, 0.18], [4, 0.22], [6, 0.06], [8, 0.08]];
+  function organ(m, at, len, vel, bright = 1) {
+    const f = mtof(m), g = ac.createGain();
+    g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(vel, at + 0.12); g.gain.setValueAtTime(vel, at + len); g.gain.linearRampToValueAtTime(0, at + len + 0.9);
+    g.connect(body);
+    STOPS.forEach(([h, a]) => { if (h > 4 && bright < 1) return; const o = ac.createOscillator(); o.frequency.value = f * h; tremAmt.connect(o.detune);
+      const ga = ac.createGain(); ga.gain.value = a; o.connect(ga).connect(g); o.start(at); o.stop(at + len + 1); });
+  }
+  function drone(m, at, len) {
+    [0, 0.12].forEach((dt, k) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = k ? 'triangle' : 'sine'; o.frequency.value = mtof(m) * (1 + dt / 100);
+      g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(0.09, at + 2.5); g.gain.setValueAtTime(0.09, at + len - 1); g.gain.linearRampToValueAtTime(0, at + len + 2);
+      o.connect(g).connect(hall); o.connect(g).connect(dry); o.start(at); o.stop(at + len + 2.2); });
+  }
+  let noise = null;
+  function tick(at, vel) {
+    if (!noise) { noise = ac.createBuffer(1, ac.sampleRate * 0.03, ac.sampleRate); const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 6); }
+    const s = ac.createBufferSource(), bp = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = noise; bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 4;
+    g.gain.value = 0.22 * vel; s.connect(bp).connect(g); g.connect(dry); g.connect(hall); s.start(at);
+  }
+  // a twenty-bar arc: open quietly, gather, swell, then thin back out
+  const ARC = 20;
+  const t0 = ac.currentTime + 0.2;
+  function scheduleBar(b) {
+    const at = t0 + b * barLen, c = b % 4, ch = CH[c], sec = b % ARC;
+    const swell = sec < 4 ? 0.55 : sec < 8 ? 0.7 : sec < 16 ? 0.7 + (sec - 8) * 0.04 : 0.85 - (sec - 16) * 0.12;
+    drone(ch[0] - 12, at, barLen);
+    // held chord, the root an octave down
+    ch.slice(1, 4).forEach(m => organ(m, at, barLen - 0.15, 0.035 * swell, 0));
+    organ(ch[0], at, barLen - 0.15, 0.05 * swell, 0);
+    // the ostinato: patient eighth notes rocking between chord tones
+    if (sec >= 4) { const pat = [ch[1], ch[3], ch[2], ch[3], ch[1], ch[3], ch[2], ch[4]];
+      pat.forEach((m, i) => organ(m + 12, at + i * beat / 2, beat / 2 - 0.05, (i % 2 ? 0.018 : 0.026) * swell)); }
+    // the line above, long and slow
+    if (sec >= 8 && sec < 18) LINE[c].forEach((m, i) => organ(m, at + i * beat * 2, beat * 2 - 0.1, 0.03 * swell));
+    if (sec >= 6 && sec < 17) for (let i = 0; i < 4; i++) tick(at + i * beat, i === 0 ? 1 : 0.6);
+  }
+  let next = 0, timer = null, alive = true;
+  if (offline) { for (let b = 0; t0 + b * barLen < seconds; b++) scheduleBar(b); }
+  else { const pump = () => { if (!alive) return; while (t0 + next * barLen < ac.currentTime + 1.5) { if (t0 + next * barLen >= ac.currentTime - 0.05) scheduleBar(next); next++; } timer = setTimeout(pump, 300); }; pump(); }
+  return {
+    stop() { alive = false; clearTimeout(timer); master.gain.cancelScheduledValues(ac.currentTime); master.gain.setTargetAtTime(0, ac.currentTime, 0.6); setTimeout(() => { try { trem.stop(); master.disconnect(); } catch {} }, 4000); },
+    duck(on) { master.gain.setTargetAtTime(on ? level * 0.45 : level, ac.currentTime, 0.5); }
   };
 }

@@ -32,7 +32,8 @@ export function mount(project) {
     </div>
     <a class="cs-down" href="#main"><span data-cs="down"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3.5 8.5 8 13l4.5-4.5"/></svg></a>`;
   const main = document.querySelector('main');
-  main.before(cover);
+  // the cover comes straight after the site header; the case tools and category strip sit below it
+  const hdr = document.querySelector('.site-header'); (hdr || main).after(cover); if (!hdr) main.before(cover);
   // the cover now carries the title; the page's own first heading steps aside
   const firstH1 = main.querySelector('h1'); if (firstH1) firstH1.classList.add('cs-hidden-title');
 

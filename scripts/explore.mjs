@@ -203,7 +203,7 @@ function setDomain(j) {
   renderProjects();
   if (G.m) domEl.children[j]?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
 }
-const openActive = () => { const p = list[active]; if (!p) return; openSound(); setTimeout(() => { location.href = caseURL(p); }, soundOn && ac ? 140 : 0); };
+const openActive = () => { const p = list[active]; if (!p) return; openSound(); setTimeout(() => { location.href = caseURL(p); }, ac ? 140 : 0); };
 
 // wheel: the arc follows the wheel continuously, then settles on the nearest project.
 // Over the inner arc (the disciplines) the wheel steps through disciplines instead.
@@ -268,23 +268,24 @@ addEventListener('popstate', () => setAbout(new URLSearchParams(location.search)
 addEventListener('click', e => { if (dock.classList.contains('is-open') && !e.target.closest?.('.ex-dock')) { e.stopPropagation(); e.preventDefault(); setContact(false); } }, true);
 const closePanel = () => { if (isAbout) setAbout(false); else setContact(false); };
 
-// ---------- sound: tiny synthesised ticks, no files to load ----------
-let ac = null, soundOn = (() => { try { return localStorage.getItem('explore-sound') !== 'off'; } catch { return true; } })();
+// ---------- sound ----------
+// Two separate things: the small interface ticks (always on; they are part of the controls) and the background
+// music (the visitor's choice, driven by site-audio.js through the same button). musicOn only governs the music.
+let ac = null, musicOn = (() => { try { return localStorage.getItem('portfolio-music') !== 'off'; } catch { return true; } })();
 const soundBtn = $('[data-sound]');
-soundBtn.setAttribute('aria-pressed', soundOn);
+soundBtn.setAttribute('aria-pressed', musicOn);
 let music = null;
 function wake() {
-  if (!soundOn) return;
   try { ac ||= new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch { return; }
-  // the real track (site-audio.js) carries the music; the synthesised score only steps in if that file is missing
-  if (!music && (!window.siteMusic || window.siteMusic.failed)) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'deep');
+  // the synthesised score only stands in when the real track is missing
+  if (!music && musicOn && window.siteMusic?.failed) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'deep');
 }
-addEventListener('portfolio:music-missing', () => { if (soundOn && ac && !music) music = startMusic(ac, 'deep'); });
-addEventListener('portfolio:music', e => { soundOn = e.detail.on; soundBtn.setAttribute('aria-pressed', soundOn); try { localStorage.setItem('explore-sound', soundOn ? 'on' : 'off'); } catch {} if (!soundOn && music) { music.stop(); music = null; } });
-document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else if (soundOn) ac.resume(); });
 ['pointerdown', 'keydown', 'touchend'].forEach(t => addEventListener(t, wake, { passive: true }));
+addEventListener('portfolio:music-missing', () => { if (musicOn && ac && !music) music = startMusic(ac, 'deep'); });
+addEventListener('portfolio:music', e => { musicOn = e.detail.on; if (!musicOn && music) { music.stop(); music = null; } else if (musicOn && ac && !music && window.siteMusic?.failed) music = startMusic(ac, 'deep'); });
+document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else ac.resume(); });
 function tone(f, dur, vol, type = 'sine', to = 0.62, delay = 0) {
-  if (!soundOn || !ac || ac.state !== 'running') return;
+  if (!ac || ac.state !== 'running') return;
   const t = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
   o.type = type; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * to, t + dur);
   g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -295,12 +296,6 @@ function tickSound() { const n = performance.now(); if (n - lastTick < 40) retur
 function domSound() { tone(520, 0.09, 0.04); tone(780, 0.12, 0.03, 'sine', 0.9, 0.06); }
 function openSound() { tone(440, 0.22, 0.04, 'sine', 2); }
 function panelSound() { tone(660, 0.1, 0.03, 'sine', 0.8); }
-soundBtn.addEventListener('click', () => {
-  soundOn = !soundOn; soundBtn.setAttribute('aria-pressed', soundOn);
-  try { localStorage.setItem('explore-sound', soundOn ? 'on' : 'off'); } catch {}
-  if (soundOn) { wake(); setTimeout(() => tone(1200, 0.06, 0.03), 30); }
-  else if (music) { music.stop(); music = null; }
-});
 $('[data-lang-toggle]').addEventListener('click', () => {
   lang = lang === 'zh' ? 'en' : 'zh'; try { localStorage.setItem('portfolio-language', lang); } catch {}
   scenes.forEach(s => s.remove()); scenes.clear(); active = -1; renderText();

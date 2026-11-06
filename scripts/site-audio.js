@@ -46,6 +46,7 @@
 @keyframes sm-eq{from{height:3px}to{height:14px}}
 html[data-theme=light] .site-music{background:rgba(255,255,255,.7);color:#111;border-color:rgba(0,0,0,.12)}
 @media print{.site-music{display:none}}
+@media (max-width:760px){.site-music{left:auto;right:14px;bottom:calc(env(safe-area-inset-bottom) + 18px)}}
 @media (prefers-reduced-motion:reduce){.sm.is-css .sm-bars i{animation:none;height:7px!important}}`;
   document.head.append(st);
   const bars = [...btn.querySelectorAll('.sm-bars i')];

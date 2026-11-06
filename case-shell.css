@@ -93,3 +93,11 @@ html:not([data-theme="light"]) body.cs main :is(.am-tldr,[class*="card"],.am-sco
 .cn-knob{position:absolute;left:-6px;bottom:1px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 50% 45%,#fff,var(--cn-accent) 45%,color-mix(in srgb,var(--cn-accent) 70%,#000) 100%);box-shadow:0 0 0 3px rgba(11,12,13,.9),0 0 18px color-mix(in srgb,var(--cn-accent) 80%,transparent);transition:transform .55s cubic-bezier(.22,.8,.24,1)}
 @media (max-width:760px){.cn a{min-height:48px;padding:0 12px;font-size:12.5px}.cn-top{display:none!important}}
 @media (prefers-reduced-motion:reduce){.cn-line,.cn-knob{transition:none}}
+
+/* ---- phones: the cover is the first thing; the wide category strip is replaced by the chapter bar + back link ---- */
+@media (max-width:760px){
+  body.cs .v3-case-categories{display:none!important}
+  body.cs .v3-case-tools{padding-top:14px}
+  .cs-cover{margin-top:0}
+  .site-music{left:auto;right:14px;bottom:calc(env(safe-area-inset-bottom) + 18px)}
+}

@@ -34,27 +34,29 @@ const aboutHTML = () => `<figure class="ex-me"><img src="assets/v3/me.webp" alt=
 
 // Each project's own scene: a film loop where there is one, otherwise its strongest real photograph.
 const S = 'assets/v3/scenes/';
+// Sources big enough to fill a screen sharply run full-bleed. Smaller or upright ones sit crisp in a frame,
+// over a blurred wash of themselves, so nothing is ever stretched past its own resolution.
 const SCENE = {
   'salon-booking': { video: 'assets/v3/desk/salon-counter.mp4', poster: 'assets/v3/desk/salon-counter.jpg' },
   'beauty-marketplace': { img: 'assets/v3/look-film/wall.webp', soft: true, phone: 'assets/v3/screens/look/discover.webp' },
   'idea-to-edit': { video: S + 'idea-to-edit.mp4', poster: S + 'idea-to-edit.jpg' },
   'doodle-to-real': { video: 'assets/projects/doodle-to-real/a-05-landscape.mp4', poster: 'assets/projects/doodle-to-real/a-05-landscape.jpg' },
-  'storyboard-skill': { img: 'assets/projects/storyboard-skill/sketch-brand-s04.webp' },
-  'cyber-toolkit': { video: S + 'cyber-toolkit.mp4', poster: S + 'cyber-toolkit.jpg' },
+  'storyboard-skill': { img: 'assets/projects/storyboard-skill/sketch-brand-s04.webp', frame: true },
+  'cyber-toolkit': { video: S + 'cyber-toolkit.mp4', poster: S + 'cyber-toolkit.jpg', scan: true },
   'blender-reel': { video: 'assets/v3/blender-reel-web.mp4', poster: 'assets/v3/blender-reel.jpg' },
   'ai-video-restyle': { video: S + 'ai-video-restyle.mp4', poster: 'assets/v3/ai-video-restyle.jpg' },
   'web-prototype': { video: S + 'web-prototype.mp4', poster: 'assets/v3/web-prototype.jpg' },
-  'ai-motion': { video: 'assets/v3/ai-motion-web.mp4', poster: 'assets/v3/ai-motion.jpg' },
-  'modeling-01': { video: 'assets/v3/modeling-01-web.mp4', poster: 'assets/v3/modeling-01.jpg' },
-  'modeling-02': { video: 'assets/v3/modeling-02-web.mp4', poster: 'assets/v3/modeling-02.jpg' },
-  'modeling-03': { video: 'assets/v3/modeling-03-web.mp4', poster: 'assets/v3/modeling-03.jpg' },
-  'ear-shield': { img: S + 'ear-shield.webp' },
-  'anxiety-market': { img: S + 'anxiety-market.webp' },
-  'biodiversity-clock': { img: S + 'biodiversity-clock.webp' },
-  'seedwalkers': { img: S + 'seedwalkers.webp' },
+  'ai-motion': { video: S + 'ai-motion.mp4', poster: S + 'ai-motion.jpg', frame: true },
+  'modeling-01': { video: S + 'modeling-01.mp4', poster: S + 'modeling-01.jpg' },
+  'modeling-02': { video: S + 'modeling-02.mp4', poster: S + 'modeling-02.jpg', frame: true },
+  'modeling-03': { video: S + 'modeling-03.mp4', poster: S + 'modeling-03.jpg' },
+  'ear-shield': { img: S + 'ear-shield.webp', frame: true },
+  'anxiety-market': { img: S + 'anxiety-market.webp', frame: true },
+  'biodiversity-clock': { img: S + 'biodiversity-clock-hd.webp' },
+  'seedwalkers': { img: S + 'seedwalkers.webp', frame: true },
   'machine-mapping': { img: S + 'machine-mapping.webp' },
-  'scone': { img: S + 'scone.webp' },
-  'cross-culture': { img: S + 'cross-culture.webp' }
+  'scone': { img: S + 'scone-hd.webp' },
+  'cross-culture': { img: S + 'cross-culture.webp', frame: true }
 };
 const sceneOf = p => SCENE[p.id] || { img: p.cover };
 
@@ -110,9 +112,10 @@ const scenes = new Map();
 function sceneEl(p) {
   if (scenes.has(p.id)) return scenes.get(p.id);
   const s = sceneOf(p), el = document.createElement('div');
-  el.className = 'ex-scene' + (s.soft ? ' ex-scene--soft' : '');
+  el.className = 'ex-scene' + (s.soft ? ' ex-scene--soft' : '') + (s.frame ? ' ex-scene--frame' : '') + (s.scan ? ' ex-scene--scan' : '');
   const still = lang === 'zh' && s.zh ? s.zh : s.img;
-  el.innerHTML = s.video ? `<video muted loop playsinline preload="none" poster="${s.poster}" data-src="${s.video}"></video>` : `<img src="${still}" alt="" decoding="async">`;
+  const media = s.video ? `<video muted loop playsinline preload="none" poster="${s.poster}" data-src="${s.video}"></video>` : `<img src="${still}" alt="" decoding="async">`;
+  el.innerHTML = s.frame ? `<img class="ex-wash" src="${s.poster || still}" alt="" decoding="async"><div class="ex-frame">${media}</div>` : media;
   if (s.phone) el.insertAdjacentHTML('beforeend', `<div class="ex-phone"><img src="${s.phone}" alt="" decoding="async"></div>`);
   bg.append(el); scenes.set(p.id, el); return el;
 }

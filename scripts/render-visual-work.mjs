@@ -75,7 +75,7 @@ export function renderVisualWork(t,document,projects){
       <div class="practice-entry-copy">
         <p class="eyebrow">${t('03 / AI-assisted Motion & Web Experiences','03 / AI 辅助动态影像与网页体验')}</p>
         <h2>${t('From visual direction to a working experience.','从视觉方向到可体验的成果。')}</h2>
-        <p>${t('Naturalis brings botanical imagery and editorial typography into an immersive web prototype. The Hyper3D collaboration applies an AI-supported pipeline to character creation and animation. Each project shows a different application of visual direction and rapid production.','Naturalis 将植物影像与编辑式排版融入沉浸式网页原型；Hyper3D 合作通过 AI 辅助流程完成角色生成与动画。两项作品分别呈现视觉方向在交互体验和动态制作中的应用。')}</p>
+        <p>${t('Naturalis brings botanical imagery and editorial typography into an immersive web prototype. In the Hyper3D collaboration, the character is generated with Hyper3D’s 3D AI and then imported into Blender to make the film. Each project shows a different application of visual direction and rapid production.','Naturalis 将植物影像与编辑式排版融入沉浸式网页原型；Hyper3D 合作中，角色先用 Hyper3D 的 3D AI 生成，再导入 Blender 完成成片。两项作品分别呈现视觉方向在交互体验和动态制作中的应用。')}</p>
         <ul class="tag-list"><li>${t('Web experience design','网页体验设计')}</li><li>${t('AI-assisted production','AI 辅助制作')}</li><li>${t('Character animation','角色动画')}</li><li>${t('Visual direction','视觉方向')}</li></ul>
       </div>
       <div class="practice-video-grid">${['web-prototype','ai-motion'].map(film).join('')}</div>

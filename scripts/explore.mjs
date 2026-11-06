@@ -3,6 +3,7 @@
 // The wheel (or a swipe, or the arrow keys) slides the projects along the arc; the one resting by the glowing dot is
 // the current project, and its own picture or film fills the screen. Click it again, or click the picture, to open it.
 import { projects, categories, orderedProjects } from './portfolio-catalog.mjs';
+import { startMusic } from './explore-music.mjs';
 
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -278,6 +279,7 @@ function setAbout(on, push = true) {
   if (on === isAbout) return; isAbout = on; panelTab = on ? 'about' : null;
   setContact(false);
   document.body.classList.toggle('is-about', on); dock.classList.toggle('is-about', on);
+  music?.duck(on);
   aboutBtn.classList.toggle('is-active', on); aboutView.setAttribute('aria-hidden', !on);
   aboutBtn.setAttribute('aria-label', L(on ? ['Back to the work', '返回作品'] : T.about));
   if (on) $('[data-about-scroll]').scrollTop = 0;
@@ -294,7 +296,13 @@ const closePanel = () => { if (isAbout) setAbout(false); else setContact(false);
 let ac = null, soundOn = (() => { try { return localStorage.getItem('explore-sound') !== 'off'; } catch { return true; } })();
 const soundBtn = $('[data-sound]');
 soundBtn.setAttribute('aria-pressed', soundOn);
-function wake() { if (!soundOn) return; try { ac ||= new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch {} }
+let music = null;
+function wake() {
+  if (!soundOn) return;
+  try { ac ||= new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch { return; }
+  if (!music) music = startMusic(ac);
+}
+document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else if (soundOn) ac.resume(); });
 ['pointerdown', 'keydown', 'touchend'].forEach(t => addEventListener(t, wake, { passive: true }));
 function tone(f, dur, vol, type = 'sine', to = 0.62, delay = 0) {
   if (!soundOn || !ac || ac.state !== 'running') return;
@@ -312,6 +320,7 @@ soundBtn.addEventListener('click', () => {
   soundOn = !soundOn; soundBtn.setAttribute('aria-pressed', soundOn);
   try { localStorage.setItem('explore-sound', soundOn ? 'on' : 'off'); } catch {}
   if (soundOn) { wake(); setTimeout(() => tone(1200, 0.06, 0.03), 30); }
+  else if (music) { music.stop(); music = null; }
 });
 $('[data-lang-toggle]').addEventListener('click', () => {
   lang = lang === 'zh' ? 'en' : 'zh'; try { localStorage.setItem('portfolio-language', lang); } catch {}

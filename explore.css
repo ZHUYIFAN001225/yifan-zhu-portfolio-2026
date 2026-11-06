@@ -232,3 +232,15 @@ body.is-about .ex-icon--contact{display:none}
 @keyframes ex-col{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 .ex-scene--wall:not(.is-on) .ex-wall-col{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){.ex-wall-col{animation:none}}
+
+/* ---- phones: readable over busy scenes, swipeable discipline chips, a clear music button ---- */
+@media (max-width:760px){
+  .ex-domains{pointer-events:auto;-webkit-overflow-scrolling:touch}
+  .ex-shade{background:linear-gradient(90deg,rgba(8,9,10,.84) 0%,rgba(8,9,10,.5) 55%,rgba(8,9,10,.25) 100%),linear-gradient(180deg,rgba(8,9,10,.78) 0%,rgba(8,9,10,.2) 24%,rgba(8,9,10,.25) 50%,rgba(8,9,10,.94) 78%)!important}
+  .ex-wall-col img{filter:brightness(.5) saturate(.9)}
+  .ex-wall{transform:translate(-40%,-50%) perspective(1600px) rotateX(24deg) rotateZ(-16deg)}
+  .ex-wall-col{width:150px}
+  .ex-sound{width:40px;height:40px}
+  .ex-proj a{text-shadow:0 2px 14px rgba(0,0,0,.65)}
+  .ex-info{background:linear-gradient(180deg,rgba(8,9,10,0),rgba(8,9,10,.35) 30%);padding-top:8px}
+}

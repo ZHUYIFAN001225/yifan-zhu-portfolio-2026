@@ -65,6 +65,8 @@ function renderText() {
   $('[data-contact]').setAttribute('aria-label', L(T.contact));
   domEl.setAttribute('aria-label', L(T.domains)); projEl.setAttribute('aria-label', L(T.works));
   renderDomains(); renderProjects(); renderInfo(true);
+  // the info block's height decides where the arc must stop on phones, so lay out again once it has its text
+  requestAnimationFrame(() => { layout(); frame(true); });
 }
 function renderDomains() {
   domEl.innerHTML = DOMAINS.map((d, j) => `<button type="button" class="ex-dom${j === dIdx ? ' is-on' : ''}" data-j="${j}" aria-pressed="${j === dIdx}">${L(d.label)}<small>${String(listOf(d.id).length).padStart(2, '0')}</small></button>`).join('');
@@ -86,6 +88,7 @@ function renderInfo(force) {
   line.textContent = L(p.subtitle); open.href = caseURL(p);
   open.setAttribute('aria-label', `${L(T.open)}: ${L(p.title)}`);
   if (!force) [kind, line, open].forEach(el => { el.classList.remove('is-swap'); void el.offsetWidth; el.classList.add('is-swap'); });
+  if (G.m) requestAnimationFrame(() => frame());
 }
 
 // ---------- the scene behind ----------
@@ -144,7 +147,7 @@ function layout() {
   $$('.ex-proj a', projEl).forEach(a => { a.style.fontSize = G.big + 'px'; });
 }
 function frame(force) {
-  if (G.m) G.floor = G.info.offsetTop - 44;
+  if (G.m) G.floor = G.info.getBoundingClientRect().top - 56;
   const { cx, cy, R, Rd, row, rowD, big, small, m } = G;
   const step = row / R, stepD = rowD / Rd;
   projLis.forEach((li, i) => {
@@ -155,7 +158,7 @@ function frame(force) {
     const k = Math.max(0, 1 - ad), s = (small + (big - small) * k) / big;
     li.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translateY(-50%)`;
     li.firstChild.style.transform = `scale(${s.toFixed(3)})`;
-    const edge = Math.min(1, Math.max(0, (G.floor - y) / 40), Math.max(0, (y - G.ceil) / 40));
+    const edge = Math.min(1, Math.max(0, (G.floor - y) / 50), Math.max(0, (y - G.ceil) / 40));
     li.style.opacity = ((ad < .5 ? 1 : clamp(0.82 - (ad - .5) * 0.2, 0, 0.82)) * edge).toFixed(3);
     li.style.pointerEvents = edge < .3 ? 'none' : '';
   });

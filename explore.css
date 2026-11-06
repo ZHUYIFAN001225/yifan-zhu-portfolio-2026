@@ -222,3 +222,13 @@ body.is-about .ex-icon--contact{display:none}
 /* a tall storyboard board: the camera travels down it */
 @keyframes ex-pan{0%{object-position:50% 8%}100%{object-position:50% 92%}}
 .ex-scene--pan.is-on>img{animation:ex-pan 40s ease-in-out infinite alternate;transform:scale(1)}
+/* LOOK: the product itself is the scene, a tilted wall of its real screens drifting past */
+.ex-scene--wall{background:radial-gradient(80% 70% at 60% 40%,#2b2230,#0d0b0f)}
+.ex-wall{position:absolute;left:50%;top:50%;width:170vw;height:200vh;display:flex;gap:28px;justify-content:center;
+  transform:translate(-44%,-50%) perspective(2200px) rotateX(24deg) rotateZ(-16deg);transform-style:preserve-3d}
+.ex-wall-col{flex:none;width:clamp(170px,14vw,250px);display:flex;flex-direction:column;gap:28px;animation:ex-col var(--d) linear infinite;animation-direction:normal}
+.ex-wall-col:nth-child(even){animation-direction:reverse;margin-top:-180px}
+.ex-wall-col img{display:block;width:100%;height:auto;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.1);filter:brightness(.82)}
+@keyframes ex-col{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+.ex-scene--wall:not(.is-on) .ex-wall-col{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.ex-wall-col{animation:none}}

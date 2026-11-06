@@ -311,7 +311,7 @@ window.addEventListener('pagereveal',event=>{
       // The curtain carries the destination project's name when we know it, otherwise the link text.
       const named = [...document.querySelectorAll('.sc-list a, .v3-card h3 a, .project-nav a')].find(x => { try { return new URL(x.href).pathname === url.pathname; } catch { return false; } });
       const title = ((named && (named.querySelector('.sc-name') || named).textContent) || a.getAttribute('aria-label') || a.textContent || '').replace(/[↗→▶]/g, '').trim().slice(0, 60);
-      const color = ink || '#0f1a14';
+      const color = 'rgba(11,12,13,.86)'; // always the site's near-black, never a project colour
       try { sessionStorage.setItem('v3-curtain', JSON.stringify({ color, title, t: Date.now() })); } catch {}
       const c = curtain(color, title); c.getBoundingClientRect(); c.classList.add('is-in');
       c.addEventListener('transitionend', ev => { if (ev.target === c && ev.propertyName === 'transform') location.href = url.href; }, { once: true });

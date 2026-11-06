@@ -38,7 +38,7 @@ const S = 'assets/v3/scenes/';
 // over a blurred wash of themselves, so nothing is ever stretched past its own resolution.
 const SCENE = {
   'salon-booking': { video: S + 'salon-loop.mp4', poster: S + 'salon-loop.jpg' },
-  'beauty-marketplace': { img: 'assets/v3/look-film/wall.webp', soft: true, phone: ['discover', 'detail', 'matches', 'booked'].map(n => `assets/v3/screens/look/${n}.webp`) },
+  'beauty-marketplace': { wall: [['discover', 'detail', 'make-it-real', 'matches', 'creator'], ['booked', 'similar', 'c-home', 'taste', 'saved'], ['c-portfolio', 'availability', 'search', 'chat', 'profile'], ['matches-map', 'c-requests', 'discover', 'summary', 'c-calendar'], ['detail', 'creator-search', 'booked', 'c-respond', 'work-info'], ['make-it-real', 'messages', 'c-home', 'preview', 'matches']] },
   'idea-to-edit': { video: S + 'idea-to-edit.mp4', poster: S + 'idea-to-edit.jpg' },
   'doodle-to-real': { video: 'assets/projects/doodle-to-real/a-05-landscape.mp4', poster: 'assets/projects/doodle-to-real/a-05-landscape.jpg' },
   'storyboard-skill': { img: 'assets/projects/storyboard-skill/sketch-drama-s06.webp', grain: true },
@@ -118,6 +118,12 @@ function sceneEl(p) {
   const s = sceneOf(p), el = document.createElement('div');
   el.className = 'ex-scene' + (s.soft ? ' ex-scene--soft' : '') + (s.frame ? ' ex-scene--frame' : '') + (s.scan ? ' ex-scene--scan' : '') + (s.video ? '' : ' ex-scene--still') + (s.grain ? ' ex-scene--grain' : '') + (s.pan ? ' ex-scene--pan' : '');
   const still = lang === 'zh' && s.zh ? s.zh : s.img;
+  if (s.wall) {
+    const dir = lang === 'zh' ? 'assets/v3/screens/look/zh/' : 'assets/v3/screens/look/';
+    el.className += ' ex-scene--wall';
+    el.innerHTML = `<div class="ex-wall">${s.wall.map((col, c) => `<div class="ex-wall-col" style="--d:${44 + c * 7}s;--o:${c % 2 ? -1 : 1}">${[...col, ...col].map(n => `<img src="${dir}${n}.webp" alt="" decoding="async" loading="lazy">`).join('')}</div>`).join('')}</div>`;
+    bg.append(el); scenes.set(p.id, el); return el;
+  }
   const media = s.video ? `<video muted loop playsinline preload="none" poster="${s.poster}" data-src="${s.video}"></video>` : `<img src="${still}" alt="" decoding="async">`;
   el.innerHTML = s.frame ? `<img class="ex-wash" src="${s.poster || still}" alt="" decoding="async"><div class="ex-frame">${media}</div>` : media;
   if (s.phone) el.insertAdjacentHTML('beforeend', `<div class="ex-phone">${[].concat(s.phone).map((u, i) => `<img src="${u}" alt="" decoding="async" style="animation-delay:${i * 3}s">`).join('')}</div>`);

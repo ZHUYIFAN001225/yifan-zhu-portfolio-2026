@@ -16,11 +16,6 @@
 <header class="ex-card">
   <a class="ex-name" href="explore.html" data-t="name"></a>
   <p class="ex-role" data-t="role"></p>
-  <p class="ex-intro" data-t="intro"></p>
-  <nav class="ex-dock" data-dock>
-    <button type="button" class="ex-icon" data-panel="about"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6" /><path d="M5 20c.6-3.7 3.4-6 7-6s6.4 2.3 7 6" /></svg><span data-t="about"></span></button>
-    <button type="button" class="ex-icon" data-panel="contact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8c4.8 0 8.4 3.3 8.4 7.6S16.8 19 12 19c-1 0-2-.1-2.9-.4L4.6 20.2l1.3-3.6C4.5 15.3 3.6 13.5 3.6 11.4 3.6 7.1 7.2 3.8 12 3.8Z" /><circle cx="8.6" cy="11.4" r=".9" /><circle cx="12" cy="11.4" r=".9" /><circle cx="15.4" cy="11.4" r=".9" /></svg><span data-t="contact"></span></button>
-  </nav>
 </header>
 <div class="ex-util">
   <a class="ex-index" href="work.html" data-t="index"></a>
@@ -43,11 +38,17 @@
   <a class="ex-open" data-open href="#"><span data-t="open"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6" /></svg></a>
 </aside>
 
-<div class="ex-veil" data-veil hidden></div>
-<aside class="ex-panel" data-panel-box aria-hidden="true" tabindex="-1">
-  <div class="ex-panel-tabs" role="tablist"><button type="button" role="tab" data-tab="about"></button><button type="button" role="tab" data-tab="contact"></button><button type="button" class="ex-panel-x" data-close><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8m0-8-8 8" /></svg></button></div>
-  <div class="ex-panel-body" data-panel-body></div>
-</aside>
+<nav class="ex-dock" data-dock>
+  <button type="button" class="ex-icon ex-icon--about" data-about><svg class="i-me" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6" /><path d="M5 20c.6-3.7 3.4-6 7-6s6.4 2.3 7 6" /></svg><svg class="i-back" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg><span class="ex-tip" data-t="about"></span></button>
+  <button type="button" class="ex-icon ex-icon--contact" data-contact aria-expanded="false"><svg class="i-chat" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8c4.8 0 8.4 3.3 8.4 7.6S16.8 19 12 19c-1 0-2-.1-2.9-.4L4.6 20.2l1.3-3.6C4.5 15.3 3.6 13.5 3.6 11.4 3.6 7.1 7.2 3.8 12 3.8Z" /><circle cx="8.6" cy="11.4" r=".9" /><circle cx="12" cy="11.4" r=".9" /><circle cx="15.4" cy="11.4" r=".9" /></svg><svg class="i-x" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" /></svg><span class="ex-tip" data-t="contact"></span></button>
+  <div class="ex-links" data-links></div>
+</nav>
+<section class="ex-about" data-about-view aria-hidden="true">
+  <div class="ex-about-in">
+    <div class="ex-about-head"><p class="ex-about-name" data-t="name"></p><p class="ex-about-role" data-t="role"></p></div>
+    <div class="ex-about-body" data-about-body></div>
+  </div>
+</section>
 
 <p class="ex-hint" data-hint></p>
 <script type="module" src="scripts/explore.mjs"></script>

@@ -20,21 +20,17 @@ const T = {
   sound: ['Sound', '音效'], close: ['Close', '关闭']
 };
 const MAIL = 'zhuyifan001225@gmail.com';
-const PANEL = {
-  about: () => `<h2>${L(T.name)}</h2><p class="ex-p-sub">${L(['Research-led multidisciplinary designer · MDes, Glasgow', '研究驱动的跨领域设计师 · 格拉斯哥 MDes'])}</p>
-    <p class="ex-p-say">${L(['I design products and services that real people use, and build in 3D, film and AI workflows when an idea needs to be felt rather than explained. I start from research, make things quickly, and test them with the people they are for.', '我做真实的人在用的产品和服务；当一个想法需要被感受而不是被解释时，我用 3D、影像和 AI 工作流把它做出来。我从调研开始，快速做出来，再和它真正的使用者一起测试。'])}</p>
-    <p class="ex-p-h">${L(['What is already out in the world', '已经落地的'])}</p>
-    <ul class="ex-p-proof">${[[['Live', '已上线'], ['A booking system a Glasgow salon runs on', '一家格拉斯哥理发店正在用的预约系统']], [['Released', '已发布'], ['A Blender add-on with a public release', '一个公开发布的 Blender 插件']], [['Research', '研究'], ['A service study tested over two rounds', '经过两轮测试的服务设计研究']], [['AI × Video', 'AI × 视频'], ['A product concept, a ComfyUI effect and an agent workflow', '产品概念、ComfyUI 特效、Agent 工作流']]].map(([a, b]) => `<li><b>${L(a)}</b>${L(b)}</li>`).join('')}</ul>
-    <p class="ex-p-h">${L(['Tools', '工具'])}</p>
-    <p class="ex-p-tools">Figma · Blender · ComfyUI · Unity · TouchDesigner · Arduino · Python · ${L(['AI-assisted prototyping', 'AI 辅助原型'])}</p>
-    <p class="ex-p-h">${L(['More', '更多'])}</p>
-    <ul class="ex-p-links"><li><a href="about.html">${L(['Full profile and skills', '完整个人介绍与技能'])}<small>↗</small></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}">${L(['Request my CV', '索取简历'])}<small>${L(['by email', '邮件'])}</small></a></li><li><a href="work.html">${L(['All work as a list', '以列表查看全部作品'])}<small>↗</small></a></li></ul>`,
-  contact: () => `<h2>${L(["Let's talk", '聊聊吧'])}</h2><p class="ex-p-sub">${L(['Roles, collaborations, or a question about a project.', '工作机会、合作，或者对某个项目的问题都可以。'])}</p>
-    <a class="ex-p-mail" href="mailto:${MAIL}">${MAIL}</a>
-    <div class="ex-p-row"><a class="ex-p-btn ex-p-btn--fill" href="mailto:${MAIL}">${L(['Write an email', '写邮件'])}</a><button type="button" class="ex-p-btn" data-copy>${L(['Copy address', '复制邮箱'])}</button></div>
-    <p class="ex-p-h">${L(['Elsewhere', '其他平台'])}</p>
-    <ul class="ex-p-links">${[['Bilibili', ['Bilibili', 'B 站'], 'https://b23.tv/DQqusXX'], ['RED', ['Xiaohongshu / RED', '小红书'], 'https://xhslink.com/m/AZhAMj7fpc7'], ['Douyin', ['Douyin', '抖音'], 'https://www.douyin.com/user/MS4wLjABAAAA_lHmWTuM_a1k_09EF1ewxBH9vU3K2tYWuNJe-Mk7H_0'], ['Res', ['Resource website', '资源网站'], 'https://boywithdoughnut.huotan.net/']].map(([, n, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${L(n)}<small>↗</small></a></li>`).join('')}</ul>`
-};
+const SOCIAL = [[['Bilibili', 'B 站'], 'https://b23.tv/DQqusXX'], [['RED', '小红书'], 'https://xhslink.com/m/AZhAMj7fpc7'], [['Douyin', '抖音'], 'https://www.douyin.com/user/MS4wLjABAAAA_lHmWTuM_a1k_09EF1ewxBH9vU3K2tYWuNJe-Mk7H_0']];
+const linksHTML = () => `<a class="ex-icon" href="mailto:${MAIL}" aria-label="${L(['Email', '邮件'])}: ${MAIL}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" /><path d="m4.5 7.5 7.5 5.5 7.5-5.5" /></svg><span class="ex-tip">${MAIL}</span></a>` +
+  SOCIAL.map(([n, u]) => `<a class="ex-icon" href="${u}" target="_blank" rel="noopener">${L(n)}</a>`).join('');
+const aboutHTML = () => L([
+  `<p><b>Research-led multidisciplinary designer</b>, turning messy problems, real users and new tools into products, services and films people actually use.</p>
+   <p>Trained at <b>Glasgow (MDes)</b>, I have shipped <b>a booking system a salon runs on</b>, released <b>a Blender add-on</b>, tested <b>a service study</b> over two rounds, and made <b>AI × Video</b> pieces with ComfyUI and agent workflows.</p>
+   <p>I work in <b>Figma, Blender, ComfyUI, Unity and TouchDesigner</b>, and pick whichever makes an idea testable fastest.</p>`,
+  `<p><b>研究驱动的跨领域设计师</b>，把复杂的问题、真实的用户和新的工具，变成人真正会用的产品、服务和影像。</p>
+   <p>我在<b>格拉斯哥读 MDes</b>，做过<b>一家理发店正在用的预约系统</b>，发布过<b>一个 Blender 插件</b>，做过<b>两轮测试的服务设计研究</b>，也用 ComfyUI 和 Agent 工作流做了 <b>AI × 视频</b>作品。</p>
+   <p>常用 <b>Figma、Blender、ComfyUI、Unity、TouchDesigner</b>，哪个能最快把想法做成可测试的东西，就用哪个。</p>`]) +
+  `<ul><li><a href="about.html"><span>${L(['Full profile, skills and CV', '完整介绍、技能与简历'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}"><span>${L(['Request my CV', '索取简历'])}</span><span>${MAIL}</span></a></li><li><a href="work.html"><span>${L(['All work as a list', '以列表查看全部作品'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul>`;
 
 // Each project's own scene: a film loop where there is one, otherwise its strongest real photograph.
 const S = 'assets/v3/scenes/';
@@ -75,7 +71,7 @@ let pos = target, dpos = dIdx, active = -1;
 const domEl = $('[data-domains]'), projEl = $('[data-projects]'), bg = $('.ex-bg');
 const arcD = $('.ex-arc--d'), arcP = $('.ex-arc--p'), tie = $('.ex-tie'), dotD = $('.ex-dot--d'), dotP = $('.ex-dot--p');
 let G = {}; // geometry
-let projLis = [], panelTab = null;
+let projLis = [], panelTab = null, isAbout = false;
 
 // ---------- text ----------
 function renderText() {
@@ -83,9 +79,10 @@ function renderText() {
   $$('[data-t]').forEach(el => { el.textContent = L(T[el.dataset.t]); });
   $('[data-hint]').textContent = L(T.hint);
   $('[data-lang-toggle]').setAttribute('aria-label', L(T.lang));
-  $$('[data-tab]').forEach(b => { b.textContent = L(T[b.dataset.tab]); });
-  $('[data-close]').setAttribute('aria-label', L(T.close)); $('[data-sound]').setAttribute('aria-label', L(T.sound));
-  if (panelTab) renderPanel(panelTab);
+  $('[data-sound]').setAttribute('aria-label', L(T.sound));
+  $('[data-links]').innerHTML = linksHTML(); $('[data-about-body]').innerHTML = aboutHTML();
+  $('[data-about]').setAttribute('aria-label', L(isAbout ? ['Back to the work', '返回作品'] : T.about));
+  $('[data-contact]').setAttribute('aria-label', L(T.contact));
   domEl.setAttribute('aria-label', L(T.domains)); projEl.setAttribute('aria-label', L(T.works));
   renderDomains(); renderProjects(); renderInfo(true);
 }
@@ -148,7 +145,8 @@ function layout() {
   G = { m, cy, R, Rd, cx, Ax, Ad, row: m ? 48 : 60, rowD: 46, big: m ? 26 : 38, small: m ? 16 : 20, floor: m ? info.top - 14 : vh - 40, ceil: m ? $('.ex-domains').getBoundingClientRect().bottom + 20 : cb + 26, info: $('.ex-info') };
   const svg = $('.ex-arcs'); svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
   const arc = (r, a) => { const p = t => `${(cx + r * Math.cos(t)).toFixed(1)} ${(cy + r * Math.sin(t)).toFixed(1)}`; return `M ${p(-a)} A ${r} ${r} 0 0 1 ${p(a)}`; };
-  arcP.setAttribute('d', arc(R, m ? 1.05 : 0.95)); arcD.setAttribute('d', m ? '' : arc(Rd, 0.5));
+  const span = Math.min(m ? 1.05 : 0.95, Math.asin(clamp((cy - G.ceil + 10) / R, 0, 1)), Math.asin(clamp((vh - cy - 30) / R, 0, 1)));
+  arcP.setAttribute('d', arc(R, span)); arcD.setAttribute('d', m ? '' : arc(Rd, 0.5));
   tie.setAttribute('x1', Ad + 6); tie.setAttribute('x2', Ax - 9); tie.setAttribute('y1', cy); tie.setAttribute('y2', cy);
   dotP.style.transform = `translate(${Ax}px,${cy}px)`; dotD.style.transform = `translate(${Ad}px,${cy}px)`;
   $$('.ex-proj a', projEl).forEach(a => { a.style.fontSize = G.big + 'px'; });
@@ -221,7 +219,7 @@ let snapT, dAcc = 0, dLock = 0;
 const inDomainZone = e => !G.m && (e.target.closest?.('.ex-domains') || (e.clientX < G.Ad + 30 && e.clientY > G.ceil));
 addEventListener('mousemove', e => { document.body.classList.toggle('in-domains', !!inDomainZone(e)); }, { passive: true });
 addEventListener('wheel', e => {
-  if (panelTab) { if (!e.target.closest?.('.ex-panel')) e.preventDefault(); return; }
+  if (panelTab) return;
   e.preventDefault();
   const px = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? innerHeight : 1;
   const dy = (Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * px;
@@ -235,11 +233,11 @@ addEventListener('wheel', e => {
 }, { passive: false });
 // touch: the arc follows the finger, then settles on the nearest project
 let ty = null, tStart = 0, tMoved = false;
-addEventListener('touchstart', e => { if (panelTab || e.target.closest?.('.ex-domains,.ex-panel')) return; ty = e.touches[0].clientY; tStart = target; tMoved = false; }, { passive: true });
+addEventListener('touchstart', e => { if (panelTab || e.target.closest?.('.ex-domains,.ex-about')) return; ty = e.touches[0].clientY; tStart = target; tMoved = false; }, { passive: true });
 addEventListener('touchmove', e => { if (ty === null) return; const dy = e.touches[0].clientY - ty; if (Math.abs(dy) > 6) tMoved = true; target = clamp(tStart - dy / G.row, -0.4, list.length - 0.6); }, { passive: true });
 addEventListener('touchend', () => { if (ty === null) return; ty = null; go(Math.round(target)); });
 addEventListener('keydown', e => {
-  if (e.key === 'Escape' && panelTab) return closePanel();
+  if (e.key === 'Escape' && (panelTab || dock.classList.contains('is-open'))) return closePanel();
   if (panelTab || e.target.closest?.('input,textarea')) return;
   if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); go(target + 1); }
   else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); go(target - 1); }
@@ -255,36 +253,27 @@ projEl.addEventListener('click', e => {
 domEl.addEventListener('click', e => { const b = e.target.closest('.ex-dom'); if (b) setDomain(+b.dataset.j); });
 bg.addEventListener('click', () => { if (!tMoved) openActive(); });
 
-// ---------- About / Contact drawer ----------
-const box = $('[data-panel-box]'), veil = $('[data-veil]'), body = $('[data-panel-body]');
-let lastFocus = null;
-function renderPanel(tab) {
-  panelTab = tab; body.innerHTML = PANEL[tab](); body.scrollTop = 0;
-  $$('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tab));
-  $$('[data-panel]').forEach(b => b.setAttribute('aria-expanded', b.dataset.panel === tab));
+// ---------- About (a page of type) and Contact (the dock opens in place) ----------
+const dock = $('[data-dock]'), aboutBtn = $('[data-about]'), contactBtn = $('[data-contact]'), aboutView = $('[data-about-view]');
+function setContact(on) {
+  dock.classList.toggle('is-open', on); document.body.classList.toggle('is-contact', on);
+  contactBtn.classList.toggle('is-active', on); contactBtn.setAttribute('aria-expanded', on);
 }
-function openPanel(tab) {
-  if (panelTab === tab) return closePanel();
-  if (!panelTab) lastFocus = document.activeElement;
-  renderPanel(tab); panelSound();
-  veil.hidden = false; requestAnimationFrame(() => { veil.classList.add('is-on'); box.classList.add('is-on'); });
-  box.setAttribute('aria-hidden', 'false'); box.focus({ preventScroll: true });
+function setAbout(on, push = true) {
+  if (on === isAbout) return; isAbout = on; panelTab = on ? 'about' : null;
+  setContact(false);
+  document.body.classList.toggle('is-about', on); dock.classList.toggle('is-about', on);
+  aboutBtn.classList.toggle('is-active', on); aboutView.setAttribute('aria-hidden', !on);
+  aboutBtn.setAttribute('aria-label', L(on ? ['Back to the work', '返回作品'] : T.about));
+  if (on) aboutView.scrollTop = 0;
+  if (push) { const u = new URL(location.href); on ? u.searchParams.set('view', 'about') : u.searchParams.delete('view'); history.pushState({ about: on }, '', u); }
+  panelSound();
 }
-function closePanel() {
-  if (!panelTab) return; panelTab = null;
-  veil.classList.remove('is-on'); box.classList.remove('is-on'); box.setAttribute('aria-hidden', 'true');
-  $$('[data-panel]').forEach(b => b.setAttribute('aria-expanded', 'false'));
-  setTimeout(() => { if (!panelTab) veil.hidden = true; }, 450);
-  lastFocus?.focus?.({ preventScroll: true });
-}
-$$('[data-panel]').forEach(b => b.addEventListener('click', () => openPanel(b.dataset.panel)));
-$$('[data-tab]').forEach(b => b.addEventListener('click', () => { if (b.dataset.tab !== panelTab) { renderPanel(b.dataset.tab); panelSound(); } }));
-$('[data-close]').addEventListener('click', closePanel);
-veil.addEventListener('click', closePanel);
-body.addEventListener('click', e => {
-  const c = e.target.closest('[data-copy]'); if (!c) return;
-  navigator.clipboard?.writeText(MAIL).then(() => { c.textContent = L(['Copied', '已复制']); setTimeout(() => { c.textContent = L(['Copy address', '复制邮箱']); }, 1600); }).catch(() => {});
-});
+aboutBtn.addEventListener('click', () => setAbout(!isAbout));
+contactBtn.addEventListener('click', () => { setContact(!dock.classList.contains('is-open')); panelSound(); });
+addEventListener('popstate', () => setAbout(new URLSearchParams(location.search).get('view') === 'about', false));
+addEventListener('click', e => { if (dock.classList.contains('is-open') && !e.target.closest?.('.ex-dock')) { e.stopPropagation(); e.preventDefault(); setContact(false); } }, true);
+const closePanel = () => { if (isAbout) setAbout(false); else setContact(false); };
 
 // ---------- sound: tiny synthesised ticks, no files to load ----------
 let ac = null, soundOn = (() => { try { return localStorage.getItem('explore-sound') !== 'off'; } catch { return true; } })();
@@ -317,6 +306,7 @@ let hintGone = false; const hideHint = () => { if (hintGone) return; hintGone = 
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); frame(true); }, 120); });
 
 renderText();
+if (qs.get('view') === 'about') setAbout(true, false);
 requestAnimationFrame(tick);
 
 function chipIntoView() {

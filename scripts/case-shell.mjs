@@ -2,6 +2,7 @@
 // A full-screen cover made from the project's own scene, the title set large over it, one accent colour per
 // project, and a quiet blurred wash of the scene behind the reading column.
 import { SCENE, ACCENT } from './scenes.mjs';
+import { rippleAll } from './ripple.mjs';
 
 const zh = () => document.documentElement.lang.startsWith('zh');
 const L = v => (v ? (zh() ? v.zh : v.en) || v.en || '' : '');
@@ -46,4 +47,6 @@ export function mount(project) {
   render(); document.addEventListener('portfolio:language', render);
   cover.querySelector('.cs-down').addEventListener('click', e => { e.preventDefault(); main.scrollIntoView({ behavior: 'smooth' }); });
   const v = cover.querySelector('video'); if (v) { v.play?.().catch(() => {}); new IntersectionObserver(([en]) => en.isIntersecting ? v.play().catch(() => {}) : v.pause()).observe(cover); }
+  // pictures answer the pointer
+  requestAnimationFrame(() => setTimeout(() => rippleAll(), 400));
 }

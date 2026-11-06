@@ -206,3 +206,8 @@ body.is-about .ex-icon--contact{display:none}
 .ex-scene.is-on .ex-phone img:first-child{animation-name:ex-cycle-first}
 @keyframes ex-cycle-first{0%{opacity:1}25%{opacity:1}30%{opacity:0}96%{opacity:0;transform:translateY(2%)}100%{opacity:1;transform:none}}
 @media (min-width:761px){.ex-phone{top:43%;width:clamp(180px,15vw,250px);max-height:calc(100vh - 400px);aspect-ratio:auto;height:min(calc(clamp(180px,15vw,250px)*2.17),calc(100vh - 400px))}}
+@media (min-width:761px){
+  .ex-frame{right:clamp(32px,5vw,96px)}
+  .ex-frame>img,.ex-frame>video{max-width:min(34vw,820px)}
+}
+.ex-proj.is-on a{text-shadow:0 2px 24px rgba(0,0,0,.55),0 0 2px rgba(0,0,0,.4)}

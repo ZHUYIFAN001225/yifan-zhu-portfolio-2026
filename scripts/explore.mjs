@@ -148,7 +148,7 @@ function layout() {
   const Ax = m ? 30 : Ad + 70;
   const cx = Ax - R, Rd = R - (Ax - Ad);
   const info = $('.ex-info').getBoundingClientRect();
-  G = { m, cy, R, Rd, cx, Ax, Ad, row: m ? 48 : 60, rowD: 46, big: m ? 26 : 38, small: m ? 16 : 20, floor: m ? info.top - 14 : vh - 40, ceil: m ? $('.ex-domains').getBoundingClientRect().bottom + 20 : cb + 26, info: $('.ex-info') };
+  G = { m, cy, R, Rd, cx, Ax, Ad, row: m ? 48 : 60, rowD: 46, big: m ? 26 : 34, small: m ? 16 : 20, floor: m ? info.top - 14 : vh - 40, ceil: m ? $('.ex-domains').getBoundingClientRect().bottom + 20 : cb + 26, info: $('.ex-info') };
   const svg = $('.ex-arcs'); svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
   const arc = (r, a) => { const p = t => `${(cx + r * Math.cos(t)).toFixed(1)} ${(cy + r * Math.sin(t)).toFixed(1)}`; return `M ${p(-a)} A ${r} ${r} 0 0 1 ${p(a)}`; };
   const span = Math.min(m ? 1.05 : 0.95, Math.asin(clamp((cy - G.ceil + 10) / R, 0, 1)), Math.asin(clamp((vh - cy - 30) / R, 0, 1)));

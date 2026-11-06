@@ -23,14 +23,14 @@ const MAIL = 'zhuyifan001225@gmail.com';
 const SOCIAL = [[['Bilibili', 'B 站'], 'https://b23.tv/DQqusXX'], [['RED', '小红书'], 'https://xhslink.com/m/AZhAMj7fpc7'], [['Douyin', '抖音'], 'https://www.douyin.com/user/MS4wLjABAAAA_lHmWTuM_a1k_09EF1ewxBH9vU3K2tYWuNJe-Mk7H_0']];
 const linksHTML = () => `<a class="ex-icon" href="mailto:${MAIL}" aria-label="${L(['Email', '邮件'])}: ${MAIL}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" /><path d="m4.5 7.5 7.5 5.5 7.5-5.5" /></svg><span class="ex-tip">${MAIL}</span></a>` +
   SOCIAL.map(([n, u]) => `<a class="ex-icon" href="${u}" target="_blank" rel="noopener">${L(n)}</a>`).join('');
-const aboutHTML = () => L([
+const aboutHTML = () => `<figure class="ex-me"><img src="assets/v3/me.webp" alt="${L(['Yifan Zhu in the studio', '朱异凡在工作室'])}" width="880" height="1100" decoding="async"></figure><div class="ex-about-text">` + L([
   `<p><b>Research-led multidisciplinary designer</b>, turning messy problems, real users and new tools into products, services and films people actually use.</p>
    <p>Trained at <b>Glasgow (MDes)</b>, I have shipped <b>a booking system a salon runs on</b>, released <b>a Blender add-on</b>, tested <b>a service study</b> over two rounds, and made <b>AI × Video</b> pieces with ComfyUI and agent workflows.</p>
    <p>I work in <b>Figma, Blender, ComfyUI, Unity and TouchDesigner</b>, and pick whichever makes an idea testable fastest.</p>`,
   `<p><b>研究驱动的跨领域设计师</b>，把复杂的问题、真实的用户和新的工具，变成人真正会用的产品、服务和影像。</p>
    <p>我在<b>格拉斯哥读 MDes</b>，做过<b>一家理发店正在用的预约系统</b>，发布过<b>一个 Blender 插件</b>，做过<b>两轮测试的服务设计研究</b>，也用 ComfyUI 和 Agent 工作流做了 <b>AI × 视频</b>作品。</p>
    <p>常用 <b>Figma、Blender、ComfyUI、Unity、TouchDesigner</b>，哪个能最快把想法做成可测试的东西，就用哪个。</p>`]) +
-  `<ul><li><a href="about.html"><span>${L(['Full profile, skills and CV', '完整介绍、技能与简历'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}"><span>${L(['Request my CV', '索取简历'])}</span><span>${MAIL}</span></a></li><li><a href="work.html"><span>${L(['All work as a list', '以列表查看全部作品'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul>`;
+  `<ul><li><a href="about.html"><span>${L(['Full profile, skills and CV', '完整介绍、技能与简历'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}"><span>${L(['Request my CV', '索取简历'])}</span><span>${MAIL}</span></a></li><li><a href="work.html"><span>${L(['All work as a list', '以列表查看全部作品'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul></div>`;
 
 // Each project's own scene: a film loop where there is one, otherwise its strongest real photograph.
 const S = 'assets/v3/scenes/';
@@ -136,6 +136,8 @@ function showScene(i) {
 function layout() {
   const vw = innerWidth, vh = innerHeight, m = vw <= 760;
   const cb = $('.ex-card').getBoundingClientRect().bottom;
+  domEl.style.top = m ? (cb + 12) + 'px' : '';
+  document.documentElement.style.setProperty('--cb', cb + 'px');
   const cy = m ? vh * 0.4 : clamp(cb + (vh - cb) * 0.44, vh * 0.5, vh * 0.62);
   const R = m ? Math.max(380, vh * 0.6) : Math.max(560, vh * 0.82);
   const Ad = m ? 0 : clamp(vw * 0.19, 230, 330);
@@ -265,7 +267,7 @@ function setAbout(on, push = true) {
   document.body.classList.toggle('is-about', on); dock.classList.toggle('is-about', on);
   aboutBtn.classList.toggle('is-active', on); aboutView.setAttribute('aria-hidden', !on);
   aboutBtn.setAttribute('aria-label', L(on ? ['Back to the work', '返回作品'] : T.about));
-  if (on) aboutView.scrollTop = 0;
+  if (on) $('[data-about-scroll]').scrollTop = 0;
   if (push) { const u = new URL(location.href); on ? u.searchParams.set('view', 'about') : u.searchParams.delete('view'); history.pushState({ about: on }, '', u); }
   panelSound();
 }

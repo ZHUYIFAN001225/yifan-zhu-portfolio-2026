@@ -31,10 +31,11 @@ const aboutHTML = () => `<figure class="ex-me"><img src="assets/v3/me.webp" alt=
   `<p><b>研究驱动的跨领域设计师</b>，把复杂的问题、真实的用户和新的工具，变成人真正会用的产品、服务和影像。</p>
    <p>我在<b>格拉斯哥读 MDes</b>，做过<b>一家英国格拉斯哥本地理发店正在用的预约系统</b>，发布过<b>一个 Blender 插件</b>，做过<b>两轮测试的服务设计研究</b>，也用 ComfyUI 和 Agent 工作流做了 <b>AI × 视频</b>作品。</p>
    <p>常用 <b>Figma、Blender、ComfyUI、Unity、TouchDesigner</b>，哪个能最快把想法做成可测试的东西，就用哪个。</p>`]) +
-  `<ul><li><a href="about.html"><span>${L(['Full profile, skills and CV', '完整介绍、技能与简历'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}"><span>${L(['Request my CV', '索取简历'])}</span><span>${MAIL}</span></a></li><li><a href="work.html"><span>${L(['All work as a list', '以列表查看全部作品'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul></div>`;
+  `<ul><li><a href="about.html"><span>${L(['Full profile, skills and CV', '完整介绍、技能与简历'])}</span><span aria-hidden="true">↗</span></a></li><li><a href="mailto:${MAIL}?subject=${encodeURIComponent('CV request')}"><span>${L(['Request my CV', '索取简历'])}</span><span>${MAIL}</span></a></li><li><a href="https://boywithdoughnut.huotan.net/" target="_blank" rel="noopener"><span>${L(['Resource website', '资源网站'])}</span><span aria-hidden="true">↗</span></a></li></ul></div>`;
 
 // Each project's own scene: a film loop where there is one, otherwise its strongest real photograph.
 import { SCENE } from './scenes.mjs';
+const caseURL = p => { const [path, hash] = p.href.split('#'); return `${path}${path.includes('?') ? '&' : '?'}from=${DOMAINS[dIdx].id}&lang=${lang}${hash ? '#' + hash : ''}`; };
 const sceneOf = p => SCENE[p.id] || { img: p.cover };
 
 const DOMAINS = categories.filter(c => c.id !== 'all');
@@ -70,7 +71,7 @@ function renderDomains() {
   chipIntoView();
 }
 function renderProjects() {
-  projEl.innerHTML = list.map((p, i) => `<li class="ex-proj" data-i="${i}"><a href="${p.href}">${L(p.title)}</a></li>`).join('');
+  projEl.innerHTML = list.map((p, i) => `<li class="ex-proj" data-i="${i}"><a href="${caseURL(p)}">${L(p.title)}</a></li>`).join('');
   projLis = $$('.ex-proj', projEl);
   $('[data-total]').textContent = String(list.length).padStart(2, '0');
   layout(); frame(true);
@@ -82,7 +83,7 @@ function renderInfo(force) {
   kind.innerHTML = '';
   kind.append(L(p.kind));
   if (p.tools) { const t = document.createElement('span'); t.className = 'ex-tool'; t.textContent = `${L(T.tools)} ${L(p.tools)}`; kind.append(t); }
-  line.textContent = L(p.subtitle); open.href = p.href;
+  line.textContent = L(p.subtitle); open.href = caseURL(p);
   open.setAttribute('aria-label', `${L(T.open)}: ${L(p.title)}`);
   if (!force) [kind, line, open].forEach(el => { el.classList.remove('is-swap'); void el.offsetWidth; el.classList.add('is-swap'); });
 }
@@ -202,7 +203,7 @@ function setDomain(j) {
   renderProjects();
   if (G.m) domEl.children[j]?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
 }
-const openActive = () => { const p = list[active]; if (!p) return; openSound(); setTimeout(() => { location.href = p.href; }, soundOn && ac ? 140 : 0); };
+const openActive = () => { const p = list[active]; if (!p) return; openSound(); setTimeout(() => { location.href = caseURL(p); }, soundOn && ac ? 140 : 0); };
 
 // wheel: the arc follows the wheel continuously, then settles on the nearest project.
 // Over the inner arc (the disciplines) the wheel steps through disciplines instead.

@@ -29,7 +29,7 @@ function labels(){
   trigger.setAttribute('aria-label',text('Browse work. Current collection: ','作品分类，当前：')+category.label[lang]);
   top.setAttribute('aria-label',text('Back to top','回到顶部'));title.textContent=text('Explore by discipline','按职业方向浏览');
   close.setAttribute('aria-label',text('Close work categories','关闭作品分类'));more.setAttribute('aria-label',text('More pages','更多页面'));filmsLabel.textContent=text('Films & Tools','影像与工具');films.href=`practice.html?lang=${lang}`;if(location.pathname.endsWith('/practice.html'))films.setAttribute('aria-current','page');else films.removeAttribute('aria-current');list.setAttribute('aria-label',text('Work categories','作品分类'));
-  list.querySelectorAll('a').forEach(a=>{const c=categories.find(c=>c.id===a.dataset.mobileCollection);a.firstElementChild.textContent=c.label[lang];a.href=`work.html?filter=${c.id}&lang=${lang}#work`;if(c.id===active&&!location.pathname.endsWith('/practice.html'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  list.querySelectorAll('a').forEach(a=>{const c=categories.find(c=>c.id===a.dataset.mobileCollection);a.firstElementChild.textContent=c.label[lang];a.href=`index.html?d=${c.id}&lang=${lang}`;if(c.id===active&&!location.pathname.endsWith('/practice.html'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
 }
 function dismiss(){sheet.close();}
 trigger.addEventListener('click',()=>{if(!phone.matches)return;labels();sheet.showModal();trigger.setAttribute('aria-expanded','true');document.documentElement.classList.add('v3-mobile-nav-open');});

@@ -9,7 +9,7 @@ export const SCENE = {
   'idea-to-edit': { video: S + 'idea-to-edit.mp4', poster: S + 'idea-to-edit.jpg' },
   'doodle-to-real': { video: 'assets/projects/doodle-to-real/a-05-landscape.mp4', poster: 'assets/projects/doodle-to-real/a-05-landscape.jpg' },
   'storyboard-skill': { img: 'assets/projects/storyboard-skill/sketch-drama-s06.webp', grain: true },
-  'cyber-toolkit': { video: S + 'cyber-toolkit.mp4', poster: S + 'cyber-toolkit.jpg', scan: true },
+  'cyber-toolkit': { video: S + 'cyber-toolkit.mp4?v=2', poster: S + 'cyber-toolkit.jpg?v=2', scan: true },
   'blender-reel': { video: S + 'blender-loop.mp4', poster: S + 'blender-loop.jpg' },
   'ai-video-restyle': { video: S + 'poker-loop.mp4', poster: S + 'poker-loop.jpg' },
   'web-prototype': { video: S + 'naturalis-loop.mp4', poster: S + 'naturalis-loop.jpg', grain: true },

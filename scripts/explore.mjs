@@ -145,6 +145,7 @@ function layout() {
   tie.setAttribute('x1', Ad + 6); tie.setAttribute('x2', Ax - 9); tie.setAttribute('y1', cy); tie.setAttribute('y2', cy);
   dotP.style.transform = `translate(${Ax}px,${cy}px)`; dotD.style.transform = `translate(${Ad}px,${cy}px)`;
   $$('.ex-proj a', projEl).forEach(a => { a.style.fontSize = G.big + 'px'; });
+  G.dw = $$('.ex-dom', domEl).map(b => b.offsetWidth);
 }
 function frame(force) {
   if (G.m) G.floor = G.info.getBoundingClientRect().top - 56;
@@ -163,7 +164,7 @@ function frame(force) {
     li.style.pointerEvents = edge < .3 ? 'none' : '';
   });
   if (!m) $$('.ex-dom', domEl).forEach((b, j) => {
-    const d = j - dpos, t = d * stepD, x = cx + Rd * Math.cos(t) - 18, y = cy + Rd * Math.sin(t);
+    const d = j - dpos, t = d * stepD, y = cy + Rd * Math.sin(t), x = Math.max(cx + Rd * Math.cos(t) - 18, (G.dw?.[j] || 0) + 20); // never past the left edge
     b.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-100%,-50%)`;
     b.style.opacity = clamp(1 - Math.abs(d) * 0.22, 0.25, 1).toFixed(3);
   });

@@ -180,8 +180,8 @@ body.is-about .ex-icon--contact{display:none}
 .ex-scene.is-on .ex-frame{transform:translateY(-50%);opacity:1}
 .ex-frame>img,.ex-frame>video{display:block;width:auto;height:auto;max-width:min(42vw,960px);max-height:min(56vh,calc(100vh - 380px));position:static;transform:none;object-fit:contain}
 /* the hologram keeps its blue, with fine scan lines so the softness reads as projection */
-.ex-scene--scan::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(4,10,20,.32) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:multiply}
-.ex-scene--scan>video{filter:contrast(1.06) saturate(1.1)}
+.ex-scene--scan::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(4,10,20,.18) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:multiply}
+.ex-scene--scan>video{filter:brightness(1.22) saturate(.88)}
 @media (max-width:760px){
   .ex-frame{right:50%;top:50%;transform:translate(50%,-48%) scale(.97)}
   .ex-scene.is-on .ex-frame{transform:translate(50%,-50%)}

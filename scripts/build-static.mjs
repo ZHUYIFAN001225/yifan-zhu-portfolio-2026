@@ -27,7 +27,7 @@ const entries = [
   "project-storyboard-skill.html",
   "project-beauty-marketplace.html",
   "project-glasgow-booking.html",
-  "scripts/language.js",
+  "scripts/language.js","scripts/site-audio.js",
   "scripts/case-lightbox.js",
   "scripts/portfolio-catalog.mjs",
   "scripts/gallery.mjs",

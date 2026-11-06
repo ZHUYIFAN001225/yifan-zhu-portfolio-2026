@@ -276,8 +276,9 @@ let music = null;
 function wake() {
   if (!soundOn) return;
   try { ac ||= new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch { return; }
-  if (!music) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'deep');
+  if (!music && !window.siteMusic?.ready) music = startMusic(ac, new URLSearchParams(location.search).get('music') || 'deep');
 }
+addEventListener('portfolio:music', e => { soundOn = e.detail.on; soundBtn.setAttribute('aria-pressed', soundOn); try { localStorage.setItem('explore-sound', soundOn ? 'on' : 'off'); } catch {} if (!soundOn && music) { music.stop(); music = null; } });
 document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else if (soundOn) ac.resume(); });
 ['pointerdown', 'keydown', 'touchend'].forEach(t => addEventListener(t, wake, { passive: true }));
 function tone(f, dur, vol, type = 'sine', to = 0.62, delay = 0) {

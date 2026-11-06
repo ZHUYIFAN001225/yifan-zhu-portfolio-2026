@@ -46,7 +46,7 @@ export function mount(project) {
   render(); document.addEventListener('portfolio:language', render);
   cover.querySelector('.cs-down').addEventListener('click', e => { e.preventDefault(); main.scrollIntoView({ behavior: 'smooth' }); });
   const v = cover.querySelector('video'); if (v) { v.play?.().catch(() => {}); new IntersectionObserver(([en]) => en.isIntersecting ? v.play().catch(() => {}) : v.pause()).observe(cover); }
-  requestAnimationFrame(() => setTimeout(glassAll, 300));
+  requestAnimationFrame(() => setTimeout(() => { glassAll(); chapterBar(main, accent); }, 300));
 }
 
 // Glass: every picture and panel sits in a frosted frame. Under the pointer the frame's edge lights up,
@@ -68,4 +68,56 @@ function glassAll() {
     g.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(2) + '%');
     g.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(2) + '%');
   }, { passive: true });
+}
+
+// Chapter bar: one sticky strip of chapters for every case, the way Glasgow Salon Booking has one.
+// A lit line runs under the chapters already read; a small glass knob sits under the current one and slides as you read.
+function chapterBar(main, accent) {
+  const zhNow = zh();
+  // chapters: the page's own index when it has one, otherwise every section that carries a heading
+  let items = [];
+  const own = main.querySelector('.ux-case-index, .case-map nav');
+  if (own) items = [...own.querySelectorAll('a[href^="#"]')].filter(a => !a.matches('.ux-index-top,.ux-index-try') && document.querySelector(a.getAttribute('href'))).map(a => ({ id: a.getAttribute('href').slice(1), label: a.textContent.replace(/^\d+\s*/, '').trim() }));
+  if (items.length < 2) {
+    items = [];
+    main.querySelectorAll('section, article').forEach((sec, i) => {
+      if (sec.closest('.gl') || sec.querySelector(':scope section h2') && !sec.querySelector(':scope > h2, :scope > * > h2')) return;
+      const h = sec.querySelector(':scope > h2, :scope > * > h2, :scope > * > * > h2'); if (!h || sec.getBoundingClientRect().height < 120) return;
+      if (!sec.id) sec.id = 'chapter-' + (i + 1);
+      const k = sec.querySelector('.section-kicker, .eyebrow, .case-label, [class*="kicker"]');
+      let label = (k && k.textContent.trim().length <= 30 ? k.textContent : h.textContent).replace(/\s+/g, ' ').trim().replace(/[.。:：]$/, '');
+      if (label.length > 34) label = label.slice(0, 32).replace(/\s\S*$/, '') + '…';
+      items.push({ id: sec.id, label });
+    });
+  }
+  if (items[0] && items[0].label.endsWith('…')) items[0].label = zhNow ? '概览' : 'Overview';
+  items = items.filter((it, i, a) => a.findIndex(x => x.id === it.id) === i);
+  if (items.length < 2) return;
+  if (own) (own.closest('.case-map') || own).classList.add('cs-hidden-nav');
+
+  const bar = document.createElement('nav'); bar.className = 'cn'; bar.setAttribute('aria-label', zhNow ? '章节' : 'Chapters');
+  bar.innerHTML = `<div class="cn-in"><div class="cn-track"><i class="cn-line"></i><i class="cn-knob"></i></div>${items.map(it => `<a href="#${it.id}">${it.label}</a>`).join('')}<a class="cn-top" href="#top" aria-label="${zhNow ? '回到顶部' : 'Back to top'}">↑</a></div>`;
+  const cover = document.querySelector('.cs-cover'); (cover || main).after(bar);
+  bar.style.setProperty('--cn-accent', accent);
+  const links = [...bar.querySelectorAll('a:not(.cn-top)')], line = bar.querySelector('.cn-line'), knob = bar.querySelector('.cn-knob'), inner = bar.querySelector('.cn-in');
+  const secs = items.map(it => document.getElementById(it.id));
+  let cur = -1;
+  function place(i, animate = true) {
+    const a = links[i]; if (!a) return;
+    const x = a.offsetLeft + a.offsetWidth / 2;
+    knob.style.transform = `translateX(${x}px)`; line.style.width = x + 'px';
+    if (!animate) { knob.style.transition = 'none'; line.style.transition = 'none'; requestAnimationFrame(() => { knob.style.transition = ''; line.style.transition = ''; }); }
+    // keep the current chapter in view when the bar scrolls sideways
+    const il = inner.scrollLeft, iw = inner.clientWidth; if (a.offsetLeft < il + 24 || a.offsetLeft + a.offsetWidth > il + iw - 24) inner.scrollTo({ left: a.offsetLeft - iw / 2 + a.offsetWidth / 2, behavior: 'smooth' });
+  }
+  function spy() {
+    const y = innerHeight * 0.38; let i = 0;
+    secs.forEach((s, k) => { if (s && s.getBoundingClientRect().top <= y) i = k; });
+    if (i !== cur) { cur = i; links.forEach((a, k) => a.toggleAttribute('aria-current', k === i)); place(i); }
+    bar.classList.toggle('is-stuck', bar.getBoundingClientRect().top <= 0.5);
+  }
+  links.forEach((a, i) => a.addEventListener('click', e => { e.preventDefault(); const t = secs[i]; if (!t) return; const top = t.getBoundingClientRect().top + scrollY - bar.offsetHeight - 8; scrollTo({ top, behavior: 'smooth' }); history.replaceState(null, '', '#' + t.id); }));
+  bar.querySelector('.cn-top').addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: 'smooth' }); });
+  addEventListener('scroll', spy, { passive: true }); addEventListener('resize', () => { place(cur, false); }, { passive: true });
+  spy(); requestAnimationFrame(() => place(Math.max(0, cur), false));
 }

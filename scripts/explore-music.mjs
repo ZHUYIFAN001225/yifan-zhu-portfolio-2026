@@ -22,7 +22,9 @@ function impulse(ac, seconds, decay) {
   return buf;
 }
 
-export function startMusic(ac, styleName = 'kalimba', level = 0.42, { offline = false, seconds = 0 } = {}) {
+export function startMusic(ac, styleName = 'kalimba', level = 0.42, opts = {}) {
+  if (styleName === 'tech' || styleName === 'tech-ambient') return startTech(ac, styleName === 'tech', level, opts);
+  const { offline = false, seconds = 0 } = opts;
   const st = STYLES[styleName] || STYLES.kalimba;
   const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
   master.gain.setTargetAtTime(level, ac.currentTime, 1.2);
@@ -69,6 +71,90 @@ export function startMusic(ac, styleName = 'kalimba', level = 0.42, { offline = 
   }
   return {
     stop() { alive = false; clearTimeout(timer); master.gain.cancelScheduledValues(ac.currentTime); master.gain.setTargetAtTime(0, ac.currentTime, 0.4); setTimeout(() => { try { master.disconnect(); } catch {} }, 3000); },
+    duck(on) { master.gain.setTargetAtTime(on ? level * 0.45 : level, ac.currentTime, 0.4); }
+  };
+}
+
+// ---- tech: a light electronic piece. Plucked synth arpeggios through a ping-pong delay, a soft side-chained pad,
+// and (optionally) a gentle kick and hi-hat. Am – F – C – G.
+function startTech(ac, drums, level, { offline = false, seconds = 0 } = {}) {
+  const bpm = 104, s16 = 60 / bpm / 4, barLen = s16 * 16;
+  const CH = [[57, 60, 64, 67, 71], [53, 57, 60, 64, 67], [48, 55, 60, 64, 67], [55, 59, 62, 67, 69]]; // Am9 Fmaj9 Cadd9 G6
+  const BS = [33, 29, 36, 31];
+  const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+  master.gain.setTargetAtTime(level, ac.currentTime, 1);
+  const comp = ac.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 4; comp.connect(master);
+  // ping-pong delay, dotted eighth
+  const dL = ac.createDelay(2), dR = ac.createDelay(2), fb = ac.createGain(), dIn = ac.createGain(), dOut = ac.createGain();
+  dL.delayTime.value = s16 * 3; dR.delayTime.value = s16 * 3; fb.gain.value = 0.38; dOut.gain.value = 0.32;
+  const mL = ac.createChannelMerger(2); const dTone = ac.createBiquadFilter(); dTone.type = 'lowpass'; dTone.frequency.value = 3200;
+  dIn.connect(dTone).connect(dL); dL.connect(dR); dR.connect(fb).connect(dL);
+  dL.connect(mL, 0, 0); dR.connect(mL, 0, 1); mL.connect(dOut).connect(comp);
+  const verb = ac.createConvolver(); verb.buffer = impulse(ac, 2.2, 3.2); const wet = ac.createGain(); wet.gain.value = 0.22; verb.connect(wet).connect(comp);
+  // pad bus with side-chain style pumping on every beat
+  const padBus = ac.createGain(); padBus.gain.value = 1; const padLP = ac.createBiquadFilter(); padLP.type = 'lowpass'; padLP.frequency.value = 900; padLP.Q.value = 0.7;
+  padBus.connect(padLP); padLP.connect(comp); padLP.connect(verb);
+  const pluckBus = ac.createGain(); pluckBus.connect(comp); pluckBus.connect(dIn); pluckBus.connect(verb);
+  // the arp filter opens and closes over eight bars
+  const sweep = ac.createOscillator(), sweepAmt = ac.createGain(); sweep.frequency.value = 1 / (barLen * 8); sweepAmt.gain.value = 1300; sweep.connect(sweepAmt);
+  sweep.start();
+
+  function pluck(m, at, vel, pan) {
+    const f = 440 * Math.pow(2, (m - 69) / 12), o = ac.createOscillator(), o2 = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+    o.type = 'sawtooth'; o2.type = 'square'; o.frequency.value = f; o2.frequency.value = f * 1.003;
+    lp.type = 'lowpass'; lp.Q.value = 6; lp.frequency.setValueAtTime(2200, at); lp.frequency.exponentialRampToValueAtTime(500, at + 0.22); sweepAmt.connect(lp.detune);
+    g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(0.07 * vel, at + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.32);
+    const p = ac.createStereoPanner(); p.pan.value = pan;
+    const g2 = ac.createGain(); g2.gain.value = 0.5; o2.connect(g2).connect(lp); o.connect(lp); lp.connect(g).connect(p).connect(pluckBus);
+    o.start(at); o2.start(at); o.stop(at + 0.36); o2.stop(at + 0.36);
+    setTimeout(() => { try { sweepAmt.disconnect(lp.detune); } catch {} }, offline ? 0 : Math.max(0, (at - ac.currentTime + 0.5) * 1000));
+  }
+  function pad(notes, at, len) {
+    notes.slice(0, 4).forEach((m, i) => [-8, 8].forEach(dt => {
+      const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = 440 * Math.pow(2, (m - 12 * (i === 0 ? 1 : 0) - 69) / 12); o.detune.value = dt;
+      g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(0.018, at + 0.6); g.gain.setValueAtTime(0.018, at + len - 0.3); g.gain.linearRampToValueAtTime(0, at + len + 0.4);
+      o.connect(g).connect(padBus); o.start(at); o.stop(at + len + 0.5);
+    }));
+    for (let b = 0; b < 4; b++) { const t = at + b * s16 * 4; padBus.gain.setValueAtTime(0.25, t); padBus.gain.linearRampToValueAtTime(1, t + s16 * 3); }
+  }
+  function bass(m, at) {
+    const o = ac.createOscillator(), g = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'triangle'; o.frequency.value = 440 * Math.pow(2, (m - 69) / 12);
+    lp.type = 'lowpass'; lp.frequency.value = 400;
+    g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(0.16, at + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, at + s16 * 3.5);
+    o.connect(lp).connect(g).connect(comp); o.start(at); o.stop(at + s16 * 4);
+  }
+  let noise = null;
+  function hat(at, vel) {
+    if (!noise) { noise = ac.createBuffer(1, ac.sampleRate * 0.1, ac.sampleRate); const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const s = ac.createBufferSource(), hp = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = noise; hp.type = 'highpass'; hp.frequency.value = 8000;
+    g.gain.setValueAtTime(0.05 * vel, at); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.04);
+    s.connect(hp).connect(g).connect(comp); s.start(at); s.stop(at + 0.06);
+  }
+  function kick(at) {
+    const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(110, at); o.frequency.exponentialRampToValueAtTime(42, at + 0.12);
+    g.gain.setValueAtTime(0.32, at); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.28);
+    o.connect(g).connect(comp); o.start(at); o.stop(at + 0.3);
+  }
+  function blip(at) {
+    const o = ac.createOscillator(), g = ac.createGain(), p = ac.createStereoPanner(); o.type = 'sine'; o.frequency.setValueAtTime(1800 + Math.random() * 1600, at);
+    g.gain.setValueAtTime(0.025, at); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.07); p.pan.value = Math.random() * 1.6 - 0.8;
+    o.connect(g).connect(p).connect(dIn); o.start(at); o.stop(at + 0.08);
+  }
+  const ARP = [0, 2, 4, 2, 1, 3, 4, 3, 0, 2, 4, 2, 3, 1, 4, 2];
+  const t0 = ac.currentTime + 0.15;
+  function scheduleBar(b) {
+    const at = t0 + b * barLen, c = b % 4, ch = CH[c], round = Math.floor(b / 4);
+    pad(ch, at, barLen);
+    ARP.forEach((k, i) => { if (round === 0 && i % 2) return; pluck(ch[k] + (i >= 8 && round % 2 ? 12 : 0), at + i * s16, i % 4 === 0 ? 1 : 0.7, ((i % 4) - 1.5) * 0.3); });
+    if (b >= 2) [0, 6, 10].forEach(i => bass(BS[c] + 12, at + i * s16));
+    if (drums && b >= 4 && round % 4 !== 3) { [0, 8].forEach(i => kick(at + i * s16)); for (let i = 2; i < 16; i += 4) hat(at + i * s16, 1); if (round % 2) [5, 13].forEach(i => hat(at + i * s16, 0.5)); }
+    if (Math.random() < 0.5) blip(at + s16 * (3 + Math.floor(Math.random() * 12)));
+  }
+  let next = 0, timer = null, alive = true;
+  if (offline) { for (let b = 0; t0 + b * barLen < seconds; b++) scheduleBar(b); }
+  else { const pump = () => { if (!alive) return; while (t0 + next * barLen < ac.currentTime + 1.2) { if (t0 + next * barLen >= ac.currentTime - 0.05) scheduleBar(next); next++; } timer = setTimeout(pump, 250); }; pump(); }
+  return {
+    stop() { alive = false; clearTimeout(timer); master.gain.cancelScheduledValues(ac.currentTime); master.gain.setTargetAtTime(0, ac.currentTime, 0.4); setTimeout(() => { try { sweep.stop(); master.disconnect(); } catch {} }, 3000); },
     duck(on) { master.gain.setTargetAtTime(on ? level * 0.45 : level, ac.currentTime, 0.4); }
   };
 }

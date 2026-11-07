@@ -261,7 +261,8 @@ body.is-about .ex-icon--contact{display:none}
   body{touch-action:auto}
   .ex-bg{cursor:default}
   .ex-bg .ex-scene{display:none}
-  .ex-shade{background:linear-gradient(180deg,rgba(11,12,13,.96) 0%,rgba(11,12,13,.9) calc(var(--cb,150px) + 54px),rgba(11,12,13,0) calc(var(--cb,150px) + 110px));z-index:5}
+  .ex-shade{background:linear-gradient(180deg,rgba(11,12,13,.96) 0%,rgba(11,12,13,.9) calc(var(--cb,150px) + 54px),rgba(11,12,13,0) calc(var(--cb,150px) + 110px))!important;z-index:5}
+  .ex-domains{position:fixed}
   .ex-card,.ex-domains{z-index:9}
   .ex-arcs,.ex-dot,.ex-info,.ex-hint{display:none}
   .ex-nav{position:relative;inset:auto;z-index:4;pointer-events:auto;padding:calc(var(--cb,150px) + 66px) 16px calc(env(safe-area-inset-bottom) + 110px)}

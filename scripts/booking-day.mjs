@@ -24,7 +24,9 @@ export function mount() {
   // the cover holds still (sticky) while the desk opening plays
   { const op = document.querySelector('[data-opening]');
     if (op && !op.parentElement.matches('.bk-cover-pin') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {   // phones too: the desk opening runs everywhere
-      const pin = document.createElement('div'); pin.className = 'bk-cover-pin'; op.before(pin); pin.append(op); } }
+      const pin = document.createElement('div'); pin.className = 'bk-cover-pin'; op.before(pin); pin.append(op);
+      // the desk owns the opening: tell the case's phone stage now, before either has loaded, so its phone never stands up first
+      window.__bkCoverMap ||= { V: 'cards', S: 0, E: 1, DOCK: 1.02, keep: true }; document.documentElement.dataset.cover = 'desk'; } }
   Promise.all([import('./booking-hand.mjs'), import('./booking-domino.mjs'), import('./booking-chair.mjs'), import('./booking-map.mjs'), import('./booking-try.mjs'), import('./booking-set.mjs'), import('./booking-feel.mjs'), import('./booking-body.mjs')]).then(([h, d, c, mp, tr, cv, feel, body]) => { tr.mountTry(root); cv.mountDesk(root); feel.mountFeel(); body.mountBody(); h.mountHand(root, d.CHARS() + c.CHARS() + mp.CHARS() + tr.CHARS() + cv.CHARS()); d.mountDomino(root); c.mountChair(root); mp.mountMap(root); }).catch(e => console.error(e));
   stage(root, calm);
   regionTags(root);

@@ -265,7 +265,7 @@ body.is-about .ex-icon--contact{display:none}
   .ex-domains{position:fixed}
   .ex-card,.ex-domains{z-index:9}
   .ex-arcs,.ex-dot,.ex-info,.ex-hint{display:none}
-  .ex-nav{position:relative;inset:auto;z-index:4;pointer-events:auto;padding:calc(var(--cb,150px) + 66px) 16px calc(env(safe-area-inset-bottom) + 110px)}
+  .ex-nav{position:relative;inset:auto;z-index:auto;pointer-events:auto;padding:calc(var(--cb,150px) + 66px) 16px calc(env(safe-area-inset-bottom) + 110px)}
   .ex-projects{position:static;display:grid;gap:26px}
   .ex-proj{position:static;transform:none!important;opacity:1!important;visibility:visible!important;white-space:normal;will-change:auto}
   .ex-proj a.ex-feed-link{display:block;padding:0;text-decoration:none;color:var(--text);line-height:1.3;font-weight:430;letter-spacing:0;text-shadow:none;-webkit-tap-highlight-color:transparent}

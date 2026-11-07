@@ -15,13 +15,13 @@ const hm = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
 const T0 = 600, T1 = 1110; // 10:00 – 18:30
 
 const DAY = [
-  { id: 'chen', n: ['Chen', '陈'], s: ['short cut', '短发'], a: 600, l: 30 },
-  { id: 'emma', n: ['Emma', 'Emma'], s: ['long cut', '长发'], a: 630, l: 60 },
-  { id: 'wang', n: ['Wang', '王阿姨'], s: ['colour', '染发'], a: 720, l: 150 },
-  { id: 'gao', n: ['Gao', '高'], s: ['long cut', '长发'], a: 900, l: 60 },
-  { id: 'li', n: ['Li', '李'], s: ['long cut', '长发'], a: 990, l: 60 }
+  { id: 'chen', n: ['Chen', '陈'], s: ['men’s cut', '男士'], a: 600, l: 30 },
+  { id: 'emma', n: ['Emma', 'Emma'], s: ['women’s cut', '女士'], a: 630, l: 60 },
+  { id: 'wang', n: ['Wang', '王阿姨'], s: ['women’s cut ×2', '女士 ×2'], a: 720, l: 120 },
+  { id: 'gao', n: ['Gao', '高'], s: ['women’s cut', '女士'], a: 900, l: 60 },
+  { id: 'li', n: ['Li', '李'], s: ['women’s cut', '女士'], a: 990, l: 60 }
 ];
-const GAPS = [690, 870, 960, 1050]; // free starts that fit 30 minutes
+const GAPS = [690, 840, 960, 1050]; // free starts that fit 30 minutes
 const STEPS = [
   { t: ['She picks a service first.', '她先选服务。'], b: ['Only the gaps that fit 30 minutes light up in the diary.', '日程里只有放得下 30 分钟的空档会亮起来。'] },
   { t: ['She taps 11:30.', '她点了 11:30。'], b: ['The booking goes straight into the shared diary, at its real length.', '预约直接进入共享日程，按真实时长占位。'] },
@@ -33,10 +33,10 @@ const TX = {
   k: ['12:10 · One diary, two views', '12:10 · 一本日程，两种视图'], t: ['Everyone looks at the same diary.', '所有人看的，是同一本日程。'],
   stamp: ['Simplified screens · the real ones are in the screen map', '简化示意 · 真实界面见下方界面地图'],
   cust: ['Customer’s phone', '顾客的手机'], diary: ['The shared diary', '共享日程'], owner: ['Owner’s phone', '店主的手机'],
-  book: ['Book', '预约'], choose: ['Choose a service', '选择服务'], svc: [['Short cut', '短发'], ['Long cut', '长发'], ['Colour', '染发']],
+  book: ['Book', '预约'], choose: ['Choose a service', '选择服务'], svc: [['Men’s cut', '男士'], ['Women’s cut', '女士']],
   times: ['Times that fit', '放得下的时间'], booked: ['Booked', '已约好'], today: ['Today', '今天'],
-  closed: ['Closed', '已关闭'], resched: ['needs a new time', '需要重选时间'], mine: ['My bookings', '我的预约'], pick: ['New time', '新时间'], tue: ['Tue 10:00 · long cut', '周二 10:00 · 长发'],
-  mia: ['Mia', 'Mia'], short: ['short cut', '短发'], skip: ['Skip ↓', '跳过 ↓'], newb: ['new', '新']
+  closed: ['Closed', '已关闭'], resched: ['needs a new time', '需要重选时间'], mine: ['My bookings', '我的预约'], pick: ['New time', '新时间'], tue: ['Tue 10:00 · women’s cut', '周二 10:00 · 女士'],
+  mia: ['Mia', 'Mia'], short: ['men’s cut', '男士'], skip: ['Skip ↓', '跳过 ↓'], newb: ['new', '新']
 };
 export const CHARS = () => [...Object.values(TX).flat(2), ...STEPS.flatMap(s => [...s.t, ...s.b])].join('');
 
@@ -52,7 +52,7 @@ export function mountFlow(root, before) {
       <div class="bk-f2-col"><p class="bk-f2-who"><i class="is-c"></i><span class="l-cust"></span></p>
         <div class="bk-f2-phone">
           <div class="bk-f2-view v-book"><p class="bk-f2-bar l-book"></p><p class="bk-f2-lab l-choose"></p>
-            <div class="bk-f2-svc">${[0, 1, 2].map(i => `<span class="${i ? '' : 'is-pick'}"><b class="l-svc${i}"></b><em>${[30, 60, 180][i]}′</em></span>`).join('')}</div>
+            <div class="bk-f2-svc">${[0, 1].map(i => `<span class="${i ? '' : 'is-pick'}"><b class="l-svc${i}"></b><em>${[30, 60][i]}′</em></span>`).join('')}</div>
             <p class="bk-f2-lab l-times"></p><div class="bk-f2-times">${GAPS.map(g => `<span data-t="${g}">${hm(g)}</span>`).join('')}</div>
             <div class="bk-f2-ok"><b class="l-booked"></b><span>${hm(690)}–${hm(720)} · <i class="l-short"></i></span></div></div>
           <div class="bk-f2-view v-li"><p class="bk-f2-bar l-mine"></p><div class="bk-f2-card is-amber"><b>16:30 · <i class="l-li"></i></b><span class="l-resched"></span></div><p class="bk-f2-lab l-pick"></p><div class="bk-f2-card is-ok"><b class="l-tue"></b></div></div>

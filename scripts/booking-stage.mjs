@@ -22,15 +22,15 @@ const glide = t => (1 - Math.cos(Math.PI * t)) / 2; // the phone's journeys: unh
 const TAU = Math.PI * 2;
 
 // which part of each screen lifts out (x, y, w, h in % of the screen image)
-export const SPOT = { today: [2, 21.3, 96, 30.6], book: [2, 19, 96, 15], day: [2, 30.9, 96, 29.1], confirm: [3, 28.5, 94, 15.6], schedule: [4, 52.3, 94, 33.2], 'time-off-hours': [2, 34.8, 96, 25.6], kept: [2, 33, 96, 30.8], add: [2, 21.5, 96, 32.5], mine: [2, 16.5, 96, 31.5], services: [2, 16, 96, 38.5], 'by-time': [2, 22.7, 96, 39.2], booked: [2, 13.9, 96, 34.1], reschedule: [2, 22.4, 96, 36.5], window: [2, 22, 96, 36] }; // edges sit in the gaps between elements, so nothing is cut
+export const SPOT = { today: [2.1, 26.2, 95.9, 25.5], book: [2.1, 17.1, 95.9, 7.1], day: [2.1, 52.9, 95.9, 35.4], confirm: [2.1, 18.4, 95.9, 12.2], schedule: [2.1, 25.3, 95.9, 52.7], 'time-off-hours': [2.1, 72, 95.9, 13.6], kept: [2.1, 29.2, 95.9, 32.3], add: [2.1, 24.9, 95.9, 46.3], mine: [2.1, 25.7, 95.9, 25.6], services: [2.1, 20.6, 95.9, 21.6], 'by-time': [2.1, 31.2, 95.9, 32.7], booked: [2.1, 13.7, 95.9, 44.7], reschedule: [2.1, 8.5, 95.9, 84.7], window: [2.1, 25.9, 95.9, 25] }; // measured from the 2026-11 screens (% of the screen image); edges sit in the gaps between elements
 
 // the 12:10 story, one booking step by step. Pose: [x, y, size, rx, ry, rz]; x/y are screen fractions, size is phone height / screen height
 export const STEPS = [
-  { f: 'book', spot: SPOT.book, tap: [22, 27], kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] },
-  { f: 'day', spot: SPOT.day, tap: [50, 45], kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'], d: [0.62, 0.52, 0.74, 0.02, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
+  { f: 'book', spot: SPOT.book, tap: [28, 21], kicker: ['Customer · 12:10', '顾客 · 12:10'], title: ['The service comes first.', '先选服务。'], body: ['Its length is known before any time is shown, so only times that fit can appear.', '服务时长先确定，后面才可能只出现放得下的时间。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] },
+  { f: 'day', spot: SPOT.day, tap: [50, 69], kicker: ['Customer · 12:11', '顾客 · 12:11'], title: ['Only times that fit.', '只给放得下的时间。'], body: ['No “are you free at 2?” messages. Every time on offer is one the diary can actually hold.', '不用再发“两点有空吗？”。给出的每个时间，日程都真的放得下。'], d: [0.62, 0.52, 0.74, 0.02, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
   { f: 'confirm', spot: SPOT.confirm, travel: true, kicker: ['Customer · 12:12', '顾客 · 12:12'], title: ['One check, then book.', '核对一次，就约好了。'], body: ['Date, time and length in one card. Keep scrolling and watch it move into the owner’s diary.', '日期、时间、时长都在一张卡里。继续滚，看它走进店主的日程。'], d: [0.6, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .03, .14, 0] },
   { f: 'schedule', spot: SPOT.schedule, kicker: ['Owner · 12:12', '店主 · 12:12'], title: ['It lands in her diary by itself.', '它自己落进了店主的日程。'], body: ['The owner does nothing. The booking is already in her week, at the right length.', '店主什么都不用做。预约已经按正确的时长，出现在她这一周里。'], d: [0.62, 0.52, 0.74, 0.03, -0.08, 0], m: [.5, .35, .46, .02, -.1, 0] },
-  { f: 'time-off-hours', spot: SPOT['time-off-hours'], tap: [62, 48], kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] }
+  { f: 'time-off-hours', spot: SPOT['time-off-hours'], tap: [27, 79], kicker: ['Owner · 17:40', '店主 · 17:40'], title: ['She closes two hours. Nobody is deleted.', '她临时关掉两小时，没有人被删掉。'], body: ['The affected customer keeps her service and picks a new time.', '受影响的顾客保留原来的服务，重新选个时间就好。'], d: [0.62, 0.52, 0.74, 0.03, 0.08, 0], m: [.5, .35, .46, .02, .1, 0] }
 ];
 
 // one beat per piece of the long page: which element, which screen, and who is holding the phone
@@ -201,11 +201,11 @@ export function mountStage(root) {
       // It follows the pointer a little the whole time (still: true).
       // the cover introduces the product: the phone turns to face you, then one part of the screen lights up at a time
       // and a short message pops out beside it saying what it is — customer side first, then the owner's side.
-      const R = { svc: [2, 25.2, 96, 16.4], soon: [2, 43.2, 96, 5.8], cal: [2, 49.6, 96, 37.6], day: [2, 31.5, 96, 26], add: [2, 58.2, 96, 6], move: [2, 65, 96, 6.2] };
+      const R = { svc: [2.1, 17.1, 95.9, 7.1], soon: [2.1, 52.9, 95.9, 18.9], cal: [2.1, 31.2, 95.9, 10.4], day: [2.1, 26.2, 95.9, 25.5], add: [2.1, 53, 95.9, 6.4], move: [2.1, 60.6, 95.9, 6.4] };
       const B = [
         ['cover-book', R.svc, 'r', ['Customers pick a service first', '顾客先选服务'], ['Its length decides which times can fit.', '时长决定了哪些时间放得下。']],
-        ['cover-book', R.soon, 'l', ['The soonest time, one tap', '最早的时间，点一下就约'], ['Most people never open the calendar.', '大多数人不用翻日历。']],
-        ['cover-book', R.cal, 'r', ['Only days that are open', '只显示开门的日子'], ['No more “are you free on Friday?”', '不用再问“周五有空吗？”']],
+        ['cover-book', R.soon, 'l', ['The earliest time is marked', '最早的时间标出来了'], ['Times sit right under the days — no scrolling.', '时间就在日期下面，不用翻。']],
+        ['cover-book', R.cal, 'r', ['Days off are greyed out', '休息的日子是灰的'], ['No more “are you free on Friday?”', '不用再问“周五有空吗？”']],
         ['cover-today', R.day, 'l', ['Her side: the day at a glance', '店主这边：一眼看完今天'], ['The booking is already in her diary.', '刚约的那单，已经在她的日程里。']],
         ['cover-today', R.add, 'r', ['Regulars who phone? Add by name', '老顾客打电话？填名字就行'], ['No account, no WeChat needed.', '不用账号，不用微信。']],
         ['cover-today', R.move, 'l', ['Closing early moves bookings', '临时关门，预约自动移出'], ['Nobody is deleted; they pick a new time.', '没有人被删掉，顾客自己重选时间。']]
@@ -228,7 +228,7 @@ export function mountStage(root) {
         shot(4, 1.48, .1, TW + .1, 0, .11),     // push in on "add a booking"
         shot(5, 1.4, -.12, TW + .26, -.07, .11) // close-up, slight dutch angle
       ];
-      const WORDS = [['Service first', '先选服务'], ['Soonest, one tap', '最早，点一下'], ['Only open days', '只给开门的日子'], ['Her side', '她的那一边'], ['Add by name', '填名字就行'], ['Nobody lost', '没人被删掉']];
+      const WORDS = [['Service first', '先选服务'], ['Earliest, marked', '最早的标出来'], ['Days off, greyed', '休息日变灰'], ['Her side', '她的那一边'], ['Add by name', '填名字就行'], ['Nobody lost', '没人被删掉']];
       const SIDE = i => i < 3 ? ['Customer side', '顾客这边'] : ['Owner side', '店主这边'];
       let cap = op.querySelector('.bk-cap');
       if (!cap) { cap = document.createElement('div'); cap.className = 'bk-cap'; cap.setAttribute('aria-hidden', 'true'); op.append(cap); }

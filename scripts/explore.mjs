@@ -66,7 +66,6 @@ let dIdx = Math.max(0, DOMAINS.findIndex(d => d.id === qs.get('d')));
 let list = listOf(DOMAINS[dIdx].id);
 let target = Math.max(0, list.findIndex(p => p.id === qs.get('p')));
 let pos = target, dpos = dIdx, dTarget = dIdx, active = -1;
-const isM = () => innerWidth <= 760;
 
 const domEl = $('[data-domains]'), projEl = $('[data-projects]'), bg = $('.ex-bg');
 const arcD = $('.ex-arc--d'), arcP = $('.ex-arc--p'), tie = $('.ex-tie'), dotD = $('.ex-dot--d'), dotP = $('.ex-dot--p');
@@ -92,14 +91,7 @@ function renderDomains() {
   domEl.innerHTML = DOMAINS.map((d, j) => `<button type="button" class="ex-dom${j === dIdx ? ' is-on' : ''}" data-j="${j}" aria-pressed="${j === dIdx}">${L(d.label)}<small>${String(listOf(d.id).length).padStart(2, '0')}</small></button>`).join('');
   chipIntoView();
 }
-// On phones the arc becomes a feed: every project as a card with its own picture, read by normal scrolling.
-const thumbOf = p => { const s = sceneOf(p); const src = s.wall ? p.cover : (s.poster || s.img || p.cover); const portrait = s.wall || (!s.poster && !s.img); return { src: lang === 'zh' && s.zh ? s.zh : src, portrait }; };
-function renderFeed() {
-  projEl.innerHTML = list.map((p, i) => { const t = thumbOf(p); return `<li class="ex-proj ex-feed-item" data-i="${i}"><a href="${caseURL(p)}" class="ex-feed-link"><span class="ex-thumb${t.portrait ? ' is-portrait' : ''}">${t.portrait ? `<img class="ex-thumb-wash" src="${t.src}" alt="" aria-hidden="true" decoding="async" loading="lazy">` : ''}<img src="${t.src}" alt="" decoding="async" loading="${i < 2 ? 'eager' : 'lazy'}"></span><span class="ex-feed-meta"><span class="ex-feed-kind">${L(p.kind)}${p.tools ? ` · ${L(p.tools)}` : ''}</span><span class="ex-feed-title">${L(p.title)}</span><span class="ex-feed-line">${L(p.subtitle)}</span><span class="ex-feed-open">${L(T.open)} <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></span></span></a></li>`; }).join('');
-  projLis = []; $('[data-total]').textContent = String(list.length).padStart(2, '0');
-}
 function renderProjects() {
-  if (isM()) { renderFeed(); layout(); return; }
   projEl.innerHTML = list.map((p, i) => `<li class="ex-proj" data-i="${i}"><a href="${caseURL(p)}">${L(p.title)}</a></li>`).join('');
   projLis = $$('.ex-proj', projEl);
   $('[data-total]').textContent = String(list.length).padStart(2, '0');
@@ -158,24 +150,26 @@ function layout() {
   const cb = $('.ex-card').getBoundingClientRect().bottom;
   domEl.style.top = m ? (cb + 12) + 'px' : '';
   document.documentElement.style.setProperty('--cb', cb + 'px');
-  const cy = m ? vh * 0.4 : clamp(cb + (vh - cb) * 0.44, vh * 0.5, vh * 0.62);
+  const infoTop = $('.ex-info').getBoundingClientRect().top;
+  // phones: the names sit in the lower third, so the project's own picture shows above them
+  const cy = m ? clamp(infoTop - 118, vh * 0.5, vh * 0.68) : clamp(cb + (vh - cb) * 0.44, vh * 0.5, vh * 0.62);
   const R = m ? Math.max(380, vh * 0.6) : Math.max(560, vh * 0.82);
   const Ad = m ? 0 : clamp(vw * 0.19, 230, 330);
   const Ax = m ? 30 : Ad + 70;
   const cx = Ax - R, Rd = R - (Ax - Ad);
   const info = $('.ex-info').getBoundingClientRect();
-  G = { m, cy, R, Rd, cx, Ax, Ad, row: m ? 48 : 60, rowD: 46, big: m ? 26 : 34, small: m ? 16 : 20, floor: m ? info.top - 14 : vh - 40, ceil: m ? $('.ex-domains').getBoundingClientRect().bottom + 20 : cb + 26, info: $('.ex-info') };
+  G = { m, cy, R, Rd, cx, Ax, Ad, row: m ? 50 : 60, rowD: 46, big: m ? 24 : 34, small: m ? 15 : 20, floor: m ? info.top - 14 : vh - 40, ceil: m ? $('.ex-domains').getBoundingClientRect().bottom + 20 : cb + 26, info: $('.ex-info') };
   const svg = $('.ex-arcs'); svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
   const arc = (r, a) => { const p = t => `${(cx + r * Math.cos(t)).toFixed(1)} ${(cy + r * Math.sin(t)).toFixed(1)}`; return `M ${p(-a)} A ${r} ${r} 0 0 1 ${p(a)}`; };
   const span = Math.min(m ? 1.05 : 0.95, Math.asin(clamp((cy - G.ceil + 10) / R, 0, 1)), Math.asin(clamp((vh - cy - 30) / R, 0, 1)));
   arcP.setAttribute('d', arc(R, span)); arcD.setAttribute('d', m ? '' : arc(Rd, 0.5));
   tie.setAttribute('x1', Ad + 6); tie.setAttribute('x2', Ax - 9); tie.setAttribute('y1', cy); tie.setAttribute('y2', cy);
   dotP.style.transform = `translate(${Ax}px,${cy}px)`; dotD.style.transform = `translate(${Ad}px,${cy}px)`;
-  if (!m) $$('.ex-proj a', projEl).forEach(a => { a.style.fontSize = G.big + 'px'; });
+  $$('.ex-proj a', projEl).forEach(a => { a.style.fontSize = G.big + 'px'; });
   G.dw = $$('.ex-dom', domEl).map(b => b.offsetWidth);
 }
 function frame(force) {
-  if (G.m) return; // phones: the feed is laid out by CSS and scrolls natively
+  if (G.m) G.floor = G.info.getBoundingClientRect().top - 56;
   const { cx, cy, R, Rd, row, rowD, big, small, m } = G;
   const step = row / R, stepD = rowD / Rd;
   projLis.forEach((li, i) => {
@@ -187,7 +181,7 @@ function frame(force) {
     li.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translateY(-50%)`;
     li.firstChild.style.transform = `scale(${s.toFixed(3)})`;
     const edge = Math.min(1, Math.max(0, (G.floor - y) / 50), Math.max(0, (y - G.ceil) / 40));
-    li.style.opacity = ((ad < .5 ? 1 : clamp(0.82 - (ad - .5) * 0.2, 0, 0.82)) * edge).toFixed(3);
+    li.style.opacity = ((ad < .5 ? 1 : m ? clamp(0.7 - (ad - .5) * 0.3, 0, 0.7) : clamp(0.82 - (ad - .5) * 0.2, 0, 0.82)) * edge).toFixed(3);
     li.style.pointerEvents = edge < .3 ? 'none' : '';
   });
   if (!m) $$('.ex-dom', domEl).forEach((b, j) => {
@@ -232,7 +226,7 @@ function setDomain(j, gliding = false) {
   $$('.ex-dom', domEl).forEach((b, n) => { b.classList.toggle('is-on', n === j); b.setAttribute('aria-pressed', n === j); });
   chipIntoView();
   renderProjects();
-  if (G.m) { domEl.children[j]?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: calm ? 'auto' : 'smooth' }); scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' }); }
+  if (G.m) domEl.children[j]?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
 }
 const openActive = () => { const p = list[active]; if (!p) return; openSound(); setTimeout(() => { location.href = caseURL(p); }, ac ? 140 : 0); };
 
@@ -243,7 +237,7 @@ let snapT, dSnapT;
 const inDomainZone = e => !G.m && (e.target.closest?.('.ex-domains') || (e.clientX < G.Ad + 30 && e.clientY > G.ceil));
 addEventListener('mousemove', e => { document.body.classList.toggle('in-domains', !!inDomainZone(e)); }, { passive: true });
 addEventListener('wheel', e => {
-  if (panelTab || G.m) return;
+  if (panelTab) return;
   e.preventDefault();
   const px = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? innerHeight : 1;
   const dy = (Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * px;
@@ -258,8 +252,8 @@ addEventListener('wheel', e => {
 }, { passive: false });
 // touch: the arc follows the finger, then settles on the nearest project
 let ty = null, tStart = 0, tMoved = false;
-addEventListener('touchstart', e => { if (panelTab || G.m || e.target.closest?.('.ex-domains,.ex-about')) return; ty = e.touches[0].clientY; tStart = target; tMoved = false; }, { passive: true });
-addEventListener('touchmove', e => { if (ty === null) return; const dy = e.touches[0].clientY - ty; if (Math.abs(dy) > 6) tMoved = true; target = clamp(tStart - dy / G.row, -0.4, list.length - 0.6); }, { passive: true });
+addEventListener('touchstart', e => { if (panelTab || e.target.closest?.('.ex-domains,.ex-about')) return; ty = e.touches[0].clientY; tStart = target; tMoved = false; }, { passive: true });
+addEventListener('touchmove', e => { if (ty === null) return; const dy = e.touches[0].clientY - ty; if (Math.abs(dy) > 6) tMoved = true; target = clamp(tStart - dy / (G.row * 1.7), -0.4, list.length - 0.6); }, { passive: true });
 addEventListener('touchend', () => { if (ty === null) return; ty = null; go(Math.round(target)); });
 addEventListener('keydown', e => {
   if (e.key === 'Escape' && (panelTab || dock.classList.contains('is-open'))) return closePanel();
@@ -272,12 +266,11 @@ addEventListener('keydown', e => {
 });
 // clicks: a name that isn't current slides to the dot; the current one (or the picture) opens the case
 projEl.addEventListener('click', e => {
-  if (G.m) return; // feed cards are plain links
   const li = e.target.closest('.ex-proj'); if (!li) return;
   const i = +li.dataset.i; if (i !== active || tMoved) { e.preventDefault(); go(i); }
 });
 domEl.addEventListener('click', e => { const b = e.target.closest('.ex-dom'); if (b) setDomain(+b.dataset.j); });
-bg.addEventListener('click', () => { if (!tMoved && !G.m) openActive(); });
+bg.addEventListener('click', () => { if (!tMoved) openActive(); });
 
 // ---------- About (a page of type) and Contact (the dock opens in place) ----------
 const dock = $('[data-dock]'), aboutBtn = $('[data-about]'), contactBtn = $('[data-contact]'), aboutView = $('[data-about-view]');
@@ -335,7 +328,7 @@ $('[data-lang-toggle]').addEventListener('click', () => {
   scenes.forEach(s => s.remove()); scenes.clear(); active = -1; renderText();
 });
 let hintGone = false; const hideHint = () => { if (hintGone) return; hintGone = true; setTimeout(() => $('[data-hint]').classList.add('is-gone'), 1200); };
-let rz, wasM = isM(); addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (isM() !== wasM) { wasM = isM(); active = -1; renderProjects(); } layout(); frame(true); }, 120); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); frame(true); }, 120); });
 
 renderText();
 if (qs.get('view') === 'about') setAbout(true, false);

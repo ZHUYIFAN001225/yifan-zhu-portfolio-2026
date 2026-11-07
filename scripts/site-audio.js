@@ -89,6 +89,8 @@ html[data-theme=light] .site-music{background:rgba(255,255,255,.75);color:#111;b
   const label = () => btn.setAttribute('aria-label', on ? (zh() ? '背景音乐：开（点击关闭）' : 'Background music: on (tap to turn off)') : (zh() ? '背景音乐：关（点击打开）' : 'Background music: off (tap to turn on)'));
   label(); document.addEventListener('portfolio:language', label);
   btn.addEventListener('click', () => {
+    // Music is "on" but the browser hasn't let it start yet (no tap so far): this tap starts it, it doesn't turn it off.
+    if (on && !failed && (a.paused || level < 0.02) && !ducked) { update(true); return; }
     on = !on; try { localStorage.setItem(K.on, on ? 'on' : 'off'); } catch {}
     if (on) update(true); else fadeTo(0, 500);
     paint(); label(); window.dispatchEvent(new CustomEvent('portfolio:music', { detail: { on } }));

@@ -255,11 +255,32 @@ body.is-about .ex-icon--contact{display:none}
 .ex-facts dd{margin:0;color:var(--soft)}
 @media (max-width:760px){.ex-wins li{font-size:16px;padding-left:28px}.ex-facts{font-size:14px;gap:8px 16px}}
 
-/* ---- phones: the same scene, adapted. Picture on top, names low, info card at the bottom ---- */
+/* ---- phones: the arc becomes a feed of cards, read by normal scrolling ---- */
 @media (max-width:760px){
-  .ex-proj a{white-space:normal;max-width:calc(100vw - 86px);line-height:1.08}
-  .ex-shade{background:linear-gradient(180deg,rgba(8,9,10,.82) 0%,rgba(8,9,10,.55) calc(var(--cb,150px) + 40px),rgba(8,9,10,0) calc(var(--cb,150px) + 120px)),linear-gradient(180deg,rgba(8,9,10,0) 44%,rgba(8,9,10,.55) 66%,rgba(8,9,10,.94) 100%)!important}
-  .ex-domains{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent)}
-  .ex-info{bottom:calc(env(safe-area-inset-bottom) + 70px)}
-  .ex-kind{font-size:12px}
+  html,body{overflow:auto;height:auto;min-height:100%;overscroll-behavior:auto}
+  body{touch-action:auto}
+  .ex-bg{cursor:default}
+  .ex-bg .ex-scene{display:none}
+  .ex-shade{background:linear-gradient(180deg,rgba(11,12,13,.96) 0%,rgba(11,12,13,.9) calc(var(--cb,150px) + 54px),rgba(11,12,13,0) calc(var(--cb,150px) + 110px))!important;z-index:5}
+  .ex-domains{position:fixed}
+  .ex-card,.ex-domains{z-index:9}
+  .ex-arcs,.ex-dot,.ex-info,.ex-hint{display:none}
+  .ex-nav{position:relative;inset:auto;z-index:auto;pointer-events:auto;padding:calc(var(--cb,150px) + 66px) 16px calc(env(safe-area-inset-bottom) + 110px)}
+  .ex-projects{position:static;display:grid;gap:26px}
+  .ex-proj{position:static;transform:none!important;opacity:1!important;visibility:visible!important;white-space:normal;will-change:auto}
+  .ex-proj a.ex-feed-link{display:block;padding:0;text-decoration:none;color:var(--text);line-height:1.3;font-weight:430;letter-spacing:0;text-shadow:none;-webkit-tap-highlight-color:transparent}
+  .ex-feed-link:active .ex-thumb{transform:scale(.985)}
+  .ex-thumb{position:relative;display:block;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:#15171a;box-shadow:0 0 0 1px rgba(243,242,238,.1),0 18px 40px -22px rgba(0,0,0,.8);transition:transform .25s var(--ease)}
+  .ex-thumb>img,.ex-thumb>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .ex-thumb>video{opacity:0;transition:opacity .6s}.ex-thumb>video.is-playing{opacity:1}
+  .ex-thumb.is-portrait>img:not(.ex-thumb-wash){inset:9% auto 0 50%;width:46%;height:auto;max-height:none;transform:translateX(-50%);object-fit:cover;object-position:top;border-radius:14px 14px 0 0;box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)}
+  .ex-thumb-wash{filter:blur(28px) brightness(.55) saturate(1.2);transform:scale(1.3)}
+  .ex-feed-meta{display:block;padding:14px 4px 0}
+  .ex-feed-kind{display:block;font-size:12.5px;color:var(--faint)}
+  .ex-feed-title{display:block;margin-top:4px;font-size:22px;font-weight:520;letter-spacing:-.02em;line-height:1.15}
+  .ex-feed-line{display:block;margin-top:6px;font-size:14.5px;line-height:1.45;color:var(--soft)}
+  .ex-feed-open{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 13px;border:1px solid var(--glass-line);border-radius:999px;font-size:13px;color:var(--text)}
+  .ex-feed-open svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .ex-util{bottom:calc(env(safe-area-inset-bottom) + 18px)}
+  body.is-about{overflow:hidden}
 }

@@ -4597,3 +4597,17 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
 .dr-chain li:not(:last-child)::after{content:'→';position:absolute;right:-9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);background:var(--bg,#111);padding:0 1px}
 .dr-chain-note{font-size:13px;color:var(--muted);margin:14px 0 6px}
 .v3-card-tool{display:inline-block;margin:-2px 0 8px;padding:3px 8px;border-radius:999px;background:var(--line);font-size:9.5px;letter-spacing:.02em;color:var(--ink,inherit)}
+
+/* Glasgow opening, first paint: the old phone opening never shows; a soft still of the finished desk holds the
+   space (in focus as the live desk takes over) while the 3D loads. Reduced motion keeps the plain opening. */
+@media (prefers-reduced-motion:no-preference){
+  .bk-day .op--3d{background:#0e0c0a}
+  .bk-day .op--3d>:not(.bk-dk){visibility:hidden}
+  .bk-day .op--3d::before{content:"";position:absolute;inset:0;z-index:0;background:#0e0c0a url(assets/v3/desk/poster-wide.jpg) center top/100% auto no-repeat;filter:blur(10px);transform:scale(1.03);transform-origin:50% 0}
+  .bk-dk.is-loading{background:transparent}
+  .bk-dk.is-loading .bk-dk-gl{opacity:0!important}
+  .bk-dk.is-arriving .bk-dk-gl{transition:opacity .7s ease}
+}
+@media (prefers-reduced-motion:no-preference) and (max-aspect-ratio:4/5){
+  .bk-day .op--3d::before{background-image:url(assets/v3/desk/poster-tall.jpg);background-size:cover;background-position:center}
+}

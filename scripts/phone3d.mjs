@@ -183,7 +183,9 @@ export function mountPhone(host) {
 export function mountAll(root = document) {
   // each phone starts only when it is about to come into view — a phone that is never shown (hidden by the page's own
   // design) never takes a graphics context, its pictures or a frame loop; on phone browsers that memory is what runs out
-  const hosts = [...root.querySelectorAll('[data-phone3d]')];
+  // the Glasgow case opens on the 3D desk instead: its old opening phone is never shown, so it is never started
+  const deskOpening = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hosts = [...root.querySelectorAll('[data-phone3d]')].filter(h => !(deskOpening && h.closest('.bk-day [data-opening]')));
   if (!('IntersectionObserver' in window)) { hosts.forEach(h => mountPhone(h)); return; }
   const io = new IntersectionObserver(es => es.forEach(en => { const r = en.boundingClientRect; if (en.isIntersecting && r.width > 0 && r.height > 0) { io.unobserve(en.target); mountPhone(en.target); } }), { rootMargin: '100% 0px' });
   hosts.forEach(h => io.observe(h));

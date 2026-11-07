@@ -29,7 +29,8 @@ export function mountDesk(root) {
   if (!document.querySelector('link[data-inter-tight]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.dataset.interTight = ''; l.href = 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&display=swap'; document.head.append(l); }
   const liveA = op.querySelector('.op-actions a[target]');
 
-  const ov = document.createElement('div'); ov.className = 'bk-dk bk-set';
+  const ov = document.createElement('div'); ov.className = 'bk-dk bk-set is-loading';   // see-through over the soft still until the desk has really drawn
+  const arrive = () => { if (!ov.classList.contains('is-loading')) return; ov.classList.add('is-arriving'); requestAnimationFrame(() => ov.classList.remove('is-loading')); setTimeout(() => ov.classList.remove('is-arriving'), 900); };
   ov.innerHTML = `<canvas class="bk-dk-gl" aria-hidden="true"></canvas><div class="bk-dk-grain" aria-hidden="true"></div><div class="bk-dk-out" aria-hidden="true"></div>
     <div class="bk-dk-hero"><p class="bk-dk-tag"></p><h1 class="bk-dk-h"><b class="t1"></b><b class="t2"></b><b class="t3"></b></h1><p class="bk-dk-copy"></p>
       <div class="bk-dk-card"><p class="bk-dk-ck"></p><hr><p class="bk-dk-cd"></p><a class="bk-dk-live" target="_blank" rel="noopener"></a></div>
@@ -540,6 +541,7 @@ export function mountDesk(root) {
     lastDraw = now; lastPos.copy(cam.position); lastLook.copy(bLook); dirtyBody = false;
     const fu = post.uniforms; fu.uFocus.value = cam.position.distanceTo(bLook) * .55; fu.uRange.value = .06; fu.uMax.value = handset ? 0 : 4.5; fu.uJit.value = 0; fu.uVig.value = .85; fu.uFringe.value = 0;
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+    arrive();
     { const o = fade.toFixed(3); if (backdrop._o !== o) { backdrop._o = o; backdrop.style.opacity = o; } }
   }
   const svCache = {}; let opFlag = false;
@@ -619,6 +621,7 @@ export function mountDesk(root) {
       if (backdrop.classList.contains('is-soft')) { fu.uMax.value = Math.min(fu.uMax.value, 2 * dpr()); const f = kOut > .002 ? `blur(${(kOut * 14).toFixed(1)}px)` : ''; if (cv._f !== f) { cv._f = f; cv.style.filter = f; } }   // phones: the same soft blur as behind the page
     }
     renderer.setRenderTarget(rt); renderer.setClearColor(0x0e0c0a, 1); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+    if (ready) arrive();
     // the words
     const tHero = clamp((now - bornAt - 300) / 1900);   // the first heading arrives on load, the rest with the scroll
     sweep(GROUPS[0], calm ? 1 : tHero, lin(pr, .004, .085));

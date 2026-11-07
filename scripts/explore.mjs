@@ -65,7 +65,8 @@ const qs = new URLSearchParams(location.search);
 let dIdx = Math.max(0, DOMAINS.findIndex(d => d.id === qs.get('d')));
 let list = listOf(DOMAINS[dIdx].id);
 let target = Math.max(0, list.findIndex(p => p.id === qs.get('p')));
-let pos = target, dpos = dIdx, active = -1;
+let pos = target, dpos = dIdx, dTarget = dIdx, active = -1;
+const isM = () => innerWidth <= 760;
 
 const domEl = $('[data-domains]'), projEl = $('[data-projects]'), bg = $('.ex-bg');
 const arcD = $('.ex-arc--d'), arcP = $('.ex-arc--p'), tie = $('.ex-tie'), dotD = $('.ex-dot--d'), dotP = $('.ex-dot--p');
@@ -91,7 +92,14 @@ function renderDomains() {
   domEl.innerHTML = DOMAINS.map((d, j) => `<button type="button" class="ex-dom${j === dIdx ? ' is-on' : ''}" data-j="${j}" aria-pressed="${j === dIdx}">${L(d.label)}<small>${String(listOf(d.id).length).padStart(2, '0')}</small></button>`).join('');
   chipIntoView();
 }
+// On phones the arc becomes a feed: every project as a card with its own picture, read by normal scrolling.
+const thumbOf = p => { const s = sceneOf(p); const src = s.wall ? p.cover : (s.poster || s.img || p.cover); const portrait = s.wall || (!s.poster && !s.img); return { src: lang === 'zh' && s.zh ? s.zh : src, portrait }; };
+function renderFeed() {
+  projEl.innerHTML = list.map((p, i) => { const t = thumbOf(p); return `<li class="ex-proj ex-feed-item" data-i="${i}"><a href="${caseURL(p)}" class="ex-feed-link"><span class="ex-thumb${t.portrait ? ' is-portrait' : ''}">${t.portrait ? `<img class="ex-thumb-wash" src="${t.src}" alt="" aria-hidden="true" decoding="async" loading="lazy">` : ''}<img src="${t.src}" alt="" decoding="async" loading="${i < 2 ? 'eager' : 'lazy'}"></span><span class="ex-feed-meta"><span class="ex-feed-kind">${L(p.kind)}${p.tools ? ` · ${L(p.tools)}` : ''}</span><span class="ex-feed-title">${L(p.title)}</span><span class="ex-feed-line">${L(p.subtitle)}</span><span class="ex-feed-open">${L(T.open)} <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></span></span></a></li>`; }).join('');
+  projLis = []; $('[data-total]').textContent = String(list.length).padStart(2, '0');
+}
 function renderProjects() {
+  if (isM()) { renderFeed(); layout(); return; }
   projEl.innerHTML = list.map((p, i) => `<li class="ex-proj" data-i="${i}"><a href="${caseURL(p)}">${L(p.title)}</a></li>`).join('');
   projLis = $$('.ex-proj', projEl);
   $('[data-total]').textContent = String(list.length).padStart(2, '0');
@@ -163,11 +171,11 @@ function layout() {
   arcP.setAttribute('d', arc(R, span)); arcD.setAttribute('d', m ? '' : arc(Rd, 0.5));
   tie.setAttribute('x1', Ad + 6); tie.setAttribute('x2', Ax - 9); tie.setAttribute('y1', cy); tie.setAttribute('y2', cy);
   dotP.style.transform = `translate(${Ax}px,${cy}px)`; dotD.style.transform = `translate(${Ad}px,${cy}px)`;
-  $$('.ex-proj a', projEl).forEach(a => { a.style.fontSize = G.big + 'px'; });
+  if (!m) $$('.ex-proj a', projEl).forEach(a => { a.style.fontSize = G.big + 'px'; });
   G.dw = $$('.ex-dom', domEl).map(b => b.offsetWidth);
 }
 function frame(force) {
-  if (G.m) G.floor = G.info.getBoundingClientRect().top - 56;
+  if (G.m) return; // phones: the feed is laid out by CSS and scrolls natively
   const { cx, cy, R, Rd, row, rowD, big, small, m } = G;
   const step = row / R, stepD = rowD / Rd;
   projLis.forEach((li, i) => {
@@ -208,39 +216,41 @@ function tick(now) {
   const dt = Math.min(64, now - last) / 16.7; last = now;
   const a = calm ? 1 : 1 - Math.pow(1 - 0.13, dt);
   const before = pos + dpos * 100;
-  pos += (target - pos) * a; dpos += (dIdx - dpos) * a;
+  pos += (target - pos) * a; dpos += (dTarget - dpos) * a;
   if (Math.abs(target - pos) < 0.0005) pos = target;
-  if (Math.abs(dIdx - dpos) < 0.001) dpos = dIdx;
+  if (Math.abs(dTarget - dpos) < 0.001) dpos = dTarget;
   if (pos + dpos * 100 !== before) frame();
   requestAnimationFrame(tick);
 }
 const go = i => { target = clamp(i, 0, list.length - 1); hideHint(); };
-function setDomain(j) {
+function setDomain(j, gliding = false) {
   if (j === dIdx || j < 0 || j >= DOMAINS.length) return;
   const keep = list[active]?.id;
-  dIdx = j; list = listOf(DOMAINS[j].id); domSound();
+  dIdx = j; if (!gliding) dTarget = j; list = listOf(DOMAINS[j].id); domSound();
   const k = list.findIndex(p => p.id === keep);
   target = pos = k >= 0 ? k : 0; active = -1;
   $$('.ex-dom', domEl).forEach((b, n) => { b.classList.toggle('is-on', n === j); b.setAttribute('aria-pressed', n === j); });
   chipIntoView();
   renderProjects();
-  if (G.m) domEl.children[j]?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
+  if (G.m) { domEl.children[j]?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: calm ? 'auto' : 'smooth' }); scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' }); }
 }
 const openActive = () => { const p = list[active]; if (!p) return; openSound(); setTimeout(() => { location.href = caseURL(p); }, ac ? 140 : 0); };
 
 // wheel: the arc follows the wheel continuously, then settles on the nearest project.
-// Over the inner arc (the disciplines) the wheel steps through disciplines instead.
-let snapT, dAcc = 0, dLock = 0;
+// Over the inner arc the disciplines glide the same way: the arc turns with the wheel, the discipline under the dot
+// becomes current as it passes, and it settles on the nearest one when the wheel stops.
+let snapT, dSnapT;
 const inDomainZone = e => !G.m && (e.target.closest?.('.ex-domains') || (e.clientX < G.Ad + 30 && e.clientY > G.ceil));
 addEventListener('mousemove', e => { document.body.classList.toggle('in-domains', !!inDomainZone(e)); }, { passive: true });
 addEventListener('wheel', e => {
-  if (panelTab) return;
+  if (panelTab || G.m) return;
   e.preventDefault();
   const px = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? innerHeight : 1;
   const dy = (Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * px;
   if (inDomainZone(e)) {
-    const now = performance.now(); if (now < dLock) return;
-    dAcc += dy; if (Math.abs(dAcc) >= 50) { setDomain(dIdx + Math.sign(dAcc)); dAcc = 0; dLock = now + 420; }
+    dTarget = clamp(dTarget + dy / 140, -0.3, DOMAINS.length - 0.7);
+    const j = clamp(Math.round(dTarget), 0, DOMAINS.length - 1); if (j !== dIdx) setDomain(j, true);
+    clearTimeout(dSnapT); dSnapT = setTimeout(() => { dTarget = dIdx; }, 200);
     return;
   }
   target = clamp(target + dy / 105, -0.35, list.length - 0.65); hideHint();
@@ -248,7 +258,7 @@ addEventListener('wheel', e => {
 }, { passive: false });
 // touch: the arc follows the finger, then settles on the nearest project
 let ty = null, tStart = 0, tMoved = false;
-addEventListener('touchstart', e => { if (panelTab || e.target.closest?.('.ex-domains,.ex-about')) return; ty = e.touches[0].clientY; tStart = target; tMoved = false; }, { passive: true });
+addEventListener('touchstart', e => { if (panelTab || G.m || e.target.closest?.('.ex-domains,.ex-about')) return; ty = e.touches[0].clientY; tStart = target; tMoved = false; }, { passive: true });
 addEventListener('touchmove', e => { if (ty === null) return; const dy = e.touches[0].clientY - ty; if (Math.abs(dy) > 6) tMoved = true; target = clamp(tStart - dy / G.row, -0.4, list.length - 0.6); }, { passive: true });
 addEventListener('touchend', () => { if (ty === null) return; ty = null; go(Math.round(target)); });
 addEventListener('keydown', e => {
@@ -262,11 +272,12 @@ addEventListener('keydown', e => {
 });
 // clicks: a name that isn't current slides to the dot; the current one (or the picture) opens the case
 projEl.addEventListener('click', e => {
+  if (G.m) return; // feed cards are plain links
   const li = e.target.closest('.ex-proj'); if (!li) return;
   const i = +li.dataset.i; if (i !== active || tMoved) { e.preventDefault(); go(i); }
 });
 domEl.addEventListener('click', e => { const b = e.target.closest('.ex-dom'); if (b) setDomain(+b.dataset.j); });
-bg.addEventListener('click', () => { if (!tMoved) openActive(); });
+bg.addEventListener('click', () => { if (!tMoved && !G.m) openActive(); });
 
 // ---------- About (a page of type) and Contact (the dock opens in place) ----------
 const dock = $('[data-dock]'), aboutBtn = $('[data-about]'), contactBtn = $('[data-contact]'), aboutView = $('[data-about-view]');
@@ -324,7 +335,7 @@ $('[data-lang-toggle]').addEventListener('click', () => {
   scenes.forEach(s => s.remove()); scenes.clear(); active = -1; renderText();
 });
 let hintGone = false; const hideHint = () => { if (hintGone) return; hintGone = true; setTimeout(() => $('[data-hint]').classList.add('is-gone'), 1200); };
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); frame(true); }, 120); });
+let rz, wasM = isM(); addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (isM() !== wasM) { wasM = isM(); active = -1; renderProjects(); } layout(); frame(true); }, 120); });
 
 renderText();
 if (qs.get('view') === 'about') setAbout(true, false);

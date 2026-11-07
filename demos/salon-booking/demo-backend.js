@@ -633,7 +633,9 @@
       validateService(service);
       const policy = await tx.getPolicy();
       const bounds = bookingBounds(policy, now);
-      requireValue(input.date >= utcToLocalDateTime(now.toISOString()).date && input.date <= bounds.last, "OUTSIDE_BOOKING_WINDOW");
+      const todayLocal = utcToLocalDateTime(now.toISOString()).date;
+      requireValue(input.date >= todayLocal && input.date <= addLocalDays(todayLocal, 365), "OUTSIDE_BOOKING_WINDOW");
+      void bounds;
       const hours = (await tx.getBusinessHours()).find((h) => h.dayOfWeek === localDayOfWeek(input.date));
       requireValue(hours?.isOpen, "SHOP_CLOSED");
       const start = localDateTimeToUtc(input.date, input.startTime);
@@ -652,7 +654,7 @@
   }
 
   // web-demo/demo-backend.ts
-  var KEY = "glasgow-booking-web-demo-v1";
+  var KEY = "glasgow-booking-web-demo-v2";
   var ME = "demo-me";
   var OWNER = "demo-owner";
   var english = document.documentElement.lang.startsWith("en");
@@ -660,6 +662,7 @@
   function seed() {
     const now = /* @__PURE__ */ new Date(), data = emptyFixture(now), first = today();
     data.hours[0].isOpen = false;
+    data.services = [["men-cut", "\u7537\u58EB\u7406\u53D1", 30], ["women-cut", "\u5973\u58EB\u7406\u53D1", 60]].map(([serviceId, name, durationMin], i) => ({ serviceId, name, durationMin, isActive: true, displayOrder: i, createdAt: now.toISOString(), updatedAt: now.toISOString() }));
     const people = {
       [ME]: { name: english ? "You (demo)" : "\u4F60\uFF08\u6F14\u793A\u987E\u5BA2\uFF09", email: "you@example.com", phone: "" },
       c1: { name: "\u9648\u6653", email: "chen@example.com", phone: "07700 900111" },
@@ -671,7 +674,7 @@
       c7: { name: "\u8D75\u5148\u751F", email: "", phone: "07700 900777" },
       c8: { name: "Aisha Khan", email: "aisha@example.com", phone: "" }
     };
-    const svc = { 30: ["cut30", "\u77ED\u53D1\u526A\u53D1"], 60: ["cut60", "\u957F\u53D1\u526A\u53D1"], 180: ["colour180", "\u590D\u6742\u67D3\u6F02"] };
+    const svc = { 30: ["men-cut", "\u7537\u58EB\u7406\u53D1"], 60: ["women-cut", "\u5973\u58EB\u7406\u53D1"] };
     const book = (dayOffset, start, minutes, customerId, status = "booked", source = "web") => {
       const date = addLocalDays(first, dayOffset);
       if (localDayOfWeek(date) === 0) return;
@@ -693,12 +696,12 @@
     };
     book(0, "10:00", 30, "c1");
     book(0, "11:00", 60, "c2");
-    book(0, "14:00", 180, "c5");
+    book(0, "14:00", 60, "c5");
     book(0, "17:30", 30, "c3", "booked", "admin_manual");
     book(1, "10:30", 60, "c4");
     book(1, "13:00", 30, "c6");
     book(1, "15:00", 30, "c7", "booked", "admin_manual");
-    book(2, "10:00", 180, "c8");
+    book(2, "10:00", 60, "c8");
     book(2, "14:30", 30, "c1");
     book(3, "11:00", 30, "c2");
     book(3, "12:00", 60, "c5");
@@ -707,7 +710,7 @@
     book(4, "13:30", 60, "c4", "needs_reschedule");
     book(5, "11:30", 30, "c7");
     book(6, "10:00", 60, "c8");
-    book(8, "14:00", 180, "c2");
+    book(8, "14:00", 60, "c2");
     const partial = addLocalDays(first, 4);
     data.closures.push({ closureId: "demo-partial", type: "partial", startAt: instant(partial, "13:00"), endAt: instant(partial, "15:00"), status: "active", createdBy: OWNER, createdAt: now.toISOString() });
     return { data, people };
@@ -778,7 +781,7 @@
       const from = localDateTimeToUtc(first, "00:00").toISOString(), to = localDateTimeToUtc(addLocalDays(range.endDate, 1), "00:00").toISOString();
       const busy = (await tx.getAppointments(from, to)).filter((a) => ["booked", "in_progress"].includes(a.status) && a.appointmentId !== editing).map((a) => ({ startAt: a.startAt, endAt: a.endAt }));
       const closures = (await tx.getClosures(from, to)).filter((c) => c.status === "active").map((c) => ({ startAt: c.startAt, endAt: c.endAt }));
-      return { selectedServiceId: editing ? appointments.find((a) => a.appointmentId === editing)?.serviceId || svc?.serviceId || "" : svc?.serviceId || "", services, first, last, days, appointments, busy, closures, businessHours: await tx.getBusinessHours(), viewer: viewer() };
+      return { selectedServiceId: editing ? appointments.find((a) => a.appointmentId === editing)?.serviceId || svc?.serviceId || "" : svc?.serviceId || "", services, first, last, days, appointments, busy, closures, businessHours: await tx.getBusinessHours(), viewer: viewer(), lastPhone: state.people[ME].phone || "" };
     });
   }
   async function handle(method, url, body) {
@@ -792,6 +795,7 @@
         if (path.endsWith("/logout")) return json({ ok: true });
         if (path === "/api/create" || path === "/api/web/create") {
           const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+          demand(phone, 400, "PHONE_REQUIRED");
           demand(phoneOk(phone));
           result = await createAppointment({ customerId: ME, serviceId: body.serviceId, startAt: body.startAt, source: "web" }, repo, now);
           if (phone) state.people[ME].phone = phone;
@@ -801,7 +805,9 @@
         else if (path === "/api/admin/closure") {
           demand(["full_day", "partial"].includes(body.type));
           const startAt = localDateTimeToUtc(body.date, body.type === "full_day" ? "00:00" : body.startTime).toISOString();
-          const endAt = localDateTimeToUtc(body.type === "full_day" ? addLocalDays(body.date, 1) : body.date, body.type === "full_day" ? "00:00" : body.endTime).toISOString();
+          const lastDay = body.type === "full_day" && typeof body.endDate === "string" ? body.endDate : body.date;
+          demand(/^\d{4}-\d{2}-\d{2}$/.test(lastDay) && lastDay >= body.date, 400, "INVALID_RANGE");
+          const endAt = localDateTimeToUtc(body.type === "full_day" ? addLocalDays(lastDay, 1) : body.date, body.type === "full_day" ? "00:00" : body.endTime).toISOString();
           result = await createClosure({ type: body.type, startAt, endAt }, owner, repo, now);
         } else if (path === "/api/admin/remove-closure") result = await removeClosure(body.closureId, owner, repo);
         else if (path === "/api/admin/business-hours") result = await setBusinessHours(body.businessHours, owner, repo, { dryRun: body.dryRun === true, confirmExisting: body.confirmExisting === true }, now);
@@ -849,6 +855,46 @@
         const d = await snap((tx) => getAdminSchedule(date, tx));
         return json({ ...d, appointments: decorate(d.appointments), customers: customers() });
       }
+      if (path === "/api/admin/free") return json(await snap(async (tx) => {
+        const hours = (await tx.getBusinessHours()).find((h) => h.dayOfWeek === (/* @__PURE__ */ new Date(date + "T12:00:00Z")).getUTCDay());
+        if (!hours?.isOpen) return { date, open: false, free: [] };
+        const open = localDateTimeToUtc(date, hours.openTime).getTime(), close = localDateTimeToUtc(date, hours.closeTime).getTime();
+        const from = new Date(open).toISOString(), to = new Date(close).toISOString();
+        const blocks = [...(await tx.getClosures(from, to)).filter((c) => c.status === "active"), ...(await tx.getAppointments(from, to)).filter((a) => ["booked", "in_progress"].includes(a.status))].map((b) => [Date.parse(b.startAt), Date.parse(b.endAt)]).sort((a, b) => a[0] - b[0]);
+        const free = [];
+        let cur = Math.max(open, Date.now());
+        for (const [a, b] of blocks) {
+          if (b <= cur) continue;
+          if (a > cur) free.push({ startAt: new Date(cur).toISOString(), endAt: new Date(Math.min(a, close)).toISOString() });
+          cur = Math.max(cur, b);
+          if (cur >= close) break;
+        }
+        if (cur < close) free.push({ startAt: new Date(cur).toISOString(), endAt: new Date(close).toISOString() });
+        return { date, open: true, free };
+      }));
+      if (path === "/api/admin/month") {
+        const from = url.searchParams.get("from") || date, to = url.searchParams.get("to") || date;
+        demand(from <= to, 400, "INVALID_RANGE");
+        const startAt = localDateTimeToUtc(from, "00:00").toISOString(), endAt = localDateTimeToUtc(addLocalDays(to, 1), "00:00").toISOString();
+        return json(await snap(async (tx) => {
+          const live = (await tx.getAppointments(startAt, endAt)).filter((a) => ["booked", "in_progress", "needs_reschedule"].includes(a.status));
+          const counts = {};
+          for (const a of live) {
+            const d = utcToLocalDateTime(a.startAt).date;
+            counts[d] ?? (counts[d] = { booked: 0, pending: 0 });
+            if (a.status === "needs_reschedule") counts[d].pending++;
+            else counts[d].booked++;
+          }
+          const hm = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+          const affected = decorate(live.filter((a) => a.status === "booked" && new Date(a.startAt) > now)).map((a) => ({ date: utcToLocalDateTime(a.startAt).date, time: hm.format(new Date(a.startAt)), name: a.customerDisplayName }));
+          const closed = [];
+          for (const c of await tx.getClosures(startAt, endAt)) {
+            if (c.status !== "active" || c.type !== "full_day") continue;
+            for (let d = utcToLocalDateTime(c.startAt).date; d < utcToLocalDateTime(c.endAt).date; d = addLocalDays(d, 1)) closed.push(d);
+          }
+          return { from, to, counts, closed, affected };
+        }));
+      }
       if (path === "/api/admin/dashboard") {
         const d = await snap((tx) => getAdminDashboard(tx));
         return json({ ...d, schedule: { ...d.schedule, appointments: decorate(d.schedule.appointments), customers: customers() } });
@@ -883,6 +929,12 @@
   };
   (() => {
     const q = new URLSearchParams(location.search), wantEn = q.get("lang") === "en";
+    if (q.get("lang") === "en" || q.get("lang") === "zh") {
+      try {
+        localStorage.setItem("booking-lang", q.get("lang"));
+      } catch {
+      }
+    }
     if (wantEn && !english) {
       const file = location.pathname.endsWith("admin.html") ? "admin.html" : "";
       location.replace(location.pathname.replace(/[^/]*$/, "") + "en/" + file + location.search + location.hash);

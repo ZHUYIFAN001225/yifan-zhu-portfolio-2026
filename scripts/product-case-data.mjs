@@ -307,11 +307,11 @@ export const productCases=[{
     title:p('Booking rules that protect the owner','保护店主的预约规则'),
     items:[
       {title:p('The routine runs itself','日常自己运转'),body:p('Owner handles exceptions only.','店主只处理例外情况。')},
-      {title:p('Duration decides availability','时长决定能否预约'),body:p('150-min gap: yes to a cut, no to a colour.','150 分钟空档：能剪发，不能染发。')},
+      {title:p('Duration decides availability','时长决定能否预约'),body:p('45-min gap: yes to a men’s cut, no to a women’s cut.','45 分钟空档：能约男士理发，约不了女士理发。')},
       {title:p('Only valid start times','只开放规定的开始时间'),body:p('No “17:45” — the day stays unfragmented.','不会出现 17:45 这种零碎时间，一天不被切碎。')},
       {title:p('Recommend, don’t decide','推荐，但不替用户决定'),body:p('Suggested times save effort; any valid time stays open.','推荐时间帮顾客省心，其他可约时间也照样能选。')},
       {title:p('“Not open yet” ≠ “full”','「暂未开放」≠「已满」'),body:p('Owner sets how far ahead to open; no same-day bookings.','店主决定开放到哪天；不能预约当天。')},
-      {title:p('Protect long gaps','保护整块时间'),body:p('Suggestions fill small gaps first, so long blocks stay free for colours.','推荐先填小空档，把大块时间留给染发。')},
+      {title:p('Protect long gaps','保护整块时间'),body:p('Suggestions fill small gaps first, so long blocks stay free for longer services.','推荐先填小空档，把大块时间留给耗时更长的服务。')},
       {title:p('Never delete a booking','预约永不直接删除'),body:p('Closures move bookings to rescheduling.','临时关店时，预约转为待改期。')},
       {title:p('Low learning cost','学习成本要低'),body:p('Starts from “today”, like her paper diary.','从「今天」开始，像她的纸质本。')}
     ],

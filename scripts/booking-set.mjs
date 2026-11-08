@@ -30,7 +30,8 @@ export function mountDesk(root) {
   const liveA = op.querySelector('.op-actions a[target]');
 
   const ov = document.createElement('div'); ov.className = 'bk-dk bk-set is-loading';   // see-through over the soft still until the desk has really drawn
-  const arrive = () => { if (!ov.classList.contains('is-loading')) return; ov.classList.add('is-arriving'); requestAnimationFrame(() => ov.classList.remove('is-loading')); setTimeout(() => ov.classList.remove('is-arriving'), 900); };
+  const arrive = () => { if (!ov.classList.contains('is-loading')) return; ov.classList.add('is-arriving'); setTimeout(() => op.classList.add('is-live'), 900);   // the soft still has done its job: take it away so it can never show through later (the hand-over to the page fades the desk out)
+    requestAnimationFrame(() => ov.classList.remove('is-loading')); setTimeout(() => ov.classList.remove('is-arriving'), 900); };
   ov.innerHTML = `<canvas class="bk-dk-gl" aria-hidden="true"></canvas><div class="bk-dk-grain" aria-hidden="true"></div><div class="bk-dk-out" aria-hidden="true"></div>
     <div class="bk-dk-hero"><p class="bk-dk-tag"></p><h1 class="bk-dk-h"><b class="t1"></b><b class="t2"></b><b class="t3"></b></h1><p class="bk-dk-copy"></p>
       <div class="bk-dk-card"><p class="bk-dk-ck"></p><hr><p class="bk-dk-cd"></p><a class="bk-dk-live" target="_blank" rel="noopener"></a></div>

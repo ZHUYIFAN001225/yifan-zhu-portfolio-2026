@@ -4604,6 +4604,7 @@ html[data-body=a]:has(.bk-day) .v3-mobile-dock>*+*{border-left-color:rgba(255,25
   .bk-day .op--3d{background:#0e0c0a}
   .bk-day .op--3d>:not(.bk-dk){visibility:hidden}
   .bk-day .op--3d::before{content:"";position:absolute;inset:0;z-index:0;background:#0e0c0a url(assets/v3/desk/poster-wide.jpg) center top/100% auto no-repeat;filter:blur(10px);transform:scale(1.03);transform-origin:50% 0}
+  .bk-day .op--3d.is-live::before{content:none}
   .bk-dk.is-loading{background:transparent}
   .bk-dk.is-loading .bk-dk-gl{opacity:0!important}
   .bk-dk.is-arriving .bk-dk-gl{transition:opacity .7s ease}

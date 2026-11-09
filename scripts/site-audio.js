@@ -95,6 +95,36 @@ html[data-theme=light] .site-music{background:rgba(255,255,255,.75);color:#111;b
     if (on) update(true); else fadeTo(0, 500);
     paint(); label(); window.dispatchEvent(new CustomEvent('portfolio:music', { detail: { on } }));
   });
+  // ---- what is playing: a quiet caption beside the button, shown for a few seconds after a tap and while hovered
+  const info = document.createElement('div'); info.className = 'sm-info'; info.id = 'sm-info'; info.setAttribute('role', 'note');
+  info.innerHTML = '<span class="sm-info-t"><b>The Garden of Escapism</b> <span>Miro</span></span><small>Used with permission from the artist, for non-commercial portfolio use.</small>';
+  document.body.append(info); btn.setAttribute('aria-describedby', 'sm-info');
+  const ist = document.createElement('style'); ist.textContent = `
+.sm-info{position:fixed;z-index:61;max-width:min(320px,calc(100vw - 96px));padding:8px 13px 9px;border-radius:14px;border:1px solid rgba(243,242,238,.14);background:rgba(16,17,19,.72);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#f3f2ee;font:12px/1.35 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:0;opacity:0;transform:translateY(var(--sm-dy,6px));transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+.sm-info.is-shown{opacity:1;transform:none}
+.sm-info-t{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm-info-t b{font-weight:600}.sm-info-t span{opacity:.7;margin-left:4px}
+.sm-info small{display:block;margin-top:2px;font-size:10.5px;opacity:.5}
+html[data-theme=light] .sm-info{background:rgba(255,255,255,.86);color:#111;border-color:rgba(0,0,0,.1)}
+@media print{.sm-info{display:none}}
+@media (prefers-reduced-motion:reduce){.sm-info{transition:opacity .2s}}`;
+  document.head.append(ist);
+  let infoT = null;
+  const place = () => {   // just above the button (or below it when the button sits at the top), clear of anything beside it
+    const r = btn.getBoundingClientRect(), w = info.offsetWidth, h = info.offsetHeight, gap = 10;
+    const above = r.top - gap - h >= 8;
+    info.style.left = Math.min(innerWidth - w - 8, Math.max(8, r.right > innerWidth / 2 ? r.right - w : r.left)) + 'px';
+    info.style.top = (above ? r.top - gap - h : r.bottom + gap) + 'px';
+    info.style.setProperty('--sm-dy', above ? '6px' : '-6px');
+  };
+  const showInfo = ms => { if (btn.hidden) return; place(); info.classList.add('is-shown'); clearTimeout(infoT); if (ms) infoT = setTimeout(hideInfo, ms); };
+  const hideInfo = () => { clearTimeout(infoT); info.classList.remove('is-shown'); };
+  btn.addEventListener('click', () => showInfo(4500));
+  btn.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') showInfo(0); });
+  btn.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hideInfo(); });
+  btn.addEventListener('focus', () => { if (btn.matches(':focus-visible')) showInfo(0); });
+  btn.addEventListener('blur', hideInfo);
+  addEventListener('resize', () => { if (info.classList.contains('is-shown')) place(); });
   paint();
   // carry straight on when the page opens; browsers that need a tap first start on the first tap instead
   if (want()) update(false);
